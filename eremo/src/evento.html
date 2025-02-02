@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eremo Frate Francesco - Eventi Spirituali</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2C3E50;
+            --secondary: #3498DB;
+            --accent: #E74C3C;
+            --light: #ECF0F1;
+            --dark: #2C3E50;
+            --gradient: linear-gradient(135deg, var(--secondary), var(--primary));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--gradient);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin: 2rem auto;
+            padding: 2rem;
+            max-width: 800px;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .event-media {
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .event-media img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .event-media:hover img {
+            transform: scale(1.05);
+        }
+
+        .btn-reserve {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1rem;
+        }
+
+        .btn-reserve:hover {
+            opacity: 0.9;
+            letter-spacing: 2px;
+        }
+
+        .btn-reserve::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .btn-reserve:hover::after {
+            left: 120%;
+        }
+
+        .comments-section {
+            margin-top: 2rem;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-top: 1.5rem;
+        }
+
+        .comment {
+            background: rgba(241, 242, 246,0.5);
+            border-radius: 20px;
+            padding: 1rem;
+            margin: 2rem 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .comment:hover {
+            transform: translateX(10px);
+            background: rgba(241, 242, 246,0.8);
+        }
+
+        .reply {
+            margin-left: 2rem;
+            border-left: 3px solid var(--secondary);
+            padding-left: 1rem;
+        }
+
+        .like-system {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .like-btn, .dislike-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: white;
+        }
+
+        .like-btn:hover {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ECC71;
+        }
+
+        .dislike-btn:hover {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--accent);
+        }
+
+        .comment-form {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            margin: 2rem 0;
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .comment-form h4 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comment-form h4::before {
+            content: "✍️";
+            font-size: 1.2em;
+        }
+
+        .comment-form-container {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-end;
+        }
+
+        .comment-form textarea {
+            flex: 1;
+            padding: 1.2rem;
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            min-height: 120px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .comment-form textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.15);
+        }
+
+        .btn-comment {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: fit-content;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-comment i {
+            font-size: 1.2em;
+            margin-left: -5px;
+        }
+
+        .btn-comment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            letter-spacing: 1.5px;
+        }
+
+        @media (max-width: 768px) {
+            .comment-form-container {
+                flex-direction: column;
+            }
+
+            .btn-comment {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+    .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid var(--secondary);
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .loading-spinner {
+            animation: rotate 1s linear infinite;
+            display: none;
+            margin-left: 10px;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .meta-info {
+            position: relative;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .seats-available {
+            font-size: 1.2em;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .seats-available::before {
+            content: "🎟️";
+            font-size: 1.4em;
+        }
+
+        .btn-reserve {
+            padding: 18px 45px;
+            border-radius: 35px;
+            font-size: 1.2em;
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-reserve::before {
+            content: "✍️";
+            font-size: 1.2em;
+        }
+
+        .btn-reserve:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .meta-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+
+            .btn-reserve {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <h1>🏔️ Eremo Frate Francesco</h1>
+    <p>Cammino Spirituale nella Natura</p>
+</header>
+
+<div class="event-card">
+    <div class="event-media">
+        <img src="images/meditation.jpg"
+             alt="Event image"
+             class="event-image"
+             loading="lazy">
+    </div>
+
+    <div class="event-details">
+        <h2>Ritiro Meditativo nel Silenzio</h2>
+
+        <div class="meta-info">
+                <span class="seats-available">
+                    Posti disponibili: <span class="count">78</span>
+                </span>
+            <button class="btn-reserve">
+                Prenota Ora
+                <i class="fas fa-spinner loading-spinner"></i>
+            </button>
+        </div>
+
+        <div class="presenters">
+            <h3>Guide Spirituali:</h3>
+            <p>Fra Antonio, Suor Maria, Padre Riccardo</p>
+        </div>
+
+        <div class="target-audience">
+            <h3>A chi è rivolto:</h3>
+            <p>Cercatori di pace interiore e contemplazione</p>
+        </div>
+
+        <div class="comments-section">
+            <h3>Condivisioni</h3>
+
+            <div class="comment-form">
+                <h4>Condividi la tua esperienza</h4>
+                <div class="comment-form-container">
+                    <textarea placeholder="Scrivi qui il tuo commento..."></textarea>
+                    <button class="btn-comment">
+                        <i class="fas fa-paper-plane"></i>
+                        Pubblica
+                    </button>
+                </div>
+            </div>
+
+            <div class="comments-list">
+                <div class="comment">
+                    <div class="comment-header">
+                        <img src="https://www.gravatar.com/avatar/000?d=retro&s=45"
+                             class="user-avatar">
+                        <div>
+                            <strong>Maria Pace</strong>
+                            <small>2 ore fa</small>
+                        </div>
+                    </div>
+                    <p>Un'esperienza che rigenera l'anima 🌿</p>
+
+                    <div class="like-system">
+                        <button class="like-btn">
+                            <i class="fas fa-heart"></i> <span>12</span>
+                        </button>
+                        <button class="dislike-btn">
+                            <i class="fas fa-heart-broken"></i> <span>2</span>
+                        </button>
+                    </div>
+
+                    <div class="comment reply">
+                        <div class="comment-header">
+                            <img src="https://www.gravatar.com/avatar/placeholder@eremo.it?d=identicon&s=45"
+                                 class="user-avatar">
+                            <div>
+                                <strong>Eremo FF</strong>
+                                <small>1 ora fa</small>
+                            </div>
+                        </div>
+                        <p>Grazie Maria! La natura ci accoglie 🌄</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script>
+    // Configurazione iniziale
+    const eventId = 1;
+    const randomCategories = ['meditation', 'nature', 'church', 'forest', 'mountain',
+        'sunrise', 'candle', 'book', 'cross', 'community'];
+
+    // Utente demo
+    const currentUser = {
+        id: 1,
+        name: "Ospite",
+        email: "ospite@eremo.it",
+        avatar: getGravatar("ospite@eremo.it")
+    };
+
+    // Inizializzazione
+    document.addEventListener('DOMContentLoaded', () => {
+        initEvent(eventId);
+
+        document.querySelector('.btn-reserve').addEventListener('click', handleReservation);
+        document.querySelector('.btn-comment').addEventListener('click', addComment);
+        document.querySelectorAll('.like-btn, .dislike-btn').forEach(btn => {
+            btn.addEventListener('click', handleReaction);
+        });
+    });
+
+
+    function getGravatar(email, size=40) {
+        const hash = CryptoJS.MD5(email.trim().toLowerCase());
+        return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=retro`;
+    }
+
+    function handleReservation() {
+        const btn = document.querySelector('.btn-reserve');
+        const seatsElement = document.querySelector('.seats-available .count');
+        const currentSeats = parseInt(seatsElement.textContent);
+
+        if(currentSeats > 0) {
+            btn.disabled = true;
+            btn.querySelector('.loading-spinner').style.display = 'inline-block';
+
+            setTimeout(() => {
+                seatsElement.textContent = currentSeats - 1;
+                btn.disabled = false;
+                btn.querySelector('.loading-spinner').style.display = 'none';
+
+                seatsElement.classList.add('pulse-alert');
+                setTimeout(() => seatsElement.classList.remove('pulse-alert'), 1000);
+
+                const reservations = JSON.parse(localStorage.getItem('reservations') || '{}');
+                reservations[eventId] = (reservations[eventId] || 0) + 1;
+                localStorage.setItem('reservations', JSON.stringify(reservations));
+            }, 800);
+        }
+    }
+
+    function addComment() {
+        const textarea = document.querySelector('.comment-form textarea');
+        const commentList = document.querySelector('.comments-list');
+
+        if(textarea.value.trim()) {
+            const commentHtml = `
+                    <div class="comment">
+                        <div class="comment-header">
+                            <img src="${currentUser.avatar}" class="user-avatar">
+                            <strong>${currentUser.name}</strong>
+                            <small>Ora</small>
+                        </div>
+                        <p>${textarea.value}</p>
+                        <div class="like-system">
+                            <button class="like-btn">
+                                <i class="fas fa-heart"></i> <span>0</span>
+                            </button>
+                            <button class="dislike-btn">
+                                <i class="fas fa-heart-broken"></i> <span>0</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+            commentList.insertAdjacentHTML('afterbegin', commentHtml);
+            textarea.value = '';
+
+            document.querySelectorAll('.like-btn, .dislike-btn').forEach(btn => {
+                btn.addEventListener('click', handleReaction);
+            });
+        }
+    }
+
+    function handleReaction(e) {
+        const btn = e.currentTarget;
+        const countSpan = btn.querySelector('span');
+        const isLike = btn.classList.contains('like-btn');
+        const currentCount = parseInt(countSpan.textContent);
+
+        if(btn.classList.contains('active')) {
+            countSpan.textContent = currentCount - 1;
+            btn.classList.remove('active');
+        } else {
+            const oppositeBtn = btn.parentElement.querySelector(isLike ? '.dislike-btn' : '.like-btn');
+            if(oppositeBtn.classList.contains('active')) {
+                const oppositeCount = parseInt(oppositeBtn.querySelector('span').textContent);
+                oppositeBtn.querySelector('span').textContent = oppositeCount - 1;
+                oppositeBtn.classList.remove('active');
+            }
+
+            countSpan.textContent = currentCount + 1;
+            btn.classList.add('active');
+        }
+    }
+
+    function initEvent(eventId) {
+        const reservations = JSON.parse(localStorage.getItem('reservations') || '{}');
+        const initialSeats = 100 - (reservations[eventId] || 0);
+        document.querySelector('.seats-available .count').textContent = initialSeats;
+
+        document.querySelectorAll('.comment-header img').forEach(img => {
+            const username = img.nextElementSibling.textContent.trim();
+            img.src = getGravatar(`${username}@eremo.it`);
+        });
+    }
+</script>
+</body>
+</html>
