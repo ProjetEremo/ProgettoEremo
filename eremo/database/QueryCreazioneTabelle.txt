@@ -7,4 +7,99 @@ CREATE TABLE UtentiRegistrati(
   PRIMARY KEY (Contatto)
 )
 
+CREATE TABLE CategorieEventi(
+  IDCategoria INTEGER NOT NULL,
+  Tipologia VARCHAR(50) NOT NULL,
+  PRIMARY KEY (IDCategoria)
+)
+
+CREATE TABLE Eventi(
+  IDEvento INTEGER NOT NULL,
+  Durata VARCHAR(40),
+  Data DATE,
+  Titolo VARCHAR(50) NOT NULL,
+  Descrizione TEXT,
+  Associazione VARCHAR(50),
+  FlagPrenotabile BOOLEAN NOT NULL DEFAULT 1,
+  PostiDisponibili INTEGER,
+  Costo INTEGER,
+  IDCategoria INTEGER,
+  PRIMARY KEY (IDEvento),
+  FOREIGN KEY (IDCategoria) REFERENCES categorieeventi(IDCategoria) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+CREATE TABLE Prenotazioni(
+  Progressivo INTEGER NOT NULL,
+  NumeroPosti INTEGER NOT NULL,
+  Contatto VARCHAR(50) NOT NULL,
+  IDEvento INTEGER NOT NULL,
+  PRIMARY KEY (Progressivo),
+  FOREIGN KEY (Contatto) REFERENCES utentiregistrati(Contatto) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (IDEvento) REFERENCES eventi(IDEvento) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+CREATE TABLE Commenti(
+  Progressivo INTEGER NOT NULL,
+  Descrizione TEXT NOT NULL,
+  Data DATE NOT NULL,
+  CodRisposta INTEGER,
+  Contatto VARCHAR(50) NOT NULL,
+  IDEvento INTEGER NOT NULL,  
+  PRIMARY KEY (Progressivo),
+  FOREIGN KEY (Contatto) REFERENCES utentiregistrati(Contatto) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (IDEvento) REFERENCES eventi(IDEvento) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+CREATE TABLE UtentiInCoda(
+  Contatto VARCHAR(50) NOT NULL,
+  IDEvento INTEGER NOT NULL,
+  NumeroInCoda INTEGER NOT NULL,
+  PRIMARY KEY (Contatto,IDEvento),
+  FOREIGN KEY (Contatto) REFERENCES utentiregistrati(Contatto) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (IDEvento) REFERENCES eventi(IDEvento) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+CREATE TABLE Media(
+  Progressivo INTEGER NOT NULL,
+  Percorso VARCHAR(200) NOT NULL,
+  IDEvento INTEGER NOT NULL,
+  PRIMARY KEY (Progressivo),
+  FOREIGN KEY (IDEvento) REFERENCES eventi(IDEvento) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+CREATE TABLE Attori(
+  IDAttore INTEGER NOT NULL,
+  Nome VARCHAR(50) NOT NULL,
+  Cognome VARCHAR(50) NOT NULL,
+  NumeroDiTelefono VARCHAR(50),
+  Mail VARCHAR(50),
+  PRIMARY KEY (IDAttore)
+)
+
+CREATE TABLE AttoriEventi(
+  IDEvento INTEGER NOT NULL,
+  IDAttore INTEGER NOT NULL, 
+  PRIMARY KEY (IDEvento,IDAttore),
+  FOREIGN KEY (IDEvento) REFERENCES eventi(IDEvento) 
+  ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (IDAttore) REFERENCES attori(IDAttore) 
+  ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+
+
+
+
+
+
+
+
 
