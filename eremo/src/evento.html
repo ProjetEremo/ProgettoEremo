@@ -10,33 +10,37 @@
 </head>
 <body>
 <header>
-    <div class="navbar">
-        <div class="logo">
-            <a href="index.html">🏔️ Eremo Frate Francesco</a>
-        </div>
-        <div class="menu">
-            <a href="#chi-siamo.html">Chi siamo</a>
-            <a href="#contatti.html">Contatti</a>
-            <a href="#eventi-corso.html">Eventi in corso</a>
-            <a href="#eventi-passati.html">Eventi passati</a>
+    <div class="navbar-container">
+        <div class="navbar">
+            <div class="logo">
+                <span class="emoji">🏔️</span>
+                <span class="text">Eremo Frate Francesco</span>
+            </div>
+            <div class="menu">
+                <a href="#chi-siamo.html">Chi siamo</a>
+                <a href="#contatti.html">Contatti</a>
+                <a href="#eventi-corso.html">Eventi in corso</a>
+                <a href="#eventi-passati.html">Eventi passati</a>
+            </div>
+
+            <!-- Contenitore Login + Hamburger -->
+            <div class="right-menu">
+                <a href="#accedi" class="login">Accedi</a>
+                <button class="hamburger" onclick="toggleMenu()" aria-expanded="false">☰</button>
+            </div>
         </div>
 
-        <!-- Contenitore Login + Hamburger -->
-        <div class="right-menu">
-            <a href="#accedi" class="login">Accedi</a>
-            <button class="hamburger" onclick="toggleMenu()" aria-expanded="false">☰</button>
+        <!-- Menu Mobile -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#chi-siamo.html" onclick="closeMenu()">Chi siamo</a>
+            <a href="#contatti.html" onclick="closeMenu()">Contatti</a>
+            <a href="#eventi-corso.html" onclick="closeMenu()">Eventi in corso</a>
+            <a href="#eventi-passati.html" onclick="closeMenu()">Eventi passati</a>
         </div>
-    </div>
-
-    <!-- Menu Mobile -->
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="#chi-siamo.html" onclick="closeMenu()">Chi siamo</a>
-        <a href="#contatti.html" onclick="closeMenu()">Contatti</a>
-        <a href="#eventi-corso.html" onclick="closeMenu()">Eventi in corso</a>
-        <a href="#eventi-passati.html" onclick="closeMenu()">Eventi passati</a>
-        <a href="#accedi" onclick="closeMenu()">Accedi</a>
     </div>
 </header>
+
+
 
 <div class="event-card">
     <div class="event-media">
@@ -135,6 +139,25 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 <script>
+    function toggleMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.toggle('open');
+    }
+
+    function closeMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.remove('open');
+    }
+
+    // Chiudi il menu mobile quando si passa alla modalità desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            closeMenu();
+        }
+    });
+</script>
+
+<script>
     // Configurazione iniziale
     const eventId = 1;
     const currentUser = {
@@ -169,7 +192,9 @@
         });
     });
 
-    function handleReservation() {
+
+
+function handleReservation() {
         const btn = document.querySelector('.btn-reserve');
         const seatsElement = document.querySelector('.seats-available .count');
         const currentSeats = parseInt(seatsElement.textContent);
