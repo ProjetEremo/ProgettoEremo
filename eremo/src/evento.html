@@ -8,6 +8,170 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
+<style>
+    /* Layout migliorato */
+    .event-card {
+        max-width: 1280px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 30px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 3rem;
+        align-items: start;
+    }
+
+    /* Sezione sinistra - Contenuto principale */
+    .event-details {
+        padding-right: 3rem;
+        border-right: 2px solid rgba(0,0,0,0.05);
+    }
+
+    /* Sezione destra - Prenotazione */
+    .booking-column {
+        position: sticky;
+        top: 120px;
+        height: fit-content;
+    }
+
+    .booking-panel {
+        background: linear-gradient(135deg, #2C3E50, #3498DB);
+        border-radius: 25px;
+        padding: 2.5rem;
+        box-shadow: 0 15px 40px rgba(52,152,219,0.15);
+    }
+
+    /* Header migliorato */
+    .event-header {
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+    .event-title {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin: 2rem 0 1rem;
+        line-height: 1.2;
+    }
+
+    /* Grid informazioni */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .info-card {
+        background: rgba(241,242,246,0.4);
+        padding: 1.5rem;
+        border-radius: 15px;
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* Sezione prenotazione */
+    .booking-status {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        padding: 1rem;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        backdrop-filter: blur(5px);
+        animation: status-pulse 2s infinite;
+    }
+
+    @keyframes status-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+        100% { box-shadow: 0 0 0 15px rgba(255,255,255,0); }
+    }
+
+    .price-display {
+        font-size: 3rem;
+        color: white;
+        text-align: center;
+        margin: 2rem 0;
+    }
+
+    .meta-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .btn-reserve {
+        width: 100%;
+        padding: 1.2rem;
+        font-size: 1.1rem;
+        border-radius: 15px;
+        background: rgba(255,255,255,0.9);
+        color: var(--primary);
+        transition: all 0.3s ease;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .btn-reserve:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Sezione commenti */
+    .comments-section {
+        margin-top: 4rem;
+        padding-top: 3rem;
+        border-top: 2px solid rgba(0,0,0,0.05);
+    }
+
+    @media (max-width: 1024px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .event-details {
+            padding-right: 0;
+            border-right: none;
+        }
+
+        .booking-column {
+            position: static;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .event-card {
+            padding: 1.5rem;
+            border-radius: 20px;
+        }
+
+        .event-title {
+            font-size: 2rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
 <body>
 <header>
     <div class="navbar-container">
@@ -44,34 +208,85 @@
 
 <div class="event-card">
     <div class="event-media">
-        <img src="images/meditation.jpg"
-             alt="Event image"
-             class="event-image"
-             loading="lazy">
+        <img src="images/meditation.jpg" alt="Event image" class="event-image" loading="lazy">
     </div>
 
-    <div class="event-details">
-        <h2>Ritiro Meditativo nel Silenzio</h2>
+    <div class="main-grid">
+        <!-- Colonna sinistra -->
+        <div class="event-details">
+            <div class="event-header">
+                <h1 class="event-title">Ritiro Meditativo nel Silenzio</h1>
+                <div class="association-badge">Associazione: Cuori Spirituali</div>
+            </div>
 
-        <div class="meta-info">
-                <span class="seats-available">
-                    Posti disponibili: <span class="count">78</span>
-                </span>
-            <button class="btn-reserve">
-                Prenota Ora
-                <i class="fas fa-spinner loading-spinner"></i>
-            </button>
+            <div class="info-grid">
+                <div class="info-card">
+                    <i class="fas fa-clock"></i>
+                    <h4>Durata</h4>
+                    <p>3 Giorni</p>
+                    <small>15-17 Settembre 2024</small>
+                </div>
+
+                <div class="info-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h4>Location</h4>
+                    <p>Eremo Frate Francesco</p>
+                    <small>Monte Sereno, Italia</small>
+                </div>
+
+                <div class="info-card">
+                    <i class="fas fa-users"></i>
+                    <h4>Partecipanti</h4>
+                    <p>Max 20 persone</p>
+                    <small>Gruppo intimo</small>
+                </div>
+
+                <div class="info-card">
+                    <i class="fas fa-concierge-bell"></i>
+                    <h4>Servizi inclusi</h4>
+                    <ul>
+                        <li>Pensione completa</li>
+                        <li>Materiale didattico</li>
+                        <li>Assicurazione</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-card" style="grid-column: 1 / -1">
+                <i class="fas fa-book-open"></i>
+                <h3>Descrizione</h3>
+                <p class="description-text">Un viaggio rigenerante tra... [testo descrittivo]</p>
+            </div>
         </div>
 
-        <div class="presenters">
-            <h3>Guide Spirituali:</h3>
-            <p>Fra Antonio, Suor Maria, Padre Riccardo</p>
-        </div>
+        <!-- Colonna destra -->
+        <div class="booking-column">
+            <div class="booking-panel">
+                <div class="booking-status">
+                    <i class="fas fa-lock-open"></i>
+                    PRENOTAZIONI APERTE
+                </div>
 
-        <div class="target-audience">
-            <h3>A chi è rivolto:</h3>
-            <p>Cercatori di pace interiore e contemplazione</p>
+                <div class="price-display">
+                    € 120<small>,00</small>
+                </div>
+
+                <div class="meta-info">
+                    <span class="seats-available">
+                        <i class="fas fa-chair"></i>
+                        Posti disponibili:
+                        <span class="count">20</span>/20 <!-- Modifica da 12 a 20 -->
+                    </span>
+                    <!-- Modifica il pulsante prenota nell'HTML -->
+                    <button class="btn-reserve">
+                        Prenota Ora
+                        <i class="fas fa-spinner loading-spinner"></i>
+                    </button>
+                    </button>
+                </div>
+            </div>
         </div>
+    </div>
 
         <div class="comments-section">
             <div class="comment-form">
@@ -160,6 +375,7 @@
 <script>
     // Configurazione iniziale
     const eventId = 1;
+    const totalSeats = 20; // Aggiornato a 20 posti totali
     const currentUser = {
         id: 1,
         name: "Ospite",
@@ -171,58 +387,77 @@
     document.addEventListener('DOMContentLoaded', () => {
         initEvent(eventId);
 
-        // Gestione commento principale
+        // Delegazione eventi
         document.querySelector('.comment-form .btn-comment').addEventListener('click', () => addComment(false));
         document.querySelector('.btn-reserve').addEventListener('click', handleReservation);
 
-        // Delegazione eventi per commenti dinamici
         document.querySelector('.comments-list').addEventListener('click', function(e) {
-            // Gestione like/dislike
-            if(e.target.closest('.like-btn')) {
-                handleReaction(e);
-            }
-            // Gestione risposte
-            if(e.target.closest('.btn-reply')) {
-                toggleReplyForm(e);
-            }
-            // Gestione invio risposte
-            if(e.target.closest('.reply-form .btn-comment')) {
-                submitReply(e.target.closest('.btn-comment'));
-            }
+            if(e.target.closest('.like-btn')) handleReaction(e);
+            if(e.target.closest('.btn-reply')) toggleReplyForm(e);
+            if(e.target.closest('.reply-form .btn-comment')) submitReply(e.target.closest('.btn-comment'));
         });
     });
 
-
-
-function handleReservation() {
+    function handleReservation() {
         const btn = document.querySelector('.btn-reserve');
         const seatsElement = document.querySelector('.seats-available .count');
-        const currentSeats = parseInt(seatsElement.textContent);
-        const spinner = btn.querySelector('.loading-spinner');
+        let currentSeats = parseInt(seatsElement.textContent);
+        const spinner = btn.querySelector('.fa-spinner');
 
         if(currentSeats > 0 && !btn.disabled) {
             btn.disabled = true;
             spinner.style.display = 'inline-block';
 
+            // Simula chiamata API
             setTimeout(() => {
                 try {
-                    seatsElement.textContent = currentSeats - 1;
+                    currentSeats--;
+                    seatsElement.textContent = currentSeats;
+
+                    // Aggiorna localStorage
                     const reservations = JSON.parse(localStorage.getItem('reservations') || '{}');
-                    reservations[eventId] = (reservations[eventId] || 0) + 1;
+                    reservations[eventId] = (totalSeats - currentSeats);
                     localStorage.setItem('reservations', JSON.stringify(reservations));
 
-                    // Animazione conferma
+                    // Animazione
                     seatsElement.classList.add('pulse-alert');
                     setTimeout(() => seatsElement.classList.remove('pulse-alert'), 1000);
 
+                    // Disabilita bottone se esauriti
+                    if(currentSeats <= 0) {
+                        btn.disabled = true;
+                        document.querySelector('.booking-status').innerHTML = `
+                            <i class="fas fa-lock"></i>
+                            PRENOTAZIONI ESAURITE
+                        `;
+                    }
                 } catch (error) {
                     console.error('Errore prenotazione:', error);
-                    seatsElement.textContent = currentSeats;
+                    seatsElement.textContent = currentSeats + 1;
                 } finally {
                     btn.disabled = false;
                     spinner.style.display = 'none';
                 }
             }, 800);
+        }
+    }
+
+    // Funzione init aggiornata
+    function initEvent(eventId) {
+        const reservations = JSON.parse(localStorage.getItem('reservations') || '{}');
+        const reserved = reservations[eventId] || 0;
+        const initialSeats = totalSeats - reserved; // Usa totalSeats invece di 100
+
+        const seatsElement = document.querySelector('.seats-available .count');
+        seatsElement.textContent = initialSeats;
+
+        // Aggiorna stato prenotazioni
+        if(initialSeats <= 0) {
+            document.querySelector('.booking-status').innerHTML = `
+            <i class="fas fa-lock"></i>
+            PRENOTAZIONI ESAURITE
+        `;
+            document.querySelector('.btn-reserve').disabled = true;
         }
     }
 
@@ -346,12 +581,6 @@ function handleReservation() {
     function getGravatar(email, size=40) {
         const hash = CryptoJS.MD5(email.trim().toLowerCase());
         return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=retro`;
-    }
-
-    function initEvent(eventId) {
-        const reservations = JSON.parse(localStorage.getItem('reservations') || '{}');
-        const initialSeats = 100 - (reservations[eventId] || 0);
-        document.querySelector('.seats-available .count').textContent = initialSeats;
     }
 
     function toggleMenu() {
