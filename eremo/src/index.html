@@ -147,19 +147,51 @@
             font-weight: bold;
         }
 
+        /* Bottone Prenota Animato */
         .btn-prenota {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 15px;
             background: var(--gradient);
             color: white;
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
         }
 
-        .btn-prenota:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(52,152,219,0.3);
+        .btn-prenota i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-prenota:hover i {
+            transform: translateX(5px);
+        }
+
+        .btn-prenota::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+            transparent 20%,
+            rgba(255,255,255,0.1) 50%,
+            transparent 80%);
+            transform: rotate(45deg);
+            animation: btn-glow 3s infinite linear;
+        }
+
+        @keyframes btn-glow {
+            0% { transform: rotate(45deg) translate(-50%, -50%); }
+            100% { transform: rotate(45deg) translate(50%, 50%); }
         }
 
         @media (max-width: 768px) {
@@ -277,7 +309,7 @@
     <div class="events-grid">
         <!-- Evento 1 -->
         <div class="event-card">
-            <div class="event-image" style="background-image: url('https://source.unsplash.com/random/800x600?retreat')">
+            <div class="event-image" style="background-image: url('https://picsum.photos/800/600?random=?retreat')">
                 <span class="event-price">€120</span>
             </div>
             <div class="event-content">
@@ -289,7 +321,7 @@
 
         <!-- Evento 2 -->
         <div class="event-card">
-            <div class="event-image" style="background-image: url('https://source.unsplash.com/random/800x600?yoga')">
+            <div class="event-image" style="background-image: url('https://picsum.photos/800/600?random=?yoga')">
                 <span class="event-price">€90</span>
             </div>
             <div class="event-content">
@@ -301,7 +333,7 @@
 
         <!-- Evento 3 -->
         <div class="event-card">
-            <div class="event-image" style="background-image: url('https://source.unsplash.com/random/800x600?hiking')">
+            <div class="event-image" style="background-image: url('https://picsum.photos/800/600?random=?hiking')">
                 <span class="event-price">€150</span>
             </div>
             <div class="event-content">
@@ -312,6 +344,14 @@
         </div>
     </div>
 </section>
+
+<script>
+    // Script per immagini casuali da Picsum
+    document.querySelectorAll('.home-event-image').forEach(img => {
+        const randomId = Math.floor(Math.random() * 1000);
+        img.style.backgroundImage = `url(https://picsum.photos/800/600?random=${randomId})`;
+    });
+</script>
 
 <script>
     // Animazione Carosello
