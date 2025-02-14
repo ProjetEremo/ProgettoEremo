@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="images/logo.png" type="image/x-icon">
     <title>Eremo Frate Francesco</title>
+    <link rel="stylesheet" href="style.css">
     <style>
+        /* Aggiungi questi stili */
         :root {
             --primary: #2C3E50;
             --secondary: #3498DB;
@@ -14,70 +16,285 @@
             --dark: #2C3E50;
             --gradient: linear-gradient(135deg, var(--secondary), var(--primary));
         }
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
+
+        .hero-carousel {
+            position: relative;
+            height: 70vh;
+            overflow: hidden;
+            border-radius: 20px;
+            margin: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
         }
-        .navbar {
-            background: var(--gradient);
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: var(--light);
+
+        .carousel-inner {
+            position: relative;
+            height: 100%;
+            transition: transform 1s ease-in-out;
         }
-        .navbar .logo {
-            font-size: 22px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
+
+        .carousel-item {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
         }
-        .navbar .logo a {
-            color: var(--light);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
+
+        .carousel-item.active {
+            opacity: 1;
+            z-index: 1;
         }
-        .navbar .logo a:hover {
-            text-decoration: underline;
+
+        .carousel-caption {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+            text-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            width: 80%;
         }
-        .navbar .menu {
-            display: flex;
-            gap: 20px;
+
+        .carousel-title {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            transform: scale(1.2);
+            transition: all 0.5s ease;
+            opacity: 0;
         }
-        .navbar .menu a {
-            color: var(--light);
-            text-decoration: none;
-            font-size: 16px;
+
+        .carousel-description {
+            font-size: 1.2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
         }
-        .navbar .menu a:hover {
-            text-decoration: underline;
+
+        .carousel-item.active .carousel-title {
+            opacity: 1;
+            transform: scale(1);
         }
-        .navbar .login {
+
+        .carousel-item.active .carousel-description {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            width: 100%;
+            z-index: 2;
+        }
+
+        .progress {
+            height: 100%;
             background: var(--light);
-            color: var(--secondary);
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
+            width: 0%;
+            transition: width 5s linear;
+        }
+
+        .events-section {
+            padding: 4rem 2rem;
+            background: var(--light);
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .event-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .event-content {
+            padding: 1.5rem;
+        }
+
+        .event-price {
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
             font-weight: bold;
         }
-        .navbar .login:hover {
-            background: #ddd;
+
+        .btn-prenota {
+            background: var(--gradient);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-prenota:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(52,152,219,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .hero-carousel {
+                height: 50vh;
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .carousel-title {
+                font-size: 2rem;
+            }
+
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <div class="logo">
-            <a href="index.html">🏔️ Eremo Frate Francesco</a>
-        </div>
-        <div class="menu">
-            <a href="#chi-siamo.html">Chi siamo</a>
-            <a href="#contatti.html">Contatti</a>
-            <a href="#eventi-corso.html">Eventi in corso</a>
-            <a href="#eventi-passati.html">Eventi passati</a>
-        </div>
-        <a href="#accedi" class="login">Accedi</a>
+<div class="navbar">
+    <div class="logo">
+        <a href="index.html">🏔️ Eremo Frate Francesco</a>
     </div>
+    <div class="menu">
+        <a href="#chi-siamo.html">Chi siamo</a>
+        <a href="#contatti.html">Contatti</a>
+        <a href="#eventi-corso.html">Eventi in corso</a>
+        <a href="#eventi-passati.html">Eventi passati</a>
+    </div>
+    <a href="#accedi" class="login">Accedi</a>
+</div>
+
+<!-- Carosello Hero -->
+<div class="hero-carousel">
+    <div class="carousel-inner">
+        <!-- Item 1 -->
+        <div class="carousel-item active" style="background-image: url('https://source.unsplash.com/random/1920x1080?meditation')">
+            <div class="carousel-caption">
+                <h2 class="carousel-title">Ritiro Spirituale</h2>
+                <p class="carousel-description">Rigenera corpo e mente nella natura incontaminata</p>
+            </div>
+        </div>
+        <!-- Item 2 -->
+        <div class="carousel-item" style="background-image: url('https://source.unsplash.com/random/1920x1080?yoga')">
+            <div class="carousel-caption">
+                <h2 class="carousel-title">Yoga Meditativo</h2>
+                <p class="carousel-description">Trova l'armonia tra movimento e quiete interiore</p>
+            </div>
+        </div>
+        <!-- Item 3 -->
+        <div class="carousel-item" style="background-image: url('https://source.unsplash.com/random/1920x1080?mountains')">
+            <div class="carousel-caption">
+                <h2 class="carousel-title">Cammino Interiore</h2>
+                <p class="carousel-description">Esplora sentieri fisici e spirituali</p>
+            </div>
+        </div>
+    </div>
+    <div class="progress-bar">
+        <div class="progress"></div>
+    </div>
+</div>
+
+<!-- Sezione Eventi -->
+<section class="events-section">
+    <div class="events-grid">
+        <!-- Evento 1 -->
+        <div class="event-card">
+            <div class="event-image" style="background-image: url('https://source.unsplash.com/random/800x600?retreat')">
+                <span class="event-price">€120</span>
+            </div>
+            <div class="event-content">
+                <h3>Ritiro del Silenzio</h3>
+                <p>3 giorni di meditazione guidata nella natura</p>
+                <button class="btn-prenota">Prenota Ora</button>
+            </div>
+        </div>
+
+        <!-- Evento 2 -->
+        <div class="event-card">
+            <div class="event-image" style="background-image: url('https://source.unsplash.com/random/800x600?yoga')">
+                <span class="event-price">€90</span>
+            </div>
+            <div class="event-content">
+                <h3>Yoga Avanzato</h3>
+                <p>Masterclass con istruttori certificati</p>
+                <button class="btn-prenota">Prenota Ora</button>
+            </div>
+        </div>
+
+        <!-- Evento 3 -->
+        <div class="event-card">
+            <div class="event-image" style="background-image: url('https://source.unsplash.com/random/800x600?hiking')">
+                <span class="event-price">€150</span>
+            </div>
+            <div class="event-content">
+                <h3>Trekking Spirituale</h3>
+                <p>Camminate contemplative con guide esperte</p>
+                <button class="btn-prenota">Prenota Ora</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Animazione Carosello
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.carousel-item');
+    const progress = document.querySelector('.progress');
+
+    function nextSlide() {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+        progress.style.width = '0%';
+        void progress.offsetWidth; // Trigger reflow
+        progress.style.width = '100%';
+    }
+
+    // Inizia animazione
+    progress.style.width = '100%';
+    setInterval(nextSlide, 5000);
+
+    // Animazione testi
+    slides.forEach(slide => {
+        slide.addEventListener('transitionend', () => {
+            const title = slide.querySelector('.carousel-title');
+            const description = slide.querySelector('.carousel-description');
+            if(slide.classList.contains('active')) {
+                title.style.transition = 'all 0.5s ease 0.3s';
+                description.style.transition = 'all 0.5s ease 0.5s';
+            }
+        });
+    });
+</script>
+
 </body>
 </html>
