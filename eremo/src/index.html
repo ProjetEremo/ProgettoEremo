@@ -349,21 +349,58 @@
 </script>
 
 <script>
+    function toggleMenu() {
+        const menu = document.getElementById("mobileMenu");
+        const button = document.querySelector(".hamburger");
+        const isOpen = menu.classList.toggle("open");
+        button.classList.toggle("open");
+        button.setAttribute("aria-expanded", isOpen);
+    }
+
+    function closeMenu() {
+        document.getElementById("mobileMenu").classList.remove("open");
+        document.querySelector(".hamburger").classList.remove("open");
+        document.querySelector(".hamburger").setAttribute("aria-expanded", "false");
+    }
+
+    // Chiudi il menu mobile quando si passa alla modalità desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            closeMenu();
+        }
+    });
+
+
+</script>
+
+<script>
     // Animazione Carosello
     let currentSlide = 0;
     const slides = document.querySelectorAll('.carousel-item');
     const progress = document.querySelector('.progress');
 
+    // Imposta la transizione iniziale per la progress bar
+    progress.style.transition = 'width 5s linear';
+
     function nextSlide() {
+        // Passa alla slide successiva
         slides[currentSlide].classList.remove('active');
         currentSlide = (currentSlide + 1) % slides.length;
         slides[currentSlide].classList.add('active');
+
+        // Resetta la progress bar disabilitando momentaneamente la transizione
+        progress.style.transition = 'none';
         progress.style.width = '0%';
-        void progress.offsetWidth; // Trigger reflow
+
+        // Forza il reflow per far sì che il browser applichi immediatamente la modifica
+        void progress.offsetWidth;
+
+        // Riattiva la transizione e avvia l'animazione
+        progress.style.transition = 'width 5s linear';
         progress.style.width = '100%';
     }
 
-    // Inizia animazione
+    // Inizia l'animazione subito
     progress.style.width = '100%';
     setInterval(nextSlide, 5000);
 
@@ -372,7 +409,7 @@
         slide.addEventListener('transitionend', () => {
             const title = slide.querySelector('.carousel-title');
             const description = slide.querySelector('.carousel-description');
-            if(slide.classList.contains('active')) {
+            if (slide.classList.contains('active')) {
                 title.style.transition = 'all 0.5s ease 0.3s';
                 description.style.transition = 'all 0.5s ease 0.5s';
             }
