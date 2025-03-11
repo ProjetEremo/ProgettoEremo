@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/logo.png" type="image/x-icon">
+    <title>Eremo Frate Francesco</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="navbar-container">
+        <div class="navbar">
+            <div class="logo">
+                <span class="emoji">🏔️</span>
+                <a href="index.html" class="text">Eremo Frate Francesco</a>
+            </div>
+            <div class="menu">
+                <a href="chi-siamo.html">Chi siamo</a>
+                <a href="contatti.html">Contatti</a>
+                <a href="eventiincorso.html">Eventi in corso</a>
+                <a href="eventi-passati.html">Eventi passati</a>
+            </div>
+
+            <!-- Contenitore Login + Hamburger -->
+            <div class="right-menu">
+                <a href="accedi" class="login">Accedi</a>
+                <button class="hamburger" onclick="toggleMenu()" aria-expanded="false">☰</button>
+            </div>
+        </div>
+
+        <!-- Menu Mobile -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="chi-siamo.html" onclick="closeMenu()">Chi siamo</a>
+            <a href="contatti.html" onclick="closeMenu()">Contatti</a>
+            <a href="eventiincorso.html" onclick="closeMenu()">Eventi in corso</a>
+            <a href="eventi-passati.html" onclick="closeMenu()">Eventi passati</a>
+        </div>
+    </div>
+</header>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById("mobileMenu");
+            const button = document.querySelector(".hamburger");
+            const isOpen = menu.classList.toggle("open");
+            button.classList.toggle("open");
+            button.setAttribute("aria-expanded", isOpen);
+        }
+
+        function closeMenu() {
+            document.getElementById("mobileMenu").classList.remove("open");
+            document.querySelector(".hamburger").classList.remove("open");
+            document.querySelector(".hamburger").setAttribute("aria-expanded", "false");
+        }
+    </script>
+
+    <div class="form-container">
+        <h2>Carica un'immagine per l'evento</h2>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <!-- Campo per caricare un'immagine -->
+            <label for="image-upload">Seleziona un'immagine:</label>
+            <input type="file" id="image-upload" name="event-image" accept="image/*" required>
+
+            <!-- Menu a tendina per selezionare l'evento -->
+            <label for="event-select">A quale evento corrisponde?</label>
+            <select id="event-select" name="event" required>
+                <option value="" disabled selected>Seleziona un evento</option>
+                <option value="evento1">Evento 1</option>
+                <option value="evento2">Evento 2</option>
+                <option value="evento3">Evento 3</option>
+            </select>
+
+            <!-- Pulsante per inviare il form -->
+            <button type="submit">Carica</button>
+        </form>
+    </div>
+</body>
+</html>
