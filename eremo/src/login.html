@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accesso</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 10px;
+        display: none;
+      }
+      .login-container {
+        max-width: 400px;
+        margin: 50px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .login-container input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s;
+      }
+      .btn-primary {
+        background: var(--secondary);
+        color: white;
+      }
+      .btn-secondary {
+        background: var(--light);
+        color: var(--secondary);
+      }
+      .btn:hover {
+        opacity: 0.8;
+      }
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <link rel="icon" href="images/logo.png" type="image/x-icon" />
+      <h1>ACCESSO</h1>
+      <form id="loginForm">
+        <input type="email" id="inputEmail" placeholder="Email" required />
+        <input
+          type="password"
+          id="inputPassword"
+          placeholder="Password"
+          required
+        />
+        <div id="error-message" class="error-message">
+          Email o password non corretti.
+        </div>
+        <div class="actions">
+          <a href="index.html" class="btn btn-secondary">Home</a>
+          <div>
+            <a href="registration.html" class="btn btn-primary">Registrati</a>
+            <button type="submit" class="btn btn-primary">Accedi</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const email = document.getElementById("inputEmail").value;
+          const password = document.getElementById("inputPassword").value;
+          if (
+            (email === "user@user.com" && password === "user") ||
+            (email === "admin@admin.com" && password === "admin")
+          ) {
+            sessionStorage.setItem("loggedIn", "true");
+            window.location.href =
+              email === "admin@admin.com" ? "index_admin.html" : "index.html";
+          } else {
+            document.getElementById("error-message").style.display = "block";
+            document.getElementById("inputEmail").style.borderColor = "red";
+            document.getElementById("inputPassword").style.borderColor = "red";
+          }
+        });
+    </script>
+  </body>
+</html>

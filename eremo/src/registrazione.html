@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registrazione</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .registration-container {
+        max-width: 650px;
+        margin: 50px auto;
+        padding: 50px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: left;
+      }
+      .registration-container h1 {
+        text-align: center;
+      }
+      .registration-container input,
+      .registration-container button {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .error-input {
+        border: 2px solid red !important;
+        background-color: #ffe6e6;
+      }
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0;
+      }
+      .checkbox-container input {
+        margin: 0;
+        width: 18px;
+        height: 18px;
+      }
+      .checkbox-container label {
+        font-weight: bold;
+        flex: 1;
+      }
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+      .btn-primary {
+        background: var(--secondary);
+        color: white;
+      }
+      .btn-secondary {
+        background: var(--light);
+        color: var(--secondary);
+      }
+      .btn:hover {
+        opacity: 0.8;
+      }
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+      }
+      .error-message {
+        color: red;
+        display: none;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="registration-container">
+      <h1>REGISTRAZIONE</h1>
+      <form id="registrationForm">
+        <input type="text" id="inputNome" placeholder="Nome" required />
+        <input type="text" id="inputCognome" placeholder="Cognome" required />
+        <input type="email" id="inputEmail" placeholder="Email" required />
+        <input
+          type="password"
+          id="inputPassword"
+          placeholder="Password"
+          required
+        />
+        <input
+          type="password"
+          id="inputConfermaPassword"
+          placeholder="Conferma Password"
+          required
+        />
+        <div id="passwordError" class="error-message">
+          Le password non coincidono.
+        </div>
+        <div class="checkbox-container">
+          <input type="checkbox" id="flexCheckDefault" />
+          <label for="flexCheckDefault">
+            <a href="#" onclick="openModal('tosModal')">Termini e Condizioni</a>
+            e
+            <a href="#" onclick="openModal('privacyModal')">Privacy</a>
+          </label>
+        </div>
+        <div class="checkbox-container">
+          <input type="checkbox" id="privacyCheckbox" />
+          <label for="privacyCheckbox">Autorizzo il trattamento dati</label>
+        </div>
+        <div id="checkboxError" class="error-message">
+          Devi accettare i termini.
+        </div>
+        <button type="submit" class="btn btn-primary">Registrati</button>
+        <div class="actions">
+          <a href="index.html" class="btn btn-secondary">Home</a>
+          <a href="login.html" id="loginButton" class="btn btn-primary"
+            >Accedi</a
+          >
+        </div>
+      </form>
+    </div>
+    <script>
+      document
+        .getElementById("registrationForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          document.getElementById("passwordError").style.display = "none";
+          document.getElementById("checkboxError").style.display = "none";
+
+          let passwordField = document.getElementById("inputPassword");
+          let confirmPasswordField = document.getElementById(
+            "inputConfermaPassword"
+          );
+          let password = passwordField.value;
+          let confirmPassword = confirmPasswordField.value;
+          let termsChecked =
+            document.getElementById("flexCheckDefault").checked;
+          let privacyChecked =
+            document.getElementById("privacyCheckbox").checked;
+
+          // Reset dei bordi degli input
+          passwordField.classList.remove("error-input");
+          confirmPasswordField.classList.remove("error-input");
+
+          if (password !== confirmPassword) {
+            document.getElementById("passwordError").style.display = "block";
+            passwordField.classList.add("error-input");
+            confirmPasswordField.classList.add("error-input");
+            return;
+          }
+          if (!termsChecked || !privacyChecked) {
+            document.getElementById("checkboxError").style.display = "block";
+            return;
+          }
+        });
+    </script>
+  </body>
+</html>
