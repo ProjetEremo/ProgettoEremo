@@ -1,480 +1,283 @@
 <!DOCTYPE html>
 <html lang="it">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="images/logo.png" type="image/x-icon" />
-    <title>Eremo Frate Francesco</title>
-    <link rel="stylesheet" href="style.css" />
-    <style>
-      .hero-carousel {
-        position: relative;
-        height: 50vh;
-        overflow: hidden;
-        border-radius: 20px;
-        margin: 20px;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="images/logo.png" type="image/x-icon">
+  <title>Eremo Frate Francesco</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --primary: #2B4A3F;
+      --secondary: #7A9B76;
+      --accent: #C17C54;
+      --light: #F5F1E7;
+    }
 
-      .carousel-inner {
-        position: relative;
-        height: 100%;
-        transition: transform 1s ease-in-out;
-      }
+    /* Hero Section */
+    .hero-section {
+      height: 60vh;
+      margin: 20px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)),
+      url('https://picsum.photos/1920/1080?random=nature') center/cover;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-      .carousel-item {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        transition: opacity 1s ease-in-out;
-        background-size: cover;
-        background-position: center;
-      }
+    .hero-content {
+      text-align: center;
+      color: var(--light);
+      max-width: 800px;
+      padding: 3rem;
+      background: rgba(43, 74, 63, 0.9);
+      border-radius: 15px;
+      backdrop-filter: blur(3px);
+    }
 
-      .carousel-item.active {
-        opacity: 1;
-        z-index: 1;
-      }
+    .hero-title {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      font-family: 'Playfair Display', serif;
+      letter-spacing: 1px;
+    }
 
-      .carousel-caption {
-        position: absolute;
-        bottom: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-        color: white;
-        text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-        width: 80%;
-      }
+    .hero-subtitle {
+      font-size: 1.4rem;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
 
-      .carousel-title {
-        font-size: 3.5rem;
-        margin-bottom: 1rem;
-        transform: scale(1.2);
-        transition: all 0.5s ease;
-        opacity: 0;
-      }
+    /* Sezioni Alternate */
+    .content-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      padding: 6rem 2rem;
+      align-items: center;
+    }
 
-      .carousel-description {
-        font-size: 1.2rem;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.5s ease;
-      }
+    .content-section:nth-child(even) {
+      background: var(--light);
+    }
 
-      .carousel-item.active .carousel-title {
-        opacity: 1;
-        transform: scale(1);
-      }
+    .section-content {
+      padding: 2rem;
+      position: relative;
+    }
 
-      .carousel-item.active .carousel-description {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .section-title {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 2rem;
+      position: relative;
+      padding-left: 2rem;
+    }
 
-      .progress-bar {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.3);
-        width: 100%;
-        z-index: 2;
-      }
+    .section-title:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 60%;
+      width: 5px;
+      background: var(--accent);
+    }
 
-      .progress {
-        height: 100%;
-        background: var(--light);
-        width: 0%;
-        transition: width 5s linear;
-      }
+    .section-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--primary);
+      margin-bottom: 2rem;
+    }
 
-      .events-section {
-        padding: 4rem 2rem;
-        background: var(--light);
-      }
+    .section-image {
+      height: 500px;
+      border-radius: 20px;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 15px 15px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
 
-      .events-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    .section-image:hover {
+      transform: scale(1.02);
+    }
+
+    /* Info Cards */
+    .info-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .info-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .info-card h3 {
+      color: var(--secondary);
+      margin: 1rem 0;
+      font-size: 1.4rem;
+    }
+
+    .info-card p {
+      color: var(--primary);
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .content-section {
+        grid-template-columns: 1fr;
+        padding: 4rem 1rem;
         gap: 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
       }
 
-      .event-card {
-        background: white;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
+      .section-image {
+        height: 300px;
+        order: -1;
       }
 
-      .event-card:hover {
-        transform: translateY(-10px);
+      .hero-title {
+        font-size: 2.5rem;
       }
 
-      .event-image {
-        height: 200px;
-        background-size: cover;
-        background-position: center;
-        position: relative;
-        border-radius: 15px;
+      .hero-subtitle {
+        font-size: 1.2rem;
       }
-
-      .event-content {
-        padding: 1.5rem;
-        height: 10rem;
-      }
-
-      .event-price {
-        background: var(--accent);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        font-weight: bold;
-      }
-
-      /* Bottone Prenota Animato */
-      .btn-prenota {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-        padding: 1rem;
-        font-size: 1.1rem;
-        border: none;
-        border-radius: 15px;
-        background: var(--gradient);
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        overflow: hidden;
-        position: relative;
-      }
-
-      .btn-prenota i {
-        transition: transform 0.3s ease;
-      }
-
-      .btn-prenota:hover i {
-        transform: translateX(5px);
-      }
-
-      .btn-prenota::after {
-        content: "";
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(
-          45deg,
-          transparent 20%,
-          rgba(255, 255, 255, 0.1) 50%,
-          transparent 80%
-        );
-        transform: rotate(45deg);
-        animation: btn-glow 3s infinite linear;
-      }
-
-      @keyframes btn-glow {
-        0% {
-          transform: rotate(45deg) translate(-50%, -50%);
-        }
-        100% {
-          transform: rotate(45deg) translate(50%, 50%);
-        }
-      }
-
-      @media (max-width: 768px) {
-        .hero-carousel {
-          height: 50vh;
-          margin: 10px;
-          border-radius: 10px;
-        }
-
-        .carousel-title {
-          font-size: 2rem;
-        }
-
-        .events-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-      /* --- Override per il bottone Prenota --- */
-      .meta-info {
-        flex-wrap: wrap;
-        gap: 15px;
-      }
-      .meta-info .btn-reserve {
-        align-self: center;
-        margin: 0 auto;
-      }
-
-      /* --- Effetto overlay dinamico sulla card --- */
-      .event-card {
-        position: relative;
-        overflow: hidden;
-      }
-
-      /* --- Animazione per le icone --- */
-      .icon-animate {
-        animation: rotateIcon 2s linear infinite;
-      }
-      @keyframes rotateIcon {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      /* --- Sistemazione immagine random (Picsum) --- */
-      .event-media img {
-        width: 100%;
-        height: auto;
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <div class="navbar-container">
-        <div class="navbar">
-          <a href="index.html" style="text-decoration: none; color: inherit">
-            <div class="logo">
-              <span class="emoji">🏔️</span>
-              <h2>Eremo Frate Francesco</h2>
-            </div>
-          </a>
-          <div class="menu">
-            <a href="chi-siamo.html">Chi siamo</a>
-            <span class="separator">|</span>
-            <a href="eventiincorso.html">Calendario attivitá</a>
-            <a href="eventipassati.html">Archivio attivitá</a>
-            <span class="separator">|</span>
-            <a href="incontrisullaparola.html">Incontri sulla parola</a>
-            <span class="separator">|</span>
-            <a href="">Dove siamo</a>
-            <a href="contatti.html">Contatti</a>
-          </div>
-
-          <!-- Contenitore Login + Hamburger -->
-          <div class="right-menu">
-            <a href="login.html" class="login">Accedi</a>
-            <button
-              class="hamburger"
-              onclick="toggleMenu()"
-              aria-expanded="false"
-            >
-              ☰
-            </button>
-          </div>
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Navbar Originale -->
+<header>
+  <div class="navbar-container">
+    <div class="navbar">
+      <a href="index.html" style="text-decoration: none; color: inherit">
+        <div class="logo">
+          <span class="emoji">🏔️</span>
+          <h2>Eremo Frate Francesco</h2>
         </div>
-
-        <!-- Menu Mobile -->
-        <div class="menu">
-          <a href="chi-siamo.html">Chi siamo</a>
-          <a href="contatti.html">Calendario attivitá</a>
-          <a href="eventiincorso.html">Archivio attivitá</a>
-          <a href="eventiincorso.html">Incontri sulla parola</a>
-          <a href="eventiincorso.html">Dove siamo</a>
-          <a href="eventi-passati.html">Contatti</a>
-        </div>
+      </a>
+      <div class="menu">
+        <a href="chi-siamo.html">Chi siamo</a>
+        <span class="separator">|</span>
+        <a href="eventiincorso.html">Calendario attivitá</a>
+        <a href="eventipassati.html">Archivio attivitá</a>
+        <span class="separator">|</span>
+        <a href="incontrisullaparola.html">Incontri sulla parola</a>
+        <span class="separator">|</span>
+        <a href="">Dove siamo</a>
+        <a href="contatti.html">Contatti</a>
       </div>
-    </header>
 
-    <!-- Carosello Hero -->
-    <div class="hero-carousel">
-      <div class="carousel-inner">
-        <!-- Item 1 -->
-        <div
-          class="carousel-item active"
-          style="
-            background-image: url('https://picsum.photos/1920/1080?random=1?meditation');
-          "
-        >
-          <div class="carousel-caption">
-            <h2 class="carousel-title">Ritiro Spirituale</h2>
-            <p class="carousel-description">
-              Rigenera corpo e mente nella natura incontaminata
-            </p>
-          </div>
-        </div>
-        <!-- Item 2 -->
-        <div
-          class="carousel-item"
-          style="
-            background-image: url('https://picsum.photos/1920/1080?random=1?relax');
-          "
-        >
-          <div class="carousel-caption">
-            <h2 class="carousel-title">Yoga Meditativo</h2>
-            <p class="carousel-description">
-              Trova l'armonia tra movimento e quiete interiore
-            </p>
-          </div>
-        </div>
-        <!-- Item 3 -->
-        <div
-          class="carousel-item"
-          style="
-            background-image: url('https://picsum.photos/1920/1080?random=?mountains');
-          "
-        >
-          <div class="carousel-caption">
-            <h2 class="carousel-title">Cammino Interiore</h2>
-            <p class="carousel-description">
-              Esplora sentieri fisici e spirituali
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="progress-bar">
-        <div class="progress"></div>
+      <div class="right-menu">
+        <a href="login.html" class="login">Accedi</a>
+        <button class="hamburger" onclick="toggleMenu()">☰</button>
       </div>
     </div>
+  </div>
+</header>
 
-    <!-- Sezione Eventi -->
-    <section class="events-section">
-      <div class="events-grid">
-        <!-- Evento 1 -->
-        <div class="event-card">
-          <div
-            class="event-image"
-            style="
-              background-image: url('https://picsum.photos/800/600?random=?retreat');
-            "
-          >
-            <span class="event-price">€120</span>
-          </div>
-          <div class="event-content">
-            <h3>Ritiro del Silenzio</h3>
-            <p>3 giorni di meditazione guidata nella natura</p>
-          </div>
-          <button class="btn-prenota">Prenota Ora</button>
-        </div>
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">Eremo Frate Francesco</h1>
+    <p class="hero-subtitle">Uno spazio sacro per il dialogo tra l'umano e il divino, immerso nella quiete delle Prealpi Bergamasche</p>
+  </div>
+</section>
 
-        <!-- Evento 2 -->
-        <div class="event-card">
-          <div
-            class="event-image"
-            style="
-              background-image: url('https://picsum.photos/800/600?random=?yoga');
-            "
-          >
-            <span class="event-price">€90</span>
-          </div>
-          <div class="event-content">
-            <h3>Yoga Avanzato</h3>
-            <p>Masterclass con istruttori certificati</p>
-          </div>
-          <button class="btn-prenota">Prenota Ora</button>
-        </div>
-
-        <!-- Evento 3 -->
-        <div class="event-card">
-          <div
-            class="event-image"
-            style="
-              background-image: url('https://picsum.photos/800/600?random=?hiking');
-            "
-          >
-            <span class="event-price">€150</span>
-          </div>
-          <div class="event-content">
-            <h3>Trekking Spirituale</h3>
-            <p>Camminate contemplative con guide esperte</p>
-          </div>
-          <button class="btn-prenota">Prenota Ora</button>
-        </div>
+<!-- Sezione 1 -->
+<section class="content-section">
+  <div class="section-image" style="background-image: url('https://picsum.photos/800/600?random=chapel')"></div>
+  <div class="section-content">
+    <h2 class="section-title">Radicati nella Storia</h2>
+    <p class="section-text">Fondato nel 1985 su un antico romitorio del XV secolo, l'Eremo custodisce secoli di spiritualità. Le nostre pietre raccontano storie di:</p>
+    <div class="info-cards">
+      <div class="info-card">
+        <h3>Eremiti medievali</h3>
+        <p>Che cercavano solitudine e contemplazione</p>
       </div>
-    </section>
+      <div class="info-card">
+        <h3>Pellegrini rinascimentali</h3>
+        <p>In cammino verso luoghi sacri</p>
+      </div>
+      <div class="info-card">
+        <h3>Frati francescani</h3>
+        <p>Custodi della tradizione spirituale</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <script>
-      // Script per immagini casuali da Picsum
-      document.querySelectorAll(".home-event-image").forEach((img) => {
-        const randomId = Math.floor(Math.random() * 1000);
-        img.style.backgroundImage = `url(https://picsum.photos/800/600?random=${randomId})`;
-      });
-    </script>
+<!-- Sezione 2 -->
+<section class="content-section">
+  <div class="section-content">
+    <h2 class="section-title">Un'Ecologia dello Spirito</h2>
+    <p class="section-text">I nostri 15 ettari di bosco sono un organismo vivente dove natura e spiritualità si intrecciano:</p>
+    <div class="info-cards">
+      <div class="info-card">
+        <h3>🌳 Sentieri contemplativi</h3>
+        <p>5 percorsi con stazioni di meditazione</p>
+      </div>
+      <div class="info-card">
+        <h3>🕊️ Oasi faunistica</h3>
+        <p>Protezione di specie locali a rischio</p>
+      </div>
+      <div class="info-card">
+        <h3>📜 Biblioteca naturale</h3>
+        <p>Percorsi didattici sulla creazione</p>
+      </div>
+    </div>
+  </div>
+  <div class="section-image" style="background-image: url('https://picsum.photos/800/600?random=nature')"></div>
+</section>
 
-    <script>
-      function toggleMenu() {
-        const menu = document.getElementById("mobileMenu");
-        const button = document.querySelector(".hamburger");
-        const isOpen = menu.classList.toggle("open");
-        button.classList.toggle("open");
-        button.setAttribute("aria-expanded", isOpen);
-      }
+<!-- Footer -->
+<footer style="background: var(--primary); color: var(--light); padding: 3rem; text-align: center;">
+  <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
+  <p style="margin-top: 1rem; opacity: 0.8;">Via della Spiritualità 123, Nembro (BG) - Italia</p>
+</footer>
 
-      function closeMenu() {
-        document.getElementById("mobileMenu").classList.remove("open");
-        document.querySelector(".hamburger").classList.remove("open");
-        document
-          .querySelector(".hamburger")
-          .setAttribute("aria-expanded", "false");
-      }
-
-      // Chiudi il menu mobile quando si passa alla modalità desktop
-      window.addEventListener("resize", function () {
-        if (window.innerWidth > 768) {
-          closeMenu();
+<script>
+  // Animazioni avanzate
+  document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = 1;
+          entry.target.style.transform = 'translateY(0)';
+          if(entry.target.classList.contains('section-image')) {
+            entry.target.style.transform = 'scale(1) rotate(0deg)';
+          }
         }
       });
-    </script>
+    }, { threshold: 0.25 });
 
-    <script>
-      // Animazione Carosello
-      let currentSlide = 0;
-      const slides = document.querySelectorAll(".carousel-item");
-      const progress = document.querySelector(".progress");
-
-      // Imposta la transizione iniziale per la progress bar
-      progress.style.transition = "width 5s linear";
-
-      function nextSlide() {
-        // Passa alla slide successiva
-        slides[currentSlide].classList.remove("active");
-        currentSlide = (currentSlide + 1) % slides.length;
-        slides[currentSlide].classList.add("active");
-
-        // Resetta la progress bar disabilitando momentaneamente la transizione
-        progress.style.transition = "none";
-        progress.style.width = "0%";
-
-        // Forza il reflow per far sì che il browser applichi immediatamente la modifica
-        void progress.offsetWidth;
-
-        // Riattiva la transizione e avvia l'animazione
-        progress.style.transition = "width 5s linear";
-        progress.style.width = "100%";
+    document.querySelectorAll('.content-section, .info-card').forEach(el => {
+      el.style.opacity = 0;
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      if(el.classList.contains('section-image')) {
+        el.style.transform = 'scale(0.95) rotate(-1deg)';
       }
-
-      // Inizia l'animazione subito
-      progress.style.width = "100%";
-      setInterval(nextSlide, 5000);
-
-      // Animazione testi
-      slides.forEach((slide) => {
-        slide.addEventListener("transitionend", () => {
-          const title = slide.querySelector(".carousel-title");
-          const description = slide.querySelector(".carousel-description");
-          if (slide.classList.contains("active")) {
-            title.style.transition = "all 0.5s ease 0.3s";
-            description.style.transition = "all 0.5s ease 0.5s";
-          }
-        });
-      });
-    </script>
-    <footer>
-      <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
-    </footer>
-  </body>
+      observer.observe(el);
+    });
+  });
+</script>
+</body>
 </html>
