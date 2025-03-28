@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profilo - Nome Eremo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="navbar">
+  <a href="indexaccesso.html" style="text-decoration: none; color: inherit">
+    <div class="logo">
+      <span class="emoji">🏔️</span>
+      <h2>Eremo Frate Francesco</h2>
+    </div>
+  </a>
+  <div class="menu">
+    <a href="chi-siamo.html">Chi siamo</a>
+    <span class="separator">|</span>
+    <a href="eventiincorso.html">Calendario attivitá</a>
+    <a href="eventipassati.html">Archivio attivitá</a>
+    <span class="separator">|</span>
+    <a href="incontrisullaparola.html">Incontri sulla parola</a>
+    <span class="separator">|</span>
+    <a href="">Dove siamo</a>
+    <a href="contatti.html">Contatti</a>
+  </div>
+
+  <div class="right-menu">
+    <!-- Sostituisci il vecchio link con questo dropdown -->
+    <div class="user-dropdown" onclick="toggleUserMenu()">
+      <button class="user-btn">
+        <span class="user-avatar">👤</span>
+        <span class="user-name">Area Personale</span>
+        <span class="dropdown-arrow">▼</span>
+      </button>
+      <div class="dropdown-menu">
+        <a href="profilo.html" class="dropdown-item">Il mio profilo</a>
+        <a href="prenotazioni.html" class="dropdown-item">Le mie prenotazioni</a>
+        <a href="logout.html" class="dropdown-item">Esci</a>
+      </div>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </div>
+</div>
+
+<!-- Hero Section -->
+<div class="profile-header">
+  <div class="avatar-container" id="main-avatar">
+    👤
+  </div>
+  <h1>Il Tuo Profilo</h1>
+  <p>Gestisci le tue informazioni personali e le preferenze</p>
+</div>
+
+<!-- Informazioni Personali -->
+<div class="profile-section">
+  <h2 style="color: var(--secondary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+    <span>📝</span> Informazioni Personali
+  </h2>
+
+  <div class="form-grid">
+    <div class="form-group">
+      <label for="nome">Nome</label>
+      <input type="text" id="nome" class="form-control" value="Mario">
+    </div>
+
+    <div class="form-group">
+      <label for="cognome">Cognome</label>
+      <input type="text" id="cognome" class="form-control" value="Rossi">
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" class="form-control" value="mario.rossi@example.com">
+    </div>
+
+    <div class="form-group">
+      <label for="telefono">Telefono</label>
+      <input type="tel" id="telefono" class="form-control" value="+39 123 456789">
+    </div>
+  </div>
+</div>
+
+<!-- Icona Profilo -->
+<div class="profile-section">
+  <h2 style="color: var(--secondary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+    <span>🖼️</span> Icona Profilo
+  </h2>
+
+  <p>Scegli un'icona che ti rappresenti:</p>
+
+  <div class="avatar-options">
+    <div class="avatar-option" data-emoji="👤">👤</div>
+    <div class="avatar-option" data-emoji="👩">👩</div>
+    <div class="avatar-option" data-emoji="🧔">🧔</div>
+    <div class="avatar-option" data-emoji="🧓">🧓</div>
+    <div class="avatar-option" data-emoji="🧘">🧘</div>
+    <div class="avatar-option" data-emoji="🙏">🙏</div>
+  </div>
+</div>
+
+<!-- Cambio Password -->
+<div class="profile-section">
+  <h2 style="color: var(--secondary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+    <span>🔒</span> Sicurezza
+  </h2>
+
+  <div class="form-grid">
+    <div class="form-group">
+      <label for="vecchia-password">Password Attuale</label>
+      <input type="password" id="vecchia-password" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="nuova-password">Nuova Password</label>
+      <input type="password" id="nuova-password" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="conferma-password">Conferma Password</label>
+      <input type="password" id="conferma-password" class="form-control">
+    </div>
+  </div>
+</div>
+
+<!-- Pulsante Salva -->
+<button class="btn-save">Salva Modifiche</button>
+
+<script>
+  // Gestione selezione avatar
+  const avatarOptions = document.querySelectorAll('.avatar-option');
+  const mainAvatar = document.getElementById('main-avatar');
+  const currentAvatar = document.getElementById('current-avatar');
+
+  avatarOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      // Rimuovi la classe 'selected' da tutte le opzioni
+      avatarOptions.forEach(opt => opt.classList.remove('selected'));
+
+      // Aggiungi la classe 'selected' all'opzione cliccata
+      this.classList.add('selected');
+
+      // Aggiorna l'avatar principale e nell'header
+      const selectedEmoji = this.getAttribute('data-emoji');
+      mainAvatar.textContent = selectedEmoji;
+      currentAvatar.textContent = selectedEmoji;
+    });
+  });
+
+  // Simulazione salvataggio
+  document.querySelector('.btn-save').addEventListener('click', function() {
+    alert('Modifiche salvate con successo!');
+  });
+
+  // Funzione per il dropdown menu (già presente nel tuo codice)
+  function toggleUserMenu() {
+    const dropdown = document.querySelector('.user-dropdown');
+    dropdown.classList.toggle('show');
+  }
+
+  document.addEventListener('click', function(event) {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (!dropdown.contains(event.target)) {
+      dropdown.classList.remove('show');
+    }
+  });
+</script>
+
+<!-- Aggiungi prima della chiusura del body, dopo il pulsante "Salva Modifiche" -->
+<div style="margin-top: 5rem;"></div>
+<!-- Footer -->
+<footer style="background: var(--primary); color: var(--light); padding: 3rem; text-align: center;">
+  <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
+  <p style="margin-top: 1rem; opacity: 0.8;">Via della Spiritualità 123, Nembro (BG) - Italia</p>
+</footer>
+</body>
+</html>
