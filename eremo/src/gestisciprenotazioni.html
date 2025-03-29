@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Le Mie Prenotazioni - Nome Eremo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Navbar -->
+<div class="navbar-container">
+  <div class="navbar">
+    <a href="indexaccesso.html" style="text-decoration: none; color: inherit">
+      <div class="logo">
+        <span class="emoji">🏔️</span>
+        <h2>Eremo Frate Francesco</h2>
+      </div>
+    </a>
+    <div class="menu">
+      <a href="chi-siamo.html">Chi siamo</a>
+      <span class="separator">|</span>
+      <a href="eventiincorso.html">Calendario attivitá</a>
+      <a href="eventipassati.html">Archivio attivitá</a>
+      <span class="separator">|</span>
+      <a href="incontrisullaparola.html">Incontri sulla parola</a>
+      <span class="separator">|</span>
+      <a href="">Dove siamo</a>
+      <a href="contatti.html">Contatti</a>
+    </div>
+
+    <div class="right-menu">
+      <!-- Sostituisci il vecchio link con questo dropdown -->
+      <div class="user-dropdown" onclick="toggleUserMenu()">
+        <button class="user-btn">
+          <span class="user-avatar">😺</span>
+          <span class="user-name">Area Personale</span>
+          <span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="dropdown-menu">
+          <a href="areapersonale.html" class="dropdown-item">Il mio profilo</a>
+          <a href="gestisciprenotazioni.html" class="dropdown-item">Le mie prenotazioni</a>
+          <a href="logout.html" class="dropdown-item">Esci</a>
+        </div>
+      </div>
+      <button class="hamburger" onclick="toggleMenu()">☰</button>
+    </div>
+  </div>
+
+<!-- Header -->
+<div class="prenotazioni-header">
+  <h1>Le Mie Prenotazioni</h1>
+  <p>Gestisci gli eventi a cui sei iscritto e visualizza la cronologia</p>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" data-tab="prossimi">Prossimi Eventi</div>
+  <div class="tab" data-tab="passati">Eventi Passati</div>
+</div>
+
+<!-- Contenuto Tab Prossimi Eventi -->
+<div id="prossimi" class="tab-content active">
+  <div class="prenotazione-card">
+    <div class="prenotazione-header">
+      <h3>Incontro sulla Parola - Meditazione sul Vangelo</h3>
+      <span class="prenotazione-stato stato-confermato">Confermato</span>
+    </div>
+    <p><strong>Data:</strong> Mercoledì 15 Novembre 2023, ore 20:30</p>
+    <p><strong>Luogo:</strong> Sede dell'Eremo</p>
+    <p><strong>Posti prenotati:</strong> 2</p>
+    <button class="btn-annulla" onclick="annullaPrenotazione('evento1')">Annulla Prenotazione</button>
+  </div>
+
+  <div class="prenotazione-card">
+    <div class="prenotazione-header">
+      <h3>Ritiro Spirituale Weekend</h3>
+      <span class="prenotazione-stato stato-confermato">Confermato</span>
+    </div>
+    <p><strong>Data:</strong> 25-26 Novembre 2023</p>
+    <p><strong>Luogo:</strong> Casa di Spiritualità "Monte Tabor"</p>
+    <p><strong>Opzione:</strong> Pensione completa</p>
+    <button class="btn-annulla" onclick="annullaPrenotazione('evento2')">Annulla Prenotazione</button>
+  </div>
+</div>
+
+<!-- Contenuto Tab Eventi Passati -->
+<div id="passati" class="tab-content">
+  <div class="prenotazione-card">
+    <div class="prenotazione-header">
+      <h3>Incontro sulla Parola - Le Beatitudini</h3>
+      <span class="prenotazione-stato stato-passato">Partecipato</span>
+    </div>
+    <p><strong>Data:</strong> Mercoledì 1 Novembre 2023</p>
+    <p><strong>Luogo:</strong> Sede dell'Eremo</p>
+    <p><strong>Feedback:</strong> <a href="#" style="color: var(--secondary);">Lascia un commento</a></p>
+  </div>
+
+  <div class="empty-state">
+    <p>Nessun altro evento passato trovato</p>
+  </div>
+</div>
+
+  <div style="margin-top: 5rem;"></div>
+  <!-- Footer -->
+  <footer style="background: var(--primary); color: var(--light); padding: 3rem; text-align: center;">
+    <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
+    <p style="margin-top: 1rem; opacity: 0.8;">Via della Spiritualità 123, Nembro (BG) - Italia</p>
+  </footer>
+
+<script>
+  // Gestione tabs
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      // Rimuovi classe active da tutti i tab e contenuti
+      document.querySelectorAll('.tab, .tab-content').forEach(el => {
+        el.classList.remove('active');
+      });
+
+      // Aggiungi active al tab cliccato
+      this.classList.add('active');
+
+      // Mostra il contenuto correlato
+      const tabId = this.getAttribute('data-tab');
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
+
+  // Funzione annullamento prenotazione
+  function annullaPrenotazione(eventoId) {
+    if(confirm("Sei sicuro di voler annullare questa prenotazione?")) {
+      // Qui andrebbe la chiamata API per l'annullamento
+      alert("Prenotazione annullata con successo!");
+      // Ricarica la lista o rimuovi l'elemento
+      document.querySelector(`[onclick="annullaPrenotazione('${eventoId}')"]`)
+              .closest('.prenotazione-card')
+              .style.opacity = '0';
+
+      setTimeout(() => {
+        document.querySelector(`[onclick="annullaPrenotazione('${eventoId}')"]`)
+                .closest('.prenotazione-card')
+                .remove();
+      }, 300);
+    }
+  }
+
+  // Funzioni esistenti per il menu
+  function toggleUserMenu() {
+    const dropdown = document.querySelector('.user-dropdown');
+    dropdown.classList.toggle('show');
+  }
+
+  document.addEventListener('click', function(event) {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (!dropdown.contains(event.target)) {
+      dropdown.classList.remove('show');
+    }
+  });
+</script>
+</body>
+</html>
