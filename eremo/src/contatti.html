@@ -3,19 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contatta i volontari dell'Eremo Frate Francesco tramite telefono o email">
     <link rel="icon" href="images/logo.png" type="image/x-icon">
     <title>Eremo Frate Francesco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
+        :root {
+            --primary-color: #7a9b76;
+            --secondary-color: #5a7a55;
+            --text-color: #333;
+            --light-text: #666;
+            --background-light: #f7f7f7;
+            --white: #ffffff;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --gradient: linear-gradient(135deg, #7a9b76 0%, #5a7a55 100%);
+            --transition: all 0.3s ease;
+        }
+
         body {
             font-family: 'Quicksand', sans-serif;
             margin: 0;
             padding: 0;
-            color: #333;
-            background-color: #f7f7f7;
+            color: var(--text-color);
+            background-color: #f5f1e7;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            line-height: 1.6;
         }
 
         main {
@@ -23,83 +40,147 @@
         }
 
         .media-section {
-            padding: 60px 20px;
+            padding: 4rem 1.5rem;
             text-align: center;
-            background-color: #ffffff;
+            background-color: var(--white);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .media-section h1 {
-            font-size: 36px;
-            color: #33c567;
-            margin-bottom: 20px;
+            font-size: 2.25rem;
+            color: var(--primary-color);
+            margin-bottom: 1.25rem;
+            font-weight: 600;
         }
 
         .media-section p {
-            font-size: 18px;
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 40px;
+            font-size: 1.125rem;
+            color: var(--light-text);
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .social-grid {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 30px;
+            margin: 0 auto;
+            max-width: 1000px;
         }
 
         .social-card {
-            background-color: #fff;
+            background-color: var(--white);
             border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            width: 280px;
-            padding: 20px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
             text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .social-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .social-card img {
             width: 80px;
             height: 80px;
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
+            object-fit: contain;
         }
 
         .social-card h3 {
-            font-size: 24px;
+            font-size: 1.5rem;
             color: #444;
-            margin-bottom: 10px;
+            margin-bottom: 1rem;
+            font-weight: 600;
         }
 
-        .social-card a {
-            font-size: 16px;
-            color: #007bff;
-            text-decoration: none;
-            font-weight: 700;
-            transition: color 0.3s ease;
-        }
-
-        .social-card a:hover {
-            color: #0056b3;
-        }
         .btn-prenota {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 0.5rem;
             width: 100%;
             padding: 1rem;
             font-size: 1.1rem;
+            font-weight: 600;
             border: none;
             border-radius: 15px;
             background: var(--gradient);
             color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
-            overflow: hidden;
+            transition: var(--transition);
             position: relative;
+            overflow: hidden;
+        }
+
+        .btn-prenota:hover {
+            background: linear-gradient(135deg, #6a8b66 0%, #4a6a45 100%);
+        }
+
+        .btn-prenota:active {
+            transform: scale(0.98);
+        }
+
+        .btn-prenota::after {
+            content: "✓ Copiato!";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-prenota.copied::after {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .media-section {
+                padding: 3rem 1rem;
+            }
+            
+            .media-section h1 {
+                font-size: 1.75rem;
+            }
+            
+            .media-section p {
+                font-size: 1rem;
+            }
+            
+            .social-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Accessibilità */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
         }
     </style>
 </head>
-    <body>
+<body>
     <div class="navbar-container">
         <div class="navbar">
             <a href="index.html" style="text-decoration: none; color: inherit">
@@ -119,15 +200,13 @@
                 <a href="">Dove siamo</a>
                 <a href="contatti.html">Contatti</a>
             </div>
-
-            <!-- Contenitore Login + Hamburger -->
+    
             <div class="right-menu">
                 <a href="accedi" class="login">Accedi</a>
                 <button class="hamburger" onclick="toggleMenu()" aria-expanded="false">☰</button>
             </div>
         </div>
-
-        <!-- Menu Mobile -->
+    
         <div class="mobile-menu" id="mobileMenu">
             <a href="chi-siamo.html" onclick="closeMenu()">Chi siamo</a>
             <a href="contatti.html" onclick="closeMenu()">Contatti</a>
@@ -136,68 +215,101 @@
         </div>
     </div>
 
-        <main>
-            <section class="media-section">
-                <h1>Contatta i volontari Eremo</h1>
-                <p>
-                    Contattaci tramite i nostri numeri di telefono oppure scrivici una mail!
-                </p>
-    
-                <!-- Social Media Cards -->
-                <div class="social-grid">
-                    <div class="social-card">
-                        <img src="images/telefono.png" alt="Whatsapp Icon">
-                        <h3>Telefono N.1</h3>
-                        <button class="btn-prenota" onclick="copyPhoneNumber('1234567890')">Copia</button>
-                    </div>
-                    <div class="social-card">
-                        <img src="images/telefono.png" alt="Phone Icon 1">
-                        <h3>Telefono N.2</h3>
-                        <button class="btn-prenota" onclick="copyPhoneNumber('0987654321')">Copia</button>
-                    </div>
-                    <div class="social-card">
-                        <img src="images/gmail.png" alt="Gmail">
-                        <h3>Gmail</h3>
-                        <button class="btn-prenota" onclick="openGmail()">Scrivici</button>
-                    </div>
+    <main>
+        <section class="media-section">
+            <h1>Contatta i volontari Eremo</h1>
+            <p>
+                Contattaci tramite i nostri numeri di telefono oppure scrivici una mail!
+            </p>
+
+            <div class="social-grid">
+                <div class="social-card">
+                    <img src="images/telefono.png" alt="Icona telefono" loading="lazy">
+                    <h3>Telefono N.1</h3>
+                    <p>Lorem Ipsum</p>
+                    <button class="btn-prenota" onclick="copyPhoneNumber('1234567890', this)">Copia numero</button>
                 </div>
-            </section>
-        </main>
+                <div class="social-card">
+                    <img src="images/telefono.png" alt="Icona telefono" loading="lazy">
+                    <h3>Telefono N.2</h3>
+                    <p>Lorem Ipsum</p>
+                    <button class="btn-prenota" onclick="copyPhoneNumber('0987654321', this)">Copia numero</button>
+                </div>
+                <div class="social-card">
+                    <img src="images/gmail.png" alt="Icona email" loading="lazy">
+                    <h3>Gmail</h3>
+                    <p>Lorem Ipsum</p>
+                    <button class="btn-prenota" onclick="openEmail()">Scrivici</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
+    </footer>
+
+    <script>
+        function copyPhoneNumber(phoneNumber, button) {
+            navigator.clipboard.writeText(phoneNumber).then(() => {
+                // Feedback visivo
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                }, 2000);
+                
+                // Feedback per screen reader
+                const feedback = document.createElement('span');
+                feedback.textContent = 'Numero copiato negli appunti';
+                feedback.className = 'sr-only';
+                document.body.appendChild(feedback);
+                setTimeout(() => feedback.remove(), 2000);
+            }).catch(err => {
+                console.error("Errore durante la copia: ", err);
+                alert("Non è stato possibile copiare il numero. Per favore, selezionalo manualmente.");
+            });
+        }
     
-        <footer>
-            <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
-        </footer>
+        function openEmail() {
+            window.open("https://mail.google.com/mail/?view=cm&fs=1&to=altervistaeremo@gmail.com", "_blank");
+        }
+    
+        function toggleMenu() {
+            const menu = document.getElementById("mobileMenu");
+            const button = document.querySelector(".hamburger");
+            const isOpen = menu.classList.toggle("open");
+            button.classList.toggle("open");
+            button.setAttribute("aria-expanded", isOpen);
+            
+            // Blocca lo scroll del body quando il menu è aperto
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+        }
+    
+        function closeMenu() {
+            document.getElementById("mobileMenu").classList.remove("open");
+            document.querySelector(".hamburger").classList.remove("open");
+            document.querySelector(".hamburger").setAttribute("aria-expanded", "false");
+            document.body.style.overflow = '';
+        }
 
-        <script>
-            function copyPhoneNumber(phoneNumber) {
-                navigator.clipboard.writeText(phoneNumber).catch(function(err) {
-                    console.error("Errore durante la copia: ", err);
-                });
+        // Chiudi il menu mobile quando si fa click fuori
+        document.addEventListener('click', (event) => {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburger = document.querySelector('.hamburger');
+            
+            if (mobileMenu.classList.contains('open') && 
+                !event.target.closest('.mobile-menu') && 
+                !event.target.closest('.hamburger')) {
+                closeMenu();
             }
-        
-            function sendEmail(emailAddress) {
-                window.location.href = "mailto:" + emailAddress + "?subject=Richiesta informazioni&body=Ciao,%0D%0A%0D%0A...";
-            }
-        
-            function toggleMenu() {
-                const menu = document.getElementById("mobileMenu");
-                const button = document.querySelector(".hamburger");
-                const isOpen = menu.classList.toggle("open");
-                button.classList.toggle("open");
-                button.setAttribute("aria-expanded", isOpen);
-            }
-        
-            function closeMenu() {
-                document.getElementById("mobileMenu").classList.remove("open");
-                document.querySelector(".hamburger").classList.remove("open");
-                document.querySelector(".hamburger").setAttribute("aria-expanded", "false");
-            }
+        });
 
-            function openGmail() {
-                window.open("https://mail.google.com/mail/?view=cm&fs=1&to=altervistaeremo@gmail.com", "_blank");
+        // Chiudi il menu mobile con ESC
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeMenu();
             }
-
-        </script>
-
-    </body>
+        });
+    </script>
+</body>
 </html>
