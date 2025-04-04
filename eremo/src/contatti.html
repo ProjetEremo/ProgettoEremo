@@ -33,6 +33,22 @@
             flex-direction: column;
             min-height: 100vh;
             line-height: 1.6;
+            padding-top: 80px;
+        }
+
+        .navbar-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            transition: transform 0.4s ease-in-out;
+            z-index: 1000;
+            transform: translateY(0);
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+        }
+        
+        .navbar-container.hidden {
+            transform: translateY(-100%);
         }
 
         main {
@@ -177,7 +193,7 @@
     </style>
 </head>
 <body>
-    <div class="navbar-container">
+    <div class="navbar-container" id="navbarContainer">
         <div class="navbar">
             <a href="index.html" style="text-decoration: none; color: inherit">
                 <div class="logo">
@@ -246,15 +262,36 @@
     </footer>
 
     <script>
+        let lastScroll = 0;
+        const navbarContainer = document.getElementById('navbarContainer');
+        
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (currentScroll <= 0) {
+                navbarContainer.classList.remove('hidden');
+                return;
+            }
+            
+            const scrollDifference = currentScroll - lastScroll;
+            
+            if (scrollDifference > 5 && !navbarContainer.classList.contains('hidden')) {
+                navbarContainer.classList.add('hidden');
+            } 
+            else if (scrollDifference < -5 && navbarContainer.classList.contains('hidden')) {
+                navbarContainer.classList.remove('hidden');
+            }
+            
+            lastScroll = currentScroll;
+        });
+
         function copyPhoneNumber(phoneNumber, button) {
             navigator.clipboard.writeText(phoneNumber).then(() => {
-                // Feedback visivo
                 button.classList.add('copied');
                 setTimeout(() => {
                     button.classList.remove('copied');
                 }, 2000);
                 
-                // Feedback per screen reader
                 const feedback = document.createElement('span');
                 feedback.textContent = 'Numero copiato negli appunti';
                 feedback.className = 'sr-only';
@@ -276,8 +313,6 @@
             const isOpen = menu.classList.toggle("open");
             button.classList.toggle("open");
             button.setAttribute("aria-expanded", isOpen);
-            
-            // Blocca lo scroll del body quando il menu è aperto
             document.body.style.overflow = isOpen ? 'hidden' : '';
         }
     
@@ -288,7 +323,6 @@
             document.body.style.overflow = '';
         }
 
-        // Chiudi il menu mobile quando si fa click fuori
         document.addEventListener('click', (event) => {
             const mobileMenu = document.getElementById('mobileMenu');
             const hamburger = document.querySelector('.hamburger');
@@ -300,7 +334,6 @@
             }
         });
 
-        // Chiudi il menu mobile con ESC
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 closeMenu();
