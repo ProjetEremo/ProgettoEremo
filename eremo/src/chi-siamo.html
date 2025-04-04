@@ -13,6 +13,22 @@
             padding: 0;
             color: #333;
             background-color: #f5f1e7;
+            padding-top: 80px;
+        }
+
+        .navbar-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            transition: transform 0.4s ease-in-out;
+            z-index: 1000;
+            transform: translateY(0);
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-container.hidden {
+            transform: translateY(-100%);
         }
 
         .content-container {
@@ -100,7 +116,7 @@
 </head>
 
 <body>
-<div class="navbar-container">
+<div class="navbar-container" id="navbarContainer">
     <div class="navbar">
         <a href="index.html" style="text-decoration: none; color: inherit">
             <div class="logo">
@@ -175,6 +191,29 @@
 </footer>
 
 <script>
+    let lastScroll = 0;
+    const navbarContainer = document.getElementById('navbarContainer');
+    
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (currentScroll <= 0) {
+            navbarContainer.classList.remove('hidden');
+            return;
+        }
+        
+        const scrollDifference = currentScroll - lastScroll;
+        
+        if (scrollDifference > 5 && !navbarContainer.classList.contains('hidden')) {
+            navbarContainer.classList.add('hidden');
+        } 
+        else if (scrollDifference < -5 && navbarContainer.classList.contains('hidden')) {
+            navbarContainer.classList.remove('hidden');
+        }
+        
+        lastScroll = currentScroll;
+    });
+
     function toggleMenu() {
         const menu = document.getElementById("mobileMenu");
         const button = document.querySelector(".hamburger");
