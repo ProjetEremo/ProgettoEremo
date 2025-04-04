@@ -6,11 +6,28 @@
     <link rel="icon" href="images/logo.png" type="image/x-icon">
     <title>Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .navbar-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-container.hidden {
+            transform: translateY(-100%);
+        }
+        body {
+            padding-top: 80px;
+        }
+    </style>
 </head>
 <body>
 
 <header>
-    <div class="navbar-container">
+    <div class="navbar-container" id="navbarContainer">
         <div class="navbar">
             <a href="indexaccesso.html" style="text-decoration: none; color: inherit">
                 <div class="logo">
@@ -21,7 +38,7 @@
             <div class="menu">
                 <a href="chi-siamo.html">Chi siamo</a>
                 <span class="separator">|</span>
-                <a href="eventiincorsoaccesso.html">Calendario attivitá</a>
+                <a href="eventiincorsoaccesso.html" class="active">Calendario attivitá</a>
                 <a href="eventipassatiaccesso.html">Archivio attivitá</a>
                 <span class="separator">|</span>
                 <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
@@ -31,7 +48,6 @@
             </div>
 
             <div class="right-menu">
-                <!-- Sostituisci il vecchio link con questo dropdown -->
                 <div class="user-dropdown" onclick="toggleUserMenu()">
                     <button class="user-btn">
                         <span class="user-avatar">😺</span>
@@ -66,6 +82,26 @@
 </header>
 
     <script>
+        let lastScroll = 0;
+        const navbar = document.getElementById('navbarContainer');
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll <= 0) {
+                navbar.classList.remove('hidden');
+                return;
+            }
+            
+            if (currentScroll > lastScroll) {
+                navbar.classList.add('hidden');
+            } else {
+                navbar.classList.remove('hidden');
+            }
+            
+            lastScroll = currentScroll;
+        });
+
         function toggleMenu() {
             const menu = document.getElementById("mobileMenu");
             const button = document.querySelector(".hamburger");

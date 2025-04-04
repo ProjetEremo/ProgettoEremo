@@ -12,14 +12,14 @@
     <link rel="stylesheet" href="style.css">
     <style>
         :root {
-            --primary-color: #7a9b76;
-            --secondary-color: #5a7a55;
+            --primary-color: #2B4A3F; 
+            --secondary-color: #7A9B76;
             --text-color: #333;
             --light-text: #666;
             --background-light: #f7f7f7;
             --white: #ffffff;
             --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            --gradient: linear-gradient(135deg, #7a9b76 0%, #5a7a55 100%);
+            --gradient: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%); 
             --transition: all 0.3s ease;
         }
 
@@ -43,12 +43,21 @@
             transition: transform 0.4s ease-in-out;
             z-index: 1000;
             transform: translateY(0);
-            background-color: var(--white);
             box-shadow: var(--shadow);
         }
         
         .navbar-container.hidden {
             transform: translateY(-100%);
+        }
+
+        /* Stile navbar identico a chi-siamo.html */
+        .navbar {
+            background: var(--gradient);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
         }
 
         main {
@@ -67,7 +76,7 @@
 
         .media-section h1 {
             font-size: 36px;
-            color: #7a9b76;
+            color: var(--secondary-color); 
             margin-bottom: 20px;
             text-align: center;
         }
@@ -129,7 +138,7 @@
             font-weight: 600;
             border: none;
             border-radius: 15px;
-            background: var(--gradient);
+            background: var(--gradient); 
             color: white;
             cursor: pointer;
             transition: var(--transition);
@@ -139,29 +148,6 @@
 
         .btn-prenota:hover {
             background: linear-gradient(135deg, #6a8b66 0%, #4a6a45 100%);
-        }
-
-        .btn-prenota:active {
-            transform: scale(0.98);
-        }
-
-        .btn-prenota::after {
-            content: "✓ Copiato!";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .btn-prenota.copied::after {
-            opacity: 1;
         }
 
         @media (max-width: 768px) {
@@ -177,22 +163,10 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        /* Accessibilità */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border-width: 0;
-        }
     </style>
 </head>
 <body>
+    <!-- Navbar identica a chi-siamo.html -->
     <div class="navbar-container" id="navbarContainer">
         <div class="navbar">
             <a href="index.html" style="text-decoration: none; color: inherit">
@@ -207,23 +181,25 @@
                 <a href="eventiincorso.html">Calendario attivitá</a>
                 <a href="eventipassati.html">Archivio attivitá</a>
                 <span class="separator">|</span>
-                <a href="">Incontri sulla parola</a>
+                <a href="incontrisullaparola.html">Incontri sulla parola</a>
                 <span class="separator">|</span>
-                <a href="">Dove siamo</a>
+                <a href="dovesiamo.html">Dove siamo</a>
                 <a href="contatti.html">Contatti</a>
             </div>
-    
+
             <div class="right-menu">
-                <a href="accedi" class="login">Accedi</a>
+                <a href="login.html" class="login">Accedi</a>
                 <button class="hamburger" onclick="toggleMenu()" aria-expanded="false">☰</button>
             </div>
         </div>
-    
+
         <div class="mobile-menu" id="mobileMenu">
             <a href="chi-siamo.html" onclick="closeMenu()">Chi siamo</a>
+            <a href="eventiincorso.html" onclick="closeMenu()">Calendario attività</a>
+            <a href="eventipassati.html" onclick="closeMenu()">Archivio attività</a>
+            <a href="incontrisullaparola.html" onclick="closeMenu()">Incontri sulla parola</a>
+            <a href="dovesiamo.html" onclick="closeMenu()">Dove siamo</a>
             <a href="contatti.html" onclick="closeMenu()">Contatti</a>
-            <a href="eventiincorso.html" onclick="closeMenu()">Eventi in corso</a>
-            <a href="eventi-passati.html" onclick="closeMenu()">Eventi passati</a>
         </div>
     </div>
 
@@ -262,6 +238,7 @@
     </footer>
 
     <script>
+        // Script rimane identico
         let lastScroll = 0;
         const navbarContainer = document.getElementById('navbarContainer');
         
@@ -291,12 +268,6 @@
                 setTimeout(() => {
                     button.classList.remove('copied');
                 }, 2000);
-                
-                const feedback = document.createElement('span');
-                feedback.textContent = 'Numero copiato negli appunti';
-                feedback.className = 'sr-only';
-                document.body.appendChild(feedback);
-                setTimeout(() => feedback.remove(), 2000);
             }).catch(err => {
                 console.error("Errore durante la copia: ", err);
                 alert("Non è stato possibile copiare il numero. Per favore, selezionalo manualmente.");
@@ -322,23 +293,6 @@
             document.querySelector(".hamburger").setAttribute("aria-expanded", "false");
             document.body.style.overflow = '';
         }
-
-        document.addEventListener('click', (event) => {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const hamburger = document.querySelector('.hamburger');
-            
-            if (mobileMenu.classList.contains('open') && 
-                !event.target.closest('.mobile-menu') && 
-                !event.target.closest('.hamburger')) {
-                closeMenu();
-            }
-        });
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                closeMenu();
-            }
-        });
     </script>
 </body>
 </html>
