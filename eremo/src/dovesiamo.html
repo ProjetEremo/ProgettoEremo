@@ -5,45 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dove Siamo - Nome Eremo</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .navbar-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            transition: transform 0.4s ease-in-out;
+            z-index: 1000;
+            transform: translateY(0);
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-container.hidden {
+            transform: translateY(-100%);
+        }
+        
+        body {
+            padding-top: 80px;
+        }
+    </style>
 </head>
 <body>
-<!-- Navbar -->
-<div class="navbar-container">
-    <div class="navbar">
-        <a href="index.html" style="text-decoration: none; color: inherit">
-            <div class="logo">
-                <span class="emoji">🏔️</span>
-                <h2>Eremo Frate Francesco</h2>
+    <div class="navbar-container" id="navbarContainer">
+        <div class="navbar">
+            <a href="index.html" style="text-decoration: none; color: inherit">
+                <div class="logo">
+                    <span class="emoji">🏔️</span>
+                    <h2>Eremo Frate Francesco</h2>
+                </div>
+            </a>
+            <div class="menu">
+                <a href="chi-siamo.html">Chi siamo</a>
+                <span class="separator">|</span>
+                <a href="eventiincorso.html">Calendario attivitá</a>
+                <a href="eventipassati.html">Archivio attivitá</a>
+                <span class="separator">|</span>
+                <a href="incontrisullaparola.html">Incontri sulla parola</a>
+                <span class="separator">|</span>
+                <a href="dovesiamo.html">Dove siamo</a>
+                <a href="contatti.html">Contatti</a>
             </div>
-        </a>
-        <div class="menu">
-            <a href="chi-siamo.html">Chi siamo</a>
-            <span class="separator">|</span>
-            <a href="eventiincorso.html">Calendario attivitá</a>
-            <a href="eventipassati.html">Archivio attivitá</a>
-            <span class="separator">|</span>
-            <a href="incontrisullaparola.html">Incontri sulla parola</a>
-            <span class="separator">|</span>
-            <a href="">Dove siamo</a>
-            <a href="contatti.html">Contatti</a>
+
+            <div class="right-menu">
+                <a href="login.html" class="login">Accedi</a>
+                <button class="hamburger" onclick="toggleMenu()" aria-expanded="false">☰</button>
+            </div>
         </div>
 
-        <!-- Contenitore Login + Hamburger -->
-        <div class="right-menu">
-            <a href="login.html" class="login">Accedi</a>
-            <button class="hamburger" onclick="toggleMenu()" aria-expanded="false">☰</button>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="chi-siamo.html" onclick="closeMenu()">Chi siamo</a>
+            <a href="eventiincorso.html" onclick="closeMenu()">Calendario attività</a>
+            <a href="eventipassati.html" onclick="closeMenu()">Archivio attività</a>
+            <a href="incontrisullaparola.html" onclick="closeMenu()">Incontri sulla parola</a>
+            <a href="dovesiamo.html" onclick="closeMenu()">Dove siamo</a>
+            <a href="contatti.html" onclick="closeMenu()">Contatti</a>
         </div>
     </div>
-
-    <!-- Menu Mobile -->
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="chi-siamo.html" onclick="closeMenu()">Chi siamo</a>
-        <a href="contatti.html" onclick="closeMenu()">Contatti</a>
-        <a href="eventiincorso.html" onclick="closeMenu()">Eventi in corso</a>
-        <a href="eventi-passati.html" onclick="closeMenu()">Eventi passati</a>
-    </div>
-</div>
-
 <!-- Hero Section -->
 <div class="location-hero">
     <h1>Dove Siamo</h1>
@@ -95,7 +113,6 @@
 </div>
 
 <!-- Sezione immagine personalizzata -->
-<!-- HTML -->
 <div class="custom-image-section">
     <div class="polaroid-frame">
         <img src="images/immagineeremo.jpg" alt="Descrizione immagine" class="styled-image">
@@ -123,14 +140,70 @@
     </div>
 </div>
 
-<!-- Footer -->
-<div style="margin-top: 3rem;"></div>
-<footer style="background: var(--dark); color: var(--light); padding: 3rem 0; text-align: center;">
-    <!-- Il tuo footer qui -->
+<footer>
+    <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
 </footer>
 
 <script>
-    // Funzioni esistenti per il menu
+    // Funzione per la navbar che compare/scompare
+    let lastScroll = 0;
+    const navbarContainer = document.getElementById('navbarContainer');
+    
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (currentScroll <= 0) {
+            navbarContainer.classList.remove('hidden');
+            return;
+        }
+        
+        const scrollDifference = currentScroll - lastScroll;
+        
+        if (scrollDifference > 5 && !navbarContainer.classList.contains('hidden')) {
+            navbarContainer.classList.add('hidden');
+        } 
+        else if (scrollDifference < -5 && navbarContainer.classList.contains('hidden')) {
+            navbarContainer.classList.remove('hidden');
+        }
+        
+        lastScroll = currentScroll;
+    });
+
+    // Funzioni per il menu mobile
+    function toggleMenu() {
+        const menu = document.getElementById("mobileMenu");
+        const button = document.querySelector(".hamburger");
+        const isOpen = menu.classList.toggle("open");
+        button.classList.toggle("open");
+        button.setAttribute("aria-expanded", isOpen);
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+    }
+
+    function closeMenu() {
+        document.getElementById("mobileMenu").classList.remove("open");
+        document.querySelector(".hamburger").classList.remove("open");
+        document.querySelector(".hamburger").setAttribute("aria-expanded", "false");
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('click', (event) => {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const hamburger = document.querySelector('.hamburger');
+        
+        if (mobileMenu.classList.contains('open') && 
+            !event.target.closest('.mobile-menu') && 
+            !event.target.closest('.hamburger')) {
+            closeMenu();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeMenu();
+        }
+    });
+
+    // Funzioni esistenti per il menu utente
     function toggleUserMenu() {
         const dropdown = document.querySelector('.user-dropdown');
         dropdown.classList.toggle('show');

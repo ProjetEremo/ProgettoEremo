@@ -7,6 +7,21 @@
     <title>Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css">
     <style>
+
+        .navbar-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-container.hidden {
+            transform: translateY(-100%);
+        }
+
         body {
             font-family: 'Quicksand', sans-serif;
             margin: 0;
@@ -16,6 +31,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            padding-top: 80px;
         }
 
         main {
@@ -187,6 +203,26 @@
         </footer>
 
         <script>
+            let lastScroll = 0;
+            const navbar = document.getElementById('navbarContainer');
+            
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll <= 0) {
+                    navbar.classList.remove('hidden');
+                    return;
+                }
+                
+                if (currentScroll > lastScroll) {
+                    navbar.classList.add('hidden');
+                } else {
+                    navbar.classList.remove('hidden');
+                }
+                
+                lastScroll = currentScroll;
+            });
+
             function copyPhoneNumber(phoneNumber) {
                 navigator.clipboard.writeText(phoneNumber).catch(function(err) {
                     console.error("Errore durante la copia: ", err);
