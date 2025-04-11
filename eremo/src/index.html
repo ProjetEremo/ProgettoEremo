@@ -8,26 +8,6 @@
   <link rel="stylesheet" href="style.css">
   <style>
 
-    .navbar-container {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      transition: transform 0.3s ease;
-      z-index: 1000;
-      background-color: #fff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .navbar-container.hidden {
-        transform: translateY(-100%);
-    }
-
-    :root {
-      --primary: #2B4A3F;
-      --secondary: #7A9B76;
-      --accent: #C17C54;
-      --light: #F5F1E7;
-    }
-
     /* Hero Section */
     .hero-section {
       height: 60vh;
@@ -173,86 +153,39 @@
         font-size: 1.2rem;
       }
     }
+
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
 <!-- Navbar Originale -->
 <header>
-  <div class="navbar-container" id="navbarContainer">
+  <div class="navbar-container">
     <div class="navbar">
-        <a href="indexaccesso.html" style="text-decoration: none; color: inherit">
-            <div class="logo">
-                <span class="emoji">🏔️</span>
-                <h2>Eremo Frate Francesco</h2>
-            </div>
-        </a>
-        <div class="menu">
-            <a href="chi-siamo.html">Chi siamo</a>
-            <span class="separator">|</span>
-            <a href="eventiincorsoaccesso.html">Calendario attivitá</a>
-            <a href="eventipassatiaccesso.html">Archivio attivitá</a>
-            <span class="separator">|</span>
-            <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
-            <span class="separator">|</span>
-            <a href="">Dove siamo</a>
-            <a href="contattiaccesso.html">Contatti</a>
+      <a href="index.html" style="text-decoration: none; color: inherit">
+        <div class="logo">
+          <span class="emoji">🏔️</span>
+          <h2>Eremo Frate Francesco</h2>
         </div>
+      </a>
+      <div class="menu">
+        <a href="chi-siamo.html">Chi siamo</a>
+        <span class="separator">|</span>
+        <a href="eventiincorso.html">Calendario attivitá</a>
+        <a href="eventipassati.html">Archivio attivitá</a>
+        <span class="separator">|</span>
+        <a href="incontrisullaparola.html">Incontri sulla parola</a>
+        <span class="separator">|</span>
+        <a href="">Dove siamo</a>
+        <a href="contatti.html">Contatti</a>
+      </div>
 
-        <div class="right-menu">
-            <div class="user-dropdown" onclick="toggleUserMenu()">
-                <button class="user-btn">
-                    <span class="user-avatar">😺</span>
-                    <span class="user-name">Area Personale</span>
-                    <span class="dropdown-arrow">▼</span>
-                </button>
-                <div class="dropdown-menu">
-                    <a href="areapersonale.html" class="dropdown-item">Il mio profilo</a>
-                    <a href="gestisciprenotazioni.html" class="dropdown-item">Le mie prenotazioni</a>
-                    <a href="logout.html" class="dropdown-item">Esci</a>
-                </div>
-            </div>
-            <button class="hamburger" onclick="toggleMenu()">☰</button>
-        </div>
+      <div class="right-menu">
+        <a href="login.html" class="login">Accedi</a>
+        <button class="hamburger" onclick="toggleMenu()">☰</button>
+      </div>
     </div>
-</div>
-
-
-  <script>
-
-    let lastScroll = 0;
-        const navbar = document.getElementById('navbarContainer');
-        
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-        
-        if (currentScroll <= 0) {
-            navbar.classList.remove('hidden');
-            return;
-        }
-        
-        if (currentScroll > lastScroll) {
-            navbar.classList.add('hidden');
-        } else {
-            navbar.classList.remove('hidden');
-        }
-        
-        lastScroll = currentScroll;
-    });
-
-    function toggleUserMenu() {
-      const dropdown = document.querySelector('.user-dropdown');
-      dropdown.classList.toggle('show');
-    }
-
-    // Chiudi il dropdown se si clicca fuori
-    document.addEventListener('click', function(event) {
-      const dropdown = document.querySelector('.user-dropdown');
-      if (!dropdown.contains(event.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
-  </script>
+  </div>
 </header>
 
 <!-- Hero Section -->
@@ -314,32 +247,3 @@
   <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
   <p style="margin-top: 1rem; opacity: 0.8;">Via della Spiritualità 123, Nembro (BG) - Italia</p>
 </footer>
-
-<script>
-  // Animazioni avanzate
-  document.addEventListener('DOMContentLoaded', function() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = 1;
-          entry.target.style.transform = 'translateY(0)';
-          if(entry.target.classList.contains('section-image')) {
-            entry.target.style.transform = 'scale(1) rotate(0deg)';
-          }
-        }
-      });
-    }, { threshold: 0.25 });
-
-    document.querySelectorAll('.content-section, .info-card').forEach(el => {
-      el.style.opacity = 0;
-      el.style.transform = 'translateY(30px)';
-      el.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-      if(el.classList.contains('section-image')) {
-        el.style.transform = 'scale(0.95) rotate(-1deg)';
-      }
-      observer.observe(el);
-    });
-  });
-</script>
-</body>
-</html>

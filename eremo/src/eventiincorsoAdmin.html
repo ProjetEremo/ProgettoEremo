@@ -27,12 +27,38 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background: white;
-        padding: 20px;
+        padding: 15px;
         border-radius: 10px;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
         z-index: 20;
         width: 400px;
         text-align: center;
+        max-height: 80vh;
+      }
+
+      .modal-content {
+        max-height: calc(80vh - 60px); /* 60px per padding e pulsanti */
+        overflow-y: auto;
+        padding-right: 5px; /* Spazio per evitare che la scrollbar copra il contenuto */
+      }
+
+      /* Stile della scrollbar */
+      .modal-content::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .modal-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      .modal-content::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+      }
+
+      .modal-content::-webkit-scrollbar-thumb:hover {
+        background: #555;
       }
 
       .modal h2 {
@@ -45,12 +71,13 @@
         width: 100%;
         padding: 8px;
         margin: 5px 0;
+        box-sizing: border-box;
       }
 
       /* Limitazioni al ridimensionamento del campo textarea */
       .modal textarea {
-        resize: none; /* Disabilita il ridimensionamento */
-        height: 120px; /* Imposta una altezza fissa */
+        resize: none;
+        height: 100px;
       }
 
       .visibility-container {
@@ -66,13 +93,17 @@
         white-space: nowrap;
       }
 
+      .modal-buttons {
+        margin-top: 15px;
+      }
+
       .modal .close-btn,
       .modal .save-btn {
         border: none;
         padding: 8px 15px;
         cursor: pointer;
         border-radius: 5px;
-        margin: 10px 5px 0 5px;
+        margin: 0 5px;
       }
 
       .modal .close-btn {
@@ -132,94 +163,6 @@
 
       .navbar-container {
         position: relative;
-      }
-
-      /* Nuovo stile per il toggle di visibilità */
-      .toggle-switch {
-        position: relative;
-        width: 60px;
-        height: 30px;
-        border: 2px solid #ccc;
-        border-radius: 4px;
-        cursor: pointer;
-        overflow: hidden;
-      }
-
-      .toggle-switch input[type="checkbox"] {
-        position: absolute;
-        opacity: 0;
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
-        z-index: 2;
-      }
-
-      .toggle-switch .toggle-slider {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-      }
-
-      .toggle-switch .toggle-slider .toggle-part {
-        width: 50%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        font-weight: bold;
-      }
-
-      .toggle-switch .toggle-slider .toggle-part.check {
-        background-color: #4caf50;
-        color: white;
-      }
-
-      .toggle-switch .toggle-slider .toggle-part.times {
-        background-color: #f1f1f1;
-        color: #888;
-      }
-
-      .toggle-switch
-        input[type="checkbox"]:checked
-        + .toggle-slider
-        .toggle-part.check {
-        background-color: #f1f1f1;
-        color: #888;
-      }
-
-      .toggle-switch
-        input[type="checkbox"]:checked
-        + .toggle-slider
-        .toggle-part.times {
-        background-color: #f44336;
-        color: white;
-      }
-
-      .toggle-switch .divider {
-        position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background-color: #ccc;
-        z-index: 1;
-      }
-
-      .aggiungi-barra {
-        margin-bottom: 20px;
-      }
-
-      /* Stile per il campo info utili */
-      .info-utili {
-        margin: 10px 0;
-      }
-      .info-utili input {
-        width: 100%;
-        padding: 8px;
       }
     </style>
   </head>
@@ -284,7 +227,6 @@
       <div class="aggiungi-barra">
         <button class="aggiungi-btn" onclick="openPopup()">Aggiungi</button>
       </div>
-      <!-- Mini Event Cards -->
       <div class="minievent-cards">
         <div class="minievent-card">
           <div class="minievent-media">
@@ -307,9 +249,7 @@
             <button type="button">Scarica PDF</button>
           </div>
         </div>
-        <!-- Altri eventi mini card -->
       </div>
-      <!-- Mini Event Cards -->
       <div class="minievent-cards">
         <div class="minievent-card">
           <div class="minievent-media">
@@ -332,9 +272,7 @@
             <button type="button">Scarica PDF</button>
           </div>
         </div>
-        <!-- Altri eventi mini card -->
       </div>
-      <!-- Mini Event Cards -->
       <div class="minievent-cards">
         <div class="minievent-card">
           <div class="minievent-media">
@@ -357,9 +295,7 @@
             <button type="button">Scarica PDF</button>
           </div>
         </div>
-        <!-- Altri eventi mini card -->
       </div>
-      <!-- Mini Event Cards -->
       <div class="minievent-cards">
         <div class="minievent-card">
           <div class="minievent-media">
@@ -382,9 +318,7 @@
             <button type="button">Scarica PDF</button>
           </div>
         </div>
-        <!-- Altri eventi mini card -->
       </div>
-      <!-- Mini Event Cards -->
       <div class="minievent-cards">
         <div class="minievent-card">
           <div class="minievent-media">
@@ -407,7 +341,6 @@
             <button type="button">Scarica PDF</button>
           </div>
         </div>
-        <!-- Altri eventi mini card -->
       </div>
     </div>
 
@@ -415,68 +348,53 @@
     <div class="overlay" id="overlay" onclick="closePopup()"></div>
 
     <!-- Popup -->
-    <form class="modal" id="popup">
+    <div class="modal" id="popup">
       <h2>Aggiungi Evento</h2>
-      <input type="text" placeholder="Titolo evento" />
-      <select>
-        <option value="">Seleziona classificazione</option>
-        <option value="Adulti">Adulti</option>
-        <option value="Ragazzi">Ragazzi</option>
-        <option value="Religiosi">Religiosi</option>
-        <option value="Spettacoli">Spettacoli</option>
-      </select>
-      <input
-        type="date"
-        placeholder="Data Inizio"
-        title="Se l'evento dura un solo giorno, inserisci la stessa data in entrambi i campi"
-      />
-      <input
-        type="date"
-        placeholder="Data Fine"
-        title="Se l'evento dura un solo giorno, inserisci la stessa data in entrambi i campi"
-      />
-      <textarea placeholder="Descrizione breve"></textarea>
-      <select>
-        <option value="">Seleziona appellativo</option>
-        <option value="Relatore">Relatore</option>
-        <option value="Autore">Autore</option>
-        <option value="Lettore">Lettore</option>
-        <option value="Prete">Prete</option>
-      </select>
-      <input type="text" placeholder="Nome" />
-      <input type="text" placeholder="Cognome" />
-      <input type="number" placeholder="Orario Inizio" />
-      <input type="number" placeholder="Orario Fine" />
-      <input type="number" placeholder="Posti disponibili" />
-      <input type="number" placeholder="Costo (in €)" step="0.01" min="0" />
+      <div class="modal-content">
+        <input type="text" placeholder="Titolo evento" />
+        <select>
+          <option value="">Seleziona classificazione</option>
+          <option value="Adulti">Adulti</option>
+          <option value="Ragazzi">Ragazzi</option>
+          <option value="Religiosi">Religiosi</option>
+          <option value="Spettacoli">Spettacoli</option>
+        </select>
+        <input type="date" placeholder="Data Inizio" />
+        <input type="date" placeholder="Data Fine" />
+        <textarea placeholder="Descrizione breve"></textarea>
+        <select>
+          <option value="">Seleziona appellativo</option>
+          <option value="Relatore">Relatore</option>
+          <option value="Autore">Autore</option>
+          <option value="Lettore">Lettore</option>
+          <option value="Prete">Prete</option>
+        </select>
+        <input type="text" placeholder="Nome" />
+        <input type="text" placeholder="Cognome" />
+        <input type="number" placeholder="Orario Inizio" />
+        <input type="number" placeholder="Orario Fine" />
+        <input type="number" placeholder="Posti disponibili" />
+        <select>
+          <option value="">Seleziona costo</option>
+          <option value="Gratuito">Gratuito</option>
+          <option value="A pagamento">A pagamento</option>
+        </select>
+        <select>
+          <option value="">Possibile alloggio in sede?</option>
+          <option value="Si">Sì</option>
+          <option value="No">No</option>
+        </select>
 
-      <!-- Campo Info utili modificato -->
-      <div class="info-utili">
-        <textarea
-          placeholder="Inserisci le informazioni utili organizzate in questo modo:
-      
-  -Pensione completa
-  -Materiale didattico
-  -Assicurazione"
-          rows="6"
-        ></textarea>
-      </div>
-
-      <div class="visibility-container">
-        <label for="visibility">Rendi l'evento visibile pubblicamente</label>
-        <div class="toggle-switch">
-          <input type="checkbox" id="visibility" checked />
-          <div class="toggle-slider">
-            <div class="toggle-part check">✓</div>
-            <div class="toggle-part times">✗</div>
-          </div>
-          <div class="divider"></div>
+        <div class="visibility-container">
+          <label for="visibility">Rendi l'evento visibile pubblicamente</label>
+          <input type="checkbox" id="visibility" />
         </div>
       </div>
-
-      <button class="close-btn" onclick="closePopup()">Chiudi</button>
-      <button class="save-btn">Salva</button>
-    </form>
+      <div class="modal-buttons">
+        <button class="close-btn" onclick="closePopup()">Chiudi</button>
+        <button class="save-btn">Salva</button>
+      </div>
+    </div>
 
     <script>
       function openPopup() {
@@ -507,38 +425,10 @@
           .setAttribute("aria-expanded", "false");
       }
 
-      // Aggiungi questo script per gestire il toggle switch
-      document.addEventListener("DOMContentLoaded", function () {
-        const toggleSwitch = document.querySelector(
-          '.toggle-switch input[type="checkbox"]'
-        );
-
-        // Aggiorna lo stato iniziale
-        updateToggleState(toggleSwitch.checked);
-
-        // Aggiungi l'event listener per i cambiamenti
-        toggleSwitch.addEventListener("change", function () {
-          updateToggleState(this.checked);
-        });
-
-        // Funzione per aggiornare lo stato visivo del toggle
-        function updateToggleState(isChecked) {
-          const checkPart = document.querySelector(".toggle-part.check");
-          const timesPart = document.querySelector(".toggle-part.times");
-
-          if (isChecked) {
-            checkPart.style.backgroundColor = "#4CAF50";
-            checkPart.style.color = "white";
-            timesPart.style.backgroundColor = "#f1f1f1";
-            timesPart.style.color = "#888";
-          } else {
-            checkPart.style.backgroundColor = "#f1f1f1";
-            checkPart.style.color = "#888";
-            timesPart.style.backgroundColor = "#f44336";
-            timesPart.style.color = "white";
-          }
-        }
-      });
+      function filterEvents() {
+        // Funzione per filtrare gli eventi
+        // Implementazione da completare
+      }
     </script>
   </body>
 </html>

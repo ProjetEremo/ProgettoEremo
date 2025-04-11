@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eremo Frate Francesco - Eventi Spirituali</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary: #2C7865;
+            --secondary: #004445;
+            --accent: #FF9A3C;
+            --light: #FAF5E4;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .event-card {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .event-details {
+            padding-right: 3rem;
+            border-right: 2px solid rgba(0,0,0,0.05);
+        }
+
+        /* Sezione Prenotazione Semplificata */
+        .booking-column {
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+        }
+
+        .volantino-section {
+            margin-bottom: 2rem;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .volantino-img {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .volantino-img:hover {
+            transform: scale(1.02);
+        }
+
+        .compact-booking {
+            padding: 1.5rem;
+            background: var(--gradient);
+            border-radius: 15px;
+            margin-top: 1rem;
+        }
+
+        .booking-status {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+
+        /* Descrizione Grande in Alto */
+        .description-tile {
+            grid-column: 1 / -1;
+            background: rgba(241,242,246,0.4);
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: rgba(241,242,246,0.4);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .btn-reserve {
+            background: var(--accent);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            width: 100%;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-reserve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,154,60,0.3);
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .event-details {
+                padding-right: 0;
+                border-right: none;
+            }
+            .volantino-img {
+                height: 400px;
+            }
+        }
+
+        /* Stili per il menu mobile */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            background: #fff;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .mobile-menu.open {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+            text-decoration: none;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<header>
+    <div class="navbar-container">
+        <div class="navbar d-flex justify-content-between align-items-center">
+            <div class="logo">
+                <span class="emoji">🏔️</span>
+                <a href="index.html" class="text">Eremo Frate Francesco</a>
+            </div>
+            <div class="menu d-none d-md-flex">
+                <a href="chi-siamo.html">Chi siamo</a>
+                <a href="#">!</a>
+                <span class="separator">|</span>
+                <a href="eventiincorso.html">Calendario attivitá</a>
+                <a href="eventipassati.html">Archivio attivitá</a>
+                <span class="separator">|</span>
+                <a href="#">Incontri sulla parola</a>
+                <span class="separator">|</span>
+                <a href="#">Dove siamo</a>
+                <a href="contatti.html">Contatti</a>
+                <a href="eventiincorso.html">Eventi in corso</a>
+                <a href="eventi-passati.html">Eventi passati</a>
+            </div>
+            <div class="right-menu d-flex align-items-center">
+                <a href="accedi" class="login me-3">Accedi</a>
+                <button class="hamburger btn btn-link" onclick="toggleMenu()">☰</button>
+            </div>
+        </div>
+        <!-- Menu mobile -->
+        <nav id="mobileMenu" class="mobile-menu">
+            <a href="chi-siamo.html">Chi siamo</a>
+            <a href="#">!</a>
+            <a href="eventiincorso.html">Calendario attivitá</a>
+            <a href="eventipassati.html">Archivio attivitá</a>
+            <a href="#">Incontri sulla parola</a>
+            <a href="#">Dove siamo</a>
+            <a href="contatti.html">Contatti</a>
+            <a href="eventiincorso.html">Eventi in corso</a>
+            <a href="eventi-passati.html">Eventi passati</a>
+        </nav>
+    </div>
+</header>
+
+<div class="event-card">
+    <div class="event-media">
+        <img src="https://picsum.photos/1920/1080?random=1?natureleafgreen" alt="Event image" class="event-image" loading="lazy">
+    </div>
+
+    <div class="main-grid">
+        <!-- Colonna Sinistra - Contenuto Principale -->
+        <div class="event-details">
+            <!-- Tile Descrizione Grande -->
+            <div class="description-tile">
+                <h1 class="event-title">Ritiro Meditativo nel Silenzio</h1>
+                <div class="association-badge">Associazione: Cuori Spirituali</div>
+                <p class="description-text mt-3">Un'esperienza trasformativa della durata di 3 giorni...</p>
+            </div>
+
+            <!-- Grid Informazioni -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <i class="fas fa-clock"></i>
+                    <h4>Durata</h4>
+                    <p>3 Giorni</p>
+                    <small>15-17 Settembre 2024</small>
+                </div>
+
+                <div class="info-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h4>Location</h4>
+                    <p>Eremo Frate Francesco</p>
+                    <small>Monte Sereno, Italia</small>
+                </div>
+
+                <div class="info-card">
+                    <i class="fas fa-users"></i>
+                    <h4>Partecipanti</h4>
+                    <p>Max 20 persone</p>
+                    <small>Gruppo intimo</small>
+                </div>
+
+                <div class="info-card">
+                    <i class="fas fa-concierge-bell"></i>
+                    <h4>Servizi inclusi</h4>
+                    <ul>
+                        <li>Pensione completa</li>
+                        <li>Materiale didattico</li>
+                        <li>Assicurazione</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonna Destra - Volantino + Prenotazione -->
+        <div class="booking-column">
+            <div class="volantino-section">
+                <a href="images/volantino.png" data-lightbox="gallery">
+                    <img src="images/volantino.png" class="volantino-img" alt="Volantino">
+                </a>
+            </div>
+
+            <div class="compact-booking">
+                <div class="d-flex justify-content-between align-items-center mb-3 text-white">
+                    <div>
+                        <i class="fas fa-euro-sign"></i>
+                        <span class="h4">120,00</span>
+                    </div>
+                    <div>
+                        <i class="fas fa-chair"></i>
+                        <span class="count">20</span>/20
+                    </div>
+                </div>
+                <button class="btn-reserve">
+                    <i class="fas fa-calendar-check"></i>
+                    Prenota Ora
+                </button>
+                <div class="booking-status text-white"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sezione Commenti -->
+    <div class="comments-section mt-4">
+        <div class="comment-form mb-4">
+            <h4>Condividi la tua esperienza</h4>
+            <div class="comment-form-container">
+                <textarea placeholder="Scrivi qui il tuo commento..." class="form-control mb-2"></textarea>
+                <button class="btn-comment btn btn-primary" id="main-comment-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Pubblica
+                </button>
+            </div>
+        </div>
+
+        <div class="comments-list">
+
+        </div>
+    </div>
+</div>
+
+<!-- Script di Bootstrap, Lightbox, CryptoJS e Anime.js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+<script>
+    // Funzioni per il menu mobile
+    function toggleMenu() {
+        const menu = document.getElementById("mobileMenu");
+        const button = document.querySelector(".hamburger");
+        const isOpen = menu.classList.toggle("open");
+        button.classList.toggle("open");
+        button.setAttribute("aria-expanded", isOpen);
+    }
+
+    function closeMenu() {
+        document.getElementById("mobileMenu").classList.remove("open");
+        document.querySelector(".hamburger").classList.remove("open");
+        document.querySelector(".hamburger").setAttribute("aria-expanded", "false");
+    }
+
+    // Chiudi il menu mobile quando si passa alla modalità desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            closeMenu();
+        }
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+
+<script>
+    // Menu Mobile
+    function toggleMenu() {
+        const menu = document.querySelector(".menu");
+        const button = document.querySelector(".hamburger");
+        const isOpen = menu.style.display === "flex";
+
+        menu.style.display = isOpen ? "none" : "flex";
+        button.classList.toggle('open');
+        button.setAttribute("aria-expanded", !isOpen);
+    }
+
+    // Chiudi menu al resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            document.querySelector('.menu').style.display = 'flex';
+        } else {
+            document.querySelector('.menu').style.display = 'none';
+        }
+    });
+
+    // Sistema Prenotazione
+    const eventId = 1;
+    const totalSeats = 20;
+    let currentSeats = totalSeats - (JSON.parse(localStorage.getItem('reservations') || '{}')[eventId] || 0);
+    const currentUser = {
+        id: 1,
+        name: "Ospite",
+        email: "ospite@eremo.it",
+        avatar: getGravatar("ospite@eremo.it")
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateSeatsDisplay();
+
+        document.querySelector('.btn-reserve').addEventListener('click', handleReservation);
+        document.getElementById('main-comment-btn').addEventListener('click', addComment);
+
+        document.querySelector('.comments-list').addEventListener('click', (e) => {
+            if (e.target.closest('.like-btn')) handleReaction(e);
+            if (e.target.closest('.btn-reply')) toggleReplyForm(e);
+            if (e.target.closest('.reply-form .btn-comment')) submitReply(e.target.closest('.btn-comment'));
+        });
+    });
+
+    function updateSeatsDisplay() {
+        const seatsElement = document.querySelector('.count');
+        seatsElement.textContent = currentSeats;
+
+        if (currentSeats <= 0) {
+            document.querySelector('.btn-reserve').disabled = true;
+            document.querySelector('.btn-reserve').innerHTML = '<i class="fas fa-lock"></i> ESAURITO';
+        }
+    }
+
+    async function handleReservation() {
+        const btn = document.querySelector('.btn-reserve');
+        const spinner = btn.querySelector('.fa-spinner');
+        const seatsElement = document.querySelector('.count');
+
+        if(currentSeats <= 0 || btn.disabled) return;
+
+        btn.disabled = true;
+        spinner.classList.remove('d-none');
+
+        // Simula ritardo della prenotazione
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        try {
+            currentSeats--;
+            localStorage.setItem('reservations', JSON.stringify({[eventId]: totalSeats - currentSeats}));
+
+            seatsElement.textContent = currentSeats;
+            spawnConfetti(btn.getBoundingClientRect());
+
+            if(currentSeats <= 0) {
+                btn.innerHTML = '<i class="fas fa-lock"></i> ESAURITO';
+                document.querySelector('.booking-status').innerHTML = `
+                    <i class="fas fa-lock"></i> PRENOTAZIONI ESAURITE
+                `;
+            }
+        } catch (error) {
+            console.error('Errore prenotazione:', error);
+            currentSeats++;
+        } finally {
+            btn.disabled = false;
+            spinner.classList.add('d-none');
+        }
+    }
+
+    // Animazione Confetti
+    function spawnConfetti() {
+        const colors = ['#2C7865', '#FF9A3C', '#FAF5E4'];
+        const confettiPieces = 50;
+
+        for (let i = 0; i < confettiPieces; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.cssText = `
+                position: fixed;
+                width: 10px;
+                height: 10px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                border-radius: 50%;
+                z-index: 9999;
+                pointer-events: none;
+            `;
+
+            const startX = window.innerWidth / 2;
+            const startY = window.innerHeight / 2;
+            confetti.style.left = `${startX}px`;
+            confetti.style.top = `${startY}px`;
+
+            document.body.appendChild(confetti);
+
+            anime({
+                targets: confetti,
+                translateX: () => anime.random(-200, 200),
+                translateY: () => anime.random(-200, 200),
+                scale: [1, 0],
+                opacity: [1, 0],
+                duration: 1500,
+                easing: 'easeOutExpo',
+                complete: () => confetti.remove()
+            });
+        }
+    }
+
+    // Sistema Commenti
+    function addComment() {
+        const textarea = document.querySelector('.comment-form textarea');
+        if (textarea.value.trim()) {
+            const timestamp = new Date().toLocaleString('it-IT', {
+                hour: '2-digit',
+                minute: '2-digit',
+                day: 'numeric',
+                month: 'short'
+            });
+
+            const commentHTML = `
+                <div class="comment">
+                    <div class="comment-header">
+                        <img src="${currentUser.avatar}" class="user-avatar">
+                        <div>
+                            <strong>${currentUser.name}</strong>
+                            <small>${timestamp}</small>
+                        </div>
+                    </div>
+                    <p>${textarea.value.trim()}</p>
+                    <div class="like-system">
+                        <button class="like-btn"><i class="fas fa-heart"></i> <span>0</span></button>
+                    </div>
+                    <div class="comment-actions">
+                        <button class="btn-reply"><i class="fas fa-reply"></i> Rispondi</button>
+                    </div>
+                </div>
+            `;
+
+            document.querySelector('.comments-list').insertAdjacentHTML('afterbegin', commentHTML);
+            textarea.value = '';
+        }
+    }
+
+
+
+    function toggleReplyForm(e) {
+        const comment = e.target.closest('.comment');
+        const replyForm = comment.querySelector('.reply-form') || createReplyForm(comment);
+        replyForm.classList.toggle('active');
+    }
+
+    function createReplyForm(comment) {
+        const formHTML = `
+            <div class="reply-form">
+                <textarea placeholder="Scrivi la tua risposta..."></textarea>
+                <button class="btn-comment"><i class="fas fa-paper-plane"></i> Invia risposta</button>
+            </div>
+        `;
+        comment.insertAdjacentHTML('beforeend', formHTML);
+        return comment.querySelector('.reply-form');
+    }
+
+    function submitReply(btn) {
+        const replyForm = btn.closest('.reply-form');
+        const textarea = replyForm.querySelector('textarea');
+
+        if (textarea.value.trim()) {
+            const timestamp = new Date().toLocaleString('it-IT', {
+                hour: '2-digit',
+                minute: '2-digit',
+                day: 'numeric',
+                month: 'short'
+            });
+
+            const replyHTML = `
+                <div class="comment">
+                    <div class="comment-header">
+                        <img src="${currentUser.avatar}" class="user-avatar">
+                        <div>
+                            <strong>${currentUser.name}</strong>
+                            <small>${timestamp}</small>
+                        </div>
+                    </div>
+                    <p>${textarea.value.trim()}</p>
+                </div>
+            `;
+
+            replyForm.insertAdjacentHTML('beforebegin', replyHTML);
+            replyForm.remove();
+        }
+    }
+
+    function handleReaction(e) {
+        const btn = e.target.closest('.like-btn');
+        const countSpan = btn.querySelector('span');
+        let count = parseInt(countSpan.textContent);
+
+        btn.classList.toggle('active');
+        countSpan.textContent = btn.classList.contains('active') ? count + 1 : count - 1;
+    }
+
+    // Gravatar
+    function getGravatar(email, size = 40) {
+        const hash = CryptoJS.MD5(email.trim().toLowerCase()).toString();
+        return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=retro`;
+    }
+</script>
+</body>
+</html>
