@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/logo.png" type="image/x-icon">
+    <title>Eremo Frate Francesco</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .navbar-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            transition: transform 0.4s ease-in-out;
+            z-index: 1000;
+            transform: translateY(0);
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-container.hidden {
+            transform: translateY(-100%);
+        }
+        
+        body {
+            padding-top: 80px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="navbar-container" id="navbarContainer">
+        <div class="navbar">
+            <a href="index.html" style="text-decoration: none; color: inherit">
+                <div class="logo">
+                    <span class="emoji">🏔️</span>
+                    <h2>Eremo Frate Francesco</h2>
+                </div>
+            </a>
+            <div class="menu">
+                <a href="chi-siamo.html">Chi siamo</a>
+                <span class="separator">|</span>
+                <a href="eventiincorso.html">Calendario attivitá</a>
+                <a href="eventipassati.html">Archivio attivitá</a>
+                <span class="separator">|</span>
+                <a href="incontrisullaparola.html">Incontri sulla parola</a>
+                <span class="separator">|</span>
+                <a href="dovesiamo.html">Dove siamo</a>
+                <a href="contatti.html">Contatti</a>
+            </div>
+
+            <div class="right-menu">
+                <a href="login.html" class="login">Accedi</a>
+                <button class="hamburger" onclick="toggleMenu()" aria-expanded="false">☰</button>
+            </div>
+        </div>
+
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="chi-siamo.html" onclick="closeMenu()">Chi siamo</a>
+            <a href="eventiincorso.html" onclick="closeMenu()">Calendario attività</a>
+            <a href="eventipassati.html" onclick="closeMenu()">Archivio attività</a>
+            <a href="incontrisullaparola.html" onclick="closeMenu()">Incontri sulla parola</a>
+            <a href="dovesiamo.html" onclick="closeMenu()">Dove siamo</a>
+            <a href="contatti.html" onclick="closeMenu()">Contatti</a>
+        </div>
+    </div>
+</header>
+
+<script>
+    let lastScroll = 0;
+    const navbarContainer = document.getElementById('navbarContainer');
+    
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (currentScroll <= 0) {
+            navbarContainer.classList.remove('hidden');
+            return;
+        }
+        
+        const scrollDifference = currentScroll - lastScroll;
+        
+        if (scrollDifference > 5 && !navbarContainer.classList.contains('hidden')) {
+            navbarContainer.classList.add('hidden');
+        } 
+        else if (scrollDifference < -5 && navbarContainer.classList.contains('hidden')) {
+            navbarContainer.classList.remove('hidden');
+        }
+        
+        lastScroll = currentScroll;
+    });
+
+    function toggleMenu() {
+        const menu = document.getElementById("mobileMenu");
+        const button = document.querySelector(".hamburger");
+        const isOpen = menu.classList.toggle("open");
+        button.classList.toggle("open");
+        button.setAttribute("aria-expanded", isOpen);
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+    }
+
+    function closeMenu() {
+        document.getElementById("mobileMenu").classList.remove("open");
+        document.querySelector(".hamburger").classList.remove("open");
+        document.querySelector(".hamburger").setAttribute("aria-expanded", "false");
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('click', (event) => {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const hamburger = document.querySelector('.hamburger');
+        
+        if (mobileMenu.classList.contains('open') && 
+            !event.target.closest('.mobile-menu') && 
+            !event.target.closest('.hamburger')) {
+            closeMenu();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeMenu();
+        }
+    });
+</script>
+
+<!-- Hero Section -->
+<section class="incontri-hero">
+    <img src="images/test1.jpg" alt="Incontri sulla Parola">
+    <div class="incontri-hero-content">
+        <h1>Incontri sulla Parola</h1>
+        <p class="subtitle">Un cammino settimanale di scoperta e crescita spirituale</p>
+    </div>
+</section>
+
+<!-- Prima sezione -->
+<section class="incontri-section">
+    <div class="incontri-section-img">
+        <img src="images/test2.jpg" alt="Gruppo di studio biblico">
+    </div>
+    <div class="incontri-section-text">
+        <h2>Cosa sono gli Incontri sulla Parola?</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+    </div>
+</section>
+
+<!-- Info Cards -->
+<div class="info-cards">
+    <div class="info-card">
+        <div class="info-card-icon">📅</div>
+        <h3>Quando</h3>
+        <p>Ogni mercoledì sera<br>20:30 - 22:00</p>
+        <p class="next-date">Prossimo incontro: <span id="next-meeting-date"></span></p>
+    </div>
+
+    <div class="info-card">
+        <div class="info-card-icon">📍</div>
+        <h3>Dove</h3>
+        <p>Sede dell'Eremo<br>Via della Spiritualità, 123</p>
+    </div>
+
+    <div class="info-card">
+        <div class="info-card-icon">👥</div>
+        <h3>Per chi</h3>
+        <p>Tutti sono benvenuti!<br>Giovani, adulti, famiglie - non è richiesta alcuna preparazione specifica.</p>
+    </div>
+</div>
+
+<!-- Seconda sezione -->
+<section class="incontri-section reverse">
+    <div class="incontri-section-img">
+        <img src="images/test3.png" alt="Studio biblico">
+    </div>
+    <div class="incontri-section-text">
+        <h2>Un approccio comunitario</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+    </div>
+</section>
+
+<!-- Come si svolge -->
+<h2 style="text-align: center; margin: 4rem auto 2rem; color: var(--secondary);">Come si svolge un incontro</h2>
+
+<div class="steps-container">
+    <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Preghiera iniziale</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Lettura e analisi</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>Condivisione</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-number">4</div>
+        <h3>Preghiera finale</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+    </div>
+</div>
+
+<!-- Footer (usa il tuo esistente) -->
+
+<script>
+    // Calcola la data del prossimo mercoledì
+    function getNextWednesday() {
+        const today = new Date();
+        const day = today.getDay();
+        const diff = day <= 3 ? 3 - day : 10 - day;
+        const nextWednesday = new Date(today);
+        nextWednesday.setDate(today.getDate() + diff);
+        return nextWednesday;
+    }
+
+    // Formatta la data in italiano
+    function formatDate(date) {
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        return date.toLocaleDateString('it-IT', options);
+    }
+
+    // Aggiorna la data nel DOM
+    document.getElementById('next-meeting-date').textContent = formatDate(getNextWednesday());
+
+    // Animazioni al scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.incontri-section, .info-card, .step-card').forEach(el => {
+            observer.observe(el);
+        });
+    });
+</script>
+
+<footer>
+    <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
+</footer>
+</body>
+</html>
