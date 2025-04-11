@@ -12,7 +12,7 @@
 <header>
     <div class="navbar-container">
         <div class="navbar">
-            <a href="index.html" style="text-decoration: none; color: inherit">
+            <a href="indexaccesso.html" style="text-decoration: none; color: inherit">
                 <div class="logo">
                     <span class="emoji">🏔️</span>
                     <h2>Eremo Frate Francesco</h2>
@@ -21,30 +21,48 @@
             <div class="menu">
                 <a href="chi-siamo.html">Chi siamo</a>
                 <span class="separator">|</span>
-                <a href="eventiincorso.html">Calendario attivitá</a>
-                <a href="eventipassati.html">Archivio attivitá</a>
+                <a href="eventiincorsoaccesso.html">Calendario attivitá</a>
+                <a href="eventipassatiaccesso.html">Archivio attivitá</a>
                 <span class="separator">|</span>
-                <a href="incontrisullaparola.html">Incontri sulla parola</a>
+                <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
                 <span class="separator">|</span>
                 <a href="">Dove siamo</a>
-                <a href="contatti.html">Contatti</a>
+                <a href="contattiaccesso.html">Contatti</a>
             </div>
 
-            <!-- Contenitore Login + Hamburger -->
             <div class="right-menu">
-                <a href="login.html" class="login">Accedi</a>
-                <button class="hamburger" onclick="toggleMenu()" aria-expanded="false">☰</button>
+                <!-- Sostituisci il vecchio link con questo dropdown -->
+                <div class="user-dropdown" onclick="toggleUserMenu()">
+                    <button class="user-btn">
+                        <span class="user-avatar">😺</span>
+                        <span class="user-name">Area Personale</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="areapersonale.html" class="dropdown-item">Il mio profilo</a>
+                        <a href="gestisciprenotazioni.html" class="dropdown-item">Le mie prenotazioni</a>
+                        <a href="logout.html" class="dropdown-item">Esci</a>
+                    </div>
+                </div>
+                <button class="hamburger" onclick="toggleMenu()">☰</button>
             </div>
-        </div>
-
-        <!-- Menu Mobile -->
-        <div class="mobile-menu" id="mobileMenu">
-            <a href="chi-siamo.html" onclick="closeMenu()">Chi siamo</a>
-            <a href="contatti.html" onclick="closeMenu()">Contatti</a>
-            <a href="eventiincorso.html" onclick="closeMenu()">Eventi in corso</a>
-            <a href="eventi-passati.html" onclick="closeMenu()">Eventi passati</a>
         </div>
     </div>
+
+    <script>
+        function toggleUserMenu() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Chiudi il dropdown se si clicca fuori
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.user-dropdown');
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    </script>
 </header>
 
     <script>
@@ -63,8 +81,17 @@
         }
     </script>
 
-<h1 class="titoloeventiincorso">EVENTI IN CORSO:</h1>
-
+<h1 class="titoloeventiincorso">EVENTI PASSATI:</h1>
+<div class="search-box">
+    <input type="text" id="searchTitle" placeholder="Cerca per titolo...">
+    <input type="date" id="searchDate">
+    <select id="searchAuthor">
+        <option value="">Seleziona relatore</option>
+        <option value="Luca Maugeri">Luca Maugeri</option>
+        <option value="Francesco Rossi">Francesco Rossi</option>
+    </select>
+    <button onclick="filterEvents()">Cerca</button>
+</div>
     <div class="event-card2">
         <div class="minievent-card">
             <div class="minievent-media">
