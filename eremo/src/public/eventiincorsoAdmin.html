@@ -6,8 +6,8 @@
     <link rel="icon" href="images/logo.png" type="image/x-icon" />
     <title>Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css" />
+    <!-- Stile del popup -->
     <style>
-      /* Stile per il popup e la sfocatura */
       .overlay {
         display: none;
         position: fixed;
@@ -17,7 +17,7 @@
         height: 100%;
         background: rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(5px);
-        z-index: 10;
+        z-index: 1000;
       }
 
       .modal {
@@ -27,199 +27,187 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background: white;
-        padding: 20px;
+        padding: 30px;
         border-radius: 10px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-        z-index: 20;
-        width: 400px;
-        text-align: center;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
       }
 
       .modal h2 {
-        margin-bottom: 10px;
+        margin-bottom: 25px;
+        color: #2c3e50;
+        text-align: center;
+        font-size: 24px;
+        border-bottom: 2px solid #f1f1f1;
+        padding-bottom: 10px;
       }
 
-      .modal input,
-      .modal select,
-      .modal textarea {
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #34495e;
+      }
+
+      .form-control {
         width: 100%;
-        padding: 8px;
-        margin: 5px 0;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 15px;
+        transition: border 0.3s;
       }
 
-      /* Limitazioni al ridimensionamento del campo textarea */
-      .modal textarea {
-        resize: none; /* Disabilita il ridimensionamento */
-        height: 120px; /* Imposta una altezza fissa */
+      .form-control:focus {
+        border-color: #3498db;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
       }
 
-      .visibility-container {
+      textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 15px;
+      }
+
+      .form-row .form-group {
+        flex: 1;
+      }
+
+      .toggle-container {
         display: flex;
         align-items: center;
-        justify-content: flex-start;
-        margin: 10px 0;
-        gap: 10px;
-      }
-
-      .visibility-container label {
-        font-size: 14px;
-        white-space: nowrap;
-      }
-
-      .modal .close-btn,
-      .modal .save-btn {
-        border: none;
-        padding: 8px 15px;
-        cursor: pointer;
-        border-radius: 5px;
-        margin: 10px 5px 0 5px;
-      }
-
-      .modal .close-btn {
-        background: red;
-        color: white;
-      }
-
-      .modal .save-btn {
-        background: green;
-        color: white;
-      }
-
-      /* Sfoca solo il corpo della pagina, non il popup */
-      body.blurred > *:not(.modal):not(.overlay) {
-        filter: blur(5px);
-        pointer-events: none;
-      }
-
-      /* Stili per il menu mobile */
-      .right-menu {
-        display: flex;
-        align-items: center;
-      }
-
-      .hamburger {
-        font-size: 30px;
-        background: none;
-        border: none;
-        cursor: pointer;
-      }
-
-      .mobile-menu {
-        display: none;
-        position: fixed;
-        top: 0;
-        right: 0;
-        background: #fff;
-        width: 200px;
-        height: 100%;
-        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
-      }
-
-      .mobile-menu.open {
-        display: block;
-      }
-
-      .mobile-menu a {
+        justify-content: space-between;
+        margin: 20px 0;
         padding: 15px;
-        text-decoration: none;
-        display: block;
-        color: #333;
+        border-radius: 6px;
       }
 
-      .mobile-menu a:hover {
-        background-color: #f1f1f1;
+      .toggle-label {
+        font-weight: 600;
+        color: #34495e;
       }
 
-      .navbar-container {
-        position: relative;
-      }
-
-      /* Nuovo stile per il toggle di visibilità */
       .toggle-switch {
         position: relative;
         width: 60px;
-        height: 30px;
-        border: 2px solid #ccc;
-        border-radius: 4px;
-        cursor: pointer;
-        overflow: hidden;
+        height: 34px;
       }
 
-      .toggle-switch input[type="checkbox"] {
-        position: absolute;
+      .toggle-switch input {
         opacity: 0;
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
-        z-index: 2;
+        width: 0;
+        height: 0;
       }
 
-      .toggle-switch .toggle-slider {
+      .slider {
         position: absolute;
+        cursor: pointer;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-      }
-
-      .toggle-switch .toggle-slider .toggle-part {
-        width: 50%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        font-weight: bold;
-      }
-
-      .toggle-switch .toggle-slider .toggle-part.check {
-        background-color: #4caf50;
-        color: white;
-      }
-
-      .toggle-switch .toggle-slider .toggle-part.times {
-        background-color: #f1f1f1;
-        color: #888;
-      }
-
-      .toggle-switch
-        input[type="checkbox"]:checked
-        + .toggle-slider
-        .toggle-part.check {
-        background-color: #f1f1f1;
-        color: #888;
-      }
-
-      .toggle-switch
-        input[type="checkbox"]:checked
-        + .toggle-slider
-        .toggle-part.times {
-        background-color: #f44336;
-        color: white;
-      }
-
-      .toggle-switch .divider {
-        position: absolute;
-        left: 50%;
-        top: 0;
+        right: 0;
         bottom: 0;
-        width: 2px;
         background-color: #ccc;
-        z-index: 1;
+        transition: 0.4s;
+        border-radius: 34px;
       }
 
-      .aggiungi-barra {
-        margin-bottom: 20px;
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
       }
 
-      /* Stile per il campo info utili */
-      .info-utili {
-        margin: 10px 0;
+      input:checked + .slider {
+        background-color: #2ecc71;
       }
-      .info-utili input {
-        width: 100%;
-        padding: 8px;
+
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      .button-group {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 25px;
+      }
+
+      .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-close {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 12px 24px; /* Identico al .btn-save */
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 15px; /* Stessa dimensione testo */
+        cursor: pointer;
+        transition: all 0.3s;
+        margin: 0; /* Allineamento perfetto */
+        line-height: 1.5; /* Altezza testo uguale */
+      }
+
+      .btn-close:hover {
+        background-color: #c0392b; /* Rosso più scuro all'hover */
+        transform: translateY(
+          -1px
+        ); /* Leggera elevazione al passaggio del mouse */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Ombra per effetto 3D */
+      }
+
+      .btn-save {
+        background-color: #2ecc71;
+        color: white;
+      }
+
+      .btn-save:hover {
+        background-color: #27ae60;
+      }
+
+      .info-hint {
+        font-size: 12px;
+        color: #7f8c8d;
+        margin-top: 5px;
+        font-style: italic;
+      }
+
+      @media (max-width: 768px) {
+        .form-row {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .modal {
+          padding: 20px;
+          width: 95%;
+        }
       }
     </style>
   </head>
@@ -414,131 +402,180 @@
     <!-- Overlay per la sfocatura -->
     <div class="overlay" id="overlay" onclick="closePopup()"></div>
 
-    <!-- Popup -->
-    <form class="modal" id="popup">
-      <h2>Aggiungi Evento</h2>
-      <input type="text" placeholder="Titolo evento" />
-      <select>
-        <option value="">Seleziona classificazione</option>
-        <option value="Adulti">Adulti</option>
-        <option value="Ragazzi">Ragazzi</option>
-        <option value="Religiosi">Religiosi</option>
-        <option value="Spettacoli">Spettacoli</option>
-      </select>
-      <input
-        type="date"
-        placeholder="Data Inizio"
-        title="Se l'evento dura un solo giorno, inserisci la stessa data in entrambi i campi"
-      />
-      <input
-        type="date"
-        placeholder="Data Fine"
-        title="Se l'evento dura un solo giorno, inserisci la stessa data in entrambi i campi"
-      />
-      <textarea placeholder="Descrizione breve"></textarea>
-      <select>
-        <option value="">Seleziona appellativo</option>
-        <option value="Relatore">Relatore</option>
-        <option value="Autore">Autore</option>
-        <option value="Lettore">Lettore</option>
-        <option value="Prete">Prete</option>
-      </select>
-      <input type="text" placeholder="Nome" />
-      <input type="text" placeholder="Cognome" />
-      <input type="number" placeholder="Orario Inizio" />
-      <input type="number" placeholder="Orario Fine" />
-      <input type="number" placeholder="Posti disponibili" />
-      <input type="number" placeholder="Costo (in €)" step="0.01" min="0" />
+    <!-- HTML del popup -->
 
-      <!-- Campo Info utili modificato -->
-      <div class="info-utili">
-        <textarea
-          placeholder="Inserisci le informazioni utili organizzate in questo modo:
-      
-  -Pensione completa
-  -Materiale didattico
-  -Assicurazione"
-          rows="6"
-        ></textarea>
-      </div>
+    <div class="overlay" id="overlay" onclick="closePopup()"></div>
 
-      <div class="visibility-container">
-        <label for="visibility">Rendi l'evento visibile pubblicamente</label>
-        <div class="toggle-switch">
-          <input type="checkbox" id="visibility" checked />
-          <div class="toggle-slider">
-            <div class="toggle-part check">✓</div>
-            <div class="toggle-part times">✗</div>
-          </div>
-          <div class="divider"></div>
+    <div class="modal" id="popup">
+      <h2>Aggiungi nuovo evento</h2>
+
+      <form id="eventForm">
+        <div class="form-group">
+          <label for="eventTitle">Titolo dell'Evento *</label>
+          <input
+            type="text"
+            id="eventTitle"
+            class="form-control"
+            required
+            placeholder="Es: Meditazione Guidata"
+          />
         </div>
-      </div>
 
-      <button class="close-btn" onclick="closePopup()">Chiudi</button>
-      <button class="save-btn">Salva</button>
-    </form>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eventCategory">Categoria *</label>
+            <select id="eventCategory" class="form-control" required>
+              <option value="">Seleziona una categoria</option>
+              <option value="meditazione">Meditazione</option>
+              <option value="preghiera">Preghiera</option>
+              <option value="incontro">Incontro Spirituale</option>
+              <option value="ritiro">Ritiro</option>
+              <option value="altro">Altro</option>
+            </select>
+          </div>
 
+          <div class="form-group">
+            <label for="eventSpeaker">Relatore *</label>
+            <input
+              type="text"
+              id="eventSpeaker"
+              class="form-control"
+              required
+              placeholder="Nome del relatore"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="startDate">Data Inizio *</label>
+            <input type="date" id="startDate" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="endDate">Data Fine *</label>
+            <input type="date" id="endDate" class="form-control" required />
+            <p class="info-hint">
+              Per eventi di un solo giorno, usare la stessa data
+            </p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="startTime">Ora Inizio *</label>
+            <input type="time" id="startTime" class="form-control" required />
+          </div>
+
+          <div class="form-group">
+            <label for="endTime">Ora Fine *</label>
+            <input type="time" id="endTime" class="form-control" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="availableSeats">Posti Disponibili *</label>
+            <input
+              type="number"
+              id="availableSeats"
+              class="form-control"
+              required
+              min="1"
+              placeholder="50"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="eventCost">Costo (€)</label>
+            <input
+              type="number"
+              id="eventCost"
+              class="form-control"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="eventDescription">Descrizione *</label>
+          <textarea
+            id="eventDescription"
+            class="form-control"
+            required
+            placeholder="Descrizione dettagliata dell'evento..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="eventInfo">Informazioni Utili</label>
+          <textarea
+            id="eventInfo"
+            class="form-control"
+            placeholder="Inserisci informazioni aggiuntive organizzate in punti:
+- Cosa portare
+- Requisiti di partecipazione
+- Note importanti"
+          ></textarea>
+        </div>
+
+        <div class="toggle-container">
+          <span class="toggle-label">Evento pubblico</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="eventVisibility" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="btn btn-close" onclick="closePopup()">
+            Annulla
+          </button>
+          <button type="submit" class="btn btn-save">Salva Evento</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- JavaScript del popup -->
     <script>
       function openPopup() {
         document.getElementById("popup").style.display = "block";
         document.getElementById("overlay").style.display = "block";
-        document.body.classList.add("blurred");
+        document.body.style.overflow = "hidden";
       }
 
       function closePopup() {
         document.getElementById("popup").style.display = "none";
         document.getElementById("overlay").style.display = "none";
-        document.body.classList.remove("blurred");
+        document.body.style.overflow = "auto";
       }
 
-      function toggleMenu() {
-        const menu = document.getElementById("mobileMenu");
-        const button = document.querySelector(".hamburger");
-        const isOpen = menu.classList.toggle("open");
-        button.classList.toggle("open");
-        button.setAttribute("aria-expanded", isOpen);
-      }
+      document
+        .getElementById("eventForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
 
-      function closeMenu() {
-        document.getElementById("mobileMenu").classList.remove("open");
-        document.querySelector(".hamburger").classList.remove("open");
-        document
-          .querySelector(".hamburger")
-          .setAttribute("aria-expanded", "false");
-      }
+          const formData = {
+            title: document.getElementById("eventTitle").value,
+            category: document.getElementById("eventCategory").value,
+            speaker: document.getElementById("eventSpeaker").value,
+            startDate: document.getElementById("startDate").value,
+            endDate: document.getElementById("endDate").value,
+            startTime: document.getElementById("startTime").value,
+            endTime: document.getElementById("endTime").value,
+            seats: document.getElementById("availableSeats").value,
+            cost: document.getElementById("eventCost").value,
+            description: document.getElementById("eventDescription").value,
+            info: document.getElementById("eventInfo").value,
+            isPublic: document.getElementById("eventVisibility").checked,
+          };
 
-      // Aggiungi questo script per gestire il toggle switch
-      document.addEventListener("DOMContentLoaded", function () {
-        const toggleSwitch = document.querySelector(
-          '.toggle-switch input[type="checkbox"]'
-        );
-
-        // Aggiorna lo stato iniziale
-        updateToggleState(toggleSwitch.checked);
-
-        // Aggiungi l'event listener per i cambiamenti
-        toggleSwitch.addEventListener("change", function () {
-          updateToggleState(this.checked);
+          console.log("Dati evento:", formData);
+          alert("Evento salvato con successo!");
+          closePopup();
         });
-
-        // Funzione per aggiornare lo stato visivo del toggle
-        function updateToggleState(isChecked) {
-          const checkPart = document.querySelector(".toggle-part.check");
-          const timesPart = document.querySelector(".toggle-part.times");
-
-          if (isChecked) {
-            checkPart.style.backgroundColor = "#4CAF50";
-            checkPart.style.color = "white";
-            timesPart.style.backgroundColor = "#f1f1f1";
-            timesPart.style.color = "#888";
-          } else {
-            checkPart.style.backgroundColor = "#f1f1f1";
-            checkPart.style.color = "#888";
-            timesPart.style.backgroundColor = "#f44336";
-            timesPart.style.color = "white";
-          }
-        }
-      });
     </script>
   </body>
 </html>
