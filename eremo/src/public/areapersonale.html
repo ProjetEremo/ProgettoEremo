@@ -3,176 +3,417 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profilo - Nome Eremo</title>
+  <title>Area Personale - Eremo Frate Francesco</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Stili aggiuntivi se necessari per il dropdown utente */
+    .user-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .user-dropdown .user-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .user-dropdown .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 110%; /* Posiziona sotto il bottone */
+      background-color: var(--white);
+      min-width: 180px;
+      box-shadow: var(--shadow-medium);
+      z-index: 1001;
+      border-radius: 8px;
+      overflow: hidden; /* Per bordi arrotondati */
+      border: 1px solid var(--gray-light);
+    }
+
+    .user-dropdown .dropdown-menu a {
+      color: var(--dark);
+      padding: 0.8rem 1.2rem;
+      text-decoration: none;
+      display: block;
+      font-size: 0.95rem;
+      white-space: nowrap; /* Evita che il testo vada a capo */
+    }
+
+    .user-dropdown .dropdown-menu a:hover {
+      background-color: var(--light);
+      color: var(--primary);
+    }
+    .user-dropdown .dropdown-menu a:last-child {
+      border-top: 1px solid var(--gray-light); /* Separatore per Esci */
+      color: var(--accent); /* Colore diverso per Esci */
+    }
+    .user-dropdown .dropdown-menu a:last-child:hover {
+      background-color: #fbeadf; /* Sfondo leggermente diverso per Esci */
+    }
+
+    .user-dropdown.show .dropdown-menu {
+      display: block;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .user-dropdown .dropdown-arrow {
+      font-size: 0.8rem;
+      transition: transform var(--transition-fast);
+    }
+    .user-dropdown.show .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+
+    .avatar-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+
+    .avatar-option {
+      font-size: 2rem;
+      padding: 0.8rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: var(--transition-medium);
+      background: var(--gray-light);
+      width: 50px; /* Dimensione fissa */
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid transparent;
+    }
+
+    .avatar-option:hover {
+      transform: scale(1.1);
+      background: var(--light);
+    }
+    .avatar-option.selected {
+      border-color: var(--secondary);
+      background-color: var(--light);
+      box-shadow: 0 0 0 3px rgba(141, 177, 135, 0.3);
+    }
+  </style>
 </head>
 <body>
-<div class="navbar">
-  <a href="indexaccesso.html" style="text-decoration: none; color: inherit">
+
+<header class="navbar-container" id="navbarContainer">
+  <nav class="navbar">
     <div class="logo">
-      <span class="emoji">🏔️</span>
-      <h2>Eremo Frate Francesco</h2>
+      <a href="index.html"> <span class="emoji">🏔️</span>
+        <h2>Eremo Frate Francesco</h2>
+      </a>
     </div>
-  </a>
-  <div class="menu">
-    <a href="chi-siamo.html">Chi siamo</a>
-    <span class="separator">|</span>
-    <a href="eventiincorsoaccesso.html">Calendario attivitá</a>
-    <a href="eventipassatiaccesso.html">Archivio attivitá</a>
-    <span class="separator">|</span>
-    <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
-    <span class="separator">|</span>
-    <a href="">Dove siamo</a>
-    <a href="contattiaccesso.html">Contatti</a>
-  </div>
-
-  <div class="right-menu">
-    <!-- Sostituisci il vecchio link con questo dropdown -->
-    <div class="user-dropdown" onclick="toggleUserMenu()">
-      <button class="user-btn">
-        <span class="user-avatar">👤</span>
-        <span class="user-name">Area Personale</span>
-        <span class="dropdown-arrow">▼</span>
-      </button>
-      <div class="dropdown-menu">
-        <a href="profilo.html" class="dropdown-item">Il mio profilo</a>
-        <a href="gestisciprenotazioni.html" class="dropdown-item">Le mie prenotazioni</a>
-        <a href="logout.html" class="dropdown-item">Esci</a>
+    <div class="menu">
+      <a href="chi-siamo.html">Chi siamo</a>
+      <span class="separator">|</span>
+      <a href="eventiincorso.html">Calendario attività</a>
+      <a href="eventipassati.html">Archivio attività</a>
+      <span class="separator">|</span>
+      <a href="incontrisullaparola.html">Incontri sulla parola</a>
+      <span class="separator">|</span>
+      <a href="dovesiamo.html">Dove siamo</a>
+      <a href="contatti.html">Contatti</a>
+    </div>
+    <div class="right-menu">
+      <div class="user-dropdown" id="userDropdownContainer">
+        <button class="user-btn" onclick="toggleUserMenu()" aria-haspopup="true" aria-expanded="false">
+          <span class="user-avatar" id="navbar-avatar">👤</span> <span class="user-name" id="navbar-username">Area Personale</span> <span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
+          <a href="areapersonale.html">Il mio profilo</a>
+          <a href="areapersonale.html#prenotazioni">Le mie prenotazioni</a> <a href="#" onclick="logout()">Esci</a> </div>
       </div>
+      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
     </div>
-    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="chi-siamo.html" onclick="closeMobileMenu()">Chi siamo</a>
+    <a href="eventiincorso.html" onclick="closeMobileMenu()">Calendario attività</a>
+    <a href="eventipassati.html" onclick="closeMobileMenu()">Archivio attività</a>
+    <a href="incontrisullaparola.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
+    <a href="dovesiamo.html" onclick="closeMobileMenu()">Dove siamo</a>
+    <a href="contatti.html" onclick="closeMobileMenu()">Contatti</a>
+    <hr style="border-color: rgba(255,255,255,0.1);">
+    <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
+    <a href="areapersonale.html#prenotazioni" onclick="closeMobileMenu()">Le mie prenotazioni</a>
+    <a href="#" onclick="logout(); closeMobileMenu();">Esci</a>
   </div>
-</div>
+</header>
 
-<!-- Hero Section -->
-<div class="profile-header">
-  <div class="avatar-container" id="main-avatar">
-    👤
+<main>
+  <div class="profile-header">
+    <div class="avatar-container" id="main-avatar">
+      👤 </div>
+    <h1 id="profile-greeting">Il Tuo Profilo</h1> <p>Gestisci le tue informazioni personali e le preferenze.</p>
   </div>
-  <h1>Il Tuo Profilo</h1>
-  <p>Gestisci le tue informazioni personali e le preferenze</p>
-</div>
 
-<!-- Informazioni Personali -->
-<div class="profile-section">
-  <h2 style="color: var(--secondary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
-    <span>📝</span> Informazioni Personali
-  </h2>
+  <div class="container">
+    <section class="profile-section">
+      <h2><i class="fas fa-user-edit" style="margin-right: 8px;"></i> Informazioni Personali</h2>
+      <form id="profile-info-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nome">Nome</label>
+            <input type="text" id="nome" class="form-control" value="Mario" required> </div>
+          <div class="form-group">
+            <label for="cognome">Cognome</label>
+            <input type="text" id="cognome" class="form-control" value="Rossi" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" class="form-control" value="mario.rossi@example.com" disabled> </div>
+          <div class="form-group">
+            <label for="telefono">Telefono (facoltativo)</label>
+            <input type="tel" id="telefono" class="form-control" placeholder="+39 123 456789">
+          </div>
+        </div>
+        <button type="submit" class="btn-save">Salva Info Personali</button>
+      </form>
+    </section>
 
-  <div class="form-grid">
-    <div class="form-group">
-      <label for="nome">Nome</label>
-      <input type="text" id="nome" class="form-control" value="Mario">
-    </div>
+    <section class="profile-section">
+      <h2><i class="fas fa-image" style="margin-right: 8px;"></i> Icona Profilo</h2>
+      <p>Scegli un'icona che ti rappresenti:</p>
+      <div class="avatar-options">
+        <div class="avatar-option selected" data-emoji="👤">👤</div>
+        <div class="avatar-option" data-emoji="👩">👩</div>
+        <div class="avatar-option" data-emoji="🧔">🧔</div>
+        <div class="avatar-option" data-emoji="🧓">🧓</div>
+        <div class="avatar-option" data-emoji="🧘">🧘</div>
+        <div class="avatar-option" data-emoji="🙏">🙏</div>
+        <div class="avatar-option" data-emoji="🌳">🌳</div>
+        <div class="avatar-option" data-emoji="🕊️">🕊️</div>
+      </div>
+      <button class="btn-save" id="save-avatar-btn">Salva Icona</button>
+    </section>
 
-    <div class="form-group">
-      <label for="cognome">Cognome</label>
-      <input type="text" id="cognome" class="form-control" value="Rossi">
-    </div>
+    <section class="profile-section">
+      <h2><i class="fas fa-lock" style="margin-right: 8px;"></i> Sicurezza Account</h2>
+      <form id="password-change-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="vecchia-password">Password Attuale</label>
+            <input type="password" id="vecchia-password" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="nuova-password">Nuova Password</label>
+            <input type="password" id="nuova-password" class="form-control" required minlength="8"> <small>Minimo 8 caratteri.</small>
+          </div>
+          <div class="form-group">
+            <label for="conferma-password">Conferma Nuova Password</label>
+            <input type="password" id="conferma-password" class="form-control" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-save">Cambia Password</button>
+      </form>
+    </section>
 
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" class="form-control" value="mario.rossi@example.com">
-    </div>
+    <section class="profile-section" id="prenotazioni">
+      <h2><i class="fas fa-calendar-check" style="margin-right: 8px;"></i> Le Mie Prenotazioni</h2>
+      <div class="card-grid" id="user-bookings-grid">
+        <article class="card prenotazione-card-sim">
+          <div class="card-image-container">
+            <img src="https://picsum.photos/400/250?random=meditation,spirituality" alt="Ritiro Meditazione" class="card-image">
+          </div>
+          <div class="card-content">
+            <h3>Ritiro di Meditazione Profonda</h3>
+            <p class="card-info">
+              <b>Data:</b> 15-17 Maggio 2025 <br>
+              <b>Stato:</b> <span style="color: green; font-weight: bold;">Confermata</span>
+            </p>
+            <p>Prenotazione per 1 persona.</p>
+            <div class="card-actions">
+              <a href="evento.html?id=1" class="card-btn card-btn-secondary">Vedi Evento</a>
+              <button class="card-btn card-btn-secondary btn-annulla-prenotazione" data-booking-id="123">Annulla</button>
+            </div>
+          </div>
+        </article>
 
-    <div class="form-group">
-      <label for="telefono">Telefono</label>
-      <input type="tel" id="telefono" class="form-control" value="+39 123 456789">
-    </div>
-  </div>
-</div>
+        <article class="card prenotazione-card-sim" style="opacity: 0.7;">
+          <div class="card-image-container">
+            <img src="https://picsum.photos/400/250?random=art,iconography" alt="Corso Iconografia" class="card-image">
+          </div>
+          <div class="card-content">
+            <h3>Corso di Iconografia Bizantina</h3>
+            <p class="card-info">
+              <b>Data:</b> 10-15 Febbraio 2024 <br>
+              <b>Stato:</b> <span style="color: gray;">Concluso</span>
+            </p>
+            <p>Evento passato.</p>
+            <div class="card-actions">
+              <a href="evento.html?id=past_1" class="card-btn card-btn-secondary">Vedi Evento</a>
+            </div>
+          </div>
+        </article>
 
-<!-- Icona Profilo -->
-<div class="profile-section">
-  <h2 style="color: var(--secondary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
-    <span>🖼️</span> Icona Profilo
-  </h2>
+        <div id="no-bookings-message" style="display: none; text-align: center; grid-column: 1 / -1; padding: 2rem; color: var(--gray-dark);">
+          <p>Non hai nessuna prenotazione attiva al momento.</p>
+          <a href="eventiincorso.html" class="card-btn card-btn-primary" style="max-width: 200px; margin: 1rem auto;">Scopri le attività</a>
+        </div>
+      </div>
+    </section>
 
-  <p>Scegli un'icona che ti rappresenti:</p>
+  </div> </main>
 
-  <div class="avatar-options">
-    <div class="avatar-option" data-emoji="👤">👤</div>
-    <div class="avatar-option" data-emoji="👩">👩</div>
-    <div class="avatar-option" data-emoji="🧔">🧔</div>
-    <div class="avatar-option" data-emoji="🧓">🧓</div>
-    <div class="avatar-option" data-emoji="🧘">🧘</div>
-    <div class="avatar-option" data-emoji="🙏">🙏</div>
-  </div>
-</div>
-
-<!-- Cambio Password -->
-<div class="profile-section">
-  <h2 style="color: var(--secondary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
-    <span>🔒</span> Sicurezza
-  </h2>
-
-  <div class="form-grid">
-    <div class="form-group">
-      <label for="vecchia-password">Password Attuale</label>
-      <input type="password" id="vecchia-password" class="form-control">
-    </div>
-
-    <div class="form-group">
-      <label for="nuova-password">Nuova Password</label>
-      <input type="password" id="nuova-password" class="form-control">
-    </div>
-
-    <div class="form-group">
-      <label for="conferma-password">Conferma Password</label>
-      <input type="password" id="conferma-password" class="form-control">
-    </div>
-  </div>
-</div>
-
-<!-- Pulsante Salva -->
-<button class="btn-save">Salva Modifiche</button>
+<footer>
+  <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia</p>
+</footer>
 
 <script>
-  // Gestione selezione avatar
+  // --- Navbar & Mobile Menu Logic (come index.html) ---
+  let lastScroll = 0;
+  const navbarContainer = document.getElementById('navbarContainer');
+  window.addEventListener('scroll', function() { /* ... */ });
+  const mobileMenu = document.getElementById("mobileMenu");
+  const hamburger = document.querySelector(".hamburger");
+  function toggleMobileMenu() { /* ... */ }
+  function closeMobileMenu() { /* ... */ }
+
+  // --- User Dropdown Logic ---
+  function toggleUserMenu() {
+    const dropdown = document.querySelector('.user-dropdown');
+    const isOpen = dropdown.classList.toggle('show');
+    dropdown.querySelector('.user-btn').setAttribute('aria-expanded', isOpen);
+  }
+
+  // Chiudi dropdown se si clicca fuori
+  document.addEventListener('click', function(event) {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown && !dropdown.contains(event.target)) {
+      dropdown.classList.remove('show');
+      dropdown.querySelector('.user-btn').setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // --- Logica Area Personale ---
+
+  // Dati Utente (simulati, dovrebbero venire dal backend/localStorage)
+  const userData = {
+    nome: "Mario",
+    cognome: "Rossi",
+    email: "mario.rossi@example.com",
+    telefono: "+39 123 456789",
+    avatar: "🧘" // Avatar selezionato
+  };
+
+  // Popola campi all'avvio
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('nome').value = userData.nome;
+    document.getElementById('cognome').value = userData.cognome;
+    document.getElementById('email').value = userData.email;
+    document.getElementById('telefono').value = userData.telefono || '';
+    document.getElementById('profile-greeting').textContent = `Ciao, ${userData.nome}!`;
+    document.getElementById('navbar-username').textContent = userData.nome; // Aggiorna nome navbar
+
+    // Imposta avatar selezionato
+    document.getElementById('main-avatar').textContent = userData.avatar;
+    document.getElementById('navbar-avatar').textContent = userData.avatar; // Aggiorna avatar navbar
+    document.querySelectorAll('.avatar-option').forEach(opt => {
+      if (opt.getAttribute('data-emoji') === userData.avatar) {
+        opt.classList.add('selected');
+      } else {
+        opt.classList.remove('selected');
+      }
+    });
+
+    // Mostra/Nascondi messaggio prenotazioni (simulato)
+    const bookingsGrid = document.getElementById('user-bookings-grid');
+    const noBookingsMsg = document.getElementById('no-bookings-message');
+    if (bookingsGrid.children.length <= 1) { // Controlla se ci sono solo card "vere"
+      noBookingsMsg.style.display = 'block';
+    }
+  });
+
+  // Gestione Selezione Avatar
   const avatarOptions = document.querySelectorAll('.avatar-option');
   const mainAvatar = document.getElementById('main-avatar');
-  const currentAvatar = document.getElementById('current-avatar');
+  const navbarAvatar = document.getElementById('navbar-avatar');
+  let selectedAvatarEmoji = userData.avatar; // Tiene traccia dell'avatar selezionato
 
   avatarOptions.forEach(option => {
     option.addEventListener('click', function() {
-      // Rimuovi la classe 'selected' da tutte le opzioni
       avatarOptions.forEach(opt => opt.classList.remove('selected'));
-
-      // Aggiungi la classe 'selected' all'opzione cliccata
       this.classList.add('selected');
-
-      // Aggiorna l'avatar principale e nell'header
-      const selectedEmoji = this.getAttribute('data-emoji');
-      mainAvatar.textContent = selectedEmoji;
-      currentAvatar.textContent = selectedEmoji;
+      selectedAvatarEmoji = this.getAttribute('data-emoji');
+      // Aggiorna subito l'anteprima, ma salva solo al click su "Salva Icona"
+      mainAvatar.textContent = selectedAvatarEmoji;
     });
   });
 
-  // Simulazione salvataggio
-  document.querySelector('.btn-save').addEventListener('click', function() {
-    alert('Modifiche salvate con successo!');
+  // Salvataggio Icona
+  document.getElementById('save-avatar-btn')?.addEventListener('click', () => {
+    userData.avatar = selectedAvatarEmoji;
+    navbarAvatar.textContent = userData.avatar; // Aggiorna anche navbar
+    // Qui logica per salvare l'avatar nel backend/localStorage
+    alert('Icona profilo aggiornata!');
   });
 
-  // Funzione per il dropdown menu (già presente nel tuo codice)
-  function toggleUserMenu() {
-    const dropdown = document.querySelector('.user-dropdown');
-    dropdown.classList.toggle('show');
+  // Salvataggio Info Personali
+  document.getElementById('profile-info-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    userData.nome = document.getElementById('nome').value;
+    userData.cognome = document.getElementById('cognome').value;
+    userData.telefono = document.getElementById('telefono').value;
+    // Aggiorna UI
+    document.getElementById('profile-greeting').textContent = `Ciao, ${userData.nome}!`;
+    document.getElementById('navbar-username').textContent = userData.nome;
+    // Qui logica per salvare i dati nel backend/localStorage
+    alert('Informazioni personali aggiornate!');
+  });
+
+  // Cambio Password
+  document.getElementById('password-change-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const oldPass = document.getElementById('vecchia-password').value;
+    const newPass = document.getElementById('nuova-password').value;
+    const confirmPass = document.getElementById('conferma-password').value;
+
+    if (newPass !== confirmPass) {
+      alert('Le nuove password non coincidono!');
+      return;
+    }
+    if (newPass.length < 8) {
+      alert('La nuova password deve essere di almeno 8 caratteri.');
+      return;
+    }
+    // Qui logica per verificare vecchia password e salvare la nuova nel backend
+    console.log("Tentativo cambio password:", { oldPass, newPass });
+    alert('Password aggiornata con successo (simulato)!');
+    // Resetta i campi password
+    document.getElementById('vecchia-password').value = '';
+    document.getElementById('nuova-password').value = '';
+    document.getElementById('conferma-password').value = '';
+  });
+
+  // Annulla Prenotazione (Simulato)
+  document.querySelectorAll('.btn-annulla-prenotazione').forEach(button => {
+    button.addEventListener('click', function() {
+      const bookingId = this.getAttribute('data-booking-id');
+      if (confirm('Sei sicuro di voler annullare questa prenotazione?')) {
+        console.log(`Annullamento prenotazione ${bookingId}`);
+        // Qui logica API per annullare
+        this.closest('.card').style.opacity = '0.5';
+        this.textContent = 'Annullata';
+        this.disabled = true;
+        alert(`Prenotazione ${bookingId} annullata (simulato).`);
+      }
+    });
+  });
+
+
+  // Funzione Logout (Simulata)
+  function logout() {
+    // Qui logica per invalidare sessione/token/cookie
+    alert('Logout effettuato (simulato). Verrai reindirizzato alla homepage.');
+    window.location.href = 'index.html'; // Reindirizza alla homepage
   }
 
-  document.addEventListener('click', function(event) {
-    const dropdown = document.querySelector('.user-dropdown');
-    if (!dropdown.contains(event.target)) {
-      dropdown.classList.remove('show');
-    }
-  });
 </script>
 
-<!-- Aggiungi prima della chiusura del body, dopo il pulsante "Salva Modifiche" -->
-<div style="margin-top: 5rem;"></div>
-<!-- Footer -->
-<footer style="background: var(--primary); color: var(--light); padding: 3rem; text-align: center;">
-  <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
-  <p style="margin-top: 1rem; opacity: 0.8;">Via della Spiritualità 123, Nembro (BG) - Italia</p>
-</footer>
 </body>
 </html>

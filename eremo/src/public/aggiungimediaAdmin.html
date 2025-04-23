@@ -4,85 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="images/logo.png" type="image/x-icon">
-    <title>Eremo Frate Francesco</title>
+    <title>Admin: Aggiungi Media - Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-<header>
-    <div class="navbar-container">
-        <div class="navbar">
-            <div class="logo">
-                <span class="emoji">🏔️</span>
-                <a href="index.html" class="text">Eremo Frate Francesco</a>
-            </div>
-            <div class="menu">
-                <a href="chi-siamo.html">Chi siamo</a>
-                <span class="separator">|</span>
-                <a href="eventiincorso.html">Calendario attivitá</a>
-                <a href="eventipassati.html">Archivio attivitá</a>
-                <span class="separator">|</span>
-                <a href="">Incontri sulla parola</a>
-                <span class="separator">|</span>
-                <a href="">Dove siamo</a>
-                <a href="contatti.html">Contatti</a>
-            </div>
-
-            <!-- Contenitore Login + Hamburger -->
-            <div class="right-menu">
-                <a href="accedi" class="login">Accedi</a>
-                <button class="hamburger" onclick="toggleMenu()" aria-expanded="false">☰</button>
-            </div>
+<header class="navbar-container" id="navbarContainer">
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html"> <span class="emoji">🏔️</span>
+                <h2>Eremo Frate Francesco (Admin)</h2>
+            </a>
         </div>
-
-        <!-- Menu Mobile -->
-        <div class="mobile-menu" id="mobileMenu">
-            <a href="chi-siamo.html" onclick="closeMenu()">Chi siamo</a>
-            <a href="contatti.html" onclick="closeMenu()">Contatti</a>
-            <a href="eventiincorso.html" onclick="closeMenu()">Eventi in corso</a>
-            <a href="eventi-passati.html" onclick="closeMenu()">Eventi passati</a>
+        <div class="right-menu">
+            <a href="#" onclick="logout()" class="login-btn">Esci</a>
         </div>
-    </div>
+    </nav>
 </header>
 
-    <script>
-        function toggleMenu() {
-            const menu = document.getElementById("mobileMenu");
-            const button = document.querySelector(".hamburger");
-            const isOpen = menu.classList.toggle("open");
-            button.classList.toggle("open");
-            button.setAttribute("aria-expanded", isOpen);
-        }
+<main>
+    <div class="form-container section-padding">
+        <h2><i class="fas fa-upload" style="margin-right: 8px;"></i> Carica Media per Evento</h2>
 
-        function closeMenu() {
-            document.getElementById("mobileMenu").classList.remove("open");
-            document.querySelector(".hamburger").classList.remove("open");
-            document.querySelector(".hamburger").setAttribute("aria-expanded", "false");
-        }
-    </script>
+        <form action="/upload-media" method="POST" enctype="multipart/form-data" id="upload-form">
+            <div class="form-group mb-4">
+                <label for="event-select">Seleziona l'Evento</label>
+                <select id="event-select" name="event_id" required class="form-control">
+                    <option value="" disabled selected>-- Scegli un evento --</option>
+                    <option value="1">Ritiro di Meditazione Profonda (15 Mag)</option>
+                    <option value="2">Incontro sulla Parola (Gio Mag)</option>
+                    <option value="3">Camminata Contemplativa (24 Mag)</option>
+                    <option value="past_1">Corso Iconografia (Feb 24)</option>
+                </select>
+            </div>
 
-    <div class="form-container">
-        <h2>Carica un'immagine per l'evento</h2>
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-            <!-- Campo per caricare un'immagine -->
-            <label for="image-upload">Seleziona un'immagine:</label>
-            <input type="file" id="image-upload" name="event-image" accept="image/*" required>
+            <div class="form-group mb-4">
+                <label for="media-upload">Seleziona Immagine/Video</label>
+                <input type="file" id="media-upload" name="media_file" accept="image/*,video/*" required class="form-control">
+                <small>Formati supportati: JPG, PNG, GIF, MP4, WEBM. Max 10MB.</small>
+            </div>
 
-            <!-- Menu a tendina per selezionare l'evento -->
-            <label for="event-select">A quale evento corrisponde?</label>
-            <select id="event-select" name="event" required>
-                <option value="" disabled selected>Seleziona un evento</option>
-                <option value="evento1">Evento 1</option>
-                <option value="evento2">Evento 2</option>
-                <option value="evento3">Evento 3</option>
-            </select>
+            <div class="form-group mb-4">
+                <label for="media-caption">Didascalia (opzionale)</label>
+                <input type="text" id="media-caption" name="caption" class="form-control" placeholder="Breve descrizione del media...">
+            </div>
 
-            <!-- Pulsante per inviare il form -->
-            <button type="submit">Carica</button>
+            <button type="submit" id="submit-btn">
+                <i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i> Carica Media
+            </button>
+
+            <div id="upload-feedback" class="mt-3" style="text-align: center;"></div>
         </form>
     </div>
+</main>
+
 <footer>
-    <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
+    <p>Area Amministrazione Eremo Frate Francesco &copy; 2025</p>
 </footer>
+
+<script>
+    // Funzione Logout (Simulata) - come area personale
+    function logout() {
+        alert('Logout effettuato (simulato).');
+        window.location.href = 'index.html';
+    }
+
+    // --- Gestione Form Upload (Esempio base con feedback) ---
+    const uploadForm = document.getElementById('upload-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const feedbackDiv = document.getElementById('upload-feedback');
+
+    uploadForm?.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Impedisce invio standard
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Caricamento...';
+        feedbackDiv.textContent = '';
+        feedbackDiv.style.color = '';
+
+        const formData = new FormData(uploadForm);
+        const eventId = formData.get('event_id');
+        const file = formData.get('media_file');
+
+        // Validazione base
+        if (!eventId) {
+            feedbackDiv.textContent = 'Errore: Seleziona un evento.';
+            feedbackDiv.style.color = 'red';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i> Carica Media';
+            return;
+        }
+        if (!file || file.size === 0) {
+            feedbackDiv.textContent = 'Errore: Seleziona un file da caricare.';
+            feedbackDiv.style.color = 'red';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i> Carica Media';
+            return;
+        }
+        // Aggiungere check dimensione/tipo file se necessario
+
+        try {
+            // Simula chiamata API di upload
+            console.log("Invio dati:", {
+                eventId: eventId,
+                fileName: file.name,
+                fileSize: file.size,
+                caption: formData.get('caption')
+            });
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Simula attesa
+
+            // Successo (simulato)
+            feedbackDiv.textContent = `Media "${file.name}" caricato con successo per l'evento selezionato!`;
+            feedbackDiv.style.color = 'green';
+            uploadForm.reset(); // Pulisce il form
+
+        } catch (error) {
+            console.error("Errore upload:", error);
+            feedbackDiv.textContent = 'Errore durante il caricamento. Riprova.';
+            feedbackDiv.style.color = 'red';
+        } finally {
+            // Riabilita il bottone
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i> Carica Media';
+        }
+    });
+
+</script>
+
 </body>
 </html>
