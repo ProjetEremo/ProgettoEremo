@@ -128,14 +128,14 @@
     <div class="login-tab" data-tab="register">Registrati</div>
   </div>
 
-  <form class="login-form active" id="loginForm">
+  <form class="login-form active" id="loginForm" method="POST">
     <div class="form-group mb-3">
       <label for="login-email">Email</label>
-      <input type="email" id="login-email" class="form-control" required>
+      <input type="email" id="login-email" name="login-email" class="form-control" required>
     </div>
     <div class="form-group mb-3">
       <label for="login-password">Password</label>
-      <input type="password" id="login-password" class="form-control" required>
+      <input type="password" id="login-password" name="login-password" class="form-control" required>
     </div>
     <div class="form-actions">
       <button type="submit" class="btn-popup">Accedi</button>
@@ -262,13 +262,32 @@
   });
 
   // Gestione invio form (esempio base)
-  document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+  document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    // Qui logica di login vera (es. chiamata API)
-    alert('Login simulato!');
-    // Se login ok:
-    // window.location.href = 'areapersonale.html'; // Redirect ad area personale
-    closeLoginPopup();
+
+    try {
+      const response = await fetch('login.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(new FormData(e.target))
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(result.message);
+        closeLoginPopup();
+        // Reindirizza o aggiorna l'interfaccia
+        window.location.href = 'areapersonale.html'; // Pagina dopo il login
+      } else {
+        alert("Errore: " + result.message);
+      }
+    } catch (error) {
+      alert("Errore durante il login: " + error.message);
+      console.error("Dettaglio errore:", error);
+    }
   });
 
   //Invio form con Javascript
