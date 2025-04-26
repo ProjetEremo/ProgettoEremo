@@ -142,26 +142,27 @@
     </div>
   </form>
 
-  <form class="login-form" id="registerForm">
+  <form class="login-form" id="registerForm" action="registrati.php" method="POST">
     <div class="form-group mb-3">
       <label for="register-name">Nome</label>
-      <input type="text" id="register-name" class="form-control" required>
+      <input type="text" id="register-name" name="register-name" class="form-control" required>
     </div>
     <div class="form-group mb-3">
       <label for="register-surname">Cognome</label>
-      <input type="text" id="register-surname" class="form-control" required>
+      <input type="text" id="register-surname" name="register-surname" class="form-control" required>
     </div>
     <div class="form-group mb-3">
       <label for="register-email">Email</label>
-      <input type="email" id="register-email" class="form-control" required>
+      <input type="email" id="register-email" name="register-email" class="form-control" required>
     </div>
     <div class="form-group mb-3">
       <label for="register-password">Password</label>
-      <input type="password" id="register-password" class="form-control" required>
+      <input type="password" id="register-password" name="register-password" class="form-control" required>
     </div>
     <div class="terms-checkbox mb-3">
       <input type="checkbox" id="register-terms" required>
-      <label for="register-terms">Accetto i <a href="/termini" target="_blank">termini e condizioni</a></label> </div>
+      <label for="register-terms">Accetto i <a href="/termini" target="_blank">termini e condizioni</a></label>
+    </div>
     <div class="form-actions">
       <button type="submit" class="btn-popup">Registrati</button>
     </div>
@@ -270,12 +271,37 @@
     closeLoginPopup();
   });
 
-  document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+  //Invio form con Javascript
+  document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    // Qui logica di registrazione vera (es. chiamata API)
-    alert('Registrazione simulata!');
-    closeLoginPopup();
-    // Magari mostra messaggio di conferma o effettua login automatico
+
+    try {
+      const response = await fetch('registrati.php', {
+        method: 'POST',
+        body: new FormData(e.target)
+      });
+
+      // Controlla se la risposta è JSON valido
+      const text = await response.text();
+      let result;
+
+      try {
+        result = JSON.parse(text);
+      } catch (jsonError) {
+        console.error("Risposta non JSON:", text);
+        throw new Error("Il server ha restituito una risposta non valida");
+      }
+
+      if (result.success) {
+        alert(result.message);
+        closeLoginPopup();
+      } else {
+        alert("Errore: " + (result.message || "Errore sconosciuto"));
+      }
+    } catch (error) {
+      alert("Errore durante la registrazione: " + error.message);
+      console.error("Dettaglio errore:", error);
+    }
   });
 
   // Chiudi popup con tasto Esc
