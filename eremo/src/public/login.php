@@ -2,10 +2,10 @@
 header('Content-Type: application/json');
 session_start();
 
-// Configurazione database (usa le stesse credenziali di registrati.php)
+// Configurazione database
 $host = "localhost";
 $user = "eremofratefrancesco";
-$password = "";
+$password = ""; // Inserisci la tua password
 $dbname = "my_eremofratefrancesco";
 
 $conn = new mysqli($host, $user, $password, $dbname);
@@ -20,10 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $email = $conn->real_escape_string($_POST['login-email']);
-$password_input = $_POST['login-password']; // Non usare real_escape_string sulle password!
+$password_input = $_POST['login-password'];
 
-// Cerca l'utente nel database
-$stmt = $conn->prepare("SELECT Contatto, Password FROM utentiregistrati WHERE Contatto = ?");
+// Modifica la query per includere IsAdmin
+$stmt = $conn->prepare("SELECT Contatto, Password, IsAdmin FROM utentiregistrati WHERE Contatto = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -35,10 +35,15 @@ if ($result->num_rows === 0) {
 
 $user = $result->fetch_assoc();
 
-// Verifica la password
 if (password_verify($password_input, $user['Password'])) {
-    $_SESSION['user_email'] = $user['Contatto']; // Salva in sessione
-    echo json_encode(['success' => true, 'message' => 'Login riuscito!']);
+    $_SESSION['user_email'] = $user['Contatto'];
+    $_SESSION['is_admin'] = (bool)$user['IsAdmin']; // Salva lo stato admin in sessione
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Login riuscito!',
+        'is_admin' => $user['IsAdmin'] // Invia anche al frontend
+    ]);
 } else {
     echo json_encode(['success' => false, 'message' => 'Password errata']);
 }
