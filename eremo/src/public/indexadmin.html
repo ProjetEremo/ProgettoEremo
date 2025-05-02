@@ -7,21 +7,111 @@
     <title>Eremo Frate Francesco - Area Admin</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
-</head>
-<body>
+    <style>
+        /* Stili aggiuntivi se necessari per il dropdown utente */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
 
-<header class="navbar-container admin-navbar" id="navbarContainer">
+        .user-dropdown .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-dropdown .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 110%; /* Posiziona sotto il bottone */
+            background-color: var(--white);
+            min-width: 180px;
+            box-shadow: var(--shadow-medium);
+            z-index: 1001;
+            border-radius: 8px;
+            overflow: hidden; /* Per bordi arrotondati */
+            border: 1px solid var(--gray-light);
+        }
+
+        .user-dropdown .dropdown-menu a {
+            color: var(--dark);
+            padding: 0.8rem 1.2rem;
+            text-decoration: none;
+            display: block;
+            font-size: 0.95rem;
+            white-space: nowrap; /* Evita che il testo vada a capo */
+        }
+
+        .user-dropdown .dropdown-menu a:hover {
+            background-color: var(--light);
+            color: var(--primary);
+        }
+        .user-dropdown .dropdown-menu a:last-child {
+            border-top: 1px solid var(--gray-light); /* Separatore per Esci */
+            color: var(--accent); /* Colore diverso per Esci */
+        }
+        .user-dropdown .dropdown-menu a:last-child:hover {
+            background-color: #fbeadf; /* Sfondo leggermente diverso per Esci */
+        }
+
+        .user-dropdown.show .dropdown-menu {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .user-dropdown .dropdown-arrow {
+            font-size: 0.8rem;
+            transition: transform var(--transition-fast);
+        }
+        .user-dropdown.show .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .avatar-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .avatar-option {
+            font-size: 2rem;
+            padding: 0.8rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition-medium);
+            background: var(--gray-light);
+            width: 50px; /* Dimensione fissa */
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid transparent;
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+            background: var(--light);
+        }
+        .avatar-option.selected {
+            border-color: var(--secondary);
+            background-color: var(--light);
+            box-shadow: 0 0 0 3px rgba(141, 177, 135, 0.3);
+        }
+    </style>
+</head>
+<body class="page-index"> <header class="navbar-container" id="navbarContainer">
     <nav class="navbar">
         <div class="logo">
-            <a href="indexadmin.html">
+            <a href="index.html">
                 <span class="emoji">🏔️</span>
                 <h2>Eremo Frate Francesco</h2>
             </a>
         </div>
-        <div class="menu">
-            <a href="chi-siamo.html">Chi siamo</a>
+        <div class="menu"> <a href="chi-siamo.html">Chi siamo</a>
             <span class="separator">|</span>
-            <a href="eventiincorso.html">Calendario attività</a>
+            <a href="eventiincorsoAdmin.html">Calendario attività</a>
             <a href="eventipassati.html">Archivio attività</a>
             <span class="separator">|</span>
             <a href="incontrisullaparola.html">Incontri sulla parola</a>
@@ -30,7 +120,14 @@
             <a href="contatti.html">Contatti</a>
         </div>
         <div class="right-menu">
-            <div class="admin-welcome">Benvenuto Admin</div>
+            <div class="user-dropdown" id="userDropdownContainer">
+                <button class="user-btn" onclick="toggleUserMenu()" aria-haspopup="true" aria-expanded="false">
+                    <span class="user-avatar" id="navbar-avatar">👤</span> <span class="user-name" id="navbar-username">Admin</span> <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
+                    <a href="areapersonale.html">Il mio profilo</a>
+                    <a href="areapersonale.html#prenotazioni">Le mie prenotazioni</a> <a href="#" onclick="logout()">Esci</a> </div>
+            </div>
             <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
         </div>
     </nav>
@@ -41,6 +138,7 @@
         <a href="incontrisullaparola.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
         <a href="dovesiamo.html" onclick="closeMobileMenu()">Dove siamo</a>
         <a href="contatti.html" onclick="closeMobileMenu()">Contatti</a>
+        <a href="#" id="login-btn-mobile" onclick="openLoginPopup(); closeMobileMenu();">Accedi</a>
     </div>
 </header>
 
@@ -52,31 +150,33 @@
         </div>
     </section>
 
-    <section class="content-section section-padding">
+    <section class="section-padding">
         <div class="container">
-            <div class="section-image-container">
-                <img src="https://picsum.photos/800/600?random=chapel,history" alt="Cappella storica dell'eremo" class="section-image">
-            </div>
-            <div class="section-content">
-                <h2 class="section-title">Radicati nella Storia</h2>
-                <p class="section-text">Fondato nel 1985 su un antico romitorio del XV secolo, l'Eremo custodisce secoli di spiritualità. Le nostre pietre raccontano storie di:</p>
-                <div class="card-grid">
-                    <div class="card info-card">
-                        <div class="card-content">
-                            <h3>Eremiti Medievali</h3>
-                            <p>Che cercavano solitudine e contemplazione.</p>
+            <div class="content-section">
+                <div class="section-image-container">
+                    <img src="https://picsum.photos/800/600?random=chapel,history,old" alt="Cappella storica dell'eremo" class="section-image" loading="lazy">
+                </div>
+                <div class="section-content">
+                    <h2 class="section-title">Radicati nella Storia</h2>
+                    <p class="section-text">Fondato nel 1985 su un antico romitorio del XV secolo, l'Eremo custodisce secoli di spiritualità. Le nostre pietre raccontano storie di:</p>
+                    <div class="card-grid">
+                        <div class="card info-card">
+                            <div class="card-content">
+                                <h3>Eremiti Medievali</h3>
+                                <p>Che cercavano solitudine e contemplazione.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card info-card">
-                        <div class="card-content">
-                            <h3>Pellegrini Rinascimentali</h3>
-                            <p>In cammino verso luoghi sacri.</p>
+                        <div class="card info-card">
+                            <div class="card-content">
+                                <h3>Pellegrini Rinascimentali</h3>
+                                <p>In cammino verso luoghi sacri.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card info-card">
-                        <div class="card-content">
-                            <h3>Frati Francescani</h3>
-                            <p>Custodi della tradizione spirituale.</p>
+                        <div class="card info-card">
+                            <div class="card-content">
+                                <h3>Frati Francescani</h3>
+                                <p>Custodi della tradizione spirituale.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -84,8 +184,8 @@
         </div>
     </section>
 
-    <section class="content-section section-padding">
-        <div class="container">
+    <section class="section-padding" style="background-color: var(--white);"> <div class="container">
+        <div class="content-section">
             <div class="section-content">
                 <h2 class="section-title">Un'Ecologia dello Spirito</h2>
                 <p class="section-text">I nostri 15 ettari di bosco sono un organismo vivente dove natura e spiritualità si intrecciano:</p>
@@ -111,12 +211,57 @@
                 </div>
             </div>
             <div class="section-image-container">
-                <img src="https://picsum.photos/800/600?random=forest,path" alt="Sentiero nel bosco dell'eremo" class="section-image">
+                <img src="https://picsum.photos/800/600?random=forest,path,green" alt="Sentiero nel bosco dell'eremo" class="section-image" loading="lazy">
             </div>
         </div>
+    </div>
     </section>
 
 </main>
+
+<div class="login-popup-overlay" id="loginOverlay"></div>
+<div class="login-popup" id="loginPopup">
+    <button class="close-popup" id="closePopup" aria-label="Chiudi popup">&times;</button>
+    <div class="login-tabs">
+        <div class="login-tab active" data-tab="login">Accedi</div>
+        <div class="login-tab" data-tab="register">Registrati</div>
+    </div>
+    <form class="login-form active" id="loginForm" method="POST"> <div class="form-group mb-3">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" name="login-email" class="form-control" required autocomplete="email"> </div>
+        <div class="form-group mb-3">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" name="login-password" class="form-control" required autocomplete="current-password"> </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-popup">Accedi</button>
+        </div>
+    </form>
+    <form class="login-form" id="registerForm" method="POST">
+        <div class="form-group mb-3">
+            <label for="register-name">Nome</label>
+            <input type="text" id="register-name" name="register-name" class="form-control" required autocomplete="given-name"> </div>
+        <div class="form-group mb-3">
+            <label for="register-surname">Cognome</label>
+            <input type="text" id="register-surname" name="register-surname" class="form-control" required autocomplete="family-name"> </div>
+        <div class="form-group mb-3">
+            <label for="register-email">Email</label>
+            <input type="email" id="register-email" name="register-email" class="form-control" required autocomplete="email"> </div>
+        <div class="form-group mb-3">
+            <label for="register-password">Password</label>
+            <input type="password" id="register-password" name="register-password" class="form-control" required minlength="8" autocomplete="new-password"> <small>Minimo 8 caratteri.</small>
+        </div>
+        <div class="terms-checkbox mb-3">
+            <input type="checkbox" id="register-terms" name="register-terms" required> <label for="register-terms">Accetto i <a href="/termini" target="_blank">termini e condizioni</a></label>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-popup">Registrati</button>
+        </div>
+    </form>
+</div>
+
+<footer>
+    <p>© 2025 Eremo Frate Francesco. Tutti i diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia</p>
+</footer>
 
 <script>
     // --- Navbar Scroll Logic ---
@@ -150,6 +295,158 @@
         hamburger.setAttribute("aria-expanded", "false");
     }
 </script>
+
+<script>
+    // --- Navbar & Mobile Menu Logic (come index.html) ---
+    let lastScroll = 0;
+    const navbarContainer = document.getElementById('navbarContainer');
+    window.addEventListener('scroll', function() { /* ... */ });
+    const mobileMenu = document.getElementById("mobileMenu");
+    const hamburger = document.querySelector(".hamburger");
+    function toggleMobileMenu() { /* ... */ }
+    function closeMobileMenu() { /* ... */ }
+
+    // --- User Dropdown Logic ---
+    function toggleUserMenu() {
+        const dropdown = document.querySelector('.user-dropdown');
+        const isOpen = dropdown.classList.toggle('show');
+        dropdown.querySelector('.user-btn').setAttribute('aria-expanded', isOpen);
+    }
+
+    // Chiudi dropdown se si clicca fuori
+    document.addEventListener('click', function(event) {
+        const dropdown = document.querySelector('.user-dropdown');
+        if (dropdown && !dropdown.contains(event.target)) {
+            dropdown.classList.remove('show');
+            dropdown.querySelector('.user-btn').setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // --- Logica Area Personale ---
+
+    // Dati Utente (simulati, dovrebbero venire dal backend/localStorage)
+    const userData = {
+        nome: "Mario",
+        cognome: "Rossi",
+        email: "mario.rossi@example.com",
+        telefono: "+39 123 456789",
+        avatar: "🧘" // Avatar selezionato
+    };
+
+    // Popola campi all'avvio
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('nome').value = userData.nome;
+        document.getElementById('cognome').value = userData.cognome;
+        document.getElementById('email').value = userData.email;
+        document.getElementById('telefono').value = userData.telefono || '';
+        document.getElementById('profile-greeting').textContent = `Ciao, ${userData.nome}!`;
+        document.getElementById('navbar-username').textContent = userData.nome; // Aggiorna nome navbar
+
+        // Imposta avatar selezionato
+        document.getElementById('main-avatar').textContent = userData.avatar;
+        document.getElementById('navbar-avatar').textContent = userData.avatar; // Aggiorna avatar navbar
+        document.querySelectorAll('.avatar-option').forEach(opt => {
+            if (opt.getAttribute('data-emoji') === userData.avatar) {
+                opt.classList.add('selected');
+            } else {
+                opt.classList.remove('selected');
+            }
+        });
+
+        // Mostra/Nascondi messaggio prenotazioni (simulato)
+        const bookingsGrid = document.getElementById('user-bookings-grid');
+        const noBookingsMsg = document.getElementById('no-bookings-message');
+        if (bookingsGrid.children.length <= 1) { // Controlla se ci sono solo card "vere"
+            noBookingsMsg.style.display = 'block';
+        }
+    });
+
+    // Gestione Selezione Avatar
+    const avatarOptions = document.querySelectorAll('.avatar-option');
+    const mainAvatar = document.getElementById('main-avatar');
+    const navbarAvatar = document.getElementById('navbar-avatar');
+    let selectedAvatarEmoji = userData.avatar; // Tiene traccia dell'avatar selezionato
+
+    avatarOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            avatarOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedAvatarEmoji = this.getAttribute('data-emoji');
+            // Aggiorna subito l'anteprima, ma salva solo al click su "Salva Icona"
+            mainAvatar.textContent = selectedAvatarEmoji;
+        });
+    });
+
+    // Salvataggio Icona
+    document.getElementById('save-avatar-btn')?.addEventListener('click', () => {
+        userData.avatar = selectedAvatarEmoji;
+        navbarAvatar.textContent = userData.avatar; // Aggiorna anche navbar
+        // Qui logica per salvare l'avatar nel backend/localStorage
+        alert('Icona profilo aggiornata!');
+    });
+
+    // Salvataggio Info Personali
+    document.getElementById('profile-info-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        userData.nome = document.getElementById('nome').value;
+        userData.cognome = document.getElementById('cognome').value;
+        userData.telefono = document.getElementById('telefono').value;
+        // Aggiorna UI
+        document.getElementById('profile-greeting').textContent = `Ciao, ${userData.nome}!`;
+        document.getElementById('navbar-username').textContent = userData.nome;
+        // Qui logica per salvare i dati nel backend/localStorage
+        alert('Informazioni personali aggiornate!');
+    });
+
+    // Cambio Password
+    document.getElementById('password-change-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const oldPass = document.getElementById('vecchia-password').value;
+        const newPass = document.getElementById('nuova-password').value;
+        const confirmPass = document.getElementById('conferma-password').value;
+
+        if (newPass !== confirmPass) {
+            alert('Le nuove password non coincidono!');
+            return;
+        }
+        if (newPass.length < 8) {
+            alert('La nuova password deve essere di almeno 8 caratteri.');
+            return;
+        }
+        // Qui logica per verificare vecchia password e salvare la nuova nel backend
+        console.log("Tentativo cambio password:", { oldPass, newPass });
+        alert('Password aggiornata con successo (simulato)!');
+        // Resetta i campi password
+        document.getElementById('vecchia-password').value = '';
+        document.getElementById('nuova-password').value = '';
+        document.getElementById('conferma-password').value = '';
+    });
+
+    // Annulla Prenotazione (Simulato)
+    document.querySelectorAll('.btn-annulla-prenotazione').forEach(button => {
+        button.addEventListener('click', function() {
+            const bookingId = this.getAttribute('data-booking-id');
+            if (confirm('Sei sicuro di voler annullare questa prenotazione?')) {
+                console.log(`Annullamento prenotazione ${bookingId}`);
+                // Qui logica API per annullare
+                this.closest('.card').style.opacity = '0.5';
+                this.textContent = 'Annullata';
+                this.disabled = true;
+                alert(`Prenotazione ${bookingId} annullata (simulato).`);
+            }
+        });
+    });
+
+
+    // Funzione Logout (Simulata)
+    function logout() {
+        // Qui logica per invalidare sessione/token/cookie
+        alert('Logout effettuato (simulato). Verrai reindirizzato alla homepage.');
+        window.location.href = 'index.html'; // Reindirizza alla homepage
+    }
+
+</script>
+
 
 </body>
 </html>
