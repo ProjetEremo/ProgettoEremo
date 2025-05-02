@@ -6,6 +6,99 @@
   <link rel="icon" href="images/logo.png" type="image/x-icon">
   <title>Calendario Attività - Eremo Frate Francesco</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Stili aggiuntivi se necessari per il dropdown utente */
+    .user-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .user-dropdown .user-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .user-dropdown .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 110%; /* Posiziona sotto il bottone */
+      background-color: var(--white);
+      min-width: 180px;
+      box-shadow: var(--shadow-medium);
+      z-index: 1001;
+      border-radius: 8px;
+      overflow: hidden; /* Per bordi arrotondati */
+      border: 1px solid var(--gray-light);
+    }
+
+    .user-dropdown .dropdown-menu a {
+      color: var(--dark);
+      padding: 0.8rem 1.2rem;
+      text-decoration: none;
+      display: block;
+      font-size: 0.95rem;
+      white-space: nowrap; /* Evita che il testo vada a capo */
+    }
+
+    .user-dropdown .dropdown-menu a:hover {
+      background-color: var(--light);
+      color: var(--primary);
+    }
+    .user-dropdown .dropdown-menu a:last-child {
+      border-top: 1px solid var(--gray-light); /* Separatore per Esci */
+      color: var(--accent); /* Colore diverso per Esci */
+    }
+    .user-dropdown .dropdown-menu a:last-child:hover {
+      background-color: #fbeadf; /* Sfondo leggermente diverso per Esci */
+    }
+
+    .user-dropdown.show .dropdown-menu {
+      display: block;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .user-dropdown .dropdown-arrow {
+      font-size: 0.8rem;
+      transition: transform var(--transition-fast);
+    }
+    .user-dropdown.show .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+
+    .avatar-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+
+    .avatar-option {
+      font-size: 2rem;
+      padding: 0.8rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: var(--transition-medium);
+      background: var(--gray-light);
+      width: 50px; /* Dimensione fissa */
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid transparent;
+    }
+
+    .avatar-option:hover {
+      transform: scale(1.1);
+      background: var(--light);
+    }
+    .avatar-option.selected {
+      border-color: var(--secondary);
+      background-color: var(--light);
+      box-shadow: 0 0 0 3px rgba(141, 177, 135, 0.3);
+    }
+  </style>
 </head>
 <body>
 
@@ -29,7 +122,14 @@
       <a href="contatti.html">Contatti</a>
     </div>
     <div class="right-menu">
-      <div class="admin-welcome">Benvenuto Admin</div>
+      <div class="user-dropdown" id="userDropdownContainer">
+        <button class="user-btn" onclick="toggleUserMenu()" aria-haspopup="true" aria-expanded="false">
+          <span class="user-avatar" id="navbar-avatar">👤</span> <span class="user-name" id="navbar-username">Admin</span> <span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
+          <a href="areapersonale.html">Il mio profilo</a>
+          <a href="areapersonale.html#prenotazioni">Le mie prenotazioni</a> <a href="#" onclick="logout()">Esci</a> </div>
+      </div>
       <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
     </div>
   </nav>
@@ -44,6 +144,9 @@
   </div>
 </header>
 
+<div class="add-event-btn-container">
+  <button class="add-event-btn" id="addEventBtn" aria-label="Aggiungi nuovo evento">+</button>
+</div>
 <main>
   <div class="container section-padding">
     <h1 class="text-center mb-4">Calendario Attività</h1>
@@ -208,5 +311,324 @@
 
 </script>
 
+<script>
+  // --- Navbar & Mobile Menu Logic (come index.html) ---
+  let lastScroll = 0;
+  const navbarContainer = document.getElementById('navbarContainer');
+  window.addEventListener('scroll', function() { /* ... */ });
+  const mobileMenu = document.getElementById("mobileMenu");
+  const hamburger = document.querySelector(".hamburger");
+  function toggleMobileMenu() { /* ... */ }
+  function closeMobileMenu() { /* ... */ }
+
+  // --- User Dropdown Logic ---
+  function toggleUserMenu() {
+    const dropdown = document.querySelector('.user-dropdown');
+    const isOpen = dropdown.classList.toggle('show');
+    dropdown.querySelector('.user-btn').setAttribute('aria-expanded', isOpen);
+  }
+
+  // Chiudi dropdown se si clicca fuori
+  document.addEventListener('click', function(event) {
+    const dropdown = document.querySelector('.user-dropdown');
+    if (dropdown && !dropdown.contains(event.target)) {
+      dropdown.classList.remove('show');
+      dropdown.querySelector('.user-btn').setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // --- Logica Area Personale ---
+
+  // Dati Utente (simulati, dovrebbero venire dal backend/localStorage)
+  const userData = {
+    nome: "Mario",
+    cognome: "Rossi",
+    email: "mario.rossi@example.com",
+    telefono: "+39 123 456789",
+    avatar: "🧘" // Avatar selezionato
+  };
+
+  // Popola campi all'avvio
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('nome').value = userData.nome;
+    document.getElementById('cognome').value = userData.cognome;
+    document.getElementById('email').value = userData.email;
+    document.getElementById('telefono').value = userData.telefono || '';
+    document.getElementById('profile-greeting').textContent = `Ciao, ${userData.nome}!`;
+    document.getElementById('navbar-username').textContent = userData.nome; // Aggiorna nome navbar
+
+    // Imposta avatar selezionato
+    document.getElementById('main-avatar').textContent = userData.avatar;
+    document.getElementById('navbar-avatar').textContent = userData.avatar; // Aggiorna avatar navbar
+    document.querySelectorAll('.avatar-option').forEach(opt => {
+      if (opt.getAttribute('data-emoji') === userData.avatar) {
+        opt.classList.add('selected');
+      } else {
+        opt.classList.remove('selected');
+      }
+    });
+
+    // Mostra/Nascondi messaggio prenotazioni (simulato)
+    const bookingsGrid = document.getElementById('user-bookings-grid');
+    const noBookingsMsg = document.getElementById('no-bookings-message');
+    if (bookingsGrid.children.length <= 1) { // Controlla se ci sono solo card "vere"
+      noBookingsMsg.style.display = 'block';
+    }
+  });
+
+  // Gestione Selezione Avatar
+  const avatarOptions = document.querySelectorAll('.avatar-option');
+  const mainAvatar = document.getElementById('main-avatar');
+  const navbarAvatar = document.getElementById('navbar-avatar');
+  let selectedAvatarEmoji = userData.avatar; // Tiene traccia dell'avatar selezionato
+
+  avatarOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      avatarOptions.forEach(opt => opt.classList.remove('selected'));
+      this.classList.add('selected');
+      selectedAvatarEmoji = this.getAttribute('data-emoji');
+      // Aggiorna subito l'anteprima, ma salva solo al click su "Salva Icona"
+      mainAvatar.textContent = selectedAvatarEmoji;
+    });
+  });
+
+  // Salvataggio Icona
+  document.getElementById('save-avatar-btn')?.addEventListener('click', () => {
+    userData.avatar = selectedAvatarEmoji;
+    navbarAvatar.textContent = userData.avatar; // Aggiorna anche navbar
+    // Qui logica per salvare l'avatar nel backend/localStorage
+    alert('Icona profilo aggiornata!');
+  });
+
+  // Salvataggio Info Personali
+  document.getElementById('profile-info-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    userData.nome = document.getElementById('nome').value;
+    userData.cognome = document.getElementById('cognome').value;
+    userData.telefono = document.getElementById('telefono').value;
+    // Aggiorna UI
+    document.getElementById('profile-greeting').textContent = `Ciao, ${userData.nome}!`;
+    document.getElementById('navbar-username').textContent = userData.nome;
+    // Qui logica per salvare i dati nel backend/localStorage
+    alert('Informazioni personali aggiornate!');
+  });
+
+  // Cambio Password
+  document.getElementById('password-change-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const oldPass = document.getElementById('vecchia-password').value;
+    const newPass = document.getElementById('nuova-password').value;
+    const confirmPass = document.getElementById('conferma-password').value;
+
+    if (newPass !== confirmPass) {
+      alert('Le nuove password non coincidono!');
+      return;
+    }
+    if (newPass.length < 8) {
+      alert('La nuova password deve essere di almeno 8 caratteri.');
+      return;
+    }
+    // Qui logica per verificare vecchia password e salvare la nuova nel backend
+    console.log("Tentativo cambio password:", { oldPass, newPass });
+    alert('Password aggiornata con successo (simulato)!');
+    // Resetta i campi password
+    document.getElementById('vecchia-password').value = '';
+    document.getElementById('nuova-password').value = '';
+    document.getElementById('conferma-password').value = '';
+  });
+
+  // Annulla Prenotazione (Simulato)
+  document.querySelectorAll('.btn-annulla-prenotazione').forEach(button => {
+    button.addEventListener('click', function() {
+      const bookingId = this.getAttribute('data-booking-id');
+      if (confirm('Sei sicuro di voler annullare questa prenotazione?')) {
+        console.log(`Annullamento prenotazione ${bookingId}`);
+        // Qui logica API per annullare
+        this.closest('.card').style.opacity = '0.5';
+        this.textContent = 'Annullata';
+        this.disabled = true;
+        alert(`Prenotazione ${bookingId} annullata (simulato).`);
+      }
+    });
+  });
+
+
+  // Funzione Logout (Simulata)
+  function logout() {
+    // Qui logica per invalidare sessione/token/cookie
+    alert('Logout effettuato (simulato). Verrai reindirizzato alla homepage.');
+    window.location.href = 'index.html'; // Reindirizza alla homepage
+  }
+
+</script>
+
+<div class="event-popup-overlay" id="eventPopupOverlay"></div>
+<div class="event-popup" id="eventPopup">
+  <button class="close-popup" id="closeEventPopup" aria-label="Chiudi popup">&times;</button>
+  <h2>Aggiungi Nuovo Evento</h2>
+  <form id="newEventForm" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="event-title">Titolo Evento*</label>
+      <input type="text" id="event-title" name="event-title" class="form-control" required>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="event-date">Data Inizio*</label>
+        <input type="date" id="event-date" name="event-date" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="event-time">Orario (es. 18:00-19:30)</label>
+        <input type="text" id="event-time" name="event-time" class="form-control" placeholder="18:00-19:30">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="event-short-desc">Descrizione Breve*</label>
+      <textarea id="event-short-desc" name="event-short-desc" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="event-long-desc">Descrizione Estesa</label>
+      <textarea id="event-long-desc" name="event-long-desc" class="form-control" rows="5"></textarea>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="event-prefix">Prefisso Relatore (es. "A cura di")</label>
+        <input type="text" id="event-prefix" name="event-prefix" class="form-control" placeholder="A cura di">
+      </div>
+      <div class="form-group">
+        <label for="event-speaker">Nome Relatore*</label>
+        <input type="text" id="event-speaker" name="event-speaker" class="form-control" required>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="event-association">Associazione</label>
+        <input type="text" id="event-association" name="event-association" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="event-seats">Posti Disponibili*</label>
+        <input type="number" id="event-seats" name="event-seats" class="form-control" required min="1">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="event-image">Immagine di Copertina</label>
+      <input type="file" id="event-image" name="event-image" class="form-control" accept="image/*">
+    </div>
+
+    <div class="form-check-group">
+      <input type="checkbox" id="event-booking" name="event-booking" checked>
+      <label for="event-booking">Prenotazioni aperte</label>
+    </div>
+
+    <div class="form-check-group">
+      <input type="checkbox" id="event-voluntary" name="event-voluntary">
+      <label for="event-voluntary">Costo su base volontaria</label>
+    </div>
+
+    <div class="form-group" id="event-price-container" style="display: none;">
+      <label for="event-price">Prezzo (€)</label>
+      <input type="number" id="event-price" name="event-price" class="form-control" min="0" step="0.01">
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-popup">Salva Evento</button>
+    </div>
+  </form>
+</div>
+
 </body>
 </html>
+
+
+<script>
+  // Gestione pulsante aggiungi evento
+  const addEventBtn = document.getElementById('addEventBtn');
+  const eventPopupOverlay = document.getElementById('eventPopupOverlay');
+  const eventPopup = document.getElementById('eventPopup');
+  const closeEventPopup = document.getElementById('closeEventPopup');
+  const voluntaryCheckbox = document.getElementById('event-voluntary');
+  const priceContainer = document.getElementById('event-price-container');
+
+  // Mostra/nascondi campo prezzo in base alla checkbox
+  voluntaryCheckbox.addEventListener('change', function() {
+    priceContainer.style.display = this.checked ? 'none' : 'block';
+  });
+
+  // Apri popup
+  addEventBtn.addEventListener('click', function() {
+    eventPopupOverlay.classList.add('active');
+    eventPopup.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  });
+
+  // Chiudi popup
+  closeEventPopup.addEventListener('click', closeEventPopupHandler);
+  eventPopupOverlay.addEventListener('click', closeEventPopupHandler);
+
+  function closeEventPopupHandler() {
+    eventPopupOverlay.classList.remove('active');
+    eventPopup.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // Gestione invio form
+  document.getElementById('newEventForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Salvataggio...';
+
+    try {
+      const formData = new FormData(this);
+
+      // Aggiungi altri dati necessari
+      formData.append('action', 'add_event');
+
+      const response = await fetch('gestione_eventi.php', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error(`Errore HTTP: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert('Evento aggiunto con successo!');
+        closeEventPopupHandler();
+        // Ricarica la pagina o aggiorna la lista eventi
+        window.location.reload();
+      } else {
+        throw new Error(result.message || 'Errore durante il salvataggio');
+      }
+    } catch (error) {
+      console.error('Errore:', error);
+      alert(`Errore: ${error.message}`);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+    }
+  });
+
+  // Chiudi con ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && eventPopup.classList.contains('active')) {
+      closeEventPopupHandler();
+    }
+  });
+</script>
+<!-- Aggiungi questo codice PRIMA del tag </main> -->
+
+
+<!-- Aggiungi questo codice PRIMA del tag </body> -->
+
+
+<!-- Aggiungi questo script PRIMA del tag </body> -->
