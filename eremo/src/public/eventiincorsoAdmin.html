@@ -149,66 +149,7 @@
     <h1 class="text-center mb-4">Calendario Attività</h1>
 
     <div class="card-grid" id="eventiGrid">
-      <article class="card">
-        <div class="card-image-container">
-          <img src="https://picsum.photos/400/250?random=meditation,spirituality" alt="Meditazione profonda" class="card-image">
-        </div>
-        <div class="card-content">
-          <h3>Ritiro di Meditazione Profonda</h3>
-          <p class="card-info">
-            <b>Data:</b> 15-17 Maggio 2025 <br>
-            <b>Relatore:</b> Fra' Elia <br>
-            <b>Orario:</b> Dalle 18:00 del 15
-          </p>
-          <p>Un weekend immersivo per esplorare tecniche meditative e ritrovare la calma interiore.</p>
-          <p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">12</span></p>
-          <div class="card-actions">
-            <a href="evento.html?id=1" class="card-btn card-btn-secondary">Dettagli</a>
-            <button class="card-btn card-btn-primary btn-prenota-rapido" data-event-id="1">Prenota</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-image-container">
-          <img src="https://picsum.photos/400/250?random=scripture,study" alt="Studio della parola" class="card-image">
-        </div>
-        <div class="card-content">
-          <h3>Incontro sulla Parola: Il Vangelo di Marco</h3>
-          <p class="card-info">
-            <b>Data:</b> Ogni Giovedì di Maggio 2025 <br>
-            <b>Relatore:</b> Sorella Chiara <br>
-            <b>Orario:</b> 20:30 - 22:00
-          </p>
-          <p>Approfondimento settimanale del Vangelo di Marco, aperto a tutti.</p>
-          <p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">30</span></p>
-          <div class="card-actions">
-            <a href="evento.html?id=2" class="card-btn card-btn-secondary">Dettagli</a>
-            <button class="card-btn card-btn-primary btn-prenota-rapido" data-event-id="2">Prenota</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-image-container">
-          <img src="https://picsum.photos/400/250?random=nature,walk" alt="Camminata contemplativa" class="card-image">
-        </div>
-        <div class="card-content">
-          <h3>Camminata Contemplativa nel Bosco</h3>
-          <p class="card-info">
-            <b>Data:</b> 24 Maggio 2025 <br>
-            <b>Guida:</b> Antonio Verdi <br>
-            <b>Orario:</b> 09:00 - 13:00
-          </p>
-          <p>Un percorso guidato nei sentieri dell'Eremo, unendo movimento e riflessione.</p>
-          <p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">8</span></p>
-          <div class="card-actions">
-            <a href="evento.html?id=3" class="card-btn card-btn-secondary">Dettagli</a>
-            <button class="card-btn card-btn-primary btn-prenota-rapido" data-event-id="3">Prenota</button>
-          </div>
-        </div>
-      </article>
-
+      <!-- Gli eventi verranno caricati qui dinamicamente via JavaScript -->
     </div>
 
   </div>
@@ -587,8 +528,13 @@
     try {
       const formData = new FormData(this);
 
-      // Aggiungi altri dati necessari
+      // Aggiungi campi aggiuntivi
       formData.append('action', 'add_event');
+      if (!formData.get('event-voluntary')) {
+        formData.append('event-price', document.getElementById('event-price').value);
+      } else {
+        formData.append('event-price', '0'); // Base volontaria = prezzo 0
+      }
 
       const response = await fetch('gestione_eventi.php', {
         method: 'POST',
@@ -604,8 +550,8 @@
       if (result.success) {
         alert('Evento aggiunto con successo!');
         closeEventPopupHandler();
-        // Ricarica la pagina o aggiorna la lista eventi
-        window.location.reload();
+        // Ricarica gli eventi
+        loadEvents();
       } else {
         throw new Error(result.message || 'Errore durante il salvataggio');
       }
@@ -624,6 +570,99 @@
       closeEventPopupHandler();
     }
   });
+</script>
+
+<script>
+  // Funzione per caricare gli eventi dal database
+  async function loadEvents() {
+    try {
+      const response = await fetch('get_events.php');
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Errore nel caricamento');
+      }
+
+      const eventsGrid = document.getElementById('eventiGrid');
+      eventsGrid.innerHTML = '';
+
+      if (result.count === 0) {
+        eventsGrid.innerHTML = '<p class="no-events">Nessun evento in programma</p>';
+        return;
+      }
+
+      result.data.forEach(event => {
+        const eventCard = createEventCard(event);
+        eventsGrid.appendChild(eventCard);
+      });
+
+    } catch (error) {
+      console.error('Errore:', error);
+      document.getElementById('eventiGrid').innerHTML = `
+            <div class="error-message">
+                <p>Si è verificato un errore nel caricamento degli eventi</p>
+                <button onclick="loadEvents()">Riprova</button>
+            </div>
+        `;
+    }
+  }
+
+  function createEventCard(event) {
+    const card = document.createElement('article');
+    card.className = 'card';
+
+    // Gestione immagine con fallback
+    let imageSrc = 'https://picsum.photos/400/250?random=event';
+    if (event.immagine) {
+      if (event.immagine.startsWith('data:image')) {
+        imageSrc = event.immagine; // Base64 image
+      } else if (event.immagine.startsWith('http')) {
+        imageSrc = event.immagine; // URL image
+      }
+    }
+
+    card.innerHTML = `
+        <div class="card-image-container">
+            <img src="${imageSrc}" alt="${event.titolo}" class="card-image" loading="lazy">
+        </div>
+        <div class="card-content">
+            <h3>${event.titolo}</h3>
+            <p class="card-info">
+                <b>Data:</b> ${formatDate(event.datainizio)}
+                ${event.durata ? '<br><b>Orario:</b> ' + event.durata : ''}
+                <br>
+                <b>Relatore:</b> ${event.relatore || 'Non specificato'}
+            </p>
+            <p>${event.descrizione || ''}</p>
+            <p class="card-info"><b>Posti disponibili:</b>
+                <span class="posti-disponibili">${event.posti_disponibili}</span>
+            </p>
+            <div class="card-actions">
+                <a href="evento.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a>
+                <button class="card-btn card-btn-primary btn-prenota-rapido"
+                        data-event-id="${event.idevento}"
+                        ${event.posti_disponibili <= 0 || !event.flagprenotabile ? 'disabled' : ''}>
+                    ${event.posti_disponibili <= 0 ? 'Esaurito' : 'Prenota'}
+                </button>
+            </div>
+        </div>
+    `;
+
+    return card;
+  }
+
+  // Funzioni di utilità per formattare data e ora
+  function formatDate(dateString) {
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString('it-IT', options);
+  }
+
+  function formatTime(timeString) {
+    return `<b>Orario:</b> ${timeString}`;
+  }
+
+  // Carica gli eventi al caricamento della pagina
+  document.addEventListener('DOMContentLoaded', loadEvents);
 </script>
 </body>
 </html>
