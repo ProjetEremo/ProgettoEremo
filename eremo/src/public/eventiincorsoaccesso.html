@@ -117,109 +117,189 @@
         }
     </script>
 
-<h1 class="titoloeventiincorso">EVENTI IN CORSO:</h1>
+    <div class="container section-padding">
+        <h1 class="text-center mb-4">Calendario Attività</h1>
 
-    <div class="event-card2">
-        <div class="minievent-card">
-            <div class="minievent-media">
-                <img src="images/meditation.jpg"
-                     alt="Event image"
-                     class="minievent-image"
-                     loading="lazy">
-            </div>
-            <h1 class="titolominievent">LIBERAZIONE DELL'ANIMA</h1>
-            <div class="container">
-                <p><b>Data:</b> 13/02/2025</p>
-                <p><b>Relatore:</b> Luca Maugeri</p>
-                <p><b>Orario:</b> 11:30</p>
-            </div>
-            <p class="PostiDisp"><b>Posti Disponibili:</b> 22</p>
-            <div class="label-container">
-                <button type="button">+ Info</button>
-                <button type="button">Prenota</button>
-            </div>
+        <div class="card-grid" id="eventiGrid">
+            <!-- Gli eventi verranno caricati qui dinamicamente via JavaScript -->
         </div>
-        <div class="minievent-card">
-            <div class="minievent-media">
-                <img src="images/meditation.jpg"
-                     alt="Event image"
-                     class="minievent-image"
-                     loading="lazy">
-            </div>
-            <h1 class="titolominievent">LIBERAZIONE DELL'ANIMA</h1>
-            <div class="container">
-                <p><b>Data:</b> 13/02/2025</p>
-                <p><b>Relatore:</b> Luca Maugeri</p>
-                <p><b>Orario:</b> 11:30</p>
-            </div>
-            <p class="PostiDisp"><b>Posti Disponibili:</b> 22</p>
-            <div class="label-container">
-                <button type="button">+ Info</button>
-                <button type="button">Prenota</button>
-            </div>
-        </div>
-        <div class="minievent-card">
-            <div class="minievent-media">
-                <img src="images/meditation.jpg"
-                     alt="Event image"
-                     class="minievent-image"
-                     loading="lazy">
-            </div>
-            <h1 class="titolominievent">LIBERAZIONE DELL'ANIMA</h1>
-            <div class="container">
-                <p><b>Data:</b> 13/02/2025</p>
-                <p><b>Relatore:</b> Luca Maugeri</p>
-                <p><b>Orario:</b> 11:30</p>
-            </div>
-            <p class="PostiDisp"><b>Posti Disponibili:</b> 22</p>
-            <div class="label-container">
-                <button type="button">+ Info</button>
-                <button type="button">Prenota</button>
-            </div>
-        </div>
-        <div class="minievent-card">
-            <div class="minievent-media">
-                <img src="images/meditation.jpg"
-                     alt="Event image"
-                     class="minievent-image"
-                     loading="lazy">
-            </div>
-            <h1 class="titolominievent">LIBERAZIONE DELL'ANIMA</h1>
-            <div class="container">
-                <p><b>Data:</b> 13/02/2025</p>
-                <p><b>Relatore:</b> Luca Maugeri</p>
-                <p><b>Orario:</b> 11:30</p>
-            </div>
-            <p class="PostiDisp"><b>Posti Disponibili:</b> 22</p>
-            <div class="label-container">
-                <button type="button">+ Info</button>
-                <button type="button">Prenota</button>
-            </div>
-        </div>
-        <div class="minievent-card">
-            <div class="minievent-media">
-                <img src="images/meditation.jpg"
-                     alt="Event image"
-                     class="minievent-image"
-                     loading="lazy">
-            </div>
-            <h1 class="titolominievent">LIBERAZIONE DELL'ANIMA</h1>
-            <div class="container">
-                <p><b>Data:</b> 13/02/2025</p>
-                <p><b>Relatore:</b> Luca Maugeri</p>
-                <p><b>Orario:</b> 11:30</p>
-            </div>
-            <p class="PostiDisp"><b>Posti Disponibili:</b> 22</p>
-            <div class="label-container">
-                <button type="button">+ Info</button>
-                <button type="button">Prenota</button>
-            </div>
-        </div>
-        </div>
+
     </div>
 
 <footer>
     <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
 </footer>
+
+<script>
+    // Gestione pulsante aggiungi evento
+    const addEventBtn = document.getElementById('addEventBtn');
+    const eventPopupOverlay = document.getElementById('eventPopupOverlay');
+    const eventPopup = document.getElementById('eventPopup');
+    const closeEventPopup = document.getElementById('closeEventPopup');
+    const voluntaryCheckbox = document.getElementById('event-voluntary');
+    const priceContainer = document.getElementById('event-price-container');
+
+    // Mostra/nascondi campo prezzo in base alla checkbox
+    voluntaryCheckbox.addEventListener('change', function() {
+        priceContainer.style.display = this.checked ? 'none' : 'block';
+    });
+
+    // Apri popup
+    addEventBtn.addEventListener('click', function() {
+        eventPopupOverlay.classList.add('active');
+        eventPopup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    // Chiudi popup
+    closeEventPopup.addEventListener('click', closeEventPopupHandler);
+    eventPopupOverlay.addEventListener('click', closeEventPopupHandler);
+
+    function closeEventPopupHandler() {
+        eventPopupOverlay.classList.remove('active');
+        eventPopup.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Gestione invio form
+    // Gestione invio form
+    document.getElementById('newEventForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Salvataggio...';
+
+        try {
+            const formData = new FormData(this);
+            formData.append('action', 'add_event');
+
+            const response = await fetch('gestione_eventi.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`Errore HTTP: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert(result.message);
+                closeEventPopupHandler();
+                window.location.reload(); // Ricarica la pagina per vedere il nuovo evento
+            } else {
+                throw new Error(result.message || 'Errore durante il salvataggio');
+            }
+        } catch (error) {
+            console.error('Errore:', error);
+            alert(`Errore: ${error.message}`);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+    });
+
+    // Chiudi con ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && eventPopup.classList.contains('active')) {
+            closeEventPopupHandler();
+        }
+    });
+</script>
+
+<script>
+    // Funzione per caricare gli eventi dal database
+    async function loadEvents() {
+        try {
+            const response = await fetch('get_events.php');
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.error || 'Errore nel caricamento');
+            }
+
+            const eventsGrid = document.getElementById('eventiGrid');
+            eventsGrid.innerHTML = '';
+
+            if (result.count === 0) {
+                eventsGrid.innerHTML = '<p class="no-events">Nessun evento in programma</p>';
+                return;
+            }
+
+            result.data.forEach(event => {
+                const eventCard = createEventCard(event);
+                eventsGrid.appendChild(eventCard);
+            });
+
+        } catch (error) {
+            console.error('Errore:', error);
+            document.getElementById('eventiGrid').innerHTML = `
+            <div class="error-message">
+                <p>Si è verificato un errore nel caricamento degli eventi</p>
+                <button onclick="loadEvents()">Riprova</button>
+            </div>
+        `;
+        }
+    }
+
+    function createEventCard(event) {
+        const card = document.createElement('article');
+        card.className = 'card';
+
+        // Gestione immagine con fallback
+        let imageSrc = 'https://picsum.photos/400/250?random=event';
+        if (event.immagine) {
+            if (event.immagine.startsWith('data:image')) {
+                imageSrc = event.immagine; // Base64 image
+            } else if (event.immagine.startsWith('http')) {
+                imageSrc = event.immagine; // URL image
+            }
+        }
+
+        card.innerHTML = `
+        <div class="card-image-container">
+            <img src="${imageSrc}" alt="${event.titolo}" class="card-image" loading="lazy">
+        </div>
+        <div class="card-content">
+            <h3>${event.titolo}</h3>
+            <p class="card-info">
+                <b>Data:</b> ${formatDate(event.datainizio)}
+                ${event.durata ? '<br><b>Orario:</b> ' + event.durata : ''}
+                <br>
+                <b>Relatore:</b> ${event.relatore || 'Non specificato'}
+            </p>
+            <p>${event.descrizione || ''}</p>
+            <p class="card-info"><b>Posti disponibili:</b>
+                <span class="posti-disponibili">${event.posti_disponibili}</span>
+            </p>
+            <div class="card-actions">
+                <a href="evento.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a>
+                <button class="card-btn card-btn-primary btn-prenota-rapido"
+                        data-event-id="${event.idevento}"
+                        ${event.posti_disponibili <= 0 || !event.flagprenotabile ? 'disabled' : ''}>
+                    ${event.posti_disponibili <= 0 ? 'Esaurito' : 'Prenota'}
+                </button>
+            </div>
+        </div>
+    `;
+
+        return card;
+    }
+
+    // Funzioni di utilità per formattare data e ora
+    function formatDate(dateString) {
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('it-IT', options);
+    }
+
+    function formatTime(timeString) {
+        return `<b>Orario:</b> ${timeString}`;
+    }
+
+    // Carica gli eventi al caricamento della pagina
+    document.addEventListener('DOMContentLoaded', loadEvents);
+</script>
 </body>
 </html>
