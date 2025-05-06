@@ -151,7 +151,7 @@
 
     <div class="form-grid">
       <div class="form-group">
-        <label for="event-prefix">Prefisso Relatore (es. "Relatore:", "A cura di")</label>
+        <label for="event-prefix">Prefisso Relatore (es. "Relatore:")</label>
         <input type="text" id="event-prefix" name="event-prefix" class="form-control" placeholder="Default: Relatore">
       </div>
       <div class="form-group">
@@ -425,7 +425,7 @@
   if (closeEventPopupBtn) closeEventPopupBtn.addEventListener('click', closeEventPopupHandler);
   if (eventPopupOverlay) eventPopupOverlay.addEventListener('click', closeEventPopupHandler);
 
-  gebi('newEventForm')?.addEventListener('submit', async function(e) {
+    gebi('newEventForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     const submitBtn = this.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.innerHTML;
@@ -435,42 +435,48 @@
     newEventFormMessage.className = 'form-message'; // Reset classi
 
     try {
-      const formData = new FormData(this);
-      formData.append('action', 'add_event');
+    const formData = new FormData(this);
+    formData.append('action', 'add_event');
 
-      const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+    const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
 
-      let result;
-      try {
-        result = await response.json();
-      } catch (jsonError) {
-        throw new Error(`Errore nella risposta del server (non JSON): ${await response.text()}`);
-      }
+    let result;
+    try {
+    result = await response.json();
+  } catch (jsonError) {
+    throw new Error(`Errore nella risposta del server (non JSON): ${await response.text()}`);
+  }
 
-      if (!response.ok) {
-        throw new Error(result.message || `Errore HTTP: ${response.status}`);
-      }
+    if (!response.ok) {
+    throw new Error(result.message || `Errore HTTP: ${response.status}`);
+  }
 
-      if (result.success) {
-        newEventFormMessage.textContent = result.message || 'Evento aggiunto con successo!';
-        newEventFormMessage.classList.add('success');
-        newEventFormMessage.style.display = 'block';
-        this.reset(); // Resetta il form
-        updatePriceFieldVisibility();
-        loadEvents();
-        setTimeout(closeEventPopupHandler, 2000); // Chiudi dopo 2 sec
-      } else {
-        throw new Error(result.message || 'Errore sconosciuto durante il salvataggio.');
-      }
-    } catch (error) {
-      console.error('Errore invio form nuovo evento:', error);
-      newEventFormMessage.textContent = `Errore: ${error.message}`;
-      newEventFormMessage.classList.add('error');
-      newEventFormMessage.style.display = 'block';
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalBtnText;
-    }
+    if (result.success) {
+    newEventFormMessage.textContent = result.message || 'Evento aggiunto con successo!';
+    newEventFormMessage.classList.add('success');
+    newEventFormMessage.style.display = 'block';
+    this.reset(); // Resetta il form
+    updatePriceFieldVisibility();
+    loadEvents();
+
+    // Chiudi il popup dopo 1 secondo
+    setTimeout(() => {
+    closeEventPopupHandler();
+    newEventFormMessage.style.display = 'none';
+  }, 1000);
+  } else {
+    throw new Error(result.message || 'Errore sconosciuto durante il salvataggio.');
+  }
+  } catch (error) {
+    console.error('Errore invio form nuovo evento:', error);
+    newEventFormMessage.textContent = `Errore: ${error.message}`;
+    newEventFormMessage.classList.add('error');
+    newEventFormMessage.style.display = 'block';
+
+    // Ripristina il bottone anche in caso di errore
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  }
   });
 
   document.addEventListener('keydown', function(e) {
