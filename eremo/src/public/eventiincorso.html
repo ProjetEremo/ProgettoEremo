@@ -146,66 +146,204 @@
 </footer>
 
 <script>
-    // --- Navbar & Mobile Menu Logic (come index.html) ---
-    // ... (includere lo script completo) ...
+    // --- Navbar Scroll Logic ---
     let lastScroll = 0;
     const navbarContainer = document.getElementById('navbarContainer');
-    window.addEventListener('scroll', function() { /* ... */ });
+    window.addEventListener('scroll', function() {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      if (currentScroll <= 50) { // Buffer aggiunto
+        navbarContainer.classList.remove('hidden');
+        lastScroll = 0;
+        return;
+      }
+      if (currentScroll > lastScroll && !navbarContainer.classList.contains('hidden')) {
+        // Scroll Down
+        navbarContainer.classList.add('hidden');
+      } else if (currentScroll < lastScroll && navbarContainer.classList.contains('hidden')) {
+        // Scroll Up
+        navbarContainer.classList.remove('hidden');
+      }
+      lastScroll = currentScroll;
+    }, false);
+  
+    // --- Mobile Menu Logic ---
     const mobileMenu = document.getElementById("mobileMenu");
     const hamburger = document.querySelector(".hamburger");
-    function toggleMobileMenu() { /* ... */ }
-    function closeMobileMenu() { /* ... */ }
-
-    // --- Login Popup Logic (come index.html) ---
+    function toggleMobileMenu() {
+      const isOpen = mobileMenu.classList.toggle("open");
+      hamburger.setAttribute("aria-expanded", isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : ''; // Blocca/sblocca scroll
+    }
+    function closeMobileMenu() {
+      mobileMenu.classList.remove("open");
+      hamburger.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = '';
+    }
+    // Chiudi menu cliccando fuori
+    document.addEventListener('click', function(event) {
+      if (mobileMenu.classList.contains('open') &&
+              !mobileMenu.contains(event.target) &&
+              !hamburger.contains(event.target)) {
+        closeMobileMenu();
+      }
+    });
+  
+    // --- Login Popup Logic ---
     const loginBtn = document.getElementById('login-btn');
-    // ... (includere lo script completo del popup) ...
-    function openLoginPopup() { /* ... */ }
-    function closeLoginPopup() { /* ... */ }
-    // ... event listeners popup ...
-
-
-    // --- Logica specifica pagina Eventi ---
-
-    // Esempio: Gestione prenotazione rapida (richiede login)
-    document.querySelectorAll('.btn-prenota-rapido').forEach(button => {
-        button.addEventListener('click', function() {
-            const eventId = this.getAttribute('data-event-id');
-            // 1. Controlla se l'utente è loggato (es. check cookie/localStorage)
-            const isLoggedIn = false; // Mettere qui la logica di controllo login
-
-            if (isLoggedIn) {
-                // 2. Se loggato, procedi con la prenotazione (simulata)
-                console.log(`Tentativo prenotazione evento ${eventId}`);
-                this.textContent = 'Prenotato!';
-                this.disabled = true;
-                // Qui aggiungere chiamata API reale per prenotare
-                alert(`Prenotazione per evento ${eventId} effettuata (simulato).`);
-            } else {
-                // 3. Se non loggato, apri il popup di login
-                openLoginPopup();
-                // Potresti voler salvare l'ID evento per completare la prenotazione dopo il login
-                localStorage.setItem('pending_booking_event_id', eventId);
-            }
-        });
-    });
-
-    // Esempio: dopo il login/registrazione dal popup, controlla se c'era una prenotazione in sospeso
-    document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+    const loginBtnMobile = document.getElementById('login-btn-mobile');
+    const loginOverlay = document.getElementById('loginOverlay');
+    const loginPopup = document.getElementById('loginPopup');
+    const closePopupBtn = document.getElementById('closePopup');
+    const loginTabs = document.querySelectorAll('.login-tab');
+    const loginForms = document.querySelectorAll('.login-form');
+  
+    function openLoginPopup() {
+      loginOverlay.classList.add('active');
+      loginPopup.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+  
+    function closeLoginPopup() {
+      loginOverlay.classList.remove('active');
+      loginPopup.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  
+    if (loginBtn) {
+      loginBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        // ... logica login ...
-        const pendingEventId = localStorage.getItem('pending_booking_event_id');
-        if (pendingEventId) {
-            alert(`Login effettuato. Completa prenotazione per evento ${pendingEventId}?`);
-            // Qui logica per completare la prenotazione
-            localStorage.removeItem('pending_booking_event_id');
+        openLoginPopup();
+      });
+    }
+    if (loginBtnMobile) {
+      loginBtnMobile.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeMobileMenu();
+        openLoginPopup();
+      });
+    }
+  
+    if(closePopupBtn) { closePopupBtn.addEventListener('click', closeLoginPopup); }
+    if(loginOverlay) { loginOverlay.addEventListener('click', closeLoginPopup); }
+  
+    // Login Tabs Switch
+    loginTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabId = tab.getAttribute('data-tab');
+        loginTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        loginForms.forEach(form => {
+          form.classList.remove('active');
+          if (form.id === `${tabId}Form`) {
+            form.classList.add('active');
+          }
+        });
+      });
+    });
+  
+    // --- Gestione Invio Form con Fetch API ---
+  
+    // LOGIN
+    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const loginButton = e.target.querySelector('button[type="submit"]');
+      const originalButtonText = loginButton.innerHTML;
+      loginButton.disabled = true;
+      loginButton.innerHTML = 'Accesso...'; // Feedback visivo
+  
+      try {
+        const response = await fetch('login.php', { // Assicurati che il percorso 'login.php' sia corretto
+          method: 'POST',
+          // Non serve 'Content-Type' header quando si usa FormData con fetch
+          body: new FormData(e.target) // Invia i dati del form
+        });
+  
+        // Controlla se la risposta è OK (status 200-299)
+        if (!response.ok) {
+          // Prova a leggere l'errore dal corpo se possibile, altrimenti usa statusText
+          let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+          try {
+            const errorData = await response.json();
+            errorMsg = errorData.message || errorMsg;
+          } catch(e) { /* Ignora se il corpo non è JSON */ }
+          throw new Error(errorMsg);
         }
+  
+        const result = await response.json(); // Aspetta risposta JSON
+  
+        if (result.success) {
+          // alert(result.message); // Puoi mostrare un messaggio meno invasivo
+          closeLoginPopup();
+          // Reindirizzamento differenziato
+          if (result.is_admin) {
+            window.location.href = 'indexadmin.html'; // Pagina admin
+          } else {
+            window.location.href = 'indexaccesso.html'; // Pagina utente loggato
+          }
+        } else {
+          // Mostra errore specifico dal backend
+          alert("Errore Login: " + (result.message || "Credenziali non valide."));
+        }
+      } catch (error) {
+        // Errore di rete o nella fetch o nel parsing JSON
+        alert("Errore durante il login: " + error.message);
+        console.error("Dettaglio errore login:", error);
+      } finally {
+        // Riabilita il bottone indipendentemente dal risultato
+        loginButton.disabled = false;
+        loginButton.innerHTML = originalButtonText;
+      }
+    });
+  
+    // REGISTRAZIONE
+    document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const registerButton = e.target.querySelector('button[type="submit"]');
+      const originalButtonText = registerButton.innerHTML;
+      registerButton.disabled = true;
+      registerButton.innerHTML = 'Registrazione...'; // Feedback visivo
+  
+      try {
+        const response = await fetch('registrati.php', { // Assicurati che 'registrati.php' sia corretto
+          method: 'POST',
+          body: new FormData(e.target)
+        });
+  
+        if (!response.ok) {
+          let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+          try {
+            const errorData = await response.json();
+            errorMsg = errorData.message || errorMsg;
+          } catch(e) { /* Ignora se il corpo non è JSON */ }
+          throw new Error(errorMsg);
+        }
+  
+        const result = await response.json();
+  
+        if (result.success) {
+          alert(result.message || "Registrazione completata con successo!");
+          closeLoginPopup();
+          // Potresti voler effettuare il login automatico qui o reindirizzare alla pagina di login
+          // openLoginPopup(); // Riapri per login?
+          // document.querySelector('.login-tab[data-tab="login"]').click(); // Seleziona tab login
+        } else {
+          alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+        }
+      } catch (error) {
+        alert("Errore durante la registrazione: " + error.message);
+        console.error("Dettaglio errore registrazione:", error);
+      } finally {
+        registerButton.disabled = false;
+        registerButton.innerHTML = originalButtonText;
+      }
+    });
+  
+    // Chiudi popup con tasto Esc
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && loginPopup.classList.contains('active')) {
         closeLoginPopup();
+      }
     });
-    document.getElementById('registerForm')?.addEventListener('submit', (e) => {
-        // ... logica registrazione ...
-        // Simile al login, controlla pendingEventId
-    });
-
 </script>
 
 </body>
