@@ -1818,3 +1818,176 @@ footer p {
     font-size: 1.5rem;
   }
 }
+
+/* Stili aggiuntivi se necessari per il dropdown utente */
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown .user-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-dropdown .dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 110%; /* Posiziona sotto il bottone */
+  background-color: var(--white, #fff);
+  min-width: 180px;
+  box-shadow: var(--shadow-medium, 0 4px 12px rgba(0,0,0,0.1));
+  z-index: 1001;
+  border-radius: 8px;
+  overflow: hidden; /* Per bordi arrotondati */
+  border: 1px solid var(--gray-light, #e0e0e0);
+}
+
+.user-dropdown .dropdown-menu a {
+  color: var(--dark, #333);
+  padding: 0.8rem 1.2rem;
+  text-decoration: none;
+  display: block;
+  font-size: 0.95rem;
+  white-space: nowrap; /* Evita che il testo vada a capo */
+}
+
+.user-dropdown .dropdown-menu a:hover {
+  background-color: var(--light, #f8f9fa);
+  color: var(--primary, #8D9B87);
+}
+.user-dropdown .dropdown-menu a:last-child {
+  border-top: 1px solid var(--gray-light, #e0e0e0); /* Separatore per Esci */
+  color: var(--accent, #dc3545); /* Colore diverso per Esci */
+}
+.user-dropdown .dropdown-menu a:last-child:hover {
+  background-color: #fbeadf; /* Sfondo leggermente diverso per Esci */
+}
+
+.user-dropdown.show .dropdown-menu {
+  display: block;
+  animation: fadeIn 0.2s ease-out;
+}
+.user-dropdown .dropdown-arrow {
+  font-size: 0.8rem;
+  transition: transform var(--transition-fast, 0.2s);
+}
+.user-dropdown.show .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.avatar-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.avatar-option {
+  font-size: 2rem;
+  padding: 0.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition-medium, 0.3s);
+  background: var(--gray-light, #e0e0e0);
+  width: 50px; /* Dimensione fissa */
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+}
+
+.avatar-option:hover {
+  transform: scale(1.1);
+  background: var(--light, #f8f9fa);
+}
+.avatar-option.selected {
+  border-color: var(--secondary, #6c757d);
+  background-color: var(--light, #f8f9fa);
+  box-shadow: 0 0 0 3px rgba(141, 177, 135, 0.3);
+}
+
+/* --- NUOVI STILI PER INDICATORE DI CARICAMENTO --- */
+/* Contenitore per la griglia degli eventi e il loader */
+#eventiGridContainer {
+  position: relative; /* Necessario per il posizionamento assoluto dell'overlay di caricamento */
+  min-height: 300px;  /* Altezza minima per dare spazio allo spinner se non ci sono ancora eventi */
+  border-radius: 8px; /* Opzionale: per abbinare lo stile se la griglia ha bordi arrotondati */
+}
+
+/* Overlay di caricamento */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.92); /* Sfondo bianco leggermente più opaco */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 20; /* Assicura che sia sopra la griglia degli eventi */
+  border-radius: inherit; /* Eredita il border-radius dal parent #eventiGridContainer */
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  visibility: hidden; /* Nascosto e non interagibile all'inizio */
+  opacity: 0;
+}
+
+.loading-overlay.visible { /* Classe per mostrare il loader */
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Nuovo spinner a 3 pallini */
+.loading-overlay .spinner {
+  display: flex; /* Per allineare i pallini */
+  justify-content: center;
+  align-items: center;
+  width: auto; /* Adattabile al contenuto */
+  height: 50px; /* Altezza dello spinner */
+  margin-bottom: 25px; /* Spazio tra spinner e testo */
+}
+
+.spinner > div { /* Stile per ogni pallino */
+  width: 16px;
+  height: 16px;
+  background-color: var(--primary, #8D9B87); /* Colore primario del sito */
+  border-radius: 100%;
+  display: inline-block;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  margin: 0 5px; /* Spazio tra i pallini */
+}
+
+/* Ritardi animazione per i pallini */
+.spinner .bounce1 {
+  animation-delay: -0.32s;
+}
+
+.spinner .bounce2 {
+  animation-delay: -0.16s;
+}
+/* .spinner .bounce3 userà il ritardo di default 0s */
+
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% {
+    transform: scale(0.3); /* Inizia e finisce piccolo */
+    opacity: 0.5;
+  } 40% {
+      transform: scale(1.0); /* Diventa grande al 40% */
+      opacity: 1;
+    }
+}
+
+/* Stile per il testo di caricamento */
+.loading-overlay p {
+  font-size: 1.2em;
+  color: var(--dark, #333333);
+  font-weight: 500;
+  text-align: center;
+}
+/* --- FINE STILI INDICATORE DI CARICAMENTO --- */
