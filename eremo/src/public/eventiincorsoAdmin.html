@@ -518,6 +518,7 @@
   }
 
   // Gestione invio form
+  // Gestione invio form
   document.getElementById('newEventForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const submitBtn = this.querySelector('button[type="submit"]');
@@ -527,14 +528,7 @@
 
     try {
       const formData = new FormData(this);
-
-      // Aggiungi campi aggiuntivi
       formData.append('action', 'add_event');
-      if (!formData.get('event-voluntary')) {
-        formData.append('event-price', document.getElementById('event-price').value);
-      } else {
-        formData.append('event-price', '0'); // Base volontaria = prezzo 0
-      }
 
       const response = await fetch('gestione_eventi.php', {
         method: 'POST',
@@ -548,10 +542,9 @@
       const result = await response.json();
 
       if (result.success) {
-        alert('Evento aggiunto con successo!');
+        alert(result.message);
         closeEventPopupHandler();
-        // Ricarica gli eventi
-        loadEvents();
+        window.location.reload(); // Ricarica la pagina per vedere il nuovo evento
       } else {
         throw new Error(result.message || 'Errore durante il salvataggio');
       }
