@@ -4,172 +4,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="images/logo.png" type="image/x-icon">
-    <title>Eremo Frate Francesco</title>
+    <title>Calendario Attività (Accesso) - Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .navbar-container {
+        /* Questi stili erano specifici in eventiincorsoaccesso.html, li ho spostati qui per chiarezza */
+        /* Se navbarContainerEl è usato globalmente, assicurati che gli stili non entrino in conflitto
+           con la logica di hide/show basata su scroll-up/scroll-down.
+           La logica di navbar fissa con 'hidden' potrebbe necessitare di revisione
+           se si usa ANCHE la logica scroll-up/scroll-down.
+           Per ora, mantengo la logica originale di questa pagina per la navbar.
+        */
+        .navbar-container.fixed-nav { /* Aggiunta una classe per attivarla se necessario via JS */
             position: fixed;
             top: 0;
             width: 100%;
             transition: transform 0.3s ease;
             z-index: 1000;
-            background-color: #fff;
+            background-color: #fff; /* Assicurati che abbia uno sfondo */
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .navbar-container.hidden {
+        .navbar-container.fixed-nav.hidden-scroll { /* Rinominata per evitare conflitto con la classe 'hidden' di Bootstrap o simili */
             transform: translateY(-100%);
         }
-        body {
-            padding-top: 80px;
+        body.body-padding-top { /* Classe da aggiungere al body se la navbar è fissa */
+            padding-top: 80px; /* Altezza approssimativa della navbar */
         }
     </style>
 </head>
-<body>
-
-<header>
-    <div class="navbar-container" id="navbarContainer">
-        <div class="navbar">
-            <a href="indexaccesso.html" style="text-decoration: none; color: inherit">
-                <div class="logo">
-                    <span class="emoji">🏔️</span>
-                    <h2>Eremo Frate Francesco</h2>
-                </div>
-            </a>
-            <div class="menu">
-                <a href="chi-siamo.html">Chi siamo</a>
-                <span class="separator">|</span>
-                <a href="eventiincorsoaccesso.html" class="active">Calendario attivitá</a>
-                <a href="eventipassatiaccesso.html">Archivio attivitá</a>
-                <span class="separator">|</span>
-                <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
-                <span class="separator">|</span>
-                <a href="">Dove siamo</a>
-                <a href="contattiaccesso.html">Contatti</a>
-            </div>
-
-            <div class="right-menu">
-                <div class="user-dropdown" onclick="toggleUserMenu()">
-                    <button class="user-btn">
-                        <span class="user-avatar">😺</span>
-                        <span class="user-name">Area Personale</span>
-                        <span class="dropdown-arrow">▼</span>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="areapersonale.html" class="dropdown-item">Il mio profilo</a>
-                        <a href="gestisciprenotazioni.html" class="dropdown-item">Le mie prenotazioni</a>
-                        <a href="logout.html" class="dropdown-item">Esci</a>
-                    </div>
-                </div>
-                <button class="hamburger" onclick="toggleMenu()">☰</button>
-            </div>
+<body id="pageBody"> <header class="navbar-container" id="navbarContainer"> <nav class="navbar">
+    <a href="indexaccesso.html" style="text-decoration: none; color: inherit;">
+        <div class="logo">
+            <span class="emoji">🏔️</span>
+            <h2>Eremo Frate Francesco</h2>
         </div>
+    </a>
+    <div class="menu">
+        <a href="chi-siamoaccesso.html">Chi siamo</a> <span class="separator">|</span>
+        <a href="eventiincorsoaccesso.html" class="active">Calendario attività</a>
+        <a href="eventipassatiaccesso.html">Archivio attività</a>
+        <span class="separator">|</span>
+        <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
+        <span class="separator">|</span>
+        <a href="dovesiamoaccesso.html">Dove siamo</a> <a href="contattiaccesso.html">Contatti</a>
     </div>
 
-    <script>
-        function toggleUserMenu() {
-            const dropdown = document.querySelector('.user-dropdown');
-            dropdown.classList.toggle('show');
-        }
-
-        // Chiudi il dropdown se si clicca fuori
-        document.addEventListener('click', function(event) {
-            const dropdown = document.querySelector('.user-dropdown');
-            if (!dropdown.contains(event.target)) {
-                dropdown.classList.remove('show');
-            }
-        });
-    </script>
+    <div class="right-menu">
+        <div class="user-dropdown" id="userDropdownContainer">
+            <button class="user-btn" onclick="toggleUserMenu()" aria-haspopup="true" aria-expanded="false">
+                <span class="user-avatar" id="navbar-avatar">👤</span>
+                <span class="user-name" id="navbar-username">Utente</span>
+                <span class="dropdown-arrow">▼</span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
+                <a href="areapersonale.html" class="dropdown-item">Il mio profilo</a>
+                <a href="gestisciprenotazioni.html" class="dropdown-item">Le mie prenotazioni</a>
+                <a href="#" onclick="logoutAndRedirect()" class="dropdown-item">Esci</a> </div>
+        </div>
+        <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
+    </div>
+</nav>
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="chi-siamoaccesso.html" onclick="closeMobileMenu()">Chi siamo</a>
+        <a href="eventiincorsoaccesso.html" onclick="closeMobileMenu()">Calendario attività</a>
+        <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()">Archivio attività</a>
+        <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
+        <a href="dovesiamoaccesso.html" onclick="closeMobileMenu()">Dove siamo</a>
+        <a href="contattiaccesso.html" onclick="closeMobileMenu()">Contatti</a>
+        <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
+        <a href="#" onclick="logoutAndRedirect(); closeMobileMenu();">Esci</a>
+    </div>
 </header>
 
-    <script>
-        let lastScroll = 0;
-        const navbar = document.getElementById('navbarContainer');
-        
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            
-            if (currentScroll <= 0) {
-                navbar.classList.remove('hidden');
-                return;
-            }
-            
-            if (currentScroll > lastScroll) {
-                navbar.classList.add('hidden');
-            } else {
-                navbar.classList.remove('hidden');
-            }
-            
-            lastScroll = currentScroll;
-        });
-
-        function toggleMenu() {
-            const menu = document.getElementById("mobileMenu");
-            const button = document.querySelector(".hamburger");
-            const isOpen = menu.classList.toggle("open");
-            button.classList.toggle("open");
-            button.setAttribute("aria-expanded", isOpen);
-        }
-
-        function closeMenu() {
-            document.getElementById("mobileMenu").classList.remove("open");
-            document.querySelector(".hamburger").classList.remove("open");
-            document.querySelector(".hamburger").setAttribute("aria-expanded", "false");
-        }
-    </script>
-
-<div class="container section-padding"> <h1 class="text-center mb-4">Calendario Attività</h1>
+<main class="container section-padding"> <h1 class="text-center mb-4">Calendario Attività</h1>
 
     <div id="eventiGridContainer">
-        <div id="loadingIndicator" class="loading-overlay"> <div class="spinner">
-            <div class="bounce1"></div>
-            <div class="bounce2"></div>
-            <div class="bounce3"></div>
-        </div>
+        <div id="loadingIndicator" class="loading-overlay">
+            <div class="spinner">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
             <p>Sto caricando gli eventi...</p>
         </div>
 
         <div class="card-grid" id="eventiGrid">
         </div>
     </div>
-
-</div>
+</main>
 
 <footer>
-    <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati.</p>
+    <p>&copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
 </footer>
 
 <script>
-    // --- Funzioni Utilità Generali ---
-    function gebi(id) { return document.getElementById(id); } // Shorthand
+    function gebi(id) { return document.getElementById(id); }
 
-    // --- Navbar & Mobile Menu Logic ---
-    let lastScrollNav = 0;
+    // --- Navbar Logic (Combinata e Semplificata) ---
     const navbarContainerEl = gebi('navbarContainer');
-    if (navbarContainerEl) {
-        window.addEventListener('scroll', function() {
-            const currentScroll = window.pageYOffset;
-            if (currentScroll <= 50) { // Leggera tolleranza per lo scroll iniziale
-                navbarContainerEl.classList.remove('scroll-up', 'scroll-down');
-                return;
-            }
-            if (currentScroll > lastScrollNav && !navbarContainerEl.classList.contains('scroll-down')) {
-                navbarContainerEl.classList.remove('scroll-up');
-                navbarContainerEl.classList.add('scroll-down');
-            } else if (currentScroll < lastScrollNav && navbarContainerEl.classList.contains('scroll-down')) {
-                navbarContainerEl.classList.remove('scroll-down');
-                navbarContainerEl.classList.add('scroll-up');
-            }
-            lastScrollNav = currentScroll;
-        });
+    let lastScrollGlobal = 0; // Unica variabile per lo scroll
+    const bodyEl = gebi('pageBody');
+
+    function handleNavbarScroll() {
+        const currentScroll = window.pageYOffset;
+        // Logica per nascondere/mostrare su scroll up/down
+        if (currentScroll <= 50) {
+            navbarContainerEl.classList.remove('scroll-up', 'scroll-down');
+            // Se si usa la logica fixed-nav con 'hidden-scroll'
+            navbarContainerEl.classList.remove('hidden-scroll');
+            return;
+        }
+        if (currentScroll > lastScrollGlobal && !navbarContainerEl.classList.contains('scroll-down')) {
+            navbarContainerEl.classList.remove('scroll-up');
+            navbarContainerEl.classList.add('scroll-down');
+            // Se si usa la logica fixed-nav con 'hidden-scroll'
+            // navbarContainerEl.classList.add('hidden-scroll');
+        } else if (currentScroll < lastScrollGlobal && navbarContainerEl.classList.contains('scroll-down')) {
+            navbarContainerEl.classList.remove('scroll-down');
+            navbarContainerEl.classList.add('scroll-up');
+            // Se si usa la logica fixed-nav con 'hidden-scroll'
+            // navbarContainerEl.classList.remove('hidden-scroll');
+        }
+        lastScrollGlobal = currentScroll;
     }
 
+    // Decidi quale logica di scroll per la navbar usare.
+    // Se la navbar deve essere *sempre* fissa e nascondersi solo su scroll down:
+    // navbarContainerEl.classList.add('fixed-nav');
+    // bodyEl.classList.add('body-padding-top');
+    // window.addEventListener('scroll', function() { // Sostituisci con la logica specifica 'hidden-scroll' se preferita
+    //     const currentScroll = window.pageYOffset;
+    //     if (currentScroll <= 0) { navbarContainerEl.classList.remove('hidden-scroll'); return; }
+    //     if (currentScroll > lastScrollGlobal) { navbarContainerEl.classList.add('hidden-scroll'); }
+    //     else { navbarContainerEl.classList.remove('hidden-scroll'); }
+    //     lastScrollGlobal = currentScroll;
+    // });
+    // ALTRIMENTI, usa la logica scroll-up/scroll-down (come nelle altre pagine)
+    window.addEventListener('scroll', handleNavbarScroll);
+
+
     const mobileMenuEl = gebi("mobileMenu");
-    const hamburgerEl = document.querySelector(".hamburger");
+    const hamburgerEl = document.querySelector(".hamburger"); // Potrebbe essercene solo uno
 
     function toggleMobileMenu() {
         if (mobileMenuEl && hamburgerEl) {
             const isActive = mobileMenuEl.classList.toggle("active");
-            hamburgerEl.classList.toggle("active");
+            hamburgerEl.classList.toggle("active"); // hamburgerEl deve essere quello corretto
             document.body.style.overflow = isActive ? 'hidden' : '';
         }
     }
@@ -182,55 +161,9 @@
         }
     }
 
-    // --- Login Popup Logic ---
-    const loginOverlay = gebi('loginOverlay');
-    const loginPopup = gebi('loginPopup');
-    const closePopupBtn = gebi('closePopup');
-    const loginTabs = document.querySelectorAll('.login-tab');
-    const loginForms = document.querySelectorAll('.login-form');
-    const loginBtnMobile = gebi('login-btn-mobile');
-
-    function openLoginPopup() {
-        if (loginOverlay && loginPopup) {
-            loginOverlay.classList.add('active');
-            loginPopup.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
-    function closeLoginPopup() {
-        if (loginOverlay && loginPopup) {
-            loginOverlay.classList.remove('active');
-            loginPopup.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    }
-
-    if (loginBtnMobile) {
-        loginBtnMobile.addEventListener('click', function(e) {
-            e.preventDefault();
-            openLoginPopup();
-            closeMobileMenu();
-        });
-    }
-
-    if (closePopupBtn) closePopupBtn.addEventListener('click', closeLoginPopup);
-    if (loginOverlay) loginOverlay.addEventListener('click', closeLoginPopup);
-
-    loginTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            loginTabs.forEach(t => t.classList.remove('active'));
-            loginForms.forEach(f => f.classList.remove('active'));
-            this.classList.add('active');
-            const targetFormId = this.getAttribute('data-tab') === 'login' ? 'loginForm' : 'registerForm';
-            const targetForm = gebi(targetFormId);
-            if (targetForm) targetForm.classList.add('active');
-        });
-    });
-
     // --- User Dropdown Logic ---
     function toggleUserMenu() {
-        const dropdown = document.querySelector('.user-dropdown');
+        const dropdown = gebi('userDropdownContainer'); // Usa l'ID per specificità
         if (dropdown) {
             const userBtn = dropdown.querySelector('.user-btn');
             const isOpen = dropdown.classList.toggle('show');
@@ -239,70 +172,31 @@
     }
 
     document.addEventListener('click', function(event) {
-        const dropdown = document.querySelector('.user-dropdown');
-        if (dropdown && !dropdown.contains(event.target)) {
-            dropdown.classList.remove('show');
-            const userBtn = dropdown.querySelector('.user-btn');
-            if (userBtn) userBtn.setAttribute('aria-expanded', 'false');
+        const dropdownContainer = gebi('userDropdownContainer');
+        if (dropdownContainer && dropdownContainer.classList.contains('show')) {
+            if (!dropdownContainer.contains(event.target) && !dropdownContainer.querySelector('.user-btn').contains(event.target) ) {
+                dropdownContainer.classList.remove('show');
+                const userBtn = dropdownContainer.querySelector('.user-btn');
+                if (userBtn) userBtn.setAttribute('aria-expanded', 'false');
+            }
         }
     });
 
-    // --- Logica Utente (Simulata per ora) ---
+    // --- Logica Utente (per pagina accesso) ---
     let currentUser = null;
 
     function updateNavbarUserUI() {
-        const navbarAvatar = gebi('navbar-avatar');
-        const navbarUsername = gebi('navbar-username');
-        const userDropdownContainer = gebi('userDropdownContainer');
-        // Non c'è un bottone login standard nell'header in questo HTML, solo nel menu mobile
-        const loginBtnMobileEl = gebi('login-btn-mobile');
+        const navbarAvatarEl = gebi('navbar-avatar');
+        const navbarUsernameEl = gebi('navbar-username');
 
-        if (currentUser && navbarAvatar && navbarUsername && userDropdownContainer) {
-            navbarAvatar.textContent = currentUser.avatar || '👤';
-            navbarUsername.textContent = currentUser.nome || 'Utente';
-            userDropdownContainer.style.display = 'inline-block';
-            if (loginBtnMobileEl) loginBtnMobileEl.style.display = 'none';
-        } else if (userDropdownContainer) {
-            userDropdownContainer.style.display = 'none';
-            if (loginBtnMobileEl) loginBtnMobileEl.style.display = 'block';
+        if (currentUser) {
+            if (navbarAvatarEl) navbarAvatarEl.textContent = currentUser.avatar || '👤';
+            if (navbarUsernameEl) navbarUsernameEl.textContent = currentUser.nome || 'Utente';
+        } else {
+            // Se l'utente non è loggato su una pagina "accesso", reindirizza al login
+            alert("Accesso richiesto. Verrai reindirizzato alla pagina di login.");
+            window.location.href = 'eventiincorso.html'; // o la tua pagina di login principale
         }
-    }
-
-    gebi('loginForm')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        // SIMULAZIONE LOGIN:
-        currentUser = { nome: gebi('login-email-popup').value.split('@')[0] || "Utente", avatar: "🧘" }; // Semplificato
-        localStorage.setItem('userDataEFF', JSON.stringify(currentUser));
-        updateNavbarUserUI();
-        alert('Login effettuato con successo!');
-        closeLoginPopup();
-
-        const pendingEventId = localStorage.getItem('pending_booking_event_id_eff');
-        if (pendingEventId) {
-            if(confirm(`Login effettuato. Vuoi completare la prenotazione per l'evento precedentemente selezionato?`)) {
-                alert(`Prenotazione per evento ${pendingEventId} da completare (simulato).`);
-            }
-            localStorage.removeItem('pending_booking_event_id_eff');
-        }
-    });
-
-    gebi('registerForm')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        // SIMULAZIONE REGISTRAZIONE E LOGIN:
-        currentUser = { nome: gebi('register-name').value || "Nuovo Utente", avatar: "👤" }; // Semplificato
-        localStorage.setItem('userDataEFF', JSON.stringify(currentUser));
-        updateNavbarUserUI();
-        alert('Registrazione effettuata con successo! Ora sei loggato.');
-        closeLoginPopup();
-    });
-
-    function logout() {
-        currentUser = null;
-        localStorage.removeItem('userDataEFF');
-        updateNavbarUserUI();
-        alert('Logout effettuato.');
-        // Non reindirizzare per default, potrebbe essere una pagina admin
-        // window.location.href = 'index.html';
     }
 
     function checkLoginStatusOnLoad() {
@@ -310,117 +204,19 @@
         if (storedUserData) {
             currentUser = JSON.parse(storedUserData);
         } else {
-            currentUser = null;
+            currentUser = null; // Dovrebbe attivare il redirect in updateNavbarUserUI
         }
         updateNavbarUserUI();
     }
 
-    // --- Gestione Pop-up Nuovo Evento ---
-    const addEventBtn = gebi('addEventBtn');
-    const eventPopupOverlay = gebi('eventPopupOverlay');
-    const eventPopup = gebi('eventPopup');
-    const closeEventPopupBtn = gebi('closeEventPopup');
-    const voluntaryCheckbox = gebi('event-voluntary');
-    const priceContainer = gebi('event-price-container');
-    const newEventFormMessage = gebi('newEventFormMessage');
-
-    function updatePriceFieldVisibility() {
-        if (voluntaryCheckbox && priceContainer) {
-            priceContainer.style.display = voluntaryCheckbox.checked ? 'none' : 'block';
-            if (voluntaryCheckbox.checked) {
-                gebi('event-price').value = ''; // Svuota se volontario
-                gebi('event-price').required = false;
-            } else {
-                gebi('event-price').required = true; // Rendi richiesto se non volontario
-            }
-        }
+    function logoutAndRedirect() {
+        currentUser = null;
+        localStorage.removeItem('userDataEFF');
+        alert('Logout effettuato.');
+        window.location.href = 'index.html'; // Reindirizza alla home page pubblica
     }
 
-    if (voluntaryCheckbox) {
-        voluntaryCheckbox.addEventListener('change', updatePriceFieldVisibility);
-        updatePriceFieldVisibility(); // Stato iniziale
-    }
-
-    if (addEventBtn) {
-        addEventBtn.addEventListener('click', function() {
-            if (eventPopupOverlay && eventPopup) {
-                eventPopupOverlay.classList.add('active');
-                eventPopup.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                newEventFormMessage.style.display = 'none'; // Nascondi messaggi precedenti
-                gebi('newEventForm').reset(); // Resetta il form
-                updatePriceFieldVisibility(); // Aggiorna visibilità prezzo
-            }
-        });
-    }
-
-    function closeEventPopupHandler() {
-        if (eventPopupOverlay && eventPopup) {
-            eventPopupOverlay.classList.remove('active');
-            eventPopup.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    }
-
-    if (closeEventPopupBtn) closeEventPopupBtn.addEventListener('click', closeEventPopupHandler);
-    if (eventPopupOverlay) eventPopupOverlay.addEventListener('click', closeEventPopupHandler);
-
-    gebi('newEventForm')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<div class="spinner-mini" style="width:1em;height:1em;border-width:2px;vertical-align:middle;margin-right:5px;"></div>Salvataggio...';
-        newEventFormMessage.style.display = 'none';
-        newEventFormMessage.className = 'form-message'; // Reset classi
-
-        try {
-            const formData = new FormData(this);
-            formData.append('action', 'add_event');
-
-            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
-
-            let result;
-            try {
-                result = await response.json();
-            } catch (jsonError) {
-                throw new Error(`Errore nella risposta del server (non JSON): ${await response.text()}`);
-            }
-
-            if (!response.ok) {
-                throw new Error(result.message || `Errore HTTP: ${response.status}`);
-            }
-
-            if (result.success) {
-                newEventFormMessage.textContent = result.message || 'Evento aggiunto con successo!';
-                newEventFormMessage.classList.add('success');
-                newEventFormMessage.style.display = 'block';
-                this.reset(); // Resetta il form
-                updatePriceFieldVisibility();
-                loadEvents();
-                setTimeout(closeEventPopupHandler, 2000); // Chiudi dopo 2 sec
-            } else {
-                throw new Error(result.message || 'Errore sconosciuto durante il salvataggio.');
-            }
-        } catch (error) {
-            console.error('Errore invio form nuovo evento:', error);
-            newEventFormMessage.textContent = `Errore: ${error.message}`;
-            newEventFormMessage.classList.add('error');
-            newEventFormMessage.style.display = 'block';
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
-        }
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            if (eventPopup && eventPopup.classList.contains('active')) closeEventPopupHandler();
-            if (loginPopup && loginPopup.classList.contains('active')) closeLoginPopup();
-        }
-    });
-
-    // --- Logica Caricamento Eventi ---
+    // --- Logica Caricamento Eventi (IDENTICA ALLA VERSIONE CORRETTA) ---
     async function loadEvents() {
         const eventsGrid = gebi('eventiGrid');
         const loadingIndicator = gebi('loadingIndicator');
@@ -428,25 +224,30 @@
         if (loadingIndicator) loadingIndicator.classList.add('visible');
         if (eventsGrid) eventsGrid.innerHTML = '';
 
-
         try {
-            // await new Promise(resolve => setTimeout(resolve, 1500)); // Simulazione ritardo
-
             const response = await fetch('get_events.php');
+            const responseText = await response.text();
 
             let result;
             try {
-                result = await response.json();
+                result = JSON.parse(responseText);
             } catch (jsonError) {
-                throw new Error(`Errore nella risposta del server (non JSON): ${await response.text()}`);
+                console.error("JSON.parse() fallito. Errore:", jsonError);
+                console.error("Testo della risposta grezza da get_events.php (primi 1000 caratteri):\n", responseText.substring(0, 1000));
+                let displayedError = `Errore nella risposta del server (non è JSON valido).`;
+                if (responseText.toLowerCase().includes("<br />") || responseText.toLowerCase().includes("<b>warning</b>") || responseText.toLowerCase().includes("<b>fatal error</b>")) {
+                    displayedError += " Potrebbe trattarsi di un errore PHP.";
+                }
+                throw new Error(displayedError + " Controlla la console (F12) per i dettagli.");
             }
 
             if (!response.ok) {
-                throw new Error(result.error || result.message || `Errore HTTP: ${response.status}`);
+                const errorMsg = result?.error || result?.message || `Errore HTTP: ${response.status} - ${response.statusText || 'Nessun testo di stato'}`;
+                throw new Error(errorMsg);
             }
 
             if (!result.success) {
-                throw new Error(result.error || result.message || 'Errore nel caricamento dei dati degli eventi.');
+                throw new Error(result.error || result.message || 'Errore nel caricamento dei dati (success: false).');
             }
 
             if (!eventsGrid) return;
@@ -464,12 +265,11 @@
             console.error('Errore dettagliato durante il caricamento degli eventi:', error);
             if (eventsGrid) {
                 eventsGrid.innerHTML = `
-          <div class="error-message text-center" style="padding: 20px; width: 100%;">
-            <p><strong>Oops! Si è verificato un errore.</strong></p>
-            <p style="font-size:0.9em; color: #e74c3c; margin-top: 5px;">${error.message || 'Impossibile caricare gli eventi.'}</p>
-            <button onclick="loadEvents()" class="btn-popup" style="margin-top: 15px;">Riprova Caricamento</button>
-          </div>
-        `;
+                  <div class="error-message text-center" style="padding: 20px; width: 100%;">
+                    <p><strong>Oops! Si è verificato un errore.</strong></p>
+                    <p style="font-size:0.9em; color: #e74c3c; margin-top: 5px;">${error.message || 'Impossibile caricare gli eventi.'}</p>
+                    <button onclick="loadEvents()" class="btn-popup" style="margin-top: 15px;">Riprova Caricamento</button>
+                  </div>`;
             }
         } finally {
             if (loadingIndicator) loadingIndicator.classList.remove('visible');
@@ -481,41 +281,42 @@
         card.className = 'card';
 
         let imageSrc = 'images/default-event.jpg';
-        if (event.immagine && event.immagine.startsWith('data:image')) {
+        if (event.immagine && typeof event.immagine === 'string' && event.immagine.startsWith('data:image')) {
             imageSrc = event.immagine;
+        } else if (event.immagine) {
+            console.warn(`Immagine per evento "${event.titolo}" non è una data URI valida:`, event.immagine.substring(0,100) + "...");
         }
 
         card.innerHTML = `
-        <div class="card-image-container">
-            <img src="${imageSrc}" alt="Immagine evento ${event.titolo || 'Evento'}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
-        </div>
-        <div class="card-content">
-            <h3>${event.titolo || 'Titolo non disponibile'}</h3>
-            <p class="card-info">
-                <b>Data:</b> ${event.datainizio ? formatDate(event.datainizio) : 'Da definire'}
-                ${event.durata ? `<br><b>Orario:</b> ${event.durata}` : ''}
-                <br>
-                <b>${event.prefisso_relatore || 'Relatore'}:</b> ${event.relatore || 'Non specificato'}
-                ${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ''}
-            </p>
-            <p class="card-description">${event.descrizione || 'Nessuna descrizione breve.'}</p>
-            <p class="card-info">
-                <b>Posti:</b>
-                <span class="posti-disponibili">${event.posti_disponibili !== null ? event.posti_disponibili : 'N/D'}</span>
-                ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (event.costo == 0 && !event.flagprenotabile_per_costo_volontario ? '<br><b>Costo:</b> Offerta libera' : '')) : ''}
-            </p>
-            <div class="card-actions">
-                <a href="evento_dettaglio.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a>
-                <button class="card-btn card-btn-primary btn-prenota-rapido"
-                        data-event-id="${event.idevento}"
-                        ${parseInt(event.posti_disponibili) === 0 || !event.flagprenotabile ? 'disabled' : ''}>
-                    ${!event.flagprenotabile ? 'Info dettagli' : (parseInt(event.posti_disponibili) === 0 ? 'Esaurito' : 'Prenota')}
-                </button>
+            <div class="card-image-container">
+                <img src="${imageSrc}" alt="Immagine evento ${event.titolo || 'Evento'}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
             </div>
-        </div>
-    `;
+            <div class="card-content">
+                <h3>${event.titolo || 'Titolo non disponibile'}</h3>
+                <p class="card-info">
+                    <b>Data:</b> ${event.datainizio ? formatDate(event.datainizio) : 'Da definire'}
+                    ${event.durata ? `<br><b>Orario:</b> ${event.durata}` : ''}
+                    <br>
+                    <b>${event.prefisso_relatore || 'Relatore'}:</b> ${event.relatore || 'Non specificato'}
+                    ${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ''}
+                </p>
+                <p class="card-description">${event.descrizione || 'Nessuna descrizione breve.'}</p>
+                <p class="card-info">
+                    <b>Posti:</b>
+                    <span class="posti-disponibili">${event.posti_disponibili !== null ? event.posti_disponibili : 'N/D'}</span>
+                    ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0 ? '<br><b>Costo:</b> Offerta libera' : '')) : ''}
+                </p>
+                <div class="card-actions">
+                    <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a> <button class="card-btn card-btn-primary btn-prenota-rapido"
+                            data-event-id="${event.idevento}"
+                            ${parseInt(event.posti_disponibili) === 0 || !event.flagprenotabile ? 'disabled' : ''}>
+                        ${!event.flagprenotabile ? 'Info dettagli' : (parseInt(event.posti_disponibili) === 0 ? 'Esaurito' : 'Prenota')}
+                    </button>
+                </div>
+            </div>
+        `;
         const prenotaBtn = card.querySelector('.btn-prenota-rapido');
-        if (prenotaBtn && event.flagprenotabile) { // Aggiungi listener solo se prenotabile
+        if (prenotaBtn && event.flagprenotabile && parseInt(event.posti_disponibili) > 0) {
             prenotaBtn.addEventListener('click', function() {
                 handleRapidBooking(this, event.idevento);
             });
@@ -524,40 +325,48 @@
     }
 
     function handleRapidBooking(buttonElement, eventId) {
-        if (currentUser) {
+        if (currentUser) { // L'utente dovrebbe essere sempre loggato qui
             console.log(`Tentativo prenotazione evento ${eventId} per utente ${currentUser.nome}`);
-            alert(`Prenotazione per evento ${eventId} in elaborazione (simulato).`);
+            // Logica di prenotazione REALE qui (es. fetch a script PHP di prenotazione)
+            alert(`Prenotazione per evento ${eventId} in elaborazione (simulato per ${currentUser.nome}).`);
+            // Esempio: reindirizza a pagina conferma prenotazione
+            // window.location.href = `conferma_prenotazione.html?evento_id=${eventId}`;
         } else {
-            openLoginPopup();
-            localStorage.setItem('pending_booking_event_id_eff', eventId);
+            // Questo non dovrebbe accadere su una pagina "accesso" se la logica di auth è corretta
+            alert("Errore: Utente non riconosciuto. Prova a effettuare nuovamente il login.");
+            logoutAndRedirect();
         }
     }
 
     function formatDate(dateString) {
         if (!dateString) return 'Data non disponibile';
         try {
-            const date = new Date(dateString);
+            const parts = dateString.split('-');
+            let date;
+            if (parts.length === 3 && !isNaN(parseInt(parts[0])) && !isNaN(parseInt(parts[1])) && !isNaN(parseInt(parts[2]))) {
+                date = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+            } else {
+                date = new Date(dateString);
+            }
+
             if (isNaN(date.getTime())) {
-                const parts = dateString.split('-'); // YYYY-MM-DD
-                if (parts.length === 3) {
-                    const normalizedDate = new Date(parts[0], parseInt(parts[1]) - 1, parts[2]);
-                    if (!isNaN(normalizedDate.getTime())) {
-                        return normalizedDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
-                    }
-                }
-                console.warn("Formato data non riconosciuto per la conversione:", dateString);
+                console.warn("Formato data non riconosciuto o data non valida:", dateString);
                 return dateString;
             }
-            return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+            return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
         } catch (e) {
             console.error("Errore formattazione data:", dateString, e);
             return dateString;
         }
     }
 
+    gebi('currentYear').textContent = new Date().getFullYear();
+
     document.addEventListener('DOMContentLoaded', () => {
-        checkLoginStatusOnLoad();
-        loadEvents();
+        checkLoginStatusOnLoad(); // Verifica stato login, aggiorna UI o reindirizza
+        if (currentUser) { // Carica eventi solo se l'utente è effettivamente loggato
+            loadEvents();
+        }
     });
 
 </script>

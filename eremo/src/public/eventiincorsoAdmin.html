@@ -314,7 +314,6 @@
     const navbarAvatar = gebi('navbar-avatar');
     const navbarUsername = gebi('navbar-username');
     const userDropdownContainer = gebi('userDropdownContainer');
-    // Non c'è un bottone login standard nell'header in questo HTML, solo nel menu mobile
     const loginBtnMobileEl = gebi('login-btn-mobile');
 
     if (currentUser && navbarAvatar && navbarUsername && userDropdownContainer) {
@@ -330,8 +329,7 @@
 
   gebi('loginForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
-    // SIMULAZIONE LOGIN:
-    currentUser = { nome: gebi('login-email-popup').value.split('@')[0] || "Utente", avatar: "🧘" }; // Semplificato
+    currentUser = { nome: gebi('login-email-popup').value.split('@')[0] || "Utente", avatar: "🧘" };
     localStorage.setItem('userDataEFF', JSON.stringify(currentUser));
     updateNavbarUserUI();
     alert('Login effettuato con successo!');
@@ -348,8 +346,7 @@
 
   gebi('registerForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
-    // SIMULAZIONE REGISTRAZIONE E LOGIN:
-    currentUser = { nome: gebi('register-name').value || "Nuovo Utente", avatar: "👤" }; // Semplificato
+    currentUser = { nome: gebi('register-name').value || "Nuovo Utente", avatar: "👤" };
     localStorage.setItem('userDataEFF', JSON.stringify(currentUser));
     updateNavbarUserUI();
     alert('Registrazione effettuata con successo! Ora sei loggato.');
@@ -361,8 +358,6 @@
     localStorage.removeItem('userDataEFF');
     updateNavbarUserUI();
     alert('Logout effettuato.');
-    // Non reindirizzare per default, potrebbe essere una pagina admin
-    // window.location.href = 'index.html';
   }
 
   function checkLoginStatusOnLoad() {
@@ -388,17 +383,17 @@
     if (voluntaryCheckbox && priceContainer) {
       priceContainer.style.display = voluntaryCheckbox.checked ? 'none' : 'block';
       if (voluntaryCheckbox.checked) {
-        gebi('event-price').value = ''; // Svuota se volontario
+        gebi('event-price').value = '';
         gebi('event-price').required = false;
       } else {
-        gebi('event-price').required = true; // Rendi richiesto se non volontario
+        gebi('event-price').required = true;
       }
     }
   }
 
   if (voluntaryCheckbox) {
     voluntaryCheckbox.addEventListener('change', updatePriceFieldVisibility);
-    updatePriceFieldVisibility(); // Stato iniziale
+    updatePriceFieldVisibility();
   }
 
   if (addEventBtn) {
@@ -407,9 +402,9 @@
         eventPopupOverlay.classList.add('active');
         eventPopup.classList.add('active');
         document.body.style.overflow = 'hidden';
-        newEventFormMessage.style.display = 'none'; // Nascondi messaggi precedenti
-        gebi('newEventForm').reset(); // Resetta il form
-        updatePriceFieldVisibility(); // Aggiorna visibilità prezzo
+        newEventFormMessage.style.display = 'none';
+        gebi('newEventForm').reset();
+        updatePriceFieldVisibility();
       }
     });
   }
@@ -425,58 +420,57 @@
   if (closeEventPopupBtn) closeEventPopupBtn.addEventListener('click', closeEventPopupHandler);
   if (eventPopupOverlay) eventPopupOverlay.addEventListener('click', closeEventPopupHandler);
 
-    gebi('newEventForm')?.addEventListener('submit', async function(e) {
+  gebi('newEventForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     const submitBtn = this.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<div class="spinner-mini" style="width:1em;height:1em;border-width:2px;vertical-align:middle;margin-right:5px;"></div>Salvataggio...';
     newEventFormMessage.style.display = 'none';
-    newEventFormMessage.className = 'form-message'; // Reset classi
+    newEventFormMessage.className = 'form-message';
 
     try {
-    const formData = new FormData(this);
-    formData.append('action', 'add_event');
+      const formData = new FormData(this);
+      formData.append('action', 'add_event');
 
-    const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+      const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+      const responseText = await response.text();
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (jsonError) {
+        console.error("Errore parsing JSON da gestione_eventi.php:", responseText);
+        throw new Error(`Errore nella risposta del server (non JSON) durante aggiunta evento: ${responseText.substring(0,200)}...`);
+      }
 
-    let result;
-    try {
-    result = await response.json();
-  } catch (jsonError) {
-    throw new Error(`Errore nella risposta del server (non JSON): ${await response.text()}`);
-  }
+      if (!response.ok) {
+        throw new Error(result.message || `Errore HTTP aggiunta evento: ${response.status}`);
+      }
 
-    if (!response.ok) {
-    throw new Error(result.message || `Errore HTTP: ${response.status}`);
-  }
+      if (result.success) {
+        newEventFormMessage.textContent = result.message || 'Evento aggiunto con successo!';
+        newEventFormMessage.classList.add('success');
+        newEventFormMessage.style.display = 'block';
+        this.reset();
+        updatePriceFieldVisibility();
+        loadEvents(); // Ricarica gli eventi
 
-    if (result.success) {
-    newEventFormMessage.textContent = result.message || 'Evento aggiunto con successo!';
-    newEventFormMessage.classList.add('success');
-    newEventFormMessage.style.display = 'block';
-    this.reset(); // Resetta il form
-    updatePriceFieldVisibility();
-    loadEvents();
-
-    // Chiudi il popup dopo 1 secondo
-    setTimeout(() => {
-    closeEventPopupHandler();
-    newEventFormMessage.style.display = 'none';
-  }, 1000);
-  } else {
-    throw new Error(result.message || 'Errore sconosciuto durante il salvataggio.');
-  }
-  } catch (error) {
-    console.error('Errore invio form nuovo evento:', error);
-    newEventFormMessage.textContent = `Errore: ${error.message}`;
-    newEventFormMessage.classList.add('error');
-    newEventFormMessage.style.display = 'block';
-
-    // Ripristina il bottone anche in caso di errore
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalBtnText;
-  }
+        setTimeout(() => {
+          closeEventPopupHandler();
+          newEventFormMessage.style.display = 'none';
+        }, 1000);
+      } else {
+        throw new Error(result.message || 'Errore sconosciuto durante il salvataggio dell\'evento.');
+      }
+    } catch (error) {
+      console.error('Errore invio form nuovo evento:', error);
+      newEventFormMessage.textContent = `Errore: ${error.message}`;
+      newEventFormMessage.classList.add('error');
+      newEventFormMessage.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+    }
   });
 
   document.addEventListener('keydown', function(e) {
@@ -486,33 +480,43 @@
     }
   });
 
-  // --- Logica Caricamento Eventi ---
+  // --- Logica Caricamento Eventi (CON MODIFICHE) ---
   async function loadEvents() {
     const eventsGrid = gebi('eventiGrid');
     const loadingIndicator = gebi('loadingIndicator');
 
     if (loadingIndicator) loadingIndicator.classList.add('visible');
-    if (eventsGrid) eventsGrid.innerHTML = '';
-
+    if (eventsGrid) eventsGrid.innerHTML = ''; // Pulisci griglia prima di caricare
 
     try {
-      // await new Promise(resolve => setTimeout(resolve, 1500)); // Simulazione ritardo
-
       const response = await fetch('get_events.php');
+      const responseText = await response.text(); // Leggi prima il testo
 
       let result;
       try {
-        result = await response.json();
+        result = JSON.parse(responseText); // Poi prova a parsare come JSON
       } catch (jsonError) {
-        throw new Error(`Errore nella risposta del server (non JSON): ${await response.text()}`);
+        // ---- MODIFICA: Log più dettagliato dell'errore JSON ----
+        console.error("JSON.parse() fallito durante il caricamento degli eventi. Errore:", jsonError);
+        console.error("Testo della risposta grezza da get_events.php che ha causato l'errore (primi 1000 caratteri):\n", responseText.substring(0, 1000));
+
+        let displayedError = `Errore nella risposta del server (non è JSON valido).`;
+        if (responseText.toLowerCase().includes("<br />") || responseText.toLowerCase().includes("<b>warning</b>") || responseText.toLowerCase().includes("<b>fatal error</b>")) {
+          displayedError += " Potrebbe trattarsi di un errore PHP.";
+        }
+        // Non mostrare responseText direttamente all'utente per sicurezza, a meno che non sia una modalità di debug esplicita.
+        // Per il debug, potresti volerlo fare, ma attenzione a non esporre informazioni sensibili.
+        throw new Error(displayedError + " Controlla la console del browser (F12) per maggiori dettagli sulla risposta del server.");
+        // ---- FINE MODIFICA ----
       }
 
-      if (!response.ok) {
-        throw new Error(result.error || result.message || `Errore HTTP: ${response.status}`);
+      if (!response.ok) { // Controlla lo stato HTTP (es. 404, 500)
+        const errorMsg = result?.error || result?.message || `Errore HTTP: ${response.status} - ${response.statusText || 'Nessun testo di stato'}`;
+        throw new Error(errorMsg);
       }
 
-      if (!result.success) {
-        throw new Error(result.error || result.message || 'Errore nel caricamento dei dati degli eventi.');
+      if (!result.success) { // Controlla il flag 'success' dal JSON di PHP
+        throw new Error(result.error || result.message || 'Errore nel caricamento dei dati degli eventi (flag success: false).');
       }
 
       if (!eventsGrid) return;
@@ -527,7 +531,7 @@
       }
 
     } catch (error) {
-      console.error('Errore dettagliato durante il caricamento degli eventi:', error);
+      console.error('Errore dettagliato durante il caricamento degli eventi (blocco catch principale):', error); // Logga l'oggetto errore completo
       if (eventsGrid) {
         eventsGrid.innerHTML = `
           <div class="error-message text-center" style="padding: 20px; width: 100%;">
@@ -546,10 +550,14 @@
     const card = document.createElement('article');
     card.className = 'card';
 
-    let imageSrc = 'images/default-event.jpg';
-    if (event.immagine && event.immagine.startsWith('data:image')) {
+    let imageSrc = 'images/default-event.jpg'; // Immagine di fallback
+    if (event.immagine && typeof event.immagine === 'string' && event.immagine.startsWith('data:image')) {
       imageSrc = event.immagine;
+    } else if (event.immagine) {
+      // Se event.immagine non è una data URI valida ma esiste, logga un avviso
+      console.warn(`Immagine per evento "${event.titolo}" non è una data URI valida:`, event.immagine.substring(0,100) + "...");
     }
+
 
     card.innerHTML = `
         <div class="card-image-container">
@@ -568,7 +576,7 @@
             <p class="card-info">
                 <b>Posti:</b>
                 <span class="posti-disponibili">${event.posti_disponibili !== null ? event.posti_disponibili : 'N/D'}</span>
-                ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (event.costo == 0 && !event.flagprenotabile_per_costo_volontario ? '<br><b>Costo:</b> Offerta libera' : '')) : ''}
+                ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0 ? '<br><b>Costo:</b> Offerta libera' : '')) : ''}
             </p>
             <div class="card-actions">
                 <a href="evento_dettaglio.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a>
@@ -581,7 +589,7 @@
         </div>
     `;
     const prenotaBtn = card.querySelector('.btn-prenota-rapido');
-    if (prenotaBtn && event.flagprenotabile) { // Aggiungi listener solo se prenotabile
+    if (prenotaBtn && event.flagprenotabile && parseInt(event.posti_disponibili) > 0) {
       prenotaBtn.addEventListener('click', function() {
         handleRapidBooking(this, event.idevento);
       });
@@ -593,6 +601,7 @@
     if (currentUser) {
       console.log(`Tentativo prenotazione evento ${eventId} per utente ${currentUser.nome}`);
       alert(`Prenotazione per evento ${eventId} in elaborazione (simulato).`);
+      // Qui potresti aggiungere una logica di chiamata fetch per la prenotazione reale
     } else {
       openLoginPopup();
       localStorage.setItem('pending_booking_event_id_eff', eventId);
@@ -602,22 +611,24 @@
   function formatDate(dateString) {
     if (!dateString) return 'Data non disponibile';
     try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) {
-        const parts = dateString.split('-'); // YYYY-MM-DD
-        if (parts.length === 3) {
-          const normalizedDate = new Date(parts[0], parseInt(parts[1]) - 1, parts[2]);
-          if (!isNaN(normalizedDate.getTime())) {
-            return normalizedDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
-          }
-        }
-        console.warn("Formato data non riconosciuto per la conversione:", dateString);
-        return dateString;
+      // Prova a creare una data, gestendo il formato YYYY-MM-DD
+      const parts = dateString.split('-');
+      let date;
+      if (parts.length === 3 && !isNaN(parseInt(parts[0])) && !isNaN(parseInt(parts[1])) && !isNaN(parseInt(parts[2]))) {
+        // Mese in JavaScript è 0-indicizzato (0 per Gennaio, 1 per Febbraio etc.)
+        date = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+      } else {
+        date = new Date(dateString); // Fallback per altri formati, seppur meno affidabile
       }
-      return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      if (isNaN(date.getTime())) {
+        console.warn("Formato data non riconosciuto o data non valida per la conversione:", dateString);
+        return dateString; // Restituisci la stringa originale se non parsabile
+      }
+      return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
     } catch (e) {
       console.error("Errore formattazione data:", dateString, e);
-      return dateString;
+      return dateString; // Restituisci la stringa originale in caso di errore
     }
   }
 
