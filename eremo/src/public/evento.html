@@ -3,8 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dettaglio Evento - Eremo Frate Francesco</title> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
+    <link rel="icon" href="images/logo.png" type="image/x-icon">
+    <title>Pagina Evento - Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ----- Inizio Stili Specifici e Correzioni per evento.html ----- */
+
+        body {
+            background-color: var(--light);
+        }
+
+        main {
+            padding-top: 100px; /* Spazio adeguato per la navbar fissa */
+        }
+
+        /* 1. Correzione per il titolo della Galleria Multimediale */
+        /* Rimuove il padding a sinistra che era per la barra e nasconde la barra ::before */
+        .event-gallery-container h2.section-title.text-center {
+            padding-left: 0;
+        }
+
+        .event-gallery-container h2.section-title.text-center::before {
+            display: none; /* Nasconde l'elemento ::before (la barra arancione) */
+        }
+
+        /* 2. Correzione per l'allineamento del testo nei commenti */
+        /* Assicura che i paragrafi (<p>) all'interno dei commenti siano allineati a sinistra */
+        .comment p {
+            text-align: left;
+        }
+
+        /* Stili per rendere la galleria più "spettacolare" */
+        .event-gallery-container { /* Contenitore per la galleria specifica dell'evento */
+            padding-bottom: 2rem; /* Spazio sotto la galleria */
+        }
+
+        .event-gallery-container .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Colonne più grandi e responsive */
+            gap: 1.5rem; /* Spazio tra gli elementi della galleria */
+        }
+
+        .event-gallery-container .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius-medium);
+            box-shadow: var(--shadow-medium);
+            transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+            aspect-ratio: 16/9; /* Mantiene le proporzioni, ideale per video e immagini landscape */
+            background-color: var(--gray-light); /* Sfondo placeholder */
+        }
+        .event-gallery-container .gallery-item:hover {
+            transform: translateY(-8px) scale(1.02); /* Leggero sollevamento e ingrandimento */
+            box-shadow: var(--shadow-medium); /* Ombra più pronunciata all'hover */
+        }
+
+        .event-gallery-container .gallery-item img,
+        .event-gallery-container .gallery-item video,
+        .event-gallery-container .gallery-item iframe {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Assicura che l'immagine/video copra l'area */
+            display: block;
+            border-radius: var(--border-radius-medium); /* Coerenza con il contenitore */
+        }
+
+        .gallery-item a { /* L'anchor tag deve riempire il contenitore per l'effetto hover */
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .gallery-item .media-play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem; /* Icona più grande */
+            color: rgba(255, 255, 255, 0.95);
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            width: 80px;  /* Dimensioni del cerchio */
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.25s ease, transform 0.25s ease;
+            pointer-events: none; /* Non interferisce con il click sull'<a> */
+            opacity: 0.85;
+        }
+        .gallery-item a:hover .media-play-button {
+            background-color: rgba(var(--accent-rgb, 209, 140, 96), 0.8); /* Usa colore accent, con fallback se var non definita */
+            transform: translate(-50%, -50%) scale(1.1);
+            opacity: 1;
+        }
+
+
+        /* Miglioramenti sezione commenti */
+        .comments-section {
+            margin-top: 3rem;
+            padding-top: 2.5rem;
+            border-top: 3px solid var(--primary); /* Bordo superiore più marcato */
+        }
+
+        .comments-section > h2 { /* Titolo principale della sezione commenti */
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 2.5rem;
+            font-size: clamp(1.9rem, 4.5vw, 2.4rem); /* Dimensione titolo */
+        }
+
+        .comment-form {
+            background: var(--white);
+            border: 1px solid var(--gray-light);
+            padding: 2rem; /* Aumenta padding */
+            border-radius: var(--border-radius-medium); /* Coerenza con il resto */
+        }
+        .comment-form h4 { /* Titolo del form "Partecipa alla discussione" */
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .comment { /* Stile base per ogni commento */
+            border-left: 5px solid var(--secondary); /* Bordo sinistro più spesso e colorato */
+            padding: 1.5rem;
+            background-color: var(--white);
+            margin-bottom: 1.8rem; /* Aumenta spazio tra commenti principali */
+            border-radius: 0 var(--border-radius-medium) var(--border-radius-medium) 0; /* Arrotondamento angoli */
+        }
+        .comment.reply { /* Stile specifico per le risposte */
+            border-left-color: var(--accent); /* Colore diverso per il bordo delle risposte */
+            background-color: var(--light); /* Sfondo leggermente diverso per le risposte */
+            padding: 1.2rem;
+            margin-top: 1rem;
+            border-radius: 0 var(--border-radius-medium) var(--border-radius-medium) 0;
+        }
+
+        .replies { /* Contenitore delle risposte */
+            margin-left: 2.5rem; /* Indentazione per le risposte */
+            padding-left: 1.5rem; /* Padding per la linea di indentazione */
+            border-left: 3px dotted var(--gray-medium); /* Linea tratteggiata per visualizzare l'annidamento */
+            margin-top: 1rem;
+        }
+        .comment-form textarea, .reply-form textarea {
+            background-color: var(--light); /* Sfondo leggermente diverso per textarea */
+        }
+        .btn-comment i, .btn-reply i, .like-btn i {
+            margin-right: 0.4em; /* Spazio tra icona e testo nei bottoni */
+        }
+
+        /* Lightbox per immagini/video */
+        .lightbox {
+            display: none; /* Nascosto di default */
+            position: fixed;
+            z-index: 2000; /* Sopra tutto */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(30, 59, 47, 0.92); /* Sfondo scuro (usa --dark con opacità, es. rgba(var(--dark-rgb), 0.92) se hai --dark-rgb) */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(3px); /* Effetto blur per lo sfondo */
+        }
+        .lightbox.active {
+            display: flex; /* Mostra quando attiva */
+            animation: fadeIn 0.3s ease-out; /* Animazione entrata */
+        }
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+            display: flex; /* Per centrare il contenuto se più piccolo */
+            justify-content: center;
+            align-items: center;
+        }
+        .lightbox-content img, .lightbox-content video, .lightbox-content iframe {
+            max-width: 100%;
+            max-height: 85vh; /* Altezza massima rispetto alla viewport */
+            display: block;
+            margin: auto;
+            border-radius: var(--border-radius-medium);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+            border: 3px solid var(--light); /* Bordo chiaro attorno al media */
+        }
+        .lightbox-content iframe { /* Stile specifico per iframe (es. YouTube) */
+            width: 80vw;
+            height: calc(80vw * 9 / 16); /* Mantiene aspect ratio 16:9 */
+            max-width: 1100px; /* Limite larghezza massima */
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: var(--white);
+            font-size: 2.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+            z-index: 2001; /* Sopra il contenuto della lightbox */
+        }
+        .lightbox-close:hover {
+            color: var(--accent);
+            transform: rotate(90deg);
+        }
+        .lightbox-navigation {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45px;
+            height: 45px;
+            background-color: rgba(0,0,0,0.4);
+            color: white;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            z-index: 2001;
+        }
+        .lightbox-navigation:hover {
+            background-color: var(--secondary);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .lightbox-prev { left: 15px; }
+        .lightbox-next { right: 15px; }
+        #lightbox-caption {
+            text-align: center;
+            color: var(--light);
+            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 5px 10px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: var(--border-radius-medium);
+            display: inline-block; /* Per adattarsi al testo */
+            position: absolute; /* Posizionamento sotto l'immagine */
+            bottom: 20px; /* Distanza dal basso */
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 70%;
+        }
+
+        /* Assicurarsi che la variabile --accent-rgb sia definita nel :root se usata in rgba() */
+        /* Se :root non ha --accent-rgb, puoi definire un fallback o usare direttamente il valore esadecimale:
+        :root {
+            --accent: #d18c60;
+            --accent-rgb: 209, 140, 96; // Esempio
+        }
+        */
+
+        /* ----- Fine Stili Specifici e Correzioni per evento.html ----- */
+    </style>
 </head>
 <body>
 
@@ -44,270 +304,397 @@
 </header>
 
 <main>
-    <div class="container section-padding">
-        <div class="evento-main-grid">
+    <div class="container">
+        <h1 class="text-center" style="margin-top: 2rem; margin-bottom: 2.5rem; color: var(--primary); font-size: clamp(2.4rem, 5.5vw, 3rem);">Ricordi dell'Incontro Speciale</h1>
 
-            <div class="evento-details">
-                <h1 class="evento-title">Ritiro di Meditazione Profonda</h1>
-                <div class="evento-meta">
-                    <span><i class="fas fa-calendar-alt"></i> 15-17 Maggio 2025</span>
-                    <span><i class="fas fa-user"></i> Relatore: Fra' Elia</span>
-                    <span><i class="fas fa-map-marker-alt"></i> Eremo Frate Francesco</span>
-                    <span><i class="fas fa-tag"></i> Categoria: Ritiro Spirituale</span>
+        <section id="event-gallery" class="event-gallery-container section-padding" style="padding-top:0;">
+            <h2 class="section-title text-center" style="padding-left:0; margin-bottom: 2.5rem; color: var(--primary);">Galleria Multimediale</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <a href="https://picsum.photos/seed/eremo_natura/1200/800" data-lightbox="event-gallery" data-title="Sentiero nel bosco vicino all'eremo">
+                        <img src="https://picsum.photos/seed/eremo_natura/600/400" alt="Sentiero nel bosco">
+                    </a>
                 </div>
-
-                <div class="evento-description">
-                    <h2>Descrizione dell'Evento</h2>
-                    <p>Un weekend dedicato all'esplorazione interiore attraverso pratiche meditative guidate e momenti di profondo silenzio. Questo ritiro è un invito a staccare dalla routine quotidiana per riconnettersi con sé stessi e con la dimensione spirituale.</p>
-                    <p>Guidati da Fra' Elia, esperto di meditazione contemplativa, i partecipanti apprenderanno tecniche per calmare la mente, coltivare la consapevolezza e aprire il cuore. Il programma include sessioni di meditazione seduta e camminata, insegnamenti spirituali, momenti di condivisione (facoltativi) e tempo personale per la riflessione nella splendida cornice naturale dell'Eremo.</p>
-                    <h3>A chi è rivolto?</h3>
-                    <p>Il ritiro è aperto a tutti, sia a principianti che a praticanti esperti di meditazione. È particolarmente indicato per chi desidera:</p>
-                    <ul>
-                        <li>Ridurre stress e ansia.</li>
-                        <li>Approfondire la propria pratica meditativa.</li>
-                        <li>Vivere un'esperienza di silenzio rigenerante.</li>
-                        <li>Esplorare la propria interiorità in un contesto protetto e accogliente.</li>
-                    </ul>
-                    <h3>Programma Indicativo</h3>
-                    <p>(Potrebbero esserci lievi variazioni)</p>
-                    <ul>
-                        <li><strong>Venerdì:</strong> Accoglienza e introduzione, prima sessione di meditazione.</li>
-                        <li><strong>Sabato:</strong> Sessioni di meditazione guidata, insegnamenti, meditazione camminata, tempo personale.</li>
-                        <li><strong>Domenica:</strong> Meditazione mattutina, condivisione finale, saluti.</li>
-                    </ul>
+                <div class="gallery-item">
+                    <a href="https://www.youtube.com/watch?v=ScEMSAPn9x0" data-lightbox="event-gallery" data-title="Momenti di riflessione (Video da YouTube)"> <img src="https://img.youtube.com/vi/ScEMSAPn9x0/hqdefault.jpg" alt="Thumbnail Video Riflessione">
+                        <div class="media-play-button"><i class="fas fa-play"></i></div>
+                    </a>
                 </div>
+                <div class="gallery-item">
+                    <a href="https://picsum.photos/seed/eremo_architettura/1200/800" data-lightbox="event-gallery" data-title="Dettaglio architettonico dell'eremo">
+                        <img src="https://picsum.photos/seed/eremo_architettura/600/400" alt="Architettura eremo">
+                    </a>
+                </div>
+                <div class="gallery-item">
+                    <a href="https://picsum.photos/seed/eremo_alba/1200/800" data-lightbox="event-gallery" data-title="Alba vista dall'eremo">
+                        <img src="https://picsum.photos/seed/eremo_alba/600/400" alt="Alba all'eremo">
+                    </a>
+                </div>
+                <div class="gallery-item">
+                    <a href="videos/sample_eremo.mp4" data-lightbox="event-gallery" data-title="Breve video della vita all'eremo">
+                        <img src="https://picsum.photos/seed/video_placeholder_eremo/600/400?text=Video+Locale+Eremo" alt="Video locale Eremo">
+                        <div class="media-play-button"><i class="fas fa-play"></i></div>
+                    </a>
+                </div>
+                <div class="gallery-item">
+                    <a href="https://picsum.photos/seed/eremo_interni/1200/800" data-lightbox="event-gallery" data-title="Interno della cappella">
+                        <img src="https://picsum.photos/seed/eremo_interni/600/400" alt="Interno cappella">
+                    </a>
+                </div>
+                <div class="gallery-item">
+                    <a href="https://picsum.photos/seed/eremo_panorama/1200/800" data-lightbox="event-gallery" data-title="Panorama montano circostante">
+                        <img src="https://picsum.photos/seed/eremo_panorama/600/400" alt="Panorama montano">
+                    </a>
+                </div>
+                <div class="gallery-item">
+                    <a href="https://picsum.photos/seed/eremo_dettaglio/1200/800" data-lightbox="event-gallery" data-title="Dettaglio floreale nel giardino">
+                        <img src="https://picsum.photos/seed/eremo_dettaglio/600/400" alt="Dettaglio floreale">
+                    </a>
+                </div>
+            </div>
+        </section>
 
-                <section class="media-gallery">
-                    <h3>Galleria Immagini</h3>
-                    <div class="gallery-grid">
-                        <div class="gallery-item">
-                            <a href="https://picsum.photos/1200/800?random=meditation,group" data-lightbox="event-gallery" data-title="Sessione di meditazione">
-                                <img src="https://picsum.photos/300/200?random=meditation,group" alt="Sessione di meditazione">
-                            </a>
-                        </div>
-                        <div class="gallery-item">
-                            <a href="https://picsum.photos/1200/800?random=eremo,view" data-lightbox="event-gallery" data-title="Vista dall'Eremo">
-                                <img src="https://picsum.photos/300/200?random=eremo,view" alt="Vista dall'Eremo">
-                            </a>
-                        </div>
-                        <div class="gallery-item">
-                            <a href="https://picsum.photos/1200/800?random=nature,path,quiet" data-lightbox="event-gallery" data-title="Sentiero per la meditazione camminata">
-                                <img src="https://picsum.photos/300/200?random=nature,path,quiet" alt="Sentiero meditazione">
-                            </a>
-                        </div>
-                        <div class="gallery-item">
-                            <a href="https://picsum.photos/1200/800?random=candles,prayer" data-lightbox="event-gallery" data-title="Atmosfera serale">
-                                <img src="https://picsum.photos/300/200?random=candles,prayer" alt="Atmosfera serale">
-                            </a>
-                        </div>
+        <section id="event-comments" class="comments-section section-padding" style="padding-bottom: 3rem;">
+            <h2 class="text-center">Condividi i Tuoi Pensieri</h2>
+            <div class="comment-form">
+                <h4>Lascia un commento o un ricordo</h4>
+                <form id="new-comment-form">
+                    <div class="comment-form-container">
+                        <textarea id="comment-text" name="comment-text" aria-label="Testo del commento" placeholder="Scrivi qui il tuo commento..." rows="4" required></textarea>
+                        <button type="submit" class="btn-comment"><i class="fas fa-paper-plane"></i> Invia Commento</button>
                     </div>
-                </section>
-
-                <section class="comments-section">
-                    <h3>Lascia un commento</h3>
-                    <div class="comment-form">
-                        <h4>Condividi la tua esperienza o fai una domanda</h4>
-                        <div class="comment-form-container">
-                            <textarea id="comment-text" placeholder="Scrivi qui..." aria-label="Testo del commento"></textarea>
-                            <button id="submit-comment" class="btn-comment">Invia</button>
-                        </div>
-                    </div>
-
-                    <div class="comments-list" id="comments-list">
-                        <h4>Commenti Recenti</h4>
-                        <div class="comment">
-                            <div class="comment-header">
-                                <img src="https://www.gravatar.com/avatar/?d=mp&s=40" alt="Avatar utente" class="user-avatar">
-                                <div class="comment-meta">
-                                    <strong>Maria Bianchi</strong> <small>2 giorni fa</small>
-                                </div>
-                            </div>
-                            <p>Sembra un ritiro meraviglioso! È necessario avere esperienza pregressa di meditazione?</p>
-                            <div class="comment-actions">
-                                <button class="like-btn" aria-label="Mi piace"><i class="far fa-heart"></i> <span>3</span></button>
-                                <button class="btn-reply" aria-label="Rispondi">Rispondi</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
+                </form>
             </div>
 
-            <aside class="evento-sidebar">
-                <div class="booking-box">
-                    <div class="price">€ 150</div>
-                    <div class="seats">
-                        Posti disponibili: <span class="count" id="posti-disponibili">12</span> / 20
-                    </div>
-                    <button class="btn-prenota-evento" id="btn-prenota-principale" data-event-id="1">
-                        Prenota il tuo posto
-                    </button>
-                    <a href="images/volantino_esempio.pdf" target="_blank" class="volantino-link" download>
-                        Scarica il volantino (PDF)
-                    </a> </div>
-
-                <div class="info-box mt-4" style="background: var(--light); padding: 1rem; border-radius: var(--border-radius-medium); font-size: 0.9rem;">
-                    <h4>Cosa Portare</h4>
-                    <ul>
-                        <li>Abbigliamento comodo</li>
-                        <li>Coperta o scialle per meditazione</li>
-                        <li>Tappetino yoga (facoltativo)</li>
-                        <li>Quaderno per appunti</li>
-                    </ul>
-                </div>
-            </aside>
-
-        </div>
-    </div>
-</main>
-
-<div class="login-popup-overlay" id="loginOverlay"></div>
-<div class="login-popup" id="loginPopup">
-    <button class="close-popup" id="closePopup" aria-label="Chiudi popup">&times;</button>
-    <div class="login-tabs">
-        <div class="login-tab active" data-tab="login">Accedi</div>
-        <div class="login-tab" data-tab="register">Registrati</div>
-    </div>
-    <form class="login-form active" id="loginForm"> ... </form>
-    <form class="login-form" id="registerForm"> ... </form>
-</div>
-
-<footer>
-    <p>&copy; 2025 Eremo Frate Francesco. Tutti i diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia</p>
-</footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
-<script>
-    // --- Navbar & Mobile Menu Logic (come index.html) ---
-    let lastScroll = 0;
-    const navbarContainer = document.getElementById('navbarContainer');
-    window.addEventListener('scroll', function() { /* ... */ });
-    const mobileMenu = document.getElementById("mobileMenu");
-    const hamburger = document.querySelector(".hamburger");
-    function toggleMobileMenu() { /* ... */ }
-    function closeMobileMenu() { /* ... */ }
-
-    // --- Login Popup Logic (come index.html) ---
-    const loginBtn = document.getElementById('login-btn');
-    // ... (includere script popup completo) ...
-    function openLoginPopup() { /* ... */ }
-    function closeLoginPopup() { /* ... */ }
-    // ... event listeners popup ...
-
-    // --- Logica Specifica Pagina Evento ---
-    const eventId = 1; // Dovrebbe essere dinamico in un'app reale
-    const totalSeats = 20;
-    let availableSeats = 12; // Dovrebbe venire dal backend
-
-    const seatsDisplay = document.getElementById('posti-disponibili');
-    const bookingButton = document.getElementById('btn-prenota-principale');
-
-    function updateBookingStatus() {
-        if (seatsDisplay) seatsDisplay.textContent = availableSeats;
-        if (bookingButton) {
-            if (availableSeats <= 0) {
-                bookingButton.textContent = 'Posti Esauriti';
-                bookingButton.disabled = true;
-            } else {
-                bookingButton.textContent = 'Prenota il tuo posto';
-                bookingButton.disabled = false;
-            }
-        }
-    }
-
-    bookingButton?.addEventListener('click', function() {
-        // Stessa logica di prenotazione rapida da eventiincorso.html
-        const isLoggedIn = false; // Check login
-        if (isLoggedIn) {
-            console.log(`Tentativo prenotazione evento ${eventId}`);
-            // Simula prenotazione
-            if (availableSeats > 0) {
-                availableSeats--;
-                updateBookingStatus();
-                this.textContent = 'Prenotato!';
-                this.disabled = true;
-                alert(`Prenotazione per evento ${eventId} effettuata (simulato).`);
-                // Chiamata API reale
-            }
-        } else {
-            openLoginPopup();
-            localStorage.setItem('pending_booking_event_id', eventId);
-        }
-    });
-
-    // --- Logica Commenti (Semplificata) ---
-    const commentText = document.getElementById('comment-text');
-    const submitCommentBtn = document.getElementById('submit-comment');
-    const commentsList = document.getElementById('comments-list');
-
-    function getGravatar(email, size = 40) {
-        const hash = CryptoJS.MD5(email.trim().toLowerCase()).toString();
-        // Usa un avatar di default se l'email non è valida o per utenti non loggati
-        return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=mp`; // mp = mystery person
-    }
-
-    submitCommentBtn?.addEventListener('click', () => {
-        const text = commentText.value.trim();
-        // Check login
-        const isLoggedIn = false; // Check login
-        const userName = isLoggedIn ? "Utente Loggato" : "Ospite"; // Nome utente
-        const userAvatar = isLoggedIn ? getGravatar("utente@loggato.it") : getGravatar("");
-
-        if (text) {
-            const timestamp = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
-            const commentHTML = `
-                <div class="comment">
+            <div class="comments-list">
+                <div class="comment" id="comment-1">
                     <div class="comment-header">
-                        <img src="${userAvatar}" alt="Avatar" class="user-avatar">
+                        <img src="https://i.pravatar.cc/40?u=elena_g" alt="Avatar Utente" class="user-avatar">
                         <div class="comment-meta">
-                            <strong>${userName}</strong> <small>${timestamp}</small>
+                            <strong>Elena Verdi</strong>
+                            <small>3 ore fa</small>
                         </div>
                     </div>
-                    <p>${text.replace(/\n/g, '<br>')}</p> <div class="comment-actions">
-                        <button class="like-btn" aria-label="Mi piace"><i class="far fa-heart"></i> <span>0</span></button>
-                        <button class="btn-reply" aria-label="Rispondi">Rispondi</button>
+                    <p>Che meraviglia questa pagina! Le foto della galleria sono mozzafiato, specialmente quella dell'alba. Rivivo le emozioni dell'evento.</p>
+                    <div class="comment-actions">
+                        <button class="like-btn" data-comment-id="1" aria-label="Mi piace a questo commento">
+                            <i class="far fa-heart"></i> <span class="like-count">22</span>
+                        </button>
+                        <button class="btn-reply" data-comment-id="1" aria-label="Rispondi a questo commento">
+                            <i class="fas fa-reply"></i> Rispondi
+                        </button>
                     </div>
-                </div>`;
-            commentsList.insertAdjacentHTML('beforeend', commentHTML); // Aggiunge in fondo
-            commentText.value = ''; // Pulisce textarea
-        } else {
-            alert("Inserisci un commento prima di inviare.");
-        }
-    });
+                    <div class="reply-form" id="reply-form-1">
+                        <form>
+                            <textarea aria-label="Testo della risposta" placeholder="Rispondi a Elena Verdi..." rows="2"></textarea>
+                            <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia Risposta</button>
+                        </form>
+                    </div>
+                    <div class="replies">
+                        <div class="comment reply" id="comment-2">
+                            <div class="comment-header">
+                                <img src="https://i.pravatar.cc/40?u=marco_b" alt="Avatar Utente" class="user-avatar">
+                                <div class="comment-meta">
+                                    <strong>Marco Bruno</strong>
+                                    <small>2 ore fa</small>
+                                </div>
+                            </div>
+                            <p>Sono d'accordo, Elena! L'atmosfera era magica. Il video dei momenti di riflessione mi ha toccato profondamente. Grazie per aver condiviso questi ricordi.</p>
+                            <div class="comment-actions">
+                                <button class="like-btn" data-comment-id="2" aria-label="Mi piace a questo commento">
+                                    <i class="far fa-heart"></i> <span class="like-count">12</span>
+                                </button>
+                                <button class="btn-reply" data-comment-id="2" aria-label="Rispondi a questo commento">
+                                    <i class="fas fa-reply"></i> Rispondi
+                                </button>
+                            </div>
+                            <div class="reply-form" id="reply-form-2">
+                                <form>
+                                    <textarea aria-label="Testo della risposta" placeholder="Rispondi a Marco Bruno..." rows="2"></textarea>
+                                    <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia Risposta</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    // Aggiungere event listener per like/reply (più complesso)
-    commentsList?.addEventListener('click', (e) => {
-        if (e.target.closest('.like-btn')) {
-            // Logica Like
-            const btn = e.target.closest('.like-btn');
-            const countSpan = btn.querySelector('span');
-            let count = parseInt(countSpan.textContent);
-            btn.classList.toggle('active');
-            // Qui servirebbe FontAwesome per cambiare icona far/fas
-            countSpan.textContent = btn.classList.contains('active') ? count + 1 : count - 1;
-            if(btn.classList.contains('active')) {
-                btn.querySelector('i').className = 'fas fa-heart'; // Cuore pieno
+
+            </div>
+        </section>
+
+    </div> </main>
+
+<div class="lightbox" id="lightbox">
+    <span class="lightbox-close" onclick="closeLightbox()" aria-label="Chiudi visualizzazione ingrandita">&times;</span>
+    <button class="lightbox-navigation lightbox-prev" onclick="changeLightboxMedia(-1)" aria-label="Media precedente">&#10094;</button>
+    <div class="lightbox-content">
+    </div>
+    <button class="lightbox-navigation lightbox-next" onclick="changeLightboxMedia(1)" aria-label="Media successivo">&#10095;</button>
+    <div id="lightbox-caption" aria-live="polite"></div>
+</div>
+
+
+<footer class="mt-4">
+    <p>&copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
+</footer>
+
+<script>
+    // Script per l'anno corrente nel footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // Script Navbar (scroll e mobile menu)
+    let lastScrollTop = 0;
+    const navbarContainer = document.getElementById('navbarContainer');
+    if (navbarContainer) {
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > lastScrollTop && scrollTop > navbarContainer.offsetHeight) {
+                navbarContainer.classList.add('hidden');
             } else {
-                btn.querySelector('i').className = 'far fa-heart'; // Cuore vuoto
+                navbarContainer.classList.remove('hidden');
             }
-        } else if (e.target.closest('.btn-reply')) {
-            // Logica Risposta (mostra form di risposta)
-            alert('Funzionalità Risposta non implementata.');
-        }
-    });
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
+    }
 
-    // Inizializza stato prenotazione e Lightbox
-    document.addEventListener('DOMContentLoaded', () => {
-        updateBookingStatus();
-        lightbox.option({ // Opzioni Lightbox
-            'resizeDuration': 200,
-            'wrapAround': true
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (mobileMenu) mobileMenu.classList.toggle('open');
+    }
+
+    function closeMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (mobileMenu) mobileMenu.classList.remove('open');
+    }
+
+    // --- Script per Lightbox ---
+    const lightbox = document.getElementById('lightbox');
+    const lightboxContent = lightbox.querySelector('.lightbox-content');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    let currentMediaIndex;
+    const galleryItems = [];
+
+    document.querySelectorAll('.gallery-item a').forEach((item, index) => {
+        galleryItems.push({
+            href: item.href,
+            title: item.dataset.title || '',
+            type: item.href.includes('youtube.com') || item.href.includes('youtu.be') ? 'youtube' : (item.href.endsWith('.mp4') || item.href.endsWith('.webm') ? 'video' : 'image')
+        });
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentMediaIndex = index;
+            openLightbox(index);
         });
     });
 
-</script>
+    function openLightbox(index) {
+        if (!lightbox || !lightboxContent || !lightboxCaption) return;
+        const item = galleryItems[index];
+        lightboxContent.innerHTML = ''; // Pulisci contenuto precedente
 
+        if (item.type === 'youtube') {
+            const videoId = getYouTubeID(item.href);
+            if (videoId) {
+                const iframe = document.createElement('iframe');
+                iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&showinfo=0&modestbranding=1`);
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', '');
+                lightboxContent.appendChild(iframe);
+            } else {
+                lightboxContent.textContent = "ID Video YouTube non valido.";
+            }
+        } else if (item.type === 'video') {
+            const video = document.createElement('video');
+            video.setAttribute('src', item.href);
+            video.setAttribute('controls', '');
+            video.setAttribute('autoplay', '');
+            video.style.maxWidth = '100%';
+            video.style.maxHeight = '85vh';
+            lightboxContent.appendChild(video);
+        } else { // Immagine
+            const img = document.createElement('img');
+            img.setAttribute('src', item.href);
+            img.setAttribute('alt', item.title);
+            lightboxContent.appendChild(img);
+        }
+        lightboxCaption.textContent = item.title;
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Impedisci scroll pagina sottostante
+    }
+
+    function closeLightbox() {
+        if (!lightbox || !lightboxContent) return;
+        lightbox.classList.remove('active');
+        lightboxContent.innerHTML = ''; // Rimuovi contenuto per fermare video etc.
+        document.body.style.overflow = ''; // Ripristina scroll
+    }
+
+    function changeLightboxMedia(direction) {
+        currentMediaIndex += direction;
+        if (currentMediaIndex < 0) {
+            currentMediaIndex = galleryItems.length - 1;
+        } else if (currentMediaIndex >= galleryItems.length) {
+            currentMediaIndex = 0;
+        }
+        openLightbox(currentMediaIndex);
+    }
+
+    function getYouTubeID(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    if (lightbox) {
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.classList.contains('active')) {
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft') changeLightboxMedia(-1);
+                if (e.key === 'ArrowRight') changeLightboxMedia(1);
+            }
+        });
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+    }
+
+
+    // --- Script per Commenti (Interattività base) ---
+    function handleLike(button) {
+        const icon = button.querySelector('i');
+        const countSpan = button.querySelector('.like-count');
+        let count = parseInt(countSpan.textContent);
+
+        if (icon.classList.contains('far')) {
+            icon.classList.replace('far', 'fas');
+            button.classList.add('active');
+            count++;
+        } else {
+            icon.classList.replace('fas', 'far');
+            button.classList.remove('active');
+            count--;
+        }
+        countSpan.textContent = count;
+        // Qui andrebbe una chiamata AJAX per salvare il like
+    }
+
+    function toggleReplyForm(button) {
+        const commentId = button.dataset.commentId;
+        const replyForm = document.getElementById(`reply-form-${commentId}`);
+        if (replyForm) {
+            replyForm.classList.toggle('active');
+            if (replyForm.classList.contains('active')) {
+                replyForm.querySelector('textarea').focus();
+            }
+        }
+    }
+
+    function attachCommentEventListeners(commentElement) {
+        const likeBtn = commentElement.querySelector('.like-btn');
+        if (likeBtn) likeBtn.addEventListener('click', () => handleLike(likeBtn));
+
+        const replyBtn = commentElement.querySelector('.btn-reply');
+        if (replyBtn) replyBtn.addEventListener('click', () => toggleReplyForm(replyBtn));
+
+        const replyFormElement = commentElement.querySelector('.reply-form form');
+        if (replyFormElement) {
+            replyFormElement.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const textarea = this.querySelector('textarea');
+                const replyText = textarea.value.trim();
+
+                // Trova il contenitore .replies del commento genitore (non della risposta stessa)
+                let repliesContainer;
+                if (commentElement.classList.contains('reply')) { // Se sto rispondendo a una risposta
+                    repliesContainer = commentElement.closest('.replies');
+                } else { // Se sto rispondendo a un commento principale
+                    repliesContainer = commentElement.querySelector('.replies');
+                }
+
+                if (replyText && repliesContainer) {
+                    addComment(replyText, repliesContainer, true); // true indica che è una risposta
+                    textarea.value = '';
+                    this.closest('.reply-form').classList.remove('active');
+                }
+            });
+        }
+    }
+
+    document.querySelectorAll('.comment').forEach(comment => {
+        attachCommentEventListeners(comment);
+    });
+
+
+    const newCommentForm = document.getElementById('new-comment-form');
+    if (newCommentForm) {
+        newCommentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const commentTextInput = document.getElementById('comment-text');
+            const commentText = commentTextInput.value.trim();
+            if (commentText) {
+                addComment(commentText, document.querySelector('.comments-list'), false); // false indica che non è una risposta
+                commentTextInput.value = ''; // Pulisce il campo di testo
+            }
+        });
+    }
+
+    function addComment(text, parentElement, isReply) {
+        const commentId = `comment-dynamic-${Date.now()}`;
+        const avatarUrl = `https://i.pravatar.cc/40?u=guest${Math.floor(Math.random() * 1000)}`;
+
+        const commentDiv = document.createElement('div');
+        commentDiv.className = isReply ? 'comment reply' : 'comment';
+        commentDiv.id = commentId;
+
+        commentDiv.innerHTML = `
+                <div class="comment-header">
+                    <img src="${avatarUrl}" alt="Avatar Utente" class="user-avatar">
+                    <div class="comment-meta">
+                        <strong>Utente Ospite</strong>
+                        <small>proprio adesso</small>
+                    </div>
+                </div>
+                <p>${text.replace(/\n/g, '<br>')}</p>
+                <div class="comment-actions">
+                    <button class="like-btn" data-comment-id="${commentId}" aria-label="Mi piace a questo commento">
+                        <i class="far fa-heart"></i> <span class="like-count">0</span>
+                    </button>
+                    <button class="btn-reply" data-comment-id="${commentId}" aria-label="Rispondi a questo commento">
+                        <i class="fas fa-reply"></i> Rispondi
+                    </button>
+                </div>
+                <div class="reply-form" id="reply-form-${commentId}">
+                     <form>
+                        <textarea aria-label="Testo della risposta" placeholder="Rispondi a Utente Ospite..." rows="2"></textarea>
+                        <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia Risposta</button>
+                    </form>
+                </div>
+                ${isReply ? '' : '<div class="replies"></div>'}
+            `;
+        // Se è un commento principale, deve avere un contenitore .replies
+        // Se è una risposta (isReply = true), non aggiungiamo un altro .replies annidato qui
+
+        if (parentElement) {
+            if (isReply) {
+                parentElement.appendChild(commentDiv); // Aggiunge la risposta al contenitore .replies del genitore
+            } else {
+                parentElement.prepend(commentDiv); // Aggiunge il nuovo commento principale in cima alla lista
+            }
+            attachCommentEventListeners(commentDiv); // Attacca listener al nuovo commento/risposta
+        }
+    }
+
+    // Eventuali script per popup login (se non globali)
+    // function openLoginPopup() {
+    //  console.log("Apri popup login - implementare logica popup se non già presente.");
+    //  alert("Funzionalità di login da implementare.");
+    // }
+    // const loginBtn = document.getElementById('login-btn');
+    // const loginBtnMobile = document.getElementById('login-btn-mobile');
+    // if(loginBtn) loginBtn.addEventListener('click', openLoginPopup);
+    // if(loginBtnMobile) loginBtnMobile.addEventListener('click', () => { openLoginPopup(); closeMobileMenu(); });
+
+</script>
 </body>
 </html>
