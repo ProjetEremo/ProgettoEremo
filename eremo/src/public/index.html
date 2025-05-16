@@ -7,6 +7,36 @@
   <link rel="stylesheet" href="style.css"> <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+
+   <style>
+  .login-popup input.form-control {
+    transition: border-color 0.3s ease;
+    border: 1px solid #ced4da;
+  }
+  
+  .login-popup input.error-border {
+    border-color: red !important;
+
+  .login-popup input.form-control {
+    transition: border-color 0.3s ease;
+    border: 1px solid #ced4da;
+    /* Aggiungi queste proprietà */
+    background-color: white !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Disabilita lo stile di autofill di Chrome */
+.login-popup input:-webkit-autofill,
+.login-popup input:-webkit-autofill:hover, 
+.login-popup input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+    -webkit-text-fill-color: #333 !important;
+}
+  }
+
+  
+  </style>
 </head>
 
 <body class="page-index"> <header class="navbar-container" id="navbarContainer">
@@ -242,57 +272,49 @@
 
   // --- Gestione Invio Form con Fetch API ---
 
-  // LOGIN
-  document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+// LOGIN
+document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const loginButton = e.target.querySelector('button[type="submit"]');
     const originalButtonText = loginButton.innerHTML;
     loginButton.disabled = true;
-    loginButton.innerHTML = 'Accesso...'; // Feedback visivo
+    loginButton.innerHTML = 'Accesso...';
+
+    // Ottieni riferimenti agli input
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
+
+    // Rimuovi eventuali classi di errore precedenti
+    emailInput.classList.remove('error-border');
+    passwordInput.classList.remove('error-border');
 
     try {
-      const response = await fetch('login.php', { // Assicurati che il percorso 'login.php' sia corretto
-        method: 'POST',
-        // Non serve 'Content-Type' header quando si usa FormData con fetch
-        body: new FormData(e.target) // Invia i dati del form
-      });
+        const response = await fetch('login.php', {
+            method: 'POST',
+            body: new FormData(e.target)
+        });
 
-      // Controlla se la risposta è OK (status 200-299)
-      if (!response.ok) {
-        // Prova a leggere l'errore dal corpo se possibile, altrimenti usa statusText
-        let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
-        try {
-          const errorData = await response.json();
-          errorMsg = errorData.message || errorMsg;
-        } catch(e) { /* Ignora se il corpo non è JSON */ }
-        throw new Error(errorMsg);
-      }
+        if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
 
-      const result = await response.json(); // Aspetta risposta JSON
+        const result = await response.json();
 
-      if (result.success) {
-        // alert(result.message); // Puoi mostrare un messaggio meno invasivo
-        closeLoginPopup();
-        // Reindirizzamento differenziato
-        if (result.is_admin) {
-          window.location.href = 'indexadmin.html'; // Pagina admin
+        if (result.success) {
+            closeLoginPopup();
+            window.location.href = result.is_admin ? 'indexadmin.html' : 'indexaccesso.html';
         } else {
-          window.location.href = 'indexaccesso.html'; // Pagina utente loggato
+            // Aggiungi classe di errore
+            emailInput.classList.add('error-border');
+            passwordInput.classList.add('error-border');
         }
-      } else {
-        // Mostra errore specifico dal backend
-        alert("Errore Login: " + (result.message || "Credenziali non valide."));
-      }
     } catch (error) {
-      // Errore di rete o nella fetch o nel parsing JSON
-      alert("Errore durante il login: " + error.message);
-      console.error("Dettaglio errore login:", error);
+        emailInput.classList.add('error-border');
+        passwordInput.classList.add('error-border');
+        console.error("Errore login:", error);
     } finally {
-      // Riabilita il bottone indipendentemente dal risultato
-      loginButton.disabled = false;
-      loginButton.innerHTML = originalButtonText;
+        loginButton.disabled = false;
+        loginButton.innerHTML = originalButtonText;
     }
-  });
+});
 
   // REGISTRAZIONE
   document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
@@ -344,6 +366,18 @@
     }
   });
 
+const setupInputReset = (id) => {
+    const input = document.getElementById(id);
+    if (input) {
+        input.addEventListener('input', function() {
+            this.classList.remove('error-border');
+        });
+    }
+};
+
+// Chiama la funzione per entrambi i campi
+setupInputReset('login-email');
+setupInputReset('login-password');
 </script>
 
 </body>
