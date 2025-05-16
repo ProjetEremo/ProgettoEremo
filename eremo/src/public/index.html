@@ -16,6 +16,7 @@
   
   .login-popup input.error-border {
     border-color: red !important;
+  }
 
   .login-popup input.form-control {
     transition: border-color 0.3s ease;
@@ -33,7 +34,7 @@
     -webkit-box-shadow: 0 0 0px 1000px white inset !important;
     -webkit-text-fill-color: #333 !important;
 }
-  }
+
 
   
   </style>
@@ -217,6 +218,14 @@
     }
   });
 
+// --- Resetta l'errore quando l'utente scrive ---
+document.getElementById('login-email')?.addEventListener('input', resetLoginError);
+document.getElementById('login-password')?.addEventListener('input', resetLoginError);
+
+// --- Opzionale: Resetta anche al click sul campo ---
+document.getElementById('login-email')?.addEventListener('focus', resetLoginError);
+document.getElementById('login-password')?.addEventListener('focus', resetLoginError);
+
   // --- Login Popup Logic ---
   const loginBtn = document.getElementById('login-btn');
   const loginBtnMobile = document.getElementById('login-btn-mobile');
@@ -374,6 +383,20 @@ const setupInputReset = (id) => {
         });
     }
 };
+
+function resetLoginError() {
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
+    const errorMessage = document.getElementById('login-error');
+    
+    emailInput.classList.remove('error-border');
+    passwordInput.classList.remove('error-border');
+    errorMessage.style.display = 'none';
+}
+
+document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+});
 
 // Chiama la funzione per entrambi i campi
 setupInputReset('login-email');
