@@ -29,25 +29,27 @@ try {
         ]
     );
 
-    // Query per recuperare gli eventi
-    // Per la pagina pubblica, potresti volere solo eventi futuri: WHERE Data >= CURDATE()
-    // Per la pagina admin, potresti volere tutti gli eventi per la gestione.
-    // Modifica la clausola WHERE e ORDER BY secondo le necessità della pagina che chiama questo script.
+    // Determina se la vista admin è richiesta, per un eventuale diverso ordinamento
+    $isAdminView = isset($_GET['admin_view']) && $_GET['admin_view'] === 'true';
 
-    // Assumiamo che questo script sia chiamato sia da eventiincorso.html (solo futuri)
-    // che da eventiincorsoAdmin.html (tutti, o comunque con logica diversa).
-    // Per semplicità, qui recuperiamo tutti gli eventi futuri.
-    // Se la pagina Admin necessita di TUTTI gli eventi, dovrai creare un endpoint separato
-    // o passare un parametro per modificare la query.
-
-    $showAll = isset($_GET['admin_view']) && $_GET['admin_view'] === 'true'; // Esempio parametro per admin
-
+    // Filtra SEMPRE per eventi da oggi in poi
     $sql_where = "WHERE Data >= CURDATE()";
-    $sql_orderby = "ORDER BY Data ASC";
 
-    if ($showAll) {
-        $sql_where = ""; // Nessun filtro sulla data per admin
-        $sql_orderby = "ORDER BY Data DESC"; // Admin vede i più recenti prima, per esempio
+    // L'ordinamento può ancora dipendere dalla vista, se lo desideri
+    // Ad esempio, l'admin potrebbe volerli vedere in ordine di inserimento o i più recenti prima (tra quelli futuri)
+    // Mentre la vista pubblica li vede dal più prossimo al più lontano.
+    $sql_orderby = "";
+    if ($isAdminView) {
+        // Per l'admin, mostriamo gli eventi futuri ordinati per data decrescente (dal più lontano al più vicino),
+        // oppure per ID decrescente se vuoi vedere gli ultimi inseriti per primi.
+        // Scegli quello che ha più senso per la gestione admin.
+        // Esempio: order by data decrescente tra quelli futuri
+        $sql_orderby = "ORDER BY Data DESC";
+        // Oppure, se vuoi per data ascendente anche per admin:
+        // $sql_orderby = "ORDER BY Data ASC";
+    } else {
+        // La vista pubblica vede gli eventi futuri ordinati per data ascendente (dal più vicino al più lontano)
+        $sql_orderby = "ORDER BY Data ASC";
     }
 
 
@@ -68,51 +70,31 @@ try {
             FotoCopertina AS immagine_url,
             VolantinoUrl AS volantino_url,
             IDCategoria AS idcategoria
-            /* Aggiungi altri campi se necessario, es. un flag per 'offerta libera' separato dal costo=0 */
         FROM eventi
-        {$sql_where}
-        {$sql_orderby}
+        {$sql_where}    -- Applica SEMPRE il filtro per data >= CURDATE()
+        {$sql_orderby}  -- Applica l'ordinamento scelto
     ";
 
     $stmt = $conn->prepare($query);
     $stmt->execute();
     $events = $stmt->fetchAll();
 
-    // I percorsi immagine_url e volantino_url sono già relativi e corretti.
-    // Non è necessaria ulteriore elaborazione qui a meno che non si vogliano URL assoluti.
-    // Se necessario, si potrebbe anteporre l'URL base del sito:
-    // define('BASE_URL', 'http://tuosito.altervista.org/');
-    // foreach ($events as &$event) {
-    //     if ($event['immagine_url'] && !filter_var($event['immagine_url'], FILTER_VALIDATE_URL)) {
-    //         $event['immagine_url'] = BASE_URL . ltrim($event['immagine_url'], '/');
-    //     }
-    //     if ($event['volantino_url'] && !filter_var($event['volantino_url'], FILTER_VALIDATE_URL)) {
-    //         $event['volantino_url'] = BASE_URL . ltrim($event['volantino_url'], '/');
-    //     }
-    // }
-    // unset($event);
-
-
     $responseData = [
         'success' => true,
         'data' => $events,
         'count' => count($events),
-        'message' => (count($events) === 0) ? 'Nessun evento trovato.' : ''
+        'message' => (count($events) === 0) ? 'Nessun evento futuro o odierno trovato.' : ''
     ];
 
-    // JSON_UNESCAPED_UNICODE per i caratteri accentati, JSON_UNESCAPED_SLASHES per gli URL
     $jsonOutput = json_encode($responseData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
     if ($jsonOutput === false) {
         $jsonErrorMsg = json_last_error_msg();
         error_log("Errore JSON Encode in get_events.php: " . $jsonErrorMsg . " (Errore PHP: " . json_last_error() . ")");
-        // Non inviare $responseData grezzo nei log se potrebbe contenere dati sensibili estesi
-        // error_log("Dati che hanno causato l'errore (parziale): " . mb_substr(print_r($responseData, true), 0, 2000));
         http_response_code(500);
         echo json_encode([
             'success' => false,
             'error' => 'Errore interno del server durante la formattazione dei dati (JSON).',
-            // 'debug_json_error' => $jsonErrorMsg // Da commentare in produzione
         ]);
     } else {
         echo $jsonOutput;
@@ -124,7 +106,6 @@ try {
     echo json_encode([
         'success' => false,
         'error' => 'Errore durante il recupero degli eventi dal database.'
-        // 'debug_message' => $e->getMessage() // Da commentare in produzione
     ]);
 } catch (Throwable $e) { // Cattura anche Error in PHP 7+
     http_response_code(500);
@@ -132,7 +113,6 @@ try {
     echo json_encode([
         'success' => false,
         'error' => 'Si è verificato un errore imprevisto durante il caricamento degli eventi.'
-        // 'debug_message' => $e->getMessage() // Da commentare in produzione
     ]);
 }
 ?>
