@@ -1,20 +1,20 @@
 <?php
-// Impostazioni per il debug (considera di modificarle per l'ambiente di produzione)
-ini_set('display_errors', 1); // Imposta a 0 in produzione
-ini_set('display_startup_errors', 1); // Imposta a 0 in produzione
+// Impostazioni PHP per Produzione
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
-// In produzione, considera di loggare gli errori su file invece di mostrarli:
-// ini_set('log_errors', 1);
-// ini_set('error_log', '/percorso/del/tuo/logfile_php.log');
+ini_set('log_errors', 1);
+// ini_set('error_log', $_SERVER['DOCUMENT_ROOT'] . '/php_error_log.txt');
+ini_set('error_log', __DIR__ . '/php_errors_get_events.log');
 
-// !!! ASSICURATI CHE NON CI SIA ALCUN OUTPUT PRIMA DI QUESTA LINEA (nemmeno spazi o BOM) !!!
-header('Content-Type: application/json');
+
+header('Content-Type: application/json; charset=utf-8');
 
 $config = [
     'host' => 'localhost',
-    'db' => 'my_eremofratefrancesco', // Assicurati che il nome del DB sia corretto
-    'user' => 'eremofratefrancesco', // Assicurati che l'utente sia corretto
-    'pass' => '' // !!! VERIFICA CHE LA PASSWORD SIA CORRETTA (vuota se non richiesta) !!!
+    'db' => 'my_eremofratefrancesco', // Sostituisci con il tuo nome DB
+    'user' => 'eremofratefrancesco', // Sostituisci con il tuo username DB
+    'pass' => ''                   // Sostituisci con la tua password DB
 ];
 
 try {
@@ -25,9 +25,31 @@ try {
         [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_EMULATE_PREPARES => false, // Usa prepared statements nativi
         ]
     );
+
+    // Query per recuperare gli eventi
+    // Per la pagina pubblica, potresti volere solo eventi futuri: WHERE Data >= CURDATE()
+    // Per la pagina admin, potresti volere tutti gli eventi per la gestione.
+    // Modifica la clausola WHERE e ORDER BY secondo le necessità della pagina che chiama questo script.
+
+    // Assumiamo che questo script sia chiamato sia da eventiincorso.html (solo futuri)
+    // che da eventiincorsoAdmin.html (tutti, o comunque con logica diversa).
+    // Per semplicità, qui recuperiamo tutti gli eventi futuri.
+    // Se la pagina Admin necessita di TUTTI gli eventi, dovrai creare un endpoint separato
+    // o passare un parametro per modificare la query.
+
+    $showAll = isset($_GET['admin_view']) && $_GET['admin_view'] === 'true'; // Esempio parametro per admin
+
+    $sql_where = "WHERE Data >= CURDATE()";
+    $sql_orderby = "ORDER BY Data ASC";
+
+    if ($showAll) {
+        $sql_where = ""; // Nessun filtro sulla data per admin
+        $sql_orderby = "ORDER BY Data DESC"; // Admin vede i più recenti prima, per esempio
+    }
+
 
     $query = "
         SELECT
@@ -40,98 +62,77 @@ try {
             PostiDisponibili AS posti_disponibili,
             FlagPrenotabile AS flagprenotabile,
             Costo AS costo,
+            PrefissoRelatore AS prefisso_relatore,
             Relatore AS relatore,
             Associazione AS associazione,
-            FotoCopertina AS immagine,
+            FotoCopertina AS immagine_url,
+            VolantinoUrl AS volantino_url,
             IDCategoria AS idcategoria
+            /* Aggiungi altri campi se necessario, es. un flag per 'offerta libera' separato dal costo=0 */
         FROM eventi
-        WHERE Data >= CURDATE()
-        ORDER BY Data ASC
+        {$sql_where}
+        {$sql_orderby}
     ";
 
     $stmt = $conn->prepare($query);
     $stmt->execute();
     $events = $stmt->fetchAll();
 
-    if (empty($events)) {
-        echo json_encode([
-            'success' => true,
-            'data' => [],
-            'count' => 0,
-            'message' => 'Nessun evento futuro trovato.'
-        ]);
-        exit;
-    }
+    // I percorsi immagine_url e volantino_url sono già relativi e corretti.
+    // Non è necessaria ulteriore elaborazione qui a meno che non si vogliano URL assoluti.
+    // Se necessario, si potrebbe anteporre l'URL base del sito:
+    // define('BASE_URL', 'http://tuosito.altervista.org/');
+    // foreach ($events as &$event) {
+    //     if ($event['immagine_url'] && !filter_var($event['immagine_url'], FILTER_VALIDATE_URL)) {
+    //         $event['immagine_url'] = BASE_URL . ltrim($event['immagine_url'], '/');
+    //     }
+    //     if ($event['volantino_url'] && !filter_var($event['volantino_url'], FILTER_VALIDATE_URL)) {
+    //         $event['volantino_url'] = BASE_URL . ltrim($event['volantino_url'], '/');
+    //     }
+    // }
+    // unset($event);
 
-    foreach ($events as &$event) {
-        if (!empty($event['immagine'])) {
-            $binaryData = $event['immagine'];
 
-            if (extension_loaded('fileinfo')) {
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mime_type = finfo_buffer($finfo, $binaryData);
-                finfo_close($finfo);
-
-                if (strpos($mime_type, 'image/') === 0) {
-                    $base64Image = base64_encode($binaryData);
-                    if ($base64Image === false) {
-                        // Errore nella codifica base64, forse dati corrotti o troppo grandi
-                        error_log("Errore base64_encode per l'evento ID: " . ($event['idevento'] ?? 'N/A'));
-                        $event['immagine'] = null;
-                    } else {
-                        $event['immagine'] = 'data:' . $mime_type . ';base64,' . $base64Image;
-                    }
-                } else {
-                    error_log("Tipo di file non immagine ('{$mime_type}') o dati corrotti per l'evento ID: " . ($event['idevento'] ?? 'N/A'));
-                    $event['immagine'] = null;
-                }
-            } else {
-                error_log("L'estensione PHP 'fileinfo' non è abilitata. Impossibile determinare il tipo MIME per l'evento ID: " . ($event['idevento'] ?? 'N/A'));
-                $event['immagine'] = null; // Fallback: considera se tentare un base64 generico o meno
-            }
-        }
-    }
-    unset($event);
-
-    // ---- CORREZIONE: Controllo dell'output JSON ----
     $responseData = [
         'success' => true,
         'data' => $events,
-        'count' => count($events)
+        'count' => count($events),
+        'message' => (count($events) === 0) ? 'Nessun evento trovato.' : ''
     ];
-    $jsonOutput = json_encode($responseData);
+
+    // JSON_UNESCAPED_UNICODE per i caratteri accentati, JSON_UNESCAPED_SLASHES per gli URL
+    $jsonOutput = json_encode($responseData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
     if ($jsonOutput === false) {
         $jsonErrorMsg = json_last_error_msg();
-        error_log("Errore JSON Encode in get_events.php: " . $jsonErrorMsg . " - Dati (parziali) che hanno causato l'errore: " . mb_substr(print_r($responseData, true), 0, 1000));
+        error_log("Errore JSON Encode in get_events.php: " . $jsonErrorMsg . " (Errore PHP: " . json_last_error() . ")");
+        // Non inviare $responseData grezzo nei log se potrebbe contenere dati sensibili estesi
+        // error_log("Dati che hanno causato l'errore (parziale): " . mb_substr(print_r($responseData, true), 0, 2000));
         http_response_code(500);
-        // Assicurati che questo messaggio di errore sia JSON encodabile!
         echo json_encode([
             'success' => false,
-            'error' => 'Errore interno del server durante la formattazione dei dati (JSON encode).',
-            'debug_json_error' => $jsonErrorMsg
+            'error' => 'Errore interno del server durante la formattazione dei dati (JSON).',
+            // 'debug_json_error' => $jsonErrorMsg // Da commentare in produzione
         ]);
     } else {
         echo $jsonOutput;
     }
-    // ---- FINE CORREZIONE ----
 
 } catch (PDOException $e) {
     http_response_code(500);
-    error_log("Errore PDO in get_events.php: " . $e->getMessage() . " - Trace: " . $e->getTraceAsString());
+    error_log("Errore PDO in get_events.php: " . $e->getMessage() . " (Code: " . $e->getCode() . ")");
     echo json_encode([
         'success' => false,
-        'error' => 'Si è verificato un errore durante il recupero degli eventi dal database.',
-        // 'debug_message' => $e->getMessage() // Scommenta solo per debug approfondito
+        'error' => 'Errore durante il recupero degli eventi dal database.'
+        // 'debug_message' => $e->getMessage() // Da commentare in produzione
     ]);
-} catch (Throwable $e) { // Usa Throwable per catturare anche Error in PHP 7+
+} catch (Throwable $e) { // Cattura anche Error in PHP 7+
     http_response_code(500);
-    error_log("Errore generico in get_events.php: " . $e->getMessage() . " - Trace: " . $e->getTraceAsString());
+    error_log("Errore generico in get_events.php: " . $e->getMessage() . " (Code: " . $e->getCode() . ")");
     echo json_encode([
         'success' => false,
-        'error' => 'Si è verificato un errore imprevisto durante il caricamento degli eventi.',
-        // 'debug_message' => $e->getMessage(), // Scommenta solo per debug approfondito
+        'error' => 'Si è verificato un errore imprevisto durante il caricamento degli eventi.'
+        // 'debug_message' => $e->getMessage() // Da commentare in produzione
     ]);
 }
-// Non ci deve essere altro codice PHP o output HTML dopo questo punto.
 ?>

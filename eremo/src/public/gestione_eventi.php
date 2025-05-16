@@ -1,102 +1,207 @@
 <?php
 // Configurazione del database
 $host = "localhost";
-$username = "eremofratefrancesco";
-$password = "";
-$dbname = "my_eremofratefrancesco";
+$username = "eremofratefrancesco"; // Sostituisci con il tuo username DB Altervista
+$password = "";                   // Sostituisci con la tua password DB Altervista (spesso è vuota per l'utente principale)
+$dbname = "my_eremofratefrancesco";   // Sostituisci con il tuo nome DB Altervista (es. my_tuonomeutente)
 
-// Connessione al database
+define('UPLOAD_DIR', 'uploads/event_images/'); // Assicurati che esista e sia scrivibile! DEVE TERMINARE CON /
+
+// Impostazioni PHP per Produzione
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);
+ini_set('log_errors', 1);
+// Per Altervista, un percorso valido potrebbe essere:
+// ini_set('error_log', $_SERVER['DOCUMENT_ROOT'] . '/php_error_log.txt');
+// Oppure se sei in una sottocartella e vuoi il log lì:
+ini_set('error_log', __DIR__ . '/php_errors_gestione_eventi.log');
+
+
+header('Content-Type: application/json; charset=utf-8');
+
 $conn = new mysqli($host, $username, $password, $dbname);
 
 if ($conn->connect_error) {
-    die(json_encode(['success' => false, 'message' => "Connessione fallita: " . $conn->connect_error]));
+    error_log("Connessione DB fallita: " . $conn->connect_error);
+    die(json_encode(['success' => false, 'message' => "Errore di connessione al database. Controlla i log del server."]));
 }
-
 $conn->set_charset("utf8mb4");
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_event') {
-    // Dati obbligatori
-    $required = ['event-title', 'event-date', 'event-speaker', 'event-seats', 'event-short-desc'];
-    foreach ($required as $field) {
-        if (empty($_POST[$field])) {
-            die(json_encode(['success' => false, 'message' => "Il campo $field è obbligatorio"]));
+// Funzione helper per gestire upload di un file (immagine o volantino)
+function handleFileUpload($fileInputName, $allowedExtensions, $existingFilePath = null) {
+    //global $conn; // Non necessario qui
+
+    if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES[$fileInputName]['tmp_name'];
+        $fileName = basename($_FILES[$fileInputName]['name']);
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        $baseName = preg_replace('/[^A-Za-z0-9.\-_]/', '', pathinfo($fileName, PATHINFO_FILENAME));
+        $baseName = substr($baseName, 0, 50);
+        $newFileName = time() . '_' . uniqid('', true) . '_' . $baseName . '.' . $fileExtension;
+
+        if (in_array($fileExtension, $allowedExtensions)) {
+            if (!is_dir(UPLOAD_DIR)) {
+                if (!mkdir(UPLOAD_DIR, 0755, true) && !is_dir(UPLOAD_DIR)) {
+                     error_log('Impossibile creare la cartella di upload: ' . UPLOAD_DIR);
+                     return ['success' => false, 'message' => 'Errore server: config. upload dir.'];
+                }
+            }
+            $dest_path = UPLOAD_DIR . $newFileName;
+
+            if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                if ($existingFilePath && file_exists($existingFilePath) && $dest_path !== $existingFilePath) {
+                    if(!unlink($existingFilePath)) {
+                        error_log("Impossibile eliminare il vecchio file: " . $existingFilePath);
+                    }
+                }
+                return ['success' => true, 'path' => $dest_path];
+            } else {
+                error_log('Errore move_uploaded_file per ' . $fileInputName . ' a ' . $dest_path . ' (PHP error: ' . $_FILES[$fileInputName]['error'] . ')');
+                return ['success' => false, 'message' => 'Errore salvataggio file: ' . $fileInputName];
+            }
+        } else {
+            return ['success' => false, 'message' => 'Tipo file non consentito per ' . $fileInputName . '. Permessi: ' . implode(', ', $allowedExtensions)];
         }
+    } elseif (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_NO_FILE) {
+        return ['success' => true, 'path' => $existingFilePath];
+    } elseif (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] !== UPLOAD_ERR_OK) {
+        error_log('Errore upload PHP per ' . $fileInputName . ': error code ' . $_FILES[$fileInputName]['error']);
+        return ['success' => false, 'message' => 'Errore caricamento file: ' . $fileInputName . ' (codice: ' . $_FILES[$fileInputName]['error'] . ')'];
     }
-
-    // Preparazione dati con valori di default
-    $titolo = $conn->real_escape_string($_POST['event-title']);
-    $data = $conn->real_escape_string($_POST['event-date']);
-    $orario = $conn->real_escape_string($_POST['event-time'] ?? '');
-    $descrizione = $conn->real_escape_string($_POST['event-short-desc']);
-    $descrizione_estesa = $conn->real_escape_string($_POST['event-long-desc'] ?? '');
-    $prefisso_relatore = $conn->real_escape_string($_POST['event-prefix'] ?? 'Relatore');
-    $relatore = $conn->real_escape_string($_POST['event-speaker']);
-    $associazione = $conn->real_escape_string($_POST['event-association'] ?? '');
-    $posti_disponibili = intval($_POST['event-seats']);
-    $prenotabile = isset($_POST['event-booking']) ? 1 : 0;
-    $costo_volontario = isset($_POST['event-voluntary']) ? 1 : 0;
-    $costo = $costo_volontario ? 0 : floatval($_POST['event-price'] ?? 0);
-
-    // Gestione immagine (opzionale)
-    $foto_copertina = null;
-    $foto_param_type = 'b';
-    if (isset($_FILES['event-image']) && $_FILES['event-image']['error'] === UPLOAD_ERR_OK) {
-        $foto_copertina = file_get_contents($_FILES['event-image']['tmp_name']);
-    } else {
-        // Se non viene fornita un'immagine, impostiamo il parametro a NULL
-        $foto_param_type = 's'; // Cambiamo il tipo a stringa per NULL
-        $foto_copertina = NULL;
-    }
-
-    // Query con gestione condizionale dell'immagine
-    if ($foto_copertina !== NULL) {
-        $sql = "INSERT INTO eventi (
-            Titolo, Data, Durata, Descrizione, DescrizioneEstesa,
-            Associazione, FlagPrenotabile, PostiDisponibili, Costo,
-            PrefissoRelatore, Relatore, FotoCopertina
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt = $conn->prepare($sql);
-        if ($stmt === false) {
-            die(json_encode(['success' => false, 'message' => "Errore preparazione query: " . $conn->error]));
-        }
-
-        $stmt->bind_param(
-            "ssssssiiidss",
-            $titolo, $data, $orario, $descrizione, $descrizione_estesa,
-            $associazione, $prenotabile, $posti_disponibili, $costo,
-            $prefisso_relatore, $relatore, $foto_copertina // Aggiunta $foto_copertina
-        );
-    }else {
-        $sql = "INSERT INTO eventi (
-            Titolo, Data, Durata, Descrizione, DescrizioneEstesa,
-            Associazione, FlagPrenotabile, PostiDisponibili, Costo,
-            PrefissoRelatore, Relatore
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt = $conn->prepare($sql);
-        if ($stmt === false) {
-            die(json_encode(['success' => false, 'message' => "Errore preparazione query: " . $conn->error]));
-        }
-
-        $stmt->bind_param(
-            "ssssssiiids",
-            $titolo, $data, $orario, $descrizione, $descrizione_estesa,
-            $associazione, $prenotabile, $posti_disponibili, $costo,
-            $prefisso_relatore, $relatore
-        );
-    }
-
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Evento aggiunto con successo!']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Errore durante il salvataggio: ' . $stmt->error]);
-    }
-
-    $stmt->close();
-} else {
-    echo json_encode(['success' => false, 'message' => 'Richiesta non valida']);
+    return ['success' => true, 'path' => $existingFilePath];
 }
 
+$action = $_POST['action'] ?? '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($action === 'add_event' || $action === 'update_event') {
+        $eventId = ($action === 'update_event') ? ($_POST['event-id'] ?? null) : null;
+
+        $required = ['event-title', 'event-date', 'event-speaker', 'event-seats', 'event-short-desc'];
+        foreach ($required as $field) {
+            if (empty($_POST[$field])) {
+                die(json_encode(['success' => false, 'message' => "Campo '$field' obbligatorio."]));
+            }
+        }
+        if ($action === 'update_event' && (empty($eventId) || !ctype_digit((string)$eventId))) {
+             die(json_encode(['success' => false, 'message' => "ID evento non valido per l'aggiornamento."]));
+        }
+
+        $titolo = $conn->real_escape_string(trim($_POST['event-title']));
+        $data = $conn->real_escape_string(trim($_POST['event-date']));
+        $orario = $conn->real_escape_string(trim($_POST['event-time'] ?? ''));
+        $descrizione = $conn->real_escape_string(trim($_POST['event-short-desc']));
+        $descrizione_estesa = $conn->real_escape_string(trim($_POST['event-long-desc'] ?? ''));
+        $prefisso_relatore = $conn->real_escape_string(trim($_POST['event-prefix'] ?? 'Relatore'));
+        $relatore = $conn->real_escape_string(trim($_POST['event-speaker'])); // Questo è il campo corretto
+        $associazione = $conn->real_escape_string(trim($_POST['event-association'] ?? ''));
+        $posti_disponibili = intval($_POST['event-seats']);
+        $prenotabile = isset($_POST['event-booking']) && $_POST['event-booking'] === 'on' ? 1 : 0; // Corretto per checkbox
+        $costo = (isset($_POST['event-voluntary']) && $_POST['event-voluntary'] === 'on') ? 0.00 : floatval($_POST['event-price'] ?? 0.00);
+
+        $percorso_foto_copertina_db = null;
+        $percorso_volantino_db = null;
+
+        if ($action === 'update_event') {
+            $stmt_select_paths = $conn->prepare("SELECT FotoCopertina, VolantinoUrl FROM eventi WHERE IDEvento = ?");
+            if ($stmt_select_paths) {
+                $stmt_select_paths->bind_param("i", $eventId);
+                $stmt_select_paths->execute();
+                $stmt_select_paths->bind_result($percorso_foto_copertina_db, $percorso_volantino_db);
+                $stmt_select_paths->fetch();
+                $stmt_select_paths->close();
+            } else { error_log("Errore prep select percorsi esistenti: " . $conn->error); }
+        }
+
+        $uploadCopertinaResult = handleFileUpload('event-image', ['jpg', 'jpeg', 'png', 'gif', 'webp'], $percorso_foto_copertina_db);
+        if (!$uploadCopertinaResult['success']) { die(json_encode($uploadCopertinaResult)); }
+        $percorso_foto_copertina_db = $uploadCopertinaResult['path'];
+
+        $uploadVolantinoResult = handleFileUpload('event-flyer', ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'], $percorso_volantino_db);
+        if (!$uploadVolantinoResult['success']) { die(json_encode($uploadVolantinoResult)); }
+        $percorso_volantino_db = $uploadVolantinoResult['path'];
+
+        if ($action === 'add_event') {
+            $sql = "INSERT INTO eventi (Titolo, Data, Durata, Descrizione, DescrizioneEstesa, Associazione, FlagPrenotabile, PostiDisponibili, Costo, PrefissoRelatore, Relatore, FotoCopertina, VolantinoUrl, IDCategoria)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)";
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                error_log("Errore prepare INSERT: " . $conn->error);
+                die(json_encode(['success' => false, 'message' => 'Errore server (DB Insert).']));
+            }
+            // CORREZIONE STRINGA TIPI: ssssssiidssss (13 tipi)
+            // Titolo(s), Data(s), Durata(s), Descrizione(s), DescrizioneEstesa(s), Associazione(s),
+            // FlagPrenotabile(i), PostiDisponibili(i), Costo(d),
+            // PrefissoRelatore(s), Relatore(s),
+            // FotoCopertina(s), VolantinoUrl(s)
+            $stmt->bind_param("ssssssiidssss",
+                $titolo, $data, $orario, $descrizione, $descrizione_estesa, $associazione,
+                $prenotabile, $posti_disponibili, $costo,
+                $prefisso_relatore, $relatore,
+                $percorso_foto_copertina_db, $percorso_volantino_db
+            );
+        } else { // update_event
+            $sql = "UPDATE eventi SET Titolo=?, Data=?, Durata=?, Descrizione=?, DescrizioneEstesa=?, Associazione=?, FlagPrenotabile=?, PostiDisponibili=?, Costo=?, PrefissoRelatore=?, Relatore=?, FotoCopertina=?, VolantinoUrl=?
+                    WHERE IDEvento = ?";
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                error_log("Errore prepare UPDATE: " . $conn->error);
+                die(json_encode(['success' => false, 'message' => 'Errore server (DB Update).']));
+            }
+            // CORREZIONE STRINGA TIPI: ssssssiidssssi (14 tipi, l'ultimo è IDEvento(i))
+            $stmt->bind_param("ssssssiidssssi",
+                $titolo, $data, $orario, $descrizione, $descrizione_estesa, $associazione,
+                $prenotabile, $posti_disponibili, $costo,
+                $prefisso_relatore, $relatore,
+                $percorso_foto_copertina_db, $percorso_volantino_db,
+                $eventId
+            );
+        }
+
+        if ($stmt->execute()) {
+            $message = ($action === 'add_event') ? 'Evento aggiunto con successo!' : 'Evento aggiornato con successo!';
+            echo json_encode(['success' => true, 'message' => $message, 'event_id' => ($action === 'add_event' ? $conn->insert_id : $eventId)]);
+        } else {
+            error_log("Errore execute $action: " . $stmt->error . " SQL: " . $sql);
+            echo json_encode(['success' => false, 'message' => 'Errore durante il salvataggio nel database: ' . $stmt->error]);
+        }
+        $stmt->close();
+
+    } elseif ($action === 'delete_event') {
+        $eventId = $_POST['event_id'] ?? null;
+        if (empty($eventId) || !ctype_digit((string)$eventId)) {
+            die(json_encode(['success' => false, 'message' => 'ID evento non valido per eliminazione.']));
+        }
+
+        $fotoPath = null; $volantinoPath = null;
+        $stmt_select_files = $conn->prepare("SELECT FotoCopertina, VolantinoUrl FROM eventi WHERE IDEvento = ?");
+        if ($stmt_select_files) {
+            $stmt_select_files->bind_param("i", $eventId); $stmt_select_files->execute();
+            $stmt_select_files->bind_result($fotoPath, $volantinoPath); $stmt_select_files->fetch();
+            $stmt_select_files->close();
+        } else { error_log("Errore prep select for delete files: " . $conn->error); }
+
+        $stmt_delete = $conn->prepare("DELETE FROM eventi WHERE IDEvento = ?");
+        if ($stmt_delete) {
+            $stmt_delete->bind_param("i", $eventId);
+            if ($stmt_delete->execute()) {
+                if ($stmt_delete->affected_rows > 0) {
+                    if ($fotoPath && file_exists($fotoPath)) { if(!unlink($fotoPath)) error_log("Impossibile eliminare FotoCopertina: ".$fotoPath);}
+                    if ($volantinoPath && file_exists($volantinoPath)) { if(!unlink($volantinoPath)) error_log("Impossibile eliminare VolantinoUrl: ".$volantinoPath);}
+                    echo json_encode(['success' => true, 'message' => 'Evento eliminato con successo.']);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Evento non trovato o già eliminato.']);
+                }
+            } else { error_log("Errore exec delete: " . $stmt_delete->error); echo json_encode(['success' => false, 'message' => 'Errore eliminazione dal DB.']);}
+            $stmt_delete->close();
+        } else { error_log("Errore prep delete: " . $conn->error); echo json_encode(['success' => false, 'message' => 'Errore server (DB Delete).']);}
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Azione non valida o non specificata.']);
+    }
+} else {
+    echo json_encode(['success' => false, 'message' => 'Metodo di richiesta non valido.']);
+}
 $conn->close();
 ?>
