@@ -422,8 +422,8 @@
     </div> </main>
 
 
-    <div class="login-popup-overlay" id="loginOverlay"></div>
-    <div class="login-popup" id="loginPopup">
+<div class="login-popup-overlay" id="loginOverlay"></div>
+<div class="login-popup" id="loginPopup">
     <button class="close-popup" id="closePopup" aria-label="Chiudi popup">&times;</button>
     <div class="login-tabs">
         <div class="login-tab active" data-tab="login">Accedi</div>
@@ -433,34 +433,34 @@
         <label for="login-email">Email</label>
         <input type="email" id="login-email" name="login-email" class="form-control" required autocomplete="email"> </div>
         <div class="form-group mb-3">
-        <label for="login-password">Password</label>
-        <input type="password" id="login-password" name="login-password" class="form-control" required autocomplete="current-password"> </div>
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" name="login-password" class="form-control" required autocomplete="current-password"> </div>
         <div class="form-actions">
-        <button type="submit" class="btn-popup">Accedi</button>
+            <button type="submit" class="btn-popup">Accedi</button>
         </div>
     </form>
     <form class="login-form" id="registerForm" method="POST">
         <div class="form-group mb-3">
-        <label for="register-name">Nome</label>
-        <input type="text" id="register-name" name="register-name" class="form-control" required autocomplete="given-name"> </div>
+            <label for="register-name">Nome</label>
+            <input type="text" id="register-name" name="register-name" class="form-control" required autocomplete="given-name"> </div>
         <div class="form-group mb-3">
-        <label for="register-surname">Cognome</label>
-        <input type="text" id="register-surname" name="register-surname" class="form-control" required autocomplete="family-name"> </div>
+            <label for="register-surname">Cognome</label>
+            <input type="text" id="register-surname" name="register-surname" class="form-control" required autocomplete="family-name"> </div>
         <div class="form-group mb-3">
-        <label for="register-email">Email</label>
-        <input type="email" id="register-email" name="register-email" class="form-control" required autocomplete="email"> </div>
+            <label for="register-email">Email</label>
+            <input type="email" id="register-email" name="register-email" class="form-control" required autocomplete="email"> </div>
         <div class="form-group mb-3">
-        <label for="register-password">Password</label>
-        <input type="password" id="register-password" name="register-password" class="form-control" required minlength="8" autocomplete="new-password"> <small>Minimo 8 caratteri.</small>
+            <label for="register-password">Password</label>
+            <input type="password" id="register-password" name="register-password" class="form-control" required minlength="8" autocomplete="new-password"> <small>Minimo 8 caratteri.</small>
         </div>
         <div class="terms-checkbox mb-3">
-        <input type="checkbox" id="register-terms" name="register-terms" required> <label for="register-terms">Accetto i <a href="/termini" target="_blank">termini e condizioni</a></label>
+            <input type="checkbox" id="register-terms" name="register-terms" required> <label for="register-terms">Accetto i <a href="/termini" target="_blank">termini e condizioni</a></label>
         </div>
         <div class="form-actions">
-        <button type="submit" class="btn-popup">Registrati</button>
+            <button type="submit" class="btn-popup">Registrati</button>
         </div>
     </form>
-    </div>
+</div>
 
 
 <div class="lightbox" id="lightbox">
@@ -474,7 +474,7 @@
 
 
 <footer class="mt-4">
-    <p>&copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
+    <p>&copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia</p>
 </footer>
 
 <script>
@@ -724,15 +724,162 @@
         }
     }
 
-    // Eventuali script per popup login (se non globali)
-    // function openLoginPopup() {
-    //  console.log("Apri popup login - implementare logica popup se non già presente.");
-    //  alert("Funzionalità di login da implementare.");
-    // }
-    // const loginBtn = document.getElementById('login-btn');
-    // const loginBtnMobile = document.getElementById('login-btn-mobile');
-    // if(loginBtn) loginBtn.addEventListener('click', openLoginPopup);
-    // if(loginBtnMobile) loginBtnMobile.addEventListener('click', () => { openLoginPopup(); closeMobileMenu(); });
+    // --- Login Popup Logic ---
+    const loginBtn = document.getElementById('login-btn');
+    const loginBtnMobile = document.getElementById('login-btn-mobile');
+    const loginOverlay = document.getElementById('loginOverlay');
+    const loginPopup = document.getElementById('loginPopup');
+    const closePopupBtn = document.getElementById('closePopup');
+    const loginTabs = document.querySelectorAll('.login-tab');
+    const loginForms = document.querySelectorAll('.login-form');
+
+    function openLoginPopup() {
+        loginOverlay.classList.add('active');
+        loginPopup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLoginPopup() {
+        loginOverlay.classList.remove('active');
+        loginPopup.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (loginBtn) {
+        loginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openLoginPopup();
+        });
+    }
+    if (loginBtnMobile) {
+        loginBtnMobile.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeMobileMenu();
+            openLoginPopup();
+        });
+    }
+
+    if(closePopupBtn) { closePopupBtn.addEventListener('click', closeLoginPopup); }
+    if(loginOverlay) { loginOverlay.addEventListener('click', closeLoginPopup); }
+
+    // Login Tabs Switch
+    loginTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabId = tab.getAttribute('data-tab');
+            loginTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            loginForms.forEach(form => {
+                form.classList.remove('active');
+                if (form.id === `${tabId}Form`) {
+                    form.classList.add('active');
+                }
+            });
+        });
+    });
+
+    // --- Gestione Invio Form con Fetch API ---
+
+    // LOGIN
+    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const loginButton = e.target.querySelector('button[type="submit"]');
+        const originalButtonText = loginButton.innerHTML;
+        loginButton.disabled = true;
+        loginButton.innerHTML = 'Accesso...'; // Feedback visivo
+
+        try {
+            const response = await fetch('login.php', { // Assicurati che il percorso 'login.php' sia corretto
+                method: 'POST',
+                // Non serve 'Content-Type' header quando si usa FormData con fetch
+                body: new FormData(e.target) // Invia i dati del form
+            });
+
+            // Controlla se la risposta è OK (status 200-299)
+            if (!response.ok) {
+                // Prova a leggere l'errore dal corpo se possibile, altrimenti usa statusText
+                let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+                try {
+                    const errorData = await response.json();
+                    errorMsg = errorData.message || errorMsg;
+                } catch(e) { /* Ignora se il corpo non è JSON */ }
+                throw new Error(errorMsg);
+            }
+
+            const result = await response.json(); // Aspetta risposta JSON
+
+            if (result.success) {
+                // alert(result.message); // Puoi mostrare un messaggio meno invasivo
+                closeLoginPopup();
+                // Reindirizzamento differenziato
+                if (result.is_admin) {
+                    window.location.href = 'indexadmin.html'; // Pagina admin
+                } else {
+                    window.location.href = 'indexaccesso.html'; // Pagina utente loggato
+                }
+            } else {
+                // Mostra errore specifico dal backend
+                alert("Errore Login: " + (result.message || "Credenziali non valide."));
+            }
+        } catch (error) {
+            // Errore di rete o nella fetch o nel parsing JSON
+            alert("Errore durante il login: " + error.message);
+            console.error("Dettaglio errore login:", error);
+        } finally {
+            // Riabilita il bottone indipendentemente dal risultato
+            loginButton.disabled = false;
+            loginButton.innerHTML = originalButtonText;
+        }
+    });
+
+    // REGISTRAZIONE
+    document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const registerButton = e.target.querySelector('button[type="submit"]');
+        const originalButtonText = registerButton.innerHTML;
+        registerButton.disabled = true;
+        registerButton.innerHTML = 'Registrazione...'; // Feedback visivo
+
+        try {
+            const response = await fetch('registrati.php', { // Assicurati che 'registrati.php' sia corretto
+                method: 'POST',
+                body: new FormData(e.target)
+            });
+
+            if (!response.ok) {
+                let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+                try {
+                    const errorData = await response.json();
+                    errorMsg = errorData.message || errorMsg;
+                } catch(e) { /* Ignora se il corpo non è JSON */ }
+                throw new Error(errorMsg);
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert(result.message || "Registrazione completata con successo!");
+                closeLoginPopup();
+                // Potresti voler effettuare il login automatico qui o reindirizzare alla pagina di login
+                // openLoginPopup(); // Riapri per login?
+                // document.querySelector('.login-tab[data-tab="login"]').click(); // Seleziona tab login
+            } else {
+                alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+            }
+        } catch (error) {
+            alert("Errore durante la registrazione: " + error.message);
+            console.error("Dettaglio errore registrazione:", error);
+        } finally {
+            registerButton.disabled = false;
+            registerButton.innerHTML = originalButtonText;
+        }
+    });
+
+    // Chiudi popup con tasto Esc
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && loginPopup.classList.contains('active')) {
+            closeLoginPopup();
+        }
+    });
 
 </script>
 </body>
