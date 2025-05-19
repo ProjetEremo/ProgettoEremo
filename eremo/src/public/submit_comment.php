@@ -89,7 +89,7 @@ try {
 
     // Opzionale: Verifica esistenza commento padre (se CodRisposta è fornito)
     if ($codRisposta !== null) {
-        $stmtCheckParent = $conn->prepare("SELECT Progressivo FROM Commenti WHERE Progressivo = :codRisposta AND IDEvento = :idEvento");
+        $stmtCheckParent = $conn->prepare("SELECT Progressivo FROM commenti WHERE Progressivo = :codRisposta AND IDEvento = :idEvento");
         $stmtCheckParent->bindParam(':codRisposta', $codRisposta, PDO::PARAM_INT);
         $stmtCheckParent->bindParam(':idEvento', $idEvento, PDO::PARAM_INT); // Importante: deve essere dello stesso evento!
         $stmtCheckParent->execute();
@@ -100,7 +100,7 @@ try {
 
     // Inserimento del commento
     // La colonna 'Data' usa NOW() per il timestamp corrente del database
-    $sql = "INSERT INTO Commenti (Descrizione, Data, CodRisposta, Contatto, IDEvento)
+    $sql = "INSERT INTO commenti (Descrizione, Data, CodRisposta, Contatto, IDEvento)
             VALUES (:descrizione, NOW(), :codRisposta, :contatto, :idEvento)";
     $stmt = $conn->prepare($sql);
 
@@ -110,11 +110,11 @@ try {
     $stmt->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
 
     $stmt->execute();
-    $newCommentId = $conn->lastInsertId();
+    $newcommentId = $conn->lastInsertId();
 
     $response['success'] = true;
     $response['message'] = 'Commento inviato con successo!';
-    $response['new_comment_id'] = $newCommentId; // Potrebbe essere utile al client
+    $response['new_comment_id'] = $newcommentId; // Potrebbe essere utile al client
     echo json_encode($response);
 
 } catch (PDOException $e) {

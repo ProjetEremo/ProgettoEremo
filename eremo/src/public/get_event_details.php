@@ -1,12 +1,11 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-// Includi qui la tua configurazione del database (o il file di connessione)
-// Esempio basato sui tuoi script precedenti:
+
 $config = [
     'host' => 'localhost',
     'db'   => 'my_eremofratefrancesco', // Il tuo nome DB
     'user' => 'eremofratefrancesco',    // Il tuo username DB
-    'pass' => ''                        // La tua password DB - LASCIA VUOTA SE NON HAI PASSWORD PER QUESTO UTENTE
+    'pass' => ''                        // La tua password DB
 ];
 
 $response = ['success' => false, 'data' => null, 'message' => ''];
@@ -32,8 +31,6 @@ try {
     );
 
     // 1. Recupera i dettagli dell'evento
-    // Assicurati che i nomi delle colonne corrispondano al tuo database
-    // (es. FotoCopertina, Titolo, Data, Durata, Relatore, PrefissoRelatore, Associazione, DescrizioneEstesa, Descrizione, VolantinoUrl)
     $stmtDetails = $conn->prepare("SELECT * FROM eventi WHERE IDEvento = :idEvento");
     $stmtDetails->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
     $stmtDetails->execute();
@@ -47,71 +44,73 @@ try {
     }
 
     // 2. Recupera i media per l'evento
-    // Assumendo che la tabella 'Media' abbia colonne 'Percorso' e opzionalmente 'TitoloMedia'
-    // L'immagine image_11b1a2.png mostra 'Progressivo', 'Percorso', 'IDEvento'
-    $stmtMedia = $conn->prepare("SELECT Progressivo, Percorso FROM Media WHERE IDEvento = :idEvento ORDER BY Progressivo ASC");
-    $stmtMedia->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
-    $stmtMedia->execute();
-    $mediaItems = $stmtMedia->fetchAll();
+    $stmtmedia = $conn->prepare("SELECT Progressivo, Percorso FROM media WHERE IDEvento = :idEvento ORDER BY Progressivo ASC");
+    $stmtmedia->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
+    $stmtmedia->execute();
+    $mediaItems = $stmtmedia->fetchAll();
 
     // 3. Recupera i commenti per l'evento
-    // L'immagine image_11b1c3.png mostra 'Progressivo', 'Descrizione', 'Data', 'CodRisposta', 'Contatto', 'IDEvento'
     $stmtComments = $conn->prepare(
-        "SELECT Progressivo, Descrizione, DATE_FORMAT(Data, '%d/%m/%Y %H:%i') AS Data, CodRisposta, Contatto, IDEvento
-         FROM Commenti
+        "SELECT Progressivo, Descrizione, Data, CodRisposta, Contatto, IDEvento
+         FROM commenti
          WHERE IDEvento = :idEvento
-         ORDER BY IFNULL(CodRisposta, Progressivo), Data ASC" // Ordina per radice e poi per data
-    );
+         ORDER BY IFNULL(CodRisposta, 0) ASC, CodRisposta ASC, Data ASC, Progressivo ASC"
+    ); //
     $stmtComments->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
     $stmtComments->execute();
     $allCommentsRaw = $stmtComments->fetchAll();
 
-    // Organizza i commenti in una struttura annidata (se lo vuoi fare qui)
     $commentsThreaded = [];
     $commentsMap = [];
 
     foreach ($allCommentsRaw as $comment) {
-        // $comment['Data'] è già formattata da SQL
+        // Formatta la data qui se non già formattata da SQL (ma la tua query lo fa)
+        // $comment['Data'] = date('d/m/Y H:i', strtotime($comment['Data']));
+        // L'ultima query che hai fornito non formatta più la data in SQL, quindi la formattiamo qui.
+        // Se la query SQL precedente (con DATE_FORMAT) è ancora in uso, questa riga non è necessaria.
+        // Assumendo che la Data dal DB sia in un formato che strtotime può leggere.
+        if (isset($comment['Data'])) { // Controlla se la Data esiste prima di formattarla
+             $comment['Data'] = date('d/m/Y H:i', strtotime($comment['Data']));
+        } else {
+             $comment['Data'] = 'Data non disponibile'; // O un altro placeholder
+        }
+
         $commentsMap[$comment['Progressivo']] = $comment;
         $commentsMap[$comment['Progressivo']]['replies'] = [];
     }
 
     foreach ($commentsMap as $commentId => $comment) {
         if ($comment['CodRisposta'] !== null && isset($commentsMap[$comment['CodRisposta']])) {
-            $commentsMap[$comment['CodRisposta']]['replies'][] = &$commentsMap[$commentId]; // Usa riferimento per annidare
+            $commentsMap[$comment['CodRisposta']]['replies'][] = $comment; // Non usare & qui, copia l'array
         } else {
-            $commentsThreaded[] = &$commentsMap[$commentId]; // Commento principale
+            $commentsThreaded[] = $comment; // Commento principale
         }
     }
-    // Filtra per ottenere solo i commenti principali (quelli non annidati direttamente)
-    $finalComments = [];
-    foreach($commentsThreaded as $c){
-        if($c['CodRisposta'] === null){
-            $finalComments[] = $c;
-        }
-    }
-
 
     $response['success'] = true;
     $response['data'] = [
         'details'  => $eventDetails,
         'media'    => $mediaItems,
-        'comments' => $finalComments // Invia solo i commenti principali, le risposte sono annidate dentro
+        'comments' => $commentsThreaded
     ];
     echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
 } catch (PDOException $e) {
-    error_log("Errore PDO in get_event_details.php: " . $e->getMessage());
-    $response['message'] = 'Errore database durante il recupero dei dettagli evento.';
-    // $response['debug_error'] = $e->getMessage(); // Non inviare in produzione
+    error_log("Errore PDO in get_event_details.php: " . $e->getMessage() . " - Codice: " . $e->getCode() . " - File: " . $e->getFile() . " - Linea: " . $e->getLine());
+    // Per debug, invia il messaggio di errore PDO al client.
+    // **RICORDA DI RIMUOVERLO O COMMENTARLO IN PRODUZIONE PER SICUREZZA!**
+    $response['message'] = 'Errore database: ' . $e->getMessage();
+    // $response['message'] = 'Errore database durante il recupero dei dettagli evento.'; // Messaggio per produzione
     http_response_code(500);
     echo json_encode($response);
+    exit; // Aggiungi exit qui per sicurezza
 } catch (Exception $e) {
     error_log("Errore generico in get_event_details.php: " . $e->getMessage());
     $response['message'] = 'Errore generale: ' . $e->getMessage();
     http_response_code(500);
     echo json_encode($response);
+    exit; // Aggiungi exit qui
 }
 
-$conn = null;
+$conn = null; // Questa riga ora potrebbe non essere raggiunta se c'è un exit prima
 ?>
