@@ -4,266 +4,164 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="images/logo.png" type="image/x-icon">
-    <title>Pagina Evento - Eremo Frate Francesco</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+    <title>Dettaglio Evento - Eremo Frate Francesco</title>
+    <link rel="stylesheet" href="style.css"> {/* ASSICURATI CHE QUESTO PERCORSO SIA CORRETTO! */}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ----- Inizio Stili Specifici e Correzioni per evento.html ----- */
+        /* Stili CSS (assicurati che le variabili CSS come --primary, --border-radius-medium, ecc. siano definite in style.css) */
+        body { font-family: sans-serif; margin:0; background-color: var(--background-color, #f4f4f4); color: var(--text-color, #333); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+        .section-padding { padding-top: 2rem; padding-bottom: 2rem; }
 
-        body {
-            background-color: var(--light);
+        .event-detail-container { padding-top: 1rem; }
+        .event-cover-image {
+            width: 100%; max-height: 450px; object-fit: cover;
+            border-radius: var(--border-radius-medium, 8px); margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-light, 0 2px 8px rgba(0,0,0,0.1)); display: none;
         }
-
-        main {
-            padding-top: 100px; /* Spazio adeguato per la navbar fissa */
+        .event-title-main {
+            font-size: clamp(2rem, 4.5vw, 2.8rem); color: var(--primary, #337ab7);
+            margin-bottom: 1rem; text-align: center;
         }
-
-        /* 1. Correzione per il titolo della Galleria Multimediale */
-        /* Rimuove il padding a sinistra che era per la barra e nasconde la barra ::before */
-        .event-gallery-container h2.section-title.text-center {
-            padding-left: 0;
+        .event-meta-info {
+            display: flex; flex-wrap: wrap; gap: 0.8rem 1.5rem; margin-bottom: 1.5rem;
+            color: var(--gray-dark, #555); font-size: 0.95rem; border-bottom: 1px solid var(--gray-light, #ddd);
+            padding-bottom: 1rem; text-align: left; display: none;
         }
-
-        .event-gallery-container h2.section-title.text-center::before {
-            display: none; /* Nasconde l'elemento ::before (la barra arancione) */
+        .event-meta-info span { display: flex; align-items: center; gap: 0.5rem; }
+        .event-meta-info i { color: var(--secondary, #5cb85c); width: 16px; text-align: center; }
+        .event-description-full {
+            margin-bottom: 2.5rem; line-height: 1.8; text-align: left; display: none;
         }
-
-        /* 2. Correzione per l'allineamento del testo nei commenti */
-        /* Assicura che i paragrafi (<p>) all'interno dei commenti siano allineati a sinistra */
-        .comment p {
-            text-align: left;
+        .volantino-link-container { margin: 2rem 0; text-align: left; display:none; }
+        .volantino-link-container h4{ text-align: left; margin-bottom: 0.5rem; font-size: 1.1rem; color: var(--primary, #337ab7);}
+        .btn-volantino {
+            display: inline-block; padding: 0.6em 1.2em; background-color: var(--primary, #337ab7); color: var(--white, #fff);
+            text-decoration: none; border-radius: var(--border-radius-small, 4px); transition: background-color 0.3s ease;
         }
-
-        /* Stili per rendere la galleria più "spettacolare" */
-        .event-gallery-container { /* Contenitore per la galleria specifica dell'evento */
-            padding-bottom: 2rem; /* Spazio sotto la galleria */
-        }
-
-        .event-gallery-container .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Colonne più grandi e responsive */
-            gap: 1.5rem; /* Spazio tra gli elementi della galleria */
-        }
-
-        .event-gallery-container .gallery-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: var(--border-radius-medium);
-            box-shadow: var(--shadow-medium);
-            transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-            aspect-ratio: 16/9; /* Mantiene le proporzioni, ideale per video e immagini landscape */
-            background-color: var(--gray-light); /* Sfondo placeholder */
-        }
-        .event-gallery-container .gallery-item:hover {
-            transform: translateY(-8px) scale(1.02); /* Leggero sollevamento e ingrandimento */
-            box-shadow: var(--shadow-medium); /* Ombra più pronunciata all'hover */
-        }
-
-        .event-gallery-container .gallery-item img,
-        .event-gallery-container .gallery-item video,
-        .event-gallery-container .gallery-item iframe {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Assicura che l'immagine/video copra l'area */
-            display: block;
-            border-radius: var(--border-radius-medium); /* Coerenza con il contenitore */
-        }
-
-        .gallery-item a { /* L'anchor tag deve riempire il contenitore per l'effetto hover */
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        .gallery-item .media-play-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 3.5rem; /* Icona più grande */
-            color: rgba(255, 255, 255, 0.95);
-            background-color: rgba(0,0,0,0.5);
-            border-radius: 50%;
-            width: 80px;  /* Dimensioni del cerchio */
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.25s ease, transform 0.25s ease;
-            pointer-events: none; /* Non interferisce con il click sull'<a> */
-            opacity: 0.85;
-        }
-        .gallery-item a:hover .media-play-button {
-            background-color: rgba(var(--accent-rgb, 209, 140, 96), 0.8); /* Usa colore accent, con fallback se var non definita */
-            transform: translate(-50%, -50%) scale(1.1);
-            opacity: 1;
-        }
+        .btn-volantino:hover { background-color: var(--primary-dark, #286090); }
+        .btn-volantino i { margin-right: 0.5em; }
 
 
-        /* Miglioramenti sezione commenti */
-        .comments-section {
-            margin-top: 3rem;
-            padding-top: 2.5rem;
-            border-top: 3px solid var(--primary); /* Bordo superiore più marcato */
+        .event-gallery-container { margin-top: 2rem; margin-bottom: 3rem; }
+        .event-gallery-container > h2 {
+            text-align: center; font-size: clamp(1.8rem, 4vw, 2.3rem);
+            color: var(--primary, #337ab7); margin-bottom: 2rem; padding-left:0;
         }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;}
+        .gallery-item {
+            position: relative; overflow: hidden; border-radius: var(--border-radius-medium, 8px);
+            box-shadow: var(--shadow-light, 0 2px 8px rgba(0,0,0,0.1)); aspect-ratio: 4/3; background-color: var(--gray-light, #eee);
+            cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .gallery-item:hover {transform: scale(1.05); box-shadow: var(--shadow-medium, 0 4px 12px rgba(0,0,0,0.15)); }
+        .gallery-item img, .gallery-item video { width: 100%; height: 100%; object-fit: cover; display: block;}
+        .gallery-item .media-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2);
+            display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .gallery-item:hover .media-overlay { opacity: 1; }
+        .gallery-item .media-play-icon { font-size: 2.5rem; color: var(--white, #fff); text-shadow: 0 1px 5px rgba(0,0,0,0.4); }
 
-        .comments-section > h2 { /* Titolo principale della sezione commenti */
-            text-align: center;
-            color: var(--primary);
-            margin-bottom: 2.5rem;
-            font-size: clamp(1.9rem, 4.5vw, 2.4rem); /* Dimensione titolo */
-        }
-
-        .comment-form {
-            background: var(--white);
-            border: 1px solid var(--gray-light);
-            padding: 2rem; /* Aumenta padding */
-            border-radius: var(--border-radius-medium); /* Coerenza con il resto */
-        }
-        .comment-form h4 { /* Titolo del form "Partecipa alla discussione" */
-            color: var(--primary);
-            font-size: 1.3rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .comment { /* Stile base per ogni commento */
-            border-left: 5px solid var(--secondary); /* Bordo sinistro più spesso e colorato */
-            padding: 1.5rem;
-            background-color: var(--white);
-            margin-bottom: 1.8rem; /* Aumenta spazio tra commenti principali */
-            border-radius: 0 var(--border-radius-medium) var(--border-radius-medium) 0; /* Arrotondamento angoli */
-        }
-        .comment.reply { /* Stile specifico per le risposte */
-            border-left-color: var(--accent); /* Colore diverso per il bordo delle risposte */
-            background-color: var(--light); /* Sfondo leggermente diverso per le risposte */
-            padding: 1.2rem;
-            margin-top: 1rem;
-            border-radius: 0 var(--border-radius-medium) var(--border-radius-medium) 0;
-        }
-
-        .replies { /* Contenitore delle risposte */
-            margin-left: 2.5rem; /* Indentazione per le risposte */
-            padding-left: 1.5rem; /* Padding per la linea di indentazione */
-            border-left: 3px dotted var(--gray-medium); /* Linea tratteggiata per visualizzare l'annidamento */
-            margin-top: 1rem;
-        }
-        .comment-form textarea, .reply-form textarea {
-            background-color: var(--light); /* Sfondo leggermente diverso per textarea */
-        }
-        .btn-comment i, .btn-reply i, .like-btn i {
-            margin-right: 0.4em; /* Spazio tra icona e testo nei bottoni */
-        }
-
-        /* Lightbox per immagini/video */
         .lightbox {
-            display: none; /* Nascosto di default */
-            position: fixed;
-            z-index: 2000; /* Sopra tutto */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(30, 59, 47, 0.92); /* Sfondo scuro (usa --dark con opacità, es. rgba(var(--dark-rgb), 0.92) se hai --dark-rgb) */
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            backdrop-filter: blur(3px); /* Effetto blur per lo sfondo */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s;
         }
-        .lightbox.active {
-            display: flex; /* Mostra quando attiva */
-            animation: fadeIn 0.3s ease-out; /* Animazione entrata */
+        .lightbox.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s 0s; }
+        .lightbox-content { position: relative; max-width: 90%; max-height: 85%;}
+        .lightbox-content img, .lightbox-content iframe, .lightbox-content video {
+            display: block; max-width: 100%; max-height: 80vh; margin: 0 auto;
+            border: 3px solid var(--white, #fff); border-radius: var(--border-radius-small, 4px);
         }
-        .lightbox-content {
-            max-width: 90%;
-            max-height: 90%;
-            position: relative;
-            display: flex; /* Per centrare il contenuto se più piccolo */
-            justify-content: center;
-            align-items: center;
-        }
-        .lightbox-content img, .lightbox-content video, .lightbox-content iframe {
-            max-width: 100%;
-            max-height: 85vh; /* Altezza massima rispetto alla viewport */
-            display: block;
-            margin: auto;
-            border-radius: var(--border-radius-medium);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.35);
-            border: 3px solid var(--light); /* Bordo chiaro attorno al media */
-        }
-        .lightbox-content iframe { /* Stile specifico per iframe (es. YouTube) */
-            width: 80vw;
-            height: calc(80vw * 9 / 16); /* Mantiene aspect ratio 16:9 */
-            max-width: 1100px; /* Limite larghezza massima */
-        }
+        .lightbox-content iframe { width: 80vw; height: calc(80vw * 9 / 16); min-height: 300px; } /* Aspect ratio 16:9 */
 
-        .lightbox-close {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            color: var(--white);
-            font-size: 2.8rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s ease, transform 0.2s ease;
-            z-index: 2001; /* Sopra il contenuto della lightbox */
+        .lightbox-close, .lightbox-navigation {
+            position: absolute; background: rgba(0,0,0,0.5); color: var(--white, #fff); border: none;
+            padding: 0.5rem 1rem; cursor: pointer; font-size: 1.5rem; z-index: 1001;
+            border-radius: var(--border-radius-small, 4px);
         }
-        .lightbox-close:hover {
-            color: var(--accent);
-            transform: rotate(90deg);
-        }
-        .lightbox-navigation {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 45px;
-            height: 45px;
-            background-color: rgba(0,0,0,0.4);
-            color: white;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s ease, transform 0.2s ease;
-            z-index: 2001;
-        }
-        .lightbox-navigation:hover {
-            background-color: var(--secondary);
-            transform: translateY(-50%) scale(1.1);
-        }
-        .lightbox-prev { left: 15px; }
-        .lightbox-next { right: 15px; }
+        .lightbox-close { top: 15px; right: 15px; }
+        .lightbox-prev { left: 15px; top: 50%; transform: translateY(-50%); }
+        .lightbox-next { right: 15px; top: 50%; transform: translateY(-50%); }
         #lightbox-caption {
-            text-align: center;
-            color: var(--light);
-            margin-top: 15px;
-            font-size: 1rem;
-            font-weight: 500;
-            padding: 5px 10px;
-            background-color: rgba(0,0,0,0.3);
-            border-radius: var(--border-radius-medium);
-            display: inline-block; /* Per adattarsi al testo */
-            position: absolute; /* Posizionamento sotto l'immagine */
-            bottom: 20px; /* Distanza dal basso */
-            left: 50%;
-            transform: translateX(-50%);
-            max-width: 70%;
+            color: var(--white, #fff); text-align: center; margin-top: 10px; padding: 0 15px;
+            font-size: 0.9rem; width: 100%; box-sizing: border-box;
         }
 
-        /* Assicurarsi che la variabile --accent-rgb sia definita nel :root se usata in rgba() */
-        /* Se :root non ha --accent-rgb, puoi definire un fallback o usare direttamente il valore esadecimale:
-        :root {
-            --accent: #d18c60;
-            --accent-rgb: 209, 140, 96; // Esempio
-        }
-        */
 
-        /* ----- Fine Stili Specifici e Correzioni per evento.html ----- */
+        .comments-section { margin-top: 2rem; background-color: var(--white, #fff); padding: 2rem; border-radius: var(--border-radius-medium, 8px); box-shadow: var(--shadow-light, 0 2px 8px rgba(0,0,0,0.05));}
+        .comments-section h2, .comments-section h3, .comments-section h4 {color: var(--primary, #337ab7); text-align: left;}
+        .comments-section h2 {text-align: center; margin-bottom: 1.5rem;}
+        .comment-form { margin-bottom:2rem; }
+        .comment-form-container { display:flex; gap:0.5rem; align-items: flex-start; }
+        .comment-form textarea {
+            flex-grow:1; padding:0.75rem; border:1px solid var(--gray-light, #ddd);
+            border-radius:var(--border-radius-small, 4px); font-size:1rem; min-height: 60px;
+            transition: border-color 0.3s ease;
+        }
+        .comment-form textarea:focus { border-color: var(--primary, #337ab7); outline:none; box-shadow: 0 0 0 2px rgba(var(--primary-rgb, 51,122,183), 0.2); }
+        .btn-comment {
+            padding: 0.75rem 1rem; background-color:var(--primary, #337ab7); color:var(--white, #fff);
+            border:none; border-radius:var(--border-radius-small, 4px); cursor:pointer; font-size:1rem;
+            transition: background-color 0.3s ease; white-space: nowrap;
+        }
+        .btn-comment:hover { background-color:var(--primary-dark, #286090); }
+        .btn-comment.btn-small { padding: 0.5rem 0.8rem; font-size:0.9rem;}
+        .btn-comment i { margin-right: 0.3em; }
+
+
+        .comments-list .comment {
+            margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom: 1px solid var(--gray-light, #eee);
+            text-align:left;
+        }
+        .comments-list .comment:last-child { border-bottom:none; margin-bottom:0; padding-bottom: 0;}
+        .comment-header { display:flex; align-items:center; margin-bottom:0.5rem; gap:0.75rem; }
+        .comment .user-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; background-color:var(--gray-light, #eee); }
+        .comment-meta { font-size:0.9rem; }
+        .comment-meta strong { color:var(--text-color-dark, #333); }
+        .comment-meta small { color:var(--gray-dark, #777); margin-left:0.5rem; }
+        .comment p { margin-top:0.3rem; margin-bottom:0.75rem; line-height:1.6; word-wrap:break-word; }
+        .comment-actions { display:flex; gap:1rem; margin-bottom:0.5rem; }
+        .comment-actions button { background:none; border:none; color:var(--gray-dark, #777); cursor:pointer; padding:0.2rem 0.5rem; font-size:0.85rem;}
+        .comment-actions button:hover { color:var(--primary, #337ab7); }
+        .comment-actions button i { margin-right:0.3em; }
+        .comment-actions .like-btn.active i { color: var(--danger, #d9534f); }
+        .comment-actions .like-btn.active { font-weight: bold;}
+
+        .replies { margin-left: 40px; margin-top:1rem; border-left: 2px solid var(--gray-light, #eee); padding-left:1rem; }
+        .reply .comment-header { /* Stili specifici per le risposte se necessario */ }
+        .reply-form { margin-top:0.5rem; display:none; /* Nascosto per default */ }
+        .reply-form.active { display:block; }
+        .reply-form form { display:flex; gap:0.5rem; align-items:flex-start; margin-top:0.5rem;}
+        .reply-form textarea {flex-grow:1; font-size:0.9rem; padding:0.5rem; min-height: 40px;}
+        .reply-form .form-message-local { flex-basis: 100%; margin-top: 0.5em; font-size:0.85em; }
+
+
+        .no-content-message { text-align:center; padding:2rem; color: var(--gray-dark, #777); font-style: italic; }
+
+        .loading-overlay {
+            display: none; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(255,255,255,0.8); justify-content:center; align-items:center;
+            z-index:10; flex-direction: column;
+        }
+        .loading-overlay.visible { display: flex;}
+        .spinner { margin: 0 auto 20px; width: 70px; text-align: center; }
+        .spinner > div { width: 18px; height: 18px; background-color: var(--primary, #337ab7); border-radius: 100%; display: inline-block; -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both; animation: sk-bouncedelay 1.4s infinite ease-in-out both; }
+        .spinner .bounce1 { -webkit-animation-delay: -0.32s; animation-delay: -0.32s; }
+        .spinner .bounce2 { -webkit-animation-delay: -0.16s; animation-delay: -0.16s; }
+        @-webkit-keyframes sk-bouncedelay { 0%, 80%, 100% { -webkit-transform: scale(0) } 40% { -webkit-transform: scale(1.0) } }
+        @keyframes sk-bouncedelay { 0%, 80%, 100% { transform: scale(0); -webkit-transform: scale(0); } 40% { transform: scale(1.0); -webkit-transform: scale(1.0); } }
+        .spinner-mini { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.5); border-top-color: #fff; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; margin-right: 5px; vertical-align: middle;}
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .form-message { padding: 0.5em 0; font-size:0.9em; text-align:left; }
+        .form-message.error { color: var(--danger, #d9534f); }
+        .form-message.success { color: var(--success, #5cb85c); }
+
+        /* Stili per navbar e mobile menu (assicurati che siano consistenti con style.css) */
+        .navbar-container { /* ... */ } .navbar { /* ... */ } .logo { /* ... */ } .menu { /* ... */ } .right-menu { /* ... */ }
+        .user-dropdown { /* ... */ } .dropdown-menu { /* ... */ } .hamburger { /* ... */ } .mobile-menu { /* ... */ }
     </style>
 </head>
 <body>
@@ -271,320 +169,259 @@
 <header class="navbar-container" id="navbarContainer">
     <nav class="navbar">
         <div class="logo">
-            <a href="index.html">
-                <span class="emoji">🏔️</span>
-                <h2>Eremo Frate Francesco</h2>
-            </a>
+            <a href="indexaccesso.html"><span class="emoji">🏔️</span><h2>Eremo Frate Francesco</h2></a>
         </div>
         <div class="menu">
-            <a href="eventiincorso.html">Calendario attività</a>
-            <a href="eventipassati.html">Archivio attività</a>
+            <a href="eventiincorsoaccesso.html">Calendario attività</a>
+            <a href="eventipassatiaccesso.html">Archivio attività</a>
             <span class="separator">|</span>
-            <a href="incontrisullaparola.html">Incontri sulla parola</a>
+            <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
             <span class="separator">|</span>
-            <a href="dovesiamo.html">Dove siamo</a>
-            <a href="contatti.html">Contatti</a>
+            <a href="dovesiamoaccesso.html">Dove siamo</a>
+            <a href="contattiaccesso.html">Contatti</a>
         </div>
         <div class="right-menu">
-            <button id="login-btn" class="login-btn">Accedi</button>
-            <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
+            <div class="user-dropdown" id="userDropdownContainer">
+                <button class="user-btn" aria-haspopup="true" aria-expanded="false">
+                    <span class="user-avatar" id="navbar-avatar">👤</span>
+                    <span class="user-name" id="navbar-username">Utente</span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
+                    <a href="areapersonale.html">Il mio profilo</a>
+                    <a href="gestisciprenotazioni.html">Le mie prenotazioni</a>
+                    <a href="#" id="logout-link-dropdown">Esci</a>
+                </div>
+            </div>
+            <button class="hamburger" aria-label="Toggle menu">☰</button>
         </div>
     </nav>
     <div class="mobile-menu" id="mobileMenu">
-        <a href="eventiincorso.html" onclick="closeMobileMenu()">Calendario attività</a>
-        <a href="eventipassati.html" onclick="closeMobileMenu()">Archivio attività</a>
-        <a href="incontrisullaparola.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
-        <a href="dovesiamo.html" onclick="closeMobileMenu()">Dove siamo</a>
-        <a href="contatti.html" onclick="closeMobileMenu()">Contatti</a>
-        <a href="#" id="login-btn-mobile" onclick="openLoginPopup(); closeMobileMenu();">Accedi</a>
+        <a href="eventiincorsoaccesso.html" onclick="closeMobileMenu()">Calendario attività</a>
+        <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()">Archivio attività</a>
+        <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
+        <a href="dovesiamoaccesso.html" onclick="closeMobileMenu()">Dove siamo</a>
+        <a href="contattiaccesso.html" onclick="closeMobileMenu()">Contatti</a>
+        <hr style="border-color: rgba(255,255,255,0.1);">
+        <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
+        <a href="gestisciprenotazioni.html" onclick="closeMobileMenu()">Le mie prenotazioni</a>
+        <a href="#" id="logout-link-mobile" onclick="closeMobileMenu()">Esci</a>
     </div>
 </header>
 
 <main>
-    <div class="container">
-        <h1 class="text-center" style="margin-top: 2rem; margin-bottom: 2.5rem; color: var(--primary); font-size: clamp(2.4rem, 5.5vw, 3rem);">Ricordi dell'Incontro Speciale</h1>
+    <div class="container event-detail-container section-padding">
 
-        <section id="event-gallery" class="event-gallery-container section-padding" style="padding-top:0;">
-            <h2 class="section-title text-center" style="padding-left:0; margin-bottom: 2.5rem; color: var(--primary);">Galleria Multimediale</h2>
-            <div class="gallery-grid">
-                <div class="gallery-item">
-                    <a href="https://picsum.photos/seed/eremo_natura/1200/800" data-lightbox="event-gallery" data-title="Sentiero nel bosco vicino all'eremo">
-                        <img src="https://picsum.photos/seed/eremo_natura/600/400" alt="Sentiero nel bosco">
-                    </a>
-                </div>
-                <div class="gallery-item">
-                    <a href="https://www.youtube.com/watch?v=ScEMSAPn9x0" data-lightbox="event-gallery" data-title="Momenti di riflessione (Video da YouTube)"> <img src="https://img.youtube.com/vi/ScEMSAPn9x0/hqdefault.jpg" alt="Thumbnail Video Riflessione">
-                        <div class="media-play-button"><i class="fas fa-play"></i></div>
-                    </a>
-                </div>
-                <div class="gallery-item">
-                    <a href="https://picsum.photos/seed/eremo_architettura/1200/800" data-lightbox="event-gallery" data-title="Dettaglio architettonico dell'eremo">
-                        <img src="https://picsum.photos/seed/eremo_architettura/600/400" alt="Architettura eremo">
-                    </a>
-                </div>
-                <div class="gallery-item">
-                    <a href="https://picsum.photos/seed/eremo_alba/1200/800" data-lightbox="event-gallery" data-title="Alba vista dall'eremo">
-                        <img src="https://picsum.photos/seed/eremo_alba/600/400" alt="Alba all'eremo">
-                    </a>
-                </div>
-                <div class="gallery-item">
-                    <a href="videos/sample_eremo.mp4" data-lightbox="event-gallery" data-title="Breve video della vita all'eremo">
-                        <img src="https://picsum.photos/seed/video_placeholder_eremo/600/400?text=Video+Locale+Eremo" alt="Video locale Eremo">
-                        <div class="media-play-button"><i class="fas fa-play"></i></div>
-                    </a>
-                </div>
-                <div class="gallery-item">
-                    <a href="https://picsum.photos/seed/eremo_interni/1200/800" data-lightbox="event-gallery" data-title="Interno della cappella">
-                        <img src="https://picsum.photos/seed/eremo_interni/600/400" alt="Interno cappella">
-                    </a>
-                </div>
-                <div class="gallery-item">
-                    <a href="https://picsum.photos/seed/eremo_panorama/1200/800" data-lightbox="event-gallery" data-title="Panorama montano circostante">
-                        <img src="https://picsum.photos/seed/eremo_panorama/600/400" alt="Panorama montano">
-                    </a>
-                </div>
-                <div class="gallery-item">
-                    <a href="https://picsum.photos/seed/eremo_dettaglio/1200/800" data-lightbox="event-gallery" data-title="Dettaglio floreale nel giardino">
-                        <img src="https://picsum.photos/seed/eremo_dettaglio/600/400" alt="Dettaglio floreale">
-                    </a>
-                </div>
-            </div>
+        <h1 id="eventTitleHeader" class="event-title-main">Dettaglio Evento</h1>
+
+        <img id="eventCoverImage" class="event-cover-image" src="" alt="Copertina evento">
+        <div id="eventMetaInfo" class="event-meta-info"></div>
+        <div id="eventDescriptionFull" class="event-description-full"></div>
+        <div id="eventVolantinoContainer" class="volantino-link-container"></div>
+
+        <div id="pageLoadingIndicator" class="loading-overlay visible" style="min-height:200px; background:transparent; position:relative;">
+            <div class="spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>
+            <p>Caricamento contenuti dell'evento...</p>
+        </div>
+
+        <section id="event-gallery" class="event-gallery-container" style="display:none;">
+            <h2>Galleria Multimediale</h2>
+            <div class="gallery-grid" id="galleryGrid"></div>
+            <p id="no-media-message" class="no-content-message" style="display:none;">Nessun media disponibile per questo evento.</p>
         </section>
 
-        <section id="event-comments" class="comments-section section-padding" style="padding-bottom: 3rem;">
-            <h2 class="text-center">Condividi i Tuoi Pensieri</h2>
-            <div class="comment-form">
-                <h4>Lascia un commento o un ricordo</h4>
+        <section id="event-comments" class="comments-section" style="display:none;">
+            <h2>Condividi i Tuoi Pensieri</h2>
+            <div class="comment-form" id="commentFormContainer" style="display:none;">
+                <h4>Lascia un commento</h4>
                 <form id="new-comment-form">
+                    <input type="hidden" name="IDEvento" id="commentEventId">
                     <div class="comment-form-container">
-                        <textarea id="comment-text" name="comment-text" aria-label="Testo del commento" placeholder="Scrivi qui il tuo commento..." rows="4" required></textarea>
+                        <textarea id="comment-text" name="Descrizione" aria-label="Testo del commento" placeholder="Scrivi qui il tuo commento..." rows="4" required></textarea>
                         <button type="submit" class="btn-comment"><i class="fas fa-paper-plane"></i> Invia Commento</button>
                     </div>
+                    <div id="comment-form-message" class="form-message"></div>
                 </form>
             </div>
+            <p id="login-to-comment-message" class="no-content-message" style="display:none;">
+                Per lasciare un commento, <a href="#" id="loginLinkFromEventPage">accedi</a>.
+            </p>
 
-            <div class="comments-list">
-                <div class="comment" id="comment-1">
-                    <div class="comment-header">
-                        <img src="https://i.pravatar.cc/40?u=elena_g" alt="Avatar Utente" class="user-avatar">
-                        <div class="comment-meta">
-                            <strong>Elena Verdi</strong>
-                            <small>3 ore fa</small>
-                        </div>
-                    </div>
-                    <p>Che meraviglia questa pagina! Le foto della galleria sono mozzafiato, specialmente quella dell'alba. Rivivo le emozioni dell'evento.</p>
-                    <div class="comment-actions">
-                        <button class="like-btn" data-comment-id="1" aria-label="Mi piace a questo commento">
-                            <i class="far fa-heart"></i> <span class="like-count">22</span>
-                        </button>
-                        <button class="btn-reply" data-comment-id="1" aria-label="Rispondi a questo commento">
-                            <i class="fas fa-reply"></i> Rispondi
-                        </button>
-                    </div>
-                    <div class="reply-form" id="reply-form-1">
-                        <form>
-                            <textarea aria-label="Testo della risposta" placeholder="Rispondi a Elena Verdi..." rows="2"></textarea>
-                            <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia Risposta</button>
-                        </form>
-                    </div>
-                    <div class="replies">
-                        <div class="comment reply" id="comment-2">
-                            <div class="comment-header">
-                                <img src="https://i.pravatar.cc/40?u=marco_b" alt="Avatar Utente" class="user-avatar">
-                                <div class="comment-meta">
-                                    <strong>Marco Bruno</strong>
-                                    <small>2 ore fa</small>
-                                </div>
-                            </div>
-                            <p>Sono d'accordo, Elena! L'atmosfera era magica. Il video dei momenti di riflessione mi ha toccato profondamente. Grazie per aver condiviso questi ricordi.</p>
-                            <div class="comment-actions">
-                                <button class="like-btn" data-comment-id="2" aria-label="Mi piace a questo commento">
-                                    <i class="far fa-heart"></i> <span class="like-count">12</span>
-                                </button>
-                                <button class="btn-reply" data-comment-id="2" aria-label="Rispondi a questo commento">
-                                    <i class="fas fa-reply"></i> Rispondi
-                                </button>
-                            </div>
-                            <div class="reply-form" id="reply-form-2">
-                                <form>
-                                    <textarea aria-label="Testo della risposta" placeholder="Rispondi a Marco Bruno..." rows="2"></textarea>
-                                    <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia Risposta</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-            </div>
+            <h3 style="margin-top:2.5rem; margin-bottom:1.5rem;">Commenti:</h3>
+            <div class="comments-list" id="commentsList"></div>
+            <p id="no-comments-message" class="no-content-message" style="display:none;">Sii il primo a commentare questo evento!</p>
         </section>
-
-    </div> </main>
-
-
-<div class="login-popup-overlay" id="loginOverlay"></div>
-<div class="login-popup" id="loginPopup">
-    <button class="close-popup" id="closePopup" aria-label="Chiudi popup">&times;</button>
-    <div class="login-tabs">
-        <div class="login-tab active" data-tab="login">Accedi</div>
-        <div class="login-tab" data-tab="register">Registrati</div>
     </div>
-    <form class="login-form active" id="loginForm" method="POST"> <div class="form-group mb-3">
-        <label for="login-email">Email</label>
-        <input type="email" id="login-email" name="login-email" class="form-control" required autocomplete="email"> </div>
-        <div class="form-group mb-3">
-            <label for="login-password">Password</label>
-            <input type="password" id="login-password" name="login-password" class="form-control" required autocomplete="current-password"> </div>
-        <div class="form-actions">
-            <button type="submit" class="btn-popup">Accedi</button>
-        </div>
-    </form>
-    <form class="login-form" id="registerForm" method="POST">
-        <div class="form-group mb-3">
-            <label for="register-name">Nome</label>
-            <input type="text" id="register-name" name="register-name" class="form-control" required autocomplete="given-name"> </div>
-        <div class="form-group mb-3">
-            <label for="register-surname">Cognome</label>
-            <input type="text" id="register-surname" name="register-surname" class="form-control" required autocomplete="family-name"> </div>
-        <div class="form-group mb-3">
-            <label for="register-email">Email</label>
-            <input type="email" id="register-email" name="register-email" class="form-control" required autocomplete="email"> </div>
-        <div class="form-group mb-3">
-            <label for="register-password">Password</label>
-            <input type="password" id="register-password" name="register-password" class="form-control" required minlength="8" autocomplete="new-password"> <small>Minimo 8 caratteri.</small>
-        </div>
-        <div class="terms-checkbox mb-3">
-            <input type="checkbox" id="register-terms" name="register-terms" required> <label for="register-terms">Accetto i <a href="/termini" target="_blank">termini e condizioni</a></label>
-        </div>
-        <div class="form-actions">
-            <button type="submit" class="btn-popup">Registrati</button>
-        </div>
-    </form>
-</div>
-
+</main>
 
 <div class="lightbox" id="lightbox">
-    <span class="lightbox-close" onclick="closeLightbox()" aria-label="Chiudi visualizzazione ingrandita">&times;</span>
-    <button class="lightbox-navigation lightbox-prev" onclick="changeLightboxMedia(-1)" aria-label="Media precedente">&#10094;</button>
-    <div class="lightbox-content">
-    </div>
-    <button class="lightbox-navigation lightbox-next" onclick="changeLightboxMedia(1)" aria-label="Media successivo">&#10095;</button>
+    <span class="lightbox-close" aria-label="Chiudi visualizzazione ingrandita">×</span>
+    <button class="lightbox-navigation lightbox-prev" aria-label="Media precedente">❮</button>
+    <div class="lightbox-content"></div>
+    <button class="lightbox-navigation lightbox-next" aria-label="Media successivo">❯</button>
     <div id="lightbox-caption" aria-live="polite"></div>
 </div>
 
-
-<footer class="mt-4">
-    <p>&copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia</p>
+<footer>
+    <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
 </footer>
 
 <script>
-    // Script per l'anno corrente nel footer
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
-
-    // Script Navbar (scroll e mobile menu)
-    let lastScrollTop = 0;
+    // --- SCRIPT GLOBALI ---
+    let currentUser = null;
+    function updateNavbarUserUI() {
+        const elName = document.getElementById('navbar-username');
+        const elAvatar = document.getElementById('navbar-avatar');
+        if(elName && elAvatar){
+            if(currentUser && currentUser.email){
+                elName.textContent = currentUser.nome || currentUser.email.split('@')[0];
+                elAvatar.textContent = currentUser.avatar || (currentUser.nome ? currentUser.nome.charAt(0).toUpperCase() : '👤');
+            } else {
+                elName.textContent = 'Utente';
+                elAvatar.textContent = '👤';
+            }
+        }
+    }
+    function handleLogout() {
+        localStorage.removeItem('userDataEFF'); currentUser = null;
+        alert('Logout effettuato.'); window.location.href = 'index.html';
+    }
+    function setupUserSessionAndNavbar() {
+        const ud_str = localStorage.getItem('userDataEFF');
+        if(ud_str){ try { currentUser = JSON.parse(ud_str); if(!currentUser || typeof currentUser.email !== 'string'){currentUser=null; localStorage.removeItem('userDataEFF');}} catch(e){currentUser=null; localStorage.removeItem('userDataEFF');}} else {currentUser=null;}
+        updateNavbarUserUI();
+        const btnLogoutD = document.getElementById('logout-link-dropdown');
+        const btnLogoutM = document.getElementById('logout-link-mobile');
+        if(btnLogoutD) btnLogoutD.addEventListener('click', (e)=>{e.preventDefault();handleLogout();});
+        if(btnLogoutM) btnLogoutM.addEventListener('click', (e)=>{e.preventDefault();if(typeof closeMobileMenu === 'function')closeMobileMenu();handleLogout();});
+    }
+    let lastScroll = 0;
     const navbarContainer = document.getElementById('navbarContainer');
     if (navbarContainer) {
-        window.addEventListener('scroll', function() {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if (scrollTop > lastScrollTop && scrollTop > navbarContainer.offsetHeight) {
-                navbarContainer.classList.add('hidden');
-            } else {
-                navbarContainer.classList.remove('hidden');
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll <= 50) { navbarContainer.classList.remove('hidden'); lastScroll = 0; return; }
+            if (currentScroll > lastScroll && !navbarContainer.classList.contains('hidden')) {navbarContainer.classList.add('hidden');}
+            else if (currentScroll < lastScroll && navbarContainer.classList.contains('hidden')) {navbarContainer.classList.remove('hidden');}
+            lastScroll = currentScroll;
+        }, {passive: true});
+    }
+    const userDropdownButton = document.querySelector('#userDropdownContainer .user-btn');
+    const userDropdownMenu = document.querySelector('#userDropdownContainer .dropdown-menu');
+    if (userDropdownButton && userDropdownMenu) {
+        userDropdownButton.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const isCurrentlyOpen = userDropdownMenu.style.display === 'block';
+            userDropdownMenu.style.display = isCurrentlyOpen ? 'none' : 'block';
+            this.setAttribute('aria-expanded', String(!isCurrentlyOpen));
+        });
+        document.addEventListener('click', function(event) {
+            if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
+                if (userDropdownButton && !userDropdownButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
+                    userDropdownMenu.style.display = 'none';
+                    userDropdownButton.setAttribute('aria-expanded', 'false');
+                }
             }
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
         });
     }
-
+    const mobileMenu = document.getElementById("mobileMenu");
+    const hamburger = document.querySelector(".navbar .hamburger");
     function toggleMobileMenu() {
-        const mobileMenu = document.getElementById('mobileMenu');
-        if (mobileMenu) mobileMenu.classList.toggle('open');
+        if (mobileMenu && hamburger) {
+            const isOpen = mobileMenu.classList.toggle("open");
+            hamburger.classList.toggle("open");
+            hamburger.setAttribute("aria-expanded", isOpen.toString());
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+        }
     }
-
     function closeMobileMenu() {
-        const mobileMenu = document.getElementById('mobileMenu');
-        if (mobileMenu) mobileMenu.classList.remove('open');
+        if (mobileMenu && hamburger && mobileMenu.classList.contains("open")) {
+            mobileMenu.classList.remove("open");
+            hamburger.classList.remove("open");
+            hamburger.setAttribute("aria-expanded", "false");
+            document.body.style.overflow = '';
+        }
     }
-
-    // --- Script per Lightbox ---
-    const lightbox = document.getElementById('lightbox');
-    const lightboxContent = lightbox.querySelector('.lightbox-content');
-    const lightboxCaption = document.getElementById('lightbox-caption');
-    let currentMediaIndex;
-    const galleryItems = [];
-
-    document.querySelectorAll('.gallery-item a').forEach((item, index) => {
-        galleryItems.push({
-            href: item.href,
-            title: item.dataset.title || '',
-            type: item.href.includes('youtube.com') || item.href.includes('youtu.be') ? 'youtube' : (item.href.endsWith('.mp4') || item.href.endsWith('.webm') ? 'video' : 'image')
-        });
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            currentMediaIndex = index;
-            openLightbox(index);
-        });
+    if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
+    document.addEventListener('click', function(event) {
+        if (mobileMenu && mobileMenu.classList.contains('open')) {
+            if (mobileMenu.contains(event.target) && event.target.tagName === 'A') { // Chiudi se clicco un link nel menu
+                closeMobileMenu();
+            } else if (hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) { // Chiudi se clicco fuori
+                closeMobileMenu();
+            }
+        }
     });
+    // --- FINE SCRIPT GLOBALI ---
+
+    // --- Logica Specifica per Pagina Evento Dettaglio ---
+    const lightbox = document.getElementById('lightbox');
+    const lightboxContent = lightbox ? lightbox.querySelector('.lightbox-content') : null;
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const lightboxCloseBtn = lightbox ? lightbox.querySelector('.lightbox-close') : null;
+    const lightboxPrevBtn = lightbox ? lightbox.querySelector('.lightbox-prev') : null;
+    const lightboxNextBtn = lightbox ? lightbox.querySelector('.lightbox-next') : null;
+    let currentMediaIndexInLightbox = 0;
+    let galleryItemsData = [];
+
+    function getYouTubeID(url) {
+        if (!url || typeof url !== 'string') return null;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2] && match[2].length === 11) ? match[2] : null;
+    }
 
     function openLightbox(index) {
-        if (!lightbox || !lightboxContent || !lightboxCaption) return;
-        const item = galleryItems[index];
-        lightboxContent.innerHTML = ''; // Pulisci contenuto precedente
+        if (!lightbox || !lightboxContent || !lightboxCaption || galleryItemsData.length === 0 || !galleryItemsData[index]) return;
+        currentMediaIndexInLightbox = index;
+        const item = galleryItemsData[index];
+        lightboxContent.innerHTML = '';
 
         if (item.type === 'youtube') {
             const videoId = getYouTubeID(item.href);
             if (videoId) {
                 const iframe = document.createElement('iframe');
-                iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&showinfo=0&modestbranding=1`);
-                iframe.setAttribute('frameborder', '0');
-                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-                iframe.setAttribute('allowfullscreen', '');
+                iframe.src = \`https://www.youtube.com/embed/\${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0\`;
+                iframe.frameBorder = '0';
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                iframe.allowFullscreen = true;
                 lightboxContent.appendChild(iframe);
             } else {
-                lightboxContent.textContent = "ID Video YouTube non valido.";
+                lightboxContent.textContent = "ID Video YouTube non valido: " + sanitizeTextForHTML(item.href);
             }
         } else if (item.type === 'video') {
             const video = document.createElement('video');
-            video.setAttribute('src', item.href);
-            video.setAttribute('controls', '');
-            video.setAttribute('autoplay', '');
-            video.style.maxWidth = '100%';
-            video.style.maxHeight = '85vh';
+            video.src = item.href;
+            video.controls = true; video.autoplay = true;
+            video.style.maxWidth = '100%'; video.style.maxHeight = '85vh';
             lightboxContent.appendChild(video);
-        } else { // Immagine
+        } else { // 'image'
             const img = document.createElement('img');
-            img.setAttribute('src', item.href);
-            img.setAttribute('alt', item.title);
+            img.src = item.href;
+            img.alt = item.title || "Immagine galleria";
             lightboxContent.appendChild(img);
         }
-        lightboxCaption.textContent = item.title;
+        lightboxCaption.textContent = item.title || '';
+        lightboxCaption.style.display = item.title ? 'block' : 'none';
         lightbox.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Impedisci scroll pagina sottostante
+        document.body.style.overflow = 'hidden';
     }
 
     function closeLightbox() {
         if (!lightbox || !lightboxContent) return;
         lightbox.classList.remove('active');
-        lightboxContent.innerHTML = ''; // Rimuovi contenuto per fermare video etc.
-        document.body.style.overflow = ''; // Ripristina scroll
+        lightboxContent.innerHTML = '';
+        document.body.style.overflow = '';
     }
-
     function changeLightboxMedia(direction) {
-        currentMediaIndex += direction;
-        if (currentMediaIndex < 0) {
-            currentMediaIndex = galleryItems.length - 1;
-        } else if (currentMediaIndex >= galleryItems.length) {
-            currentMediaIndex = 0;
-        }
-        openLightbox(currentMediaIndex);
+        if(galleryItemsData.length === 0) return;
+        currentMediaIndexInLightbox = (currentMediaIndexInLightbox + direction + galleryItemsData.length) % galleryItemsData.length;
+        openLightbox(currentMediaIndexInLightbox);
     }
 
-    function getYouTubeID(url) {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
-    }
-
+    if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
+    if (lightboxPrevBtn) lightboxPrevBtn.addEventListener('click', () => changeLightboxMedia(-1));
+    if (lightboxNextBtn) lightboxNextBtn.addEventListener('click', () => changeLightboxMedia(1));
     if (lightbox) {
         document.addEventListener('keydown', (e) => {
             if (lightbox.classList.contains('active')) {
@@ -598,289 +435,417 @@
         });
     }
 
-
-    // --- Script per Commenti (Interattività base) ---
-    function handleLike(button) {
-        const icon = button.querySelector('i');
-        const countSpan = button.querySelector('.like-count');
-        let count = parseInt(countSpan.textContent);
-
-        if (icon.classList.contains('far')) {
-            icon.classList.replace('far', 'fas');
-            button.classList.add('active');
-            count++;
-        } else {
-            icon.classList.replace('fas', 'far');
-            button.classList.remove('active');
-            count--;
-        }
-        countSpan.textContent = count;
-        // Qui andrebbe una chiamata AJAX per salvare il like
+    function sanitizeTextForHTML(str) {
+        if (typeof str !== 'string') str = String(str || ''); // Gestisce null/undefined
+        const temp = document.createElement('div');
+        temp.textContent = str;
+        return temp.innerHTML.replace(/\\r\\n|\\r|\\n/g, '<br>');
     }
 
-    function toggleReplyForm(button) {
-        const commentId = button.dataset.commentId;
-        const replyForm = document.getElementById(`reply-form-${commentId}`);
-        if (replyForm) {
-            replyForm.classList.toggle('active');
-            if (replyForm.classList.contains('active')) {
-                replyForm.querySelector('textarea').focus();
-            }
-        }
-    }
+    async function fetchEventDetails(eventId) {
+        const eventTitleHeaderEl = document.getElementById('eventTitleHeader');
+        const eventCoverImageEl = document.getElementById('eventCoverImage');
+        const eventMetaInfoEl = document.getElementById('eventMetaInfo');
+        const eventDescriptionFullEl = document.getElementById('eventDescriptionFull');
+        const eventVolantinoContainerEl = document.getElementById('eventVolantinoContainer');
+        const gallerySectionEl = document.getElementById('event-gallery');
+        const commentsSectionEl = document.getElementById('event-comments');
+        const galleryGridEl = document.getElementById('galleryGrid');
+        const commentsListEl = document.getElementById('commentsList');
+        const noMediaMessageEl = document.getElementById('no-media-message');
+        const noCommentsMessageEl = document.getElementById('no-comments-message');
+        const pageLoadingEl = document.getElementById('pageLoadingIndicator');
 
-    function attachCommentEventListeners(commentElement) {
-        const likeBtn = commentElement.querySelector('.like-btn');
-        if (likeBtn) likeBtn.addEventListener('click', () => handleLike(likeBtn));
-
-        const replyBtn = commentElement.querySelector('.btn-reply');
-        if (replyBtn) replyBtn.addEventListener('click', () => toggleReplyForm(replyBtn));
-
-        const replyFormElement = commentElement.querySelector('.reply-form form');
-        if (replyFormElement) {
-            replyFormElement.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const textarea = this.querySelector('textarea');
-                const replyText = textarea.value.trim();
-
-                // Trova il contenitore .replies del commento genitore (non della risposta stessa)
-                let repliesContainer;
-                if (commentElement.classList.contains('reply')) { // Se sto rispondendo a una risposta
-                    repliesContainer = commentElement.closest('.replies');
-                } else { // Se sto rispondendo a un commento principale
-                    repliesContainer = commentElement.querySelector('.replies');
-                }
-
-                if (replyText && repliesContainer) {
-                    addComment(replyText, repliesContainer, true); // true indica che è una risposta
-                    textarea.value = '';
-                    this.closest('.reply-form').classList.remove('active');
-                }
-            });
-        }
-    }
-
-    document.querySelectorAll('.comment').forEach(comment => {
-        attachCommentEventListeners(comment);
-    });
-
-
-    const newCommentForm = document.getElementById('new-comment-form');
-    if (newCommentForm) {
-        newCommentForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const commentTextInput = document.getElementById('comment-text');
-            const commentText = commentTextInput.value.trim();
-            if (commentText) {
-                addComment(commentText, document.querySelector('.comments-list'), false); // false indica che non è una risposta
-                commentTextInput.value = ''; // Pulisce il campo di testo
-            }
+        if (pageLoadingEl) pageLoadingEl.classList.add('visible');
+        [gallerySectionEl, commentsSectionEl, eventCoverImageEl, eventMetaInfoEl, eventDescriptionFullEl, eventVolantinoContainerEl].forEach(el => {
+            if(el) el.style.display = 'none';
         });
-    }
-
-    function addComment(text, parentElement, isReply) {
-        const commentId = `comment-dynamic-${Date.now()}`;
-        const avatarUrl = `https://i.pravatar.cc/40?u=guest${Math.floor(Math.random() * 1000)}`;
-
-        const commentDiv = document.createElement('div');
-        commentDiv.className = isReply ? 'comment reply' : 'comment';
-        commentDiv.id = commentId;
-
-        commentDiv.innerHTML = `
-                <div class="comment-header">
-                    <img src="${avatarUrl}" alt="Avatar Utente" class="user-avatar">
-                    <div class="comment-meta">
-                        <strong>Utente Ospite</strong>
-                        <small>proprio adesso</small>
-                    </div>
-                </div>
-                <p>${text.replace(/\n/g, '<br>')}</p>
-                <div class="comment-actions">
-                    <button class="like-btn" data-comment-id="${commentId}" aria-label="Mi piace a questo commento">
-                        <i class="far fa-heart"></i> <span class="like-count">0</span>
-                    </button>
-                    <button class="btn-reply" data-comment-id="${commentId}" aria-label="Rispondi a questo commento">
-                        <i class="fas fa-reply"></i> Rispondi
-                    </button>
-                </div>
-                <div class="reply-form" id="reply-form-${commentId}">
-                     <form>
-                        <textarea aria-label="Testo della risposta" placeholder="Rispondi a Utente Ospite..." rows="2"></textarea>
-                        <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia Risposta</button>
-                    </form>
-                </div>
-                ${isReply ? '' : '<div class="replies"></div>'}
-            `;
-        // Se è un commento principale, deve avere un contenitore .replies
-        // Se è una risposta (isReply = true), non aggiungiamo un altro .replies annidato qui
-
-        if (parentElement) {
-            if (isReply) {
-                parentElement.appendChild(commentDiv); // Aggiunge la risposta al contenitore .replies del genitore
-            } else {
-                parentElement.prepend(commentDiv); // Aggiunge il nuovo commento principale in cima alla lista
-            }
-            attachCommentEventListeners(commentDiv); // Attacca listener al nuovo commento/risposta
-        }
-    }
-
-    // --- Login Popup Logic ---
-    const loginBtn = document.getElementById('login-btn');
-    const loginBtnMobile = document.getElementById('login-btn-mobile');
-    const loginOverlay = document.getElementById('loginOverlay');
-    const loginPopup = document.getElementById('loginPopup');
-    const closePopupBtn = document.getElementById('closePopup');
-    const loginTabs = document.querySelectorAll('.login-tab');
-    const loginForms = document.querySelectorAll('.login-form');
-
-    function openLoginPopup() {
-        loginOverlay.classList.add('active');
-        loginPopup.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeLoginPopup() {
-        loginOverlay.classList.remove('active');
-        loginPopup.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    if (loginBtn) {
-        loginBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            openLoginPopup();
-        });
-    }
-    if (loginBtnMobile) {
-        loginBtnMobile.addEventListener('click', (e) => {
-            e.preventDefault();
-            closeMobileMenu();
-            openLoginPopup();
-        });
-    }
-
-    if(closePopupBtn) { closePopupBtn.addEventListener('click', closeLoginPopup); }
-    if(loginOverlay) { loginOverlay.addEventListener('click', closeLoginPopup); }
-
-    // Login Tabs Switch
-    loginTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabId = tab.getAttribute('data-tab');
-            loginTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            loginForms.forEach(form => {
-                form.classList.remove('active');
-                if (form.id === `${tabId}Form`) {
-                    form.classList.add('active');
-                }
-            });
-        });
-    });
-
-    // --- Gestione Invio Form con Fetch API ---
-
-    // LOGIN
-    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const loginButton = e.target.querySelector('button[type="submit"]');
-        const originalButtonText = loginButton.innerHTML;
-        loginButton.disabled = true;
-        loginButton.innerHTML = 'Accesso...'; // Feedback visivo
 
         try {
-            const response = await fetch('login.php', { // Assicurati che il percorso 'login.php' sia corretto
-                method: 'POST',
-                // Non serve 'Content-Type' header quando si usa FormData con fetch
-                body: new FormData(e.target) // Invia i dati del form
-            });
+            const response = await fetch(\`get_event_details.php?id=\${encodeURIComponent(eventId)}\`);
+            if (!response.ok) throw new Error(\`Errore HTTP (\${response.status}): \${response.statusText}\`);
 
-            // Controlla se la risposta è OK (status 200-299)
-            if (!response.ok) {
-                // Prova a leggere l'errore dal corpo se possibile, altrimenti usa statusText
-                let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
-                try {
-                    const errorData = await response.json();
-                    errorMsg = errorData.message || errorMsg;
-                } catch(e) { /* Ignora se il corpo non è JSON */ }
-                throw new Error(errorMsg);
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                const responseText = await response.text().catch(() => "Risposta non JSON e illeggibile.");
+                throw new Error(\`Risposta non attesa da get_event_details.php (non JSON): \${responseText.substring(0,200)}\`);
             }
+            const result = await response.json();
 
-            const result = await response.json(); // Aspetta risposta JSON
+            if (result.success && result.data) {
+                const event = result.data.details;
+                const mediaItems = result.data.media || [];
+                const fetchedComments = result.data.comments || [];
 
-            if (result.success) {
-                // alert(result.message); // Puoi mostrare un messaggio meno invasivo
-                closeLoginPopup();
-                // Reindirizzamento differenziato
-                if (result.is_admin) {
-                    window.location.href = 'indexadmin.html'; // Pagina admin
-                } else {
-                    window.location.href = 'indexaccesso.html'; // Pagina utente loggato
+                if (eventTitleHeaderEl && event && event.Titolo) {
+                    eventTitleHeaderEl.textContent = event.Titolo;
+                    document.title = \`\${event.Titolo} - Eremo Frate Francesco\`;
+                } else if (eventTitleHeaderEl) {
+                     eventTitleHeaderEl.textContent = "Dettaglio Evento";
                 }
+
+                if (event) {
+                    if(event.FotoCopertina && eventCoverImageEl){
+                        eventCoverImageEl.src = event.FotoCopertina;
+                        eventCoverImageEl.alt = "Copertina " + sanitizeTextForHTML(event.Titolo || "evento");
+                        eventCoverImageEl.style.display = 'block';
+                    }
+                    if(eventMetaInfoEl){
+                        let metaHTML = '';
+                        if (event.Data) {
+                            try {
+                                metaHTML += \`<span><i class="fas fa-calendar-alt"></i> \${new Date(event.Data.replace(/-/g, '/')).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'})}</span>\`;
+                            } catch (dateError) {
+                                metaHTML += \`<span><i class="fas fa-calendar-alt"></i> \${sanitizeTextForHTML(event.Data)}</span>\`;
+                            }
+                        }
+                        if (event.Durata) metaHTML += \`<span><i class="fas fa-clock"></i> \${sanitizeTextForHTML(event.Durata)}</span>\`;
+                        if (event.Relatore) metaHTML += \`<span><i class="fas fa-user"></i> \${sanitizeTextForHTML(event.PrefissoRelatore || 'Relatore')}: \${sanitizeTextForHTML(event.Relatore)}</span>\`;
+                        if (event.Associazione) metaHTML += \`<span><i class="fas fa-users"></i> \${sanitizeTextForHTML(event.Associazione)}</span>\`;
+                        eventMetaInfoEl.innerHTML = metaHTML;
+                        if (metaHTML) eventMetaInfoEl.style.display = 'flex';
+                    }
+                    if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){
+                        eventDescriptionFullEl.innerHTML = sanitizeTextForHTML(event.DescrizioneEstesa || event.Descrizione);
+                        eventDescriptionFullEl.style.display = 'block';
+                    }
+                    if(eventVolantinoContainerEl && event.VolantinoUrl){
+                        eventVolantinoContainerEl.innerHTML = \`
+                            <h4>Volantino Evento</h4>
+                            <a href="\${encodeURI(event.VolantinoUrl)}" target="_blank" title="Visualizza volantino \${sanitizeTextForHTML(event.Titolo || '')}" class="btn-volantino">
+                                <i class="fas fa-file-pdf"></i> Visualizza Volantino
+                            </a>\`;
+                        eventVolantinoContainerEl.style.display = 'block';
+                    }
+                } else {
+                    if (eventTitleHeaderEl) eventTitleHeaderEl.textContent = "Dettaglio Evento non disponibile";
+                }
+
+                galleryItemsData = [];
+                if (galleryGridEl) galleryGridEl.innerHTML = '';
+                if (mediaItems.length > 0) {
+                    if (gallerySectionEl) gallerySectionEl.style.display = 'block';
+                    if (noMediaMessageEl) noMediaMessageEl.style.display = 'none';
+
+                    mediaItems.forEach(item => {
+                        const rawPercorso = item.Percorso || '';
+                        const ytId = getYouTubeID(rawPercorso);
+                        let itemType, itemHref, thumbSrc;
+                        const mediaTitle = sanitizeTextForHTML(item.TitoloMedia || (event ? event.Titolo : '') || 'Media');
+
+                        if (ytId) {
+                            itemType = 'youtube'; itemHref = rawPercorso;
+                            thumbSrc = \`https://img.youtube.com/vi/\$\${ytId}/hqdefault.jpg\`;
+                        } else {
+                            itemHref = \`uploads/event_images/\${rawPercorso}\`;
+                            if (rawPercorso.match(/\.(mp4|webm|ogg)$/i)) {
+                                itemType = 'video'; thumbSrc = 'images/video_placeholder.png';
+                            } else if (rawPercorso.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                                itemType = 'image'; thumbSrc = itemHref;
+                            } else { itemType = 'unknown'; thumbSrc = 'images/file_placeholder.png'; }
+                        }
+
+                        if (itemType !== 'unknown') {
+                            galleryItemsData.push({ href: itemHref, title: mediaTitle, type: itemType });
+                            const galleryItemDiv = document.createElement('div');
+                            galleryItemDiv.className = 'gallery-item';
+                            galleryItemDiv.innerHTML = \`
+                                <a href="#" data-index="\${galleryItemsData.length - 1}" title="\${mediaTitle}">
+                                    <img src="\${thumbSrc}" alt="\${mediaTitle}">
+                                    \${(itemType === 'youtube' || itemType === 'video') ? '<div class="media-overlay"><i class="fas fa-play media-play-icon"></i></div>' : ''}
+                                </a>\`;
+                            if (galleryGridEl) galleryGridEl.appendChild(galleryItemDiv);
+                        }
+                    });
+
+                    document.querySelectorAll('#galleryGrid .gallery-item a').forEach(anchor => {
+                        anchor.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            openLightbox(parseInt(this.dataset.index));
+                        });
+                    });
+
+                } else {
+                    if (gallerySectionEl) gallerySectionEl.style.display = 'block';
+                    if (noMediaMessageEl) noMediaMessageEl.style.display = 'block';
+                }
+
+                const commentFormContainerEl = document.getElementById('commentFormContainer');
+                const loginToCommentMessageEl = document.getElementById('login-to-comment-message');
+                const commentEventIdInput = document.getElementById('commentEventId');
+
+                if (commentsSectionEl) commentsSectionEl.style.display = 'block';
+                if (currentUser && currentUser.email) {
+                    if (commentFormContainerEl) commentFormContainerEl.style.display = 'block';
+                    if (loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'none';
+                    if (commentEventIdInput) commentEventIdInput.value = eventId;
+                } else {
+                    if (commentFormContainerEl) commentFormContainerEl.style.display = 'none';
+                    if (loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'block';
+                }
+
+                if (commentsListEl) commentsListEl.innerHTML = '';
+                if (fetchedComments.length > 0) {
+                    if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'none';
+                    displayComments(fetchedComments, commentsListEl);
+                } else {
+                    if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'block';
+                }
+
             } else {
-                // Mostra errore specifico dal backend
-                alert("Errore Login: " + (result.message || "Credenziali non valide."));
+                throw new Error(result.message || "Formato dati evento non corretto da get_event_details.php.");
             }
         } catch (error) {
-            // Errore di rete o nella fetch o nel parsing JSON
-            alert("Errore durante il login: " + error.message);
-            console.error("Dettaglio errore login:", error);
+            console.error("Errore fetchEventDetails:", error);
+            if (eventTitleHeaderEl) eventTitleHeaderEl.innerHTML = \`<p class="no-content-message">Impossibile caricare i dettagli: \${sanitizeTextForHTML(error.message)}</p>\`;
         } finally {
-            // Riabilita il bottone indipendentemente dal risultato
-            loginButton.disabled = false;
-            loginButton.innerHTML = originalButtonText;
+            if (pageLoadingEl) pageLoadingEl.classList.remove('visible');
         }
-    });
+    }
 
-    // REGISTRAZIONE
-    document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const registerButton = e.target.querySelector('button[type="submit"]');
-        const originalButtonText = registerButton.innerHTML;
-        registerButton.disabled = true;
-        registerButton.innerHTML = 'Registrazione...'; // Feedback visivo
+    function displayComments(comments, parentEl) {
+        parentEl.innerHTML = '';
+        comments.forEach(comment => {
+            parentEl.appendChild(createCommentElement(comment));
+        });
+    }
+
+    function createCommentElement(commentData, isReply = false) {
+        const commentDiv = document.createElement('div');
+        commentDiv.className = isReply ? 'comment reply' : 'comment';
+        commentDiv.id = \`comment-\${commentData.Progressivo}\`;
+
+        let rawUserName = 'Anonimo';
+        if (commentData.Contatto) {
+            rawUserName = commentData.Contatto.split('@')[0];
+        }
+        if (currentUser && currentUser.email === commentData.Contatto && currentUser.nome) {
+            rawUserName = currentUser.nome;
+        }
+
+        const safeUserName = sanitizeTextForHTML(rawUserName);
+        const safeCommentDate = sanitizeTextForHTML(commentData.Data);
+        const sanitizedDescription = sanitizeTextForHTML(commentData.Descrizione);
+        const avatarUrl = \`https://i.pravatar.cc/40?u=\${encodeURIComponent(commentData.Contatto || 'default_user')}\`;
+
+        commentDiv.innerHTML = \`
+            <div class="comment-header">
+                <img src="\${avatarUrl}" alt="Avatar \${safeUserName}" class="user-avatar">
+                <div class="comment-meta"><strong>\${safeUserName}</strong> <small>\${safeCommentDate}</small></div>
+            </div>
+            <p>\${sanitizedDescription}</p>
+            <div class="comment-actions">
+                <button class="like-btn" data-comment-id="\${commentData.Progressivo}" aria-label="Mi piace"><i class="far fa-heart"></i> <span class="like-count">0</span></button>
+                <button class="btn-reply" data-comment-id="\${commentData.Progressivo}" aria-label="Rispondi"><i class="fas fa-reply"></i> Rispondi</button>
+            </div>
+            <div class="reply-form" id="reply-form-\${commentData.Progressivo}">
+                 <form data-parent-comment-id="\${commentData.Progressivo}">
+                    <textarea name="Descrizione" placeholder="Rispondi a \${safeUserName}..." rows="2" required aria-label="Testo della risposta"></textarea>
+                    <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia</button>
+                    <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em;"></div>
+                 </form>
+            </div>
+            <div class="replies"></div>\`;
+
+        if (commentData.replies && commentData.replies.length > 0) {
+            const repliesContainer = commentDiv.querySelector('.replies');
+            commentData.replies.forEach(reply => repliesContainer.appendChild(createCommentElement(reply, true)));
+        }
+        attachCommentInteractionListeners(commentDiv);
+        return commentDiv;
+    }
+
+    function attachCommentInteractionListeners(el) {
+        const likeBtn = el.querySelector('.like-btn');
+        if(likeBtn) likeBtn.addEventListener('click',()=>handleLikeAction(likeBtn));
+
+        const replyBtn = el.querySelector('.btn-reply');
+        if(replyBtn) replyBtn.addEventListener('click',()=>toggleReplyFormAction(replyBtn));
+
+        const replyFormEl = el.querySelector('.reply-form form');
+        if(replyFormEl) replyFormEl.addEventListener('submit', handleReplySubmit);
+    }
+
+    function handleLikeAction(btn) {
+         const icon = btn.querySelector('i');
+         const countSpan = btn.querySelector('.like-count');
+         let count = parseInt(countSpan.textContent) || 0;
+        if (btn.classList.toggle('active')) {
+            icon.classList.remove('far'); icon.classList.add('fas');
+            countSpan.textContent = count + 1;
+        } else {
+            icon.classList.remove('fas'); icon.classList.add('far');
+            countSpan.textContent = Math.max(0, count - 1);
+        }
+    }
+
+    function toggleReplyFormAction(btn) {
+        const commentId = btn.dataset.commentId;
+        const formDiv = document.getElementById(\`reply-form-\${commentId}\`);
+        if(formDiv){
+            const isActive = formDiv.classList.toggle('active');
+            if(isActive) formDiv.querySelector('textarea').focus();
+            const localMsg = formDiv.querySelector('.form-message-local');
+            if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }
+        }
+    }
+
+    async function handleCommentSubmit(form, eventId, isReply = false) {
+        if (!currentUser || !currentUser.email) {
+            alert("Devi essere loggato per commentare.");
+            return;
+        }
+
+        const formData = new FormData(form);
+        formData.append('Contatto', currentUser.email);
+
+        if (isReply) {
+            if (!formData.has('IDEvento')) { formData.append('IDEvento', eventId); }
+            const parentCommentId = form.dataset.parentCommentId;
+            if (parentCommentId) {
+                formData.append('CodRisposta', parentCommentId);
+            } else {
+                const msgEl = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
+                if (msgEl) {
+                    msgEl.textContent = 'Errore: riferimento mancante per la risposta.';
+                    msgEl.className = 'form-message error'; msgEl.style.display = 'block';
+                }
+                return;
+            }
+        }
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const commentFormMessageElement = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
+
+        if (!submitBtn) { return; }
+        const originalBtnText = submitBtn.innerHTML;
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-mini"></span> Invio...';
+
+        if (commentFormMessageElement) {
+            commentFormMessageElement.textContent = '';
+            commentFormMessageElement.className = 'form-message';
+            commentFormMessageElement.style.display = 'none';
+        }
 
         try {
-            const response = await fetch('registrati.php', { // Assicurati che 'registrati.php' sia corretto
-                method: 'POST',
-                body: new FormData(e.target)
-            });
+            const response = await fetch('submit_comment.php', { method: 'POST', body: formData });
 
             if (!response.ok) {
-                let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
-                try {
-                    const errorData = await response.json();
-                    errorMsg = errorData.message || errorMsg;
-                } catch(e) { /* Ignora se il corpo non è JSON */ }
-                throw new Error(errorMsg);
+                const errorText = await response.text().catch(() => "Impossibile leggere il corpo dell'errore.");
+                throw new Error(\`Errore dal server (\${response.status} \${response.statusText}). Dettagli: \${errorText.substring(0, 200)}\`);
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                const responseText = await response.text().catch(() => "Risposta non JSON e illeggibile.");
+                throw new Error(\`Risposta non attesa da submit_comment.php (non JSON): \${responseText.substring(0,200)}\`);
             }
 
             const result = await response.json();
 
             if (result.success) {
-                alert(result.message || "Registrazione completata con successo!");
-                closeLoginPopup();
-                // Potresti voler effettuare il login automatico qui o reindirizzare alla pagina di login
-                // openLoginPopup(); // Riapri per login?
-                // document.querySelector('.login-tab[data-tab="login"]').click(); // Seleziona tab login
+                form.reset();
+                if (isReply && form.closest('.reply-form')) {
+                    form.closest('.reply-form').classList.remove('active');
+                }
+                fetchEventDetails(eventId);
+
+                const successMessageTarget = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
+                if (successMessageTarget) {
+                    successMessageTarget.textContent = isReply ? 'Risposta inviata con successo!' : 'Commento inviato con successo!';
+                    successMessageTarget.className = 'form-message success';
+                    successMessageTarget.style.display = 'block';
+                    setTimeout(() => { if (successMessageTarget) { successMessageTarget.style.display = 'none'; } }, 3000);
+                }
             } else {
-                alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+                throw new Error(result.message || "Si è verificato un errore (risposta server).");
             }
         } catch (error) {
-            alert("Errore durante la registrazione: " + error.message);
-            console.error("Dettaglio errore registrazione:", error);
+            console.error("handleCommentSubmit Errore Catturato:", error);
+            if (commentFormMessageElement) {
+                let errorMessageString = "Errore sconosciuto.";
+                if (error && error.message) {
+                    errorMessageString = String(error.message).substring(0, 300);
+                }
+                commentFormMessageElement.textContent = 'Errore: ' + errorMessageString;
+                commentFormMessageElement.className = 'form-message error';
+                commentFormMessageElement.style.display = 'block';
+            }
         } finally {
-            registerButton.disabled = false;
-            registerButton.innerHTML = originalButtonText;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
         }
-    });
+    }
 
-    // Chiudi popup con tasto Esc
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && loginPopup.classList.contains('active')) {
-            closeLoginPopup();
+    async function handleReplySubmit(e) {
+        e.preventDefault();
+        const eventIdInput = document.getElementById('commentEventId');
+        if (!eventIdInput || !eventIdInput.value) {
+            console.error("ID Evento non trovato nel form per la risposta.");
+            // Mostra un errore all'utente nel form di risposta, se possibile
+            const form = e.target;
+            const msgEl = form.querySelector('.form-message-local');
+            if (msgEl) {
+                msgEl.textContent = "Errore: ID Evento mancante.";
+                msgEl.className = 'form-message error'; msgEl.style.display = 'block';
+            }
+            return;
         }
-    });
+        const eventId = eventIdInput.value;
+        handleCommentSubmit(e.target, eventId, true);
+    }
 
+    document.addEventListener('DOMContentLoaded', () => {
+        setupUserSessionAndNavbar();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('id');
+
+        const newCommentForm = document.getElementById('new-comment-form');
+        const commentFormContainerEl = document.getElementById('commentFormContainer'); // Referenziato in fetchEventDetails
+        const loginToCommentMessageEl = document.getElementById('login-to-comment-message'); // Referenziato in fetchEventDetails
+        const eventIdInput = document.getElementById('commentEventId');
+
+        // La logica per mostrare/nascondere il form dei commenti è dentro fetchEventDetails
+        // in base allo stato di currentUser. Qui impostiamo solo l'ID evento se l'utente è loggato.
+        if (currentUser && currentUser.email && eventIdInput && eventId) {
+            eventIdInput.value = eventId;
+        }
+
+        if (newCommentForm && eventId) { // eventId deve essere valido
+            newCommentForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const commentTextInput = document.getElementById('comment-text');
+                const commentFormMessageGlobal = document.getElementById('comment-form-message');
+
+                if (!commentTextInput || !commentTextInput.value.trim()) {
+                    if(commentFormMessageGlobal) {
+                        commentFormMessageGlobal.textContent = 'Il commento non può essere vuoto.';
+                        commentFormMessageGlobal.className = 'form-message error';
+                        commentFormMessageGlobal.style.display='block';
+                    }
+                    return;
+                }
+                handleCommentSubmit(this, eventId, false);
+            });
+        }
+
+        if (eventId) {
+            fetchEventDetails(eventId);
+        } else {
+            const pageLoadingEl = document.getElementById('pageLoadingIndicator');
+            const eventTitleHeaderEl = document.getElementById('eventTitleHeader');
+            if(eventTitleHeaderEl) eventTitleHeaderEl.innerHTML = "<p class='no-content-message'>ID evento non specificato.</p>";
+            if(pageLoadingEl) pageLoadingEl.classList.remove('visible');
+        }
+
+        const currentYearEl = document.getElementById('currentYear');
+        if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
+    });
 </script>
 </body>
 </html>
