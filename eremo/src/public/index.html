@@ -8,35 +8,35 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
 
-   <style>
-  .login-popup input.form-control {
-    transition: border-color 0.3s ease;
-    border: 1px solid #ced4da;
-  }
-  
-  .login-popup input.error-border {
-    border-color: red !important;
-  }
+  <style>
+    .login-popup input.form-control {
+      transition: border-color 0.3s ease;
+      border: 1px solid #ced4da;
+    }
 
-  .login-popup input.form-control {
-    transition: border-color 0.3s ease;
-    border: 1px solid #ced4da;
-    /* Aggiungi queste proprietà */
-    background-color: white !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
+    .login-popup input.error-border {
+      border-color: red !important;
+    }
 
-/* Disabilita lo stile di autofill di Chrome */
-.login-popup input:-webkit-autofill,
-.login-popup input:-webkit-autofill:hover, 
-.login-popup input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
-    -webkit-text-fill-color: #333 !important;
-}
+    .login-popup input.form-control {
+      transition: border-color 0.3s ease;
+      border: 1px solid #ced4da;
+      /* Aggiungi queste proprietà */
+      background-color: white !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    /* Disabilita lo stile di autofill di Chrome */
+    .login-popup input:-webkit-autofill,
+    .login-popup input:-webkit-autofill:hover,
+    .login-popup input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+      -webkit-text-fill-color: #333 !important;
+    }
 
 
-  
+
   </style>
 </head>
 
@@ -48,7 +48,8 @@
         <h2>Eremo Frate Francesco</h2>
       </a>
     </div>
-    <div class="menu">
+    <div class="menu"> <a href="chi-siamo.html">Chi siamo</a>
+      <span class="separator">|</span>
       <a href="eventiincorso.html">Calendario attività</a>
       <a href="eventipassati.html">Archivio attività</a>
       <span class="separator">|</span>
@@ -62,6 +63,7 @@
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
+    <a href="chi-siamo.html" onclick="closeMobileMenu()">Chi siamo</a>
     <a href="eventiincorso.html" onclick="closeMobileMenu()">Calendario attività</a>
     <a href="eventipassati.html" onclick="closeMobileMenu()">Archivio attività</a>
     <a href="incontrisullaparola.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
@@ -75,7 +77,7 @@
   <section class="hero-section">
     <div class="hero-content">
       <h1 class="hero-title">Eremo Frate Francesco</h1>
-      <p class="hero-subtitle">In ascolto della Parola, in cammino nella fraternità</p>
+      <p class="hero-subtitle">In ascolto della Parola, in cammino nella fraternita'</p>
     </div>
   </section>
 
@@ -86,7 +88,7 @@
           <img src="https://picsum.photos/600/400?random=group,reading,discussion" alt="Gruppo di studio biblico" class="chi-siamo-image">
         </div>
         <div class="chi-siamo-content">
-          <h2>La Fraternità</h2>
+          <h2>La Fraternita'</h2>
           <p>La Fraternità Eremo Frate Francesco, nata nel 1992 attorno alla Parola di Dio sotto la
             guida di padre Maurizio Novelli secondo il metodo della “Lectio Divina”, è una
             organizzazione di volontari cristiani che condividono uno stile di vita comunitario e
@@ -216,13 +218,13 @@
     }
   });
 
-// --- Resetta l'errore quando l'utente scrive ---
-document.getElementById('login-email')?.addEventListener('input', resetLoginError);
-document.getElementById('login-password')?.addEventListener('input', resetLoginError);
+  // --- Resetta l'errore quando l'utente scrive ---
+  document.getElementById('login-email')?.addEventListener('input', resetLoginError);
+  document.getElementById('login-password')?.addEventListener('input', resetLoginError);
 
-// --- Opzionale: Resetta anche al click sul campo ---
-document.getElementById('login-email')?.addEventListener('focus', resetLoginError);
-document.getElementById('login-password')?.addEventListener('focus', resetLoginError);
+  // --- Opzionale: Resetta anche al click sul campo ---
+  document.getElementById('login-email')?.addEventListener('focus', resetLoginError);
+  document.getElementById('login-password')?.addEventListener('focus', resetLoginError);
 
   // --- Login Popup Logic ---
   const loginBtn = document.getElementById('login-btn');
@@ -279,8 +281,8 @@ document.getElementById('login-password')?.addEventListener('focus', resetLoginE
 
   // --- Gestione Invio Form con Fetch API ---
 
-// LOGIN
-document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+  // LOGIN
+  document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const loginButton = e.target.querySelector('button[type="submit"]');
     const originalButtonText = loginButton.innerHTML;
@@ -296,32 +298,32 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     passwordInput.classList.remove('error-border');
 
     try {
-        const response = await fetch('login.php', {
-            method: 'POST',
-            body: new FormData(e.target)
-        });
+      const response = await fetch('login.php', {
+        method: 'POST',
+        body: new FormData(e.target)
+      });
 
-        if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
+      if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
 
-        const result = await response.json();
+      const result = await response.json();
 
-        if (result.success) {
-            closeLoginPopup();
-            window.location.href = result.is_admin ? 'indexadmin.html' : 'indexaccesso.html';
-        } else {
-            // Aggiungi classe di errore
-            emailInput.classList.add('error-border');
-            passwordInput.classList.add('error-border');
-        }
-    } catch (error) {
+      if (result.success) {
+        closeLoginPopup();
+        window.location.href = result.is_admin ? 'indexadmin.html' : 'indexaccesso.html';
+      } else {
+        // Aggiungi classe di errore
         emailInput.classList.add('error-border');
         passwordInput.classList.add('error-border');
-        console.error("Errore login:", error);
+      }
+    } catch (error) {
+      emailInput.classList.add('error-border');
+      passwordInput.classList.add('error-border');
+      console.error("Errore login:", error);
     } finally {
-        loginButton.disabled = false;
-        loginButton.innerHTML = originalButtonText;
+      loginButton.disabled = false;
+      loginButton.innerHTML = originalButtonText;
     }
-});
+  });
 
   // REGISTRAZIONE
   document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
@@ -373,32 +375,32 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     }
   });
 
-const setupInputReset = (id) => {
+  const setupInputReset = (id) => {
     const input = document.getElementById(id);
     if (input) {
-        input.addEventListener('input', function() {
-            this.classList.remove('error-border');
-        });
+      input.addEventListener('input', function() {
+        this.classList.remove('error-border');
+      });
     }
-};
+  };
 
-function resetLoginError() {
+  function resetLoginError() {
     const emailInput = document.getElementById('login-email');
     const passwordInput = document.getElementById('login-password');
     const errorMessage = document.getElementById('login-error');
-    
+
     emailInput.classList.remove('error-border');
     passwordInput.classList.remove('error-border');
     errorMessage.style.display = 'none';
-}
+  }
 
-document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+  document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-});
+  });
 
-// Chiama la funzione per entrambi i campi
-setupInputReset('login-email');
-setupInputReset('login-password');
+  // Chiama la funzione per entrambi i campi
+  setupInputReset('login-email');
+  setupInputReset('login-password');
 </script>
 
 </body>

@@ -79,6 +79,7 @@
         </div>
     </nav>
     <div class="mobile-menu" id="mobileMenu">
+        <a href="chi-siamoaccesso.html" onclick="closeMobileMenu()">Chi siamo</a>
         <a href="eventiincorsoaccesso.html" onclick="closeMobileMenu()">Calendario attività</a>
         <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()">Archivio attività</a>
         <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
@@ -136,7 +137,6 @@
         const navbarUsernameEl = document.getElementById('navbar-username');
         const navbarAvatarEl = document.getElementById('navbar-avatar');
         if (!navbarUsernameEl || !navbarAvatarEl) {
-            // console.warn("Elementi navbar per utente (navbar-username, navbar-avatar) non trovati.");
             return;
         }
         if (currentUser) {
@@ -272,28 +272,27 @@
         card.dataset.speaker = event.relatore?.toLowerCase() || '';
         let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-past.jpg';
 
-        // CORREZIONE: Assicurarsi che i backtick (`) siano usati correttamente per i template literal
-        // e che le variabili siano interpolate con ${...}
-        card.innerHTML = \`
-            <div class="card-image-container">
-                <img src="\${imageSrc}" alt="Copertina: \${event.titolo || 'Evento passato'}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
-            </div>
-            <div class="card-content">
-                <h3>\${event.titolo || 'Titolo non disponibile'}</h3>
-                <p class="card-info">
-                    <b>Data:</b> \${formatDate(event.datainizio)}
-                    \${event.durata ? \`<br><b>Orario/Durata:</b> \${event.durata}\` : ''}
-                </p>
-                <p class="card-info">
-                    <b>\${event.prefisso_relatore || 'Relatore'}:</b> \${event.relatore || 'N/D'}
-                    \${event.associazione ? \`<br><b>Associazione:</b> \${event.associazione}\` : ''}
-                </p>
-                <p>\${event.descrizione || 'Nessuna descrizione breve disponibile.'}</p>
-                <div class="card-actions single-action">
-                    <a href="evento_dettaglio_accesso.html?id=\${event.idevento}" class="card-btn card-btn-secondary">Dettagli Evento</a>
-                </div>
-            </div>
-        \`;
+        // Riscritto usando concatenazione di stringhe standard
+        let htmlContent = '<div class="card-image-container">' +
+            '<img src="' + imageSrc + '" alt="Copertina: ' + (event.titolo || 'Evento passato') + '" class="card-image" loading="lazy" onerror="this.onerror=null;this.src=\'images/default-event-error.jpg\';">' +
+            '</div>' +
+            '<div class="card-content">' +
+            '<h3>' + (event.titolo || 'Titolo non disponibile') + '</h3>' +
+            '<p class="card-info">' +
+            '<b>Data:</b> ' + formatDate(event.datainizio) +
+            (event.durata ? '<br><b>Orario/Durata:</b> ' + event.durata : '') +
+            '</p>' +
+            '<p class="card-info">' +
+            '<b>' + (event.prefisso_relatore || 'Relatore') + ':</b> ' + (event.relatore || 'N/D') +
+            (event.associazione ? '<br><b>Associazione:</b> ' + event.associazione : '') +
+            '</p>' +
+            '<p>' + (event.descrizione || 'Nessuna descrizione breve disponibile.') + '</p>' +
+            '<div class="card-actions single-action">' +
+            // MODIFICA QUI: Cambia il link per puntare a evento_dettaglio_accesso.html
+            '<a href="evento_dettaglio_accesso.html?id=' + event.idevento + '" class="card-btn card-btn-secondary">Dettagli Evento</a>' +
+            '</div>' +
+            '</div>';
+        card.innerHTML = htmlContent;
         return card;
     }
 
@@ -308,11 +307,11 @@
         try {
             const response = await fetch('get_past_events.php');
             if (!response.ok) {
-                throw new Error(\`Errore HTTP \${response.status}: \${response.statusText}\`);
+                throw new Error('Errore HTTP ' + response.status + ': ' + response.statusText);
             }
             const result = await response.json();
 
-            if (result.success && Array.isArray(result.data)) { // Verifica che result.data sia un array
+            if (result.success && Array.isArray(result.data)) {
                 allPastEventsData = result.data;
                 if (allPastEventsData.length > 0) {
                     allPastEventsData.forEach(event => {
@@ -326,7 +325,7 @@
             }
         } catch (error) {
             console.error('Errore dettagliato caricamento eventi passati:', error);
-            eventiPassatiGrid.innerHTML = \`<p class="no-events error-message" style="text-align:center; padding:20px;">Errore caricamento eventi: \${error.message}. <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>\`;
+            eventiPassatiGrid.innerHTML = '<p class="no-events error-message" style="text-align:center; padding:20px;">Errore caricamento eventi: ' + error.message + '. <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>';
         } finally {
             loadingIndicator.classList.remove('visible');
         }
@@ -358,17 +357,17 @@
             });
         } else {
             if (titleFilter || dateFilter || speakerFilter) {
-                 eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato corrisponde ai criteri di ricerca.</p>';
+                eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato corrisponde ai criteri di ricerca.</p>';
             } else if (allPastEventsData.length === 0) {
-                 eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
+                eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
             } else {
-                 allPastEventsData.forEach(event => eventiPassatiGrid.appendChild(createPastEventCard(event)));
+                allPastEventsData.forEach(event => eventiPassatiGrid.appendChild(createPastEventCard(event)));
             }
         }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        setupUserSessionAndNavbar(); // Imposta currentUser e UI navbar PRIMA
+        setupUserSessionAndNavbar();
 
         if (!currentUser) {
             console.log("Utente non loggato su eventipassatiaccesso.html. Reindirizzamento a index.html");
