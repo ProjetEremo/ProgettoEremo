@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="images/logo.png" type="image/x-icon">
     <title>Dettaglio Evento - Eremo Frate Francesco</title>
-    <link rel="stylesheet" href="style.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
@@ -308,26 +309,26 @@
             const result = await response.json();
 
             if (result.success && result.data) {
-                const event = result.data.details; // Variabile 'event' (singolare)
+                const event = result.data.details;
                 const mediaItems = result.data.media || [];
                 const fetchedComments = result.data.comments || [];
 
-                if (eventTitleHeaderEl && event && event.Titolo) { // Usa event.Titolo
+                if (eventTitleHeaderEl && event && event.Titolo) {
                     eventTitleHeaderEl.textContent = event.Titolo;
                     document.title = sanitizeTextForHTML(event.Titolo) + ' - Eremo Frate Francesco';
                 } else if (eventTitleHeaderEl) {
                     eventTitleHeaderEl.textContent = "Dettaglio Evento";
                 }
 
-                if (event) { // Controlla 'event'
-                    if(event.FotoCopertina && eventCoverImageEl){ // Usa event.FotoCopertina
+                if (event) {
+                    if(event.FotoCopertina && eventCoverImageEl){
                         eventCoverImageEl.src = event.FotoCopertina;
-                        eventCoverImageEl.alt = "Copertina " + sanitizeTextForHTML(event.Titolo || "evento"); // Usa event.Titolo
+                        eventCoverImageEl.alt = "Copertina " + sanitizeTextForHTML(event.Titolo || "evento");
                         eventCoverImageEl.style.display = 'block';
                     }
                     if(eventMetaInfoEl){
                         let metaHTML = '';
-                        if (event.Data) { // Usa event.Data
+                        if (event.Data) { // Questo è il campo Data originale, non DataPubb per ora
                             try {
                                 metaHTML += '<span><i class="fas fa-calendar-alt"></i> ' + new Date(event.Data.replace(/-/g, '/')).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'}) + '</span>';
                             } catch (dateError) {
@@ -335,21 +336,20 @@
                                 metaHTML += '<span><i class="fas fa-calendar-alt"></i> ' + sanitizeTextForHTML(event.Data) + '</span>';
                             }
                         }
-                        if (event.Durata) metaHTML += '<span><i class="fas fa-clock"></i> ' + sanitizeTextForHTML(event.Durata) + '</span>'; // Usa event.Durata
-                        if (event.Relatore) metaHTML += '<span><i class="fas fa-user"></i> ' + sanitizeTextForHTML(event.PrefissoRelatore || 'Relatore') + ': ' + sanitizeTextForHTML(event.Relatore) + '</span>'; // Usa event.PrefissoRelatore, event.Relatore
-                        if (event.Associazione) metaHTML += '<span><i class="fas fa-users"></i> ' + sanitizeTextForHTML(event.Associazione) + '</span>'; // Usa event.Associazione
+                        if (event.Durata) metaHTML += '<span><i class="fas fa-clock"></i> ' + sanitizeTextForHTML(event.Durata) + '</span>';
+                        if (event.Relatore) metaHTML += '<span><i class="fas fa-user"></i> ' + sanitizeTextForHTML(event.PrefissoRelatore || 'Relatore') + ': ' + sanitizeTextForHTML(event.Relatore) + '</span>';
+                        if (event.Associazione) metaHTML += '<span><i class="fas fa-users"></i> ' + sanitizeTextForHTML(event.Associazione) + '</span>';
                         eventMetaInfoEl.innerHTML = metaHTML;
                         if (metaHTML) eventMetaInfoEl.style.display = 'flex';
                     }
-                    // Area della potenziale riga 442 (o vicinanze)
-                    if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){ // Usa event.DescrizioneEstesa, event.Descrizione
+                    if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){
                         eventDescriptionFullEl.innerHTML = sanitizeTextForHTML(event.DescrizioneEstesa || event.Descrizione);
                         eventDescriptionFullEl.style.display = 'block';
                     }
-                    if(eventVolantinoContainerEl && event.VolantinoUrl){ // Usa event.VolantinoUrl
+                    if(eventVolantinoContainerEl && event.VolantinoUrl){
                         eventVolantinoContainerEl.innerHTML =
                             '<h4>Volantino Evento</h4>' +
-                            '<a href="' + encodeURI(event.VolantinoUrl) + '" target="_blank" title="Visualizza volantino ' + sanitizeTextForHTML(event.Titolo || '') + '" class="btn-volantino">' + // Usa event.Titolo
+                            '<a href="' + encodeURI(event.VolantinoUrl) + '" target="_blank" title="Visualizza volantino ' + sanitizeTextForHTML(event.Titolo || '') + '" class="btn-volantino">' +
                             '<i class="fas fa-file-pdf"></i> Visualizza Volantino' +
                             '</a>';
                         eventVolantinoContainerEl.style.display = 'block';
@@ -369,9 +369,8 @@
                         let itemType = 'unknown';
                         let itemHref = 'uploads/event_images/' + rawPercorso;
                         let thumbSrc = 'images/file_placeholder.png';
-                        const mediaTitle = sanitizeTextForHTML(item.TitoloMedia || (event ? event.Titolo : '') || 'Media'); // Usa 'event'
+                        const mediaTitle = sanitizeTextForHTML(item.TitoloMedia || (event ? event.Titolo : '') || 'Media');
 
-                        // Regex verificate per non avere flag invalidi
                         if (rawPercorso.match(/\.(mp4|webm|ogg)$/i)) {
                             itemType = 'video';
                             thumbSrc = 'images/video_placeholder.png';
@@ -461,9 +460,11 @@
         if (currentUser && currentUser.email === commentData.Contatto && currentUser.nome) { rawUserName = currentUser.nome; }
 
         const safeUserName = sanitizeTextForHTML(rawUserName);
-        const safeCommentDate = sanitizeTextForHTML(commentData.Data);
+        // Usa DataVisualizzata che PHP ha formattato, includendo data e ora corretta
+        const safeCommentDate = sanitizeTextForHTML(commentData.DataVisualizzata || 'Data non disponibile');
         const sanitizedDescription = sanitizeTextForHTML(commentData.Descrizione);
         const avatarUrl = 'https://i.pravatar.cc/40?u=' + encodeURIComponent(commentData.Contatto || 'default_user');
+        const numLike = commentData.NumLike !== null ? parseInt(commentData.NumLike) : 0;
 
         let commentHTML =
             '<div class="comment-header">' +
@@ -472,7 +473,7 @@
             '</div>' +
             '<p>' + sanitizedDescription + '</p>' +
             '<div class="comment-actions">' +
-            '<button class="like-btn" data-comment-id="' + commentData.Progressivo + '" aria-label="Mi piace"><i class="far fa-heart"></i> <span class="like-count">0</span></button>' +
+            '<button class="like-btn" data-comment-id="' + commentData.Progressivo + '" aria-label="Mi piace"><i class="far fa-heart"></i> <span class="like-count">' + numLike + '</span></button>' +
             '<button class="btn-reply" data-comment-id="' + commentData.Progressivo + '" aria-label="Rispondi"><i class="fas fa-reply"></i> Rispondi</button>' +
             '</div>' +
             '<div class="reply-form" id="reply-form-' + commentData.Progressivo + '">' +
@@ -506,16 +507,56 @@
         if(replyFormEl) replyFormEl.addEventListener('submit', handleReplySubmit);
     }
 
-    function handleLikeAction(btn) {
+    async function handleLikeAction(btn) {
+        if (!currentUser || !currentUser.email) {
+            alert("Devi essere loggato per mettere 'Mi piace'.");
+            return;
+        }
+        const commentId = btn.dataset.commentId;
         const icon = btn.querySelector('i');
         const countSpan = btn.querySelector('.like-count');
-        let count = parseInt(countSpan.textContent) || 0;
-        if (btn.classList.toggle('active')) {
-            icon.classList.remove('far'); icon.classList.add('fas');
-            countSpan.textContent = String(count + 1);
-        } else {
-            icon.classList.remove('fas'); icon.classList.add('far');
-            countSpan.textContent = String(Math.max(0, count - 1));
+
+        btn.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append('commentId', commentId);
+
+            const response = await fetch('like_comment.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text().catch(() => "Dettaglio errore server non disponibile.");
+                throw new Error('Errore dal server (' + response.status + ' ' + response.statusText + '). ' + errorText.substring(0,100));
+            }
+
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                const responseText = await response.text().catch(() => "Risposta non JSON e illeggibile.");
+                throw new Error('Risposta non attesa da like_comment.php (tipo: ' + contentType + '): ' + responseText.substring(0,200));
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                if (countSpan) countSpan.textContent = result.newLikeCount;
+                if(icon) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    icon.style.color = 'var(--danger)';
+                }
+                // Per un sistema completo di like/unlike, qui si gestirebbe lo stato del bottone
+                // btn.classList.add('active'); // o toggle
+            } else {
+                throw new Error(result.message || "Impossibile aggiornare il like.");
+            }
+        } catch (error) {
+            console.error("Errore durante l'aggiornamento del like:", error.message);
+            // alert("Errore: " + error.message); // Opzionale: feedback all'utente
+        } finally {
+            setTimeout(() => { if(btn) btn.disabled = false; }, 500); // Riabilita dopo un breve ritardo
         }
     }
 
@@ -606,7 +647,7 @@
                 throw new Error(result.message || "Errore durante l'invio (risposta server).");
             }
         } catch (error) {
-            console.error("Errore Catturato in handleCommentSubmit:", error.message, error); // Logga anche l'oggetto errore completo
+            console.error("Errore Catturato in handleCommentSubmit:", error.message, error);
             if (commentFormMessageElement) {
                 let errMsg = "Errore sconosciuto.";
                 if (error && error.message) { errMsg = String(error.message).substring(0, 300); }
@@ -642,17 +683,16 @@
         setupUserSessionAndNavbar();
 
         const urlParams = new URLSearchParams(window.location.search);
-        const eventId = urlParams.get('id'); // Questo è l'ID dell'evento dalla URL
+        const eventId = urlParams.get('id');
 
         const newCommentForm = document.getElementById('new-comment-form');
-        const eventIdInputForMainForm = document.getElementById('commentEventId'); // Input hidden nel form principale
+        const eventIdInputForMainForm = document.getElementById('commentEventId');
 
-        // Imposta l'ID dell'evento nel form principale se l'utente è loggato e l'ID è presente
         if (currentUser && currentUser.email && eventIdInputForMainForm && eventId) {
             eventIdInputForMainForm.value = eventId;
         }
 
-        if (newCommentForm && eventId) { // Assicurati che eventId sia valido per aggiungere il listener
+        if (newCommentForm && eventId) {
             newCommentForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 const commentTextInput = document.getElementById('comment-text');
@@ -666,17 +706,15 @@
                     }
                     return;
                 }
-                // 'this' si riferisce al form, eventId è preso dalla closure
                 handleCommentSubmit(this, eventId, false);
             });
-        } else if (!eventId) { // Se eventId non è presente nell'URL
+        } else if (!eventId) {
             const pageLoadingEl = document.getElementById('pageLoadingIndicator');
             const eventTitleHeaderEl = document.getElementById('eventTitleHeader');
             if(eventTitleHeaderEl) eventTitleHeaderEl.innerHTML = "<p class='no-content-message'>ID evento non specificato nell'URL.</p>";
             if(pageLoadingEl) pageLoadingEl.classList.remove('visible');
         }
 
-        // Carica i dettagli dell'evento solo se eventId è presente
         if (eventId) {
             fetchEventDetails(eventId);
         }

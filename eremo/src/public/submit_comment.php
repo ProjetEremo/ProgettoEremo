@@ -1,18 +1,19 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-if (session_status() == PHP_SESSION_NONE) {
-    // session_start(); // Avvia solo se usi la sessione PHP per l'autenticazione
-}
+// if (session_status() == PHP_SESSION_NONE) {
+//     session_start();
+// }
 
 $config = [
     'host' => 'localhost',
     'db'   => 'my_eremofratefrancesco',
     'user' => 'eremofratefrancesco',
-    'pass' => '' // LA TUA PASSWORD DB - LASCIA VUOTA SE NON HAI PASSWORD PER QUESTO UTENTE
+    'pass' => '' // LA TUA PASSWORD DB
 ];
 
 $response = ['success' => false, 'message' => ''];
+$sql_debug = ''; // Inizializza per debug
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $response['message'] = 'Metodo non consentito.';
@@ -21,14 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Recupero e validazione dei dati dal POST
 $idEvento = filter_input(INPUT_POST, 'IDEvento', FILTER_VALIDATE_INT);
 $descrizione = isset($_POST['Descrizione']) ? trim($_POST['Descrizione']) : '';
-$contatto = filter_input(INPUT_POST, 'Contatto', FILTER_VALIDATE_EMAIL); // Email utente da JS (currentUser.email)
+$contatto = filter_input(INPUT_POST, 'Contatto', FILTER_VALIDATE_EMAIL);
 $codRisposta = filter_input(INPUT_POST, 'CodRisposta', FILTER_VALIDATE_INT);
 
-// Validazioni di base
-if (!$idEvento) {
+if (!$idEvento || $idEvento <= 0) {
     $response['message'] = 'ID Evento mancante o non valido.';
     http_response_code(400);
     echo json_encode($response);
@@ -40,32 +39,25 @@ if (empty($descrizione)) {
     echo json_encode($response);
     exit;
 }
-if (mb_strlen($descrizione) > 2000) { // Limite lunghezza commento
+if (mb_strlen($descrizione) > 2000) {
     $response['message'] = 'Il commento è troppo lungo (max 2000 caratteri).';
     http_response_code(400);
     echo json_encode($response);
     exit;
 }
 if (!$contatto) {
-    // Questa validazione è cruciale. Assicurati che il client JS invii SEMPRE l'email dell'utente loggato.
-    // Idealmente, dovresti anche verificare lato server che l'utente sia effettivamente loggato
-    // (es. tramite token di sessione o API key se stai costruendo un'API più complessa).
-    $response['message'] = 'Email utente (Contatto) non fornita o non valida. Devi essere loggato per commentare.';
-    http_response_code(400); // O 401 Unauthorized se preferisci
+    $response['message'] = 'Email utente non fornita o non valida.';
+    http_response_code(400);
     echo json_encode($response);
     exit;
 }
 
-// Se codRisposta è inviato ma non è un intero valido (o è 0, che non dovrebbe essere un ID), impostalo a NULL
-if ($codRisposta !== null && ($codRisposta === false || $codRisposta === 0)) {
+if ($codRisposta !== null && ($codRisposta === false || $codRisposta <= 0)) {
     $codRisposta = null;
 }
-// Se 'CodRisposta' non è presente nel POST o è una stringa vuota, filter_input restituirà null o false,
-// quindi la gestione sopra dovrebbe bastare. Ma per sicurezza:
 if (isset($_POST['CodRisposta']) && empty($_POST['CodRisposta']) && $_POST['CodRisposta'] !== '0') {
     $codRisposta = null;
 }
-
 
 try {
     $conn = new PDO(
@@ -79,58 +71,58 @@ try {
         ]
     );
 
-    // Opzionale: Verifica esistenza evento
     $stmtCheckEvent = $conn->prepare("SELECT IDEvento FROM eventi WHERE IDEvento = :idEvento");
     $stmtCheckEvent->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
     $stmtCheckEvent->execute();
     if ($stmtCheckEvent->fetchColumn() === false) {
-        throw new Exception("L'evento a cui stai cercando di commentare non esiste.");
+        throw new Exception("L'evento specificato non esiste.");
     }
 
-    // Opzionale: Verifica esistenza commento padre (se CodRisposta è fornito)
     if ($codRisposta !== null) {
+        // Assicurati che il nome della tabella sia corretto (commenti vs Commenti)
         $stmtCheckParent = $conn->prepare("SELECT Progressivo FROM commenti WHERE Progressivo = :codRisposta AND IDEvento = :idEvento");
         $stmtCheckParent->bindParam(':codRisposta', $codRisposta, PDO::PARAM_INT);
-        $stmtCheckParent->bindParam(':idEvento', $idEvento, PDO::PARAM_INT); // Importante: deve essere dello stesso evento!
+        $stmtCheckParent->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
         $stmtCheckParent->execute();
         if ($stmtCheckParent->fetchColumn() === false) {
             throw new Exception("Il commento a cui stai cercando di rispondere non esiste o non appartiene a questo evento.");
         }
     }
 
-    // Inserimento del commento
-    // La colonna 'Data' usa NOW() per il timestamp corrente del database
-    $sql = "INSERT INTO commenti (Descrizione, Data, CodRisposta, Contatto, IDEvento)
-            VALUES (:descrizione, NOW(), :codRisposta, :contatto, :idEvento)";
-    $stmt = $conn->prepare($sql);
+    // Query SQL CORRETTA per includere DataPubb e OraPubb
+    // La colonna 'Data' originale potrebbe non essere più necessaria se hai DataPubb e OraPubb,
+    // ma la mantengo per ora come nella tua ultima versione.
+    // Se 'Data' è ridondante, puoi rimuoverla dall'INSERT e dalla tabella.
+    $sql_debug = "INSERT INTO commenti (Descrizione, Data, DataPubb, OraPubb, CodRisposta, Contatto, IDEvento, NumLike)
+                  VALUES (:descrizione, NOW(), NOW(), CURTIME(), :codRisposta, :contatto, :idEvento, 0)";
+    $stmt = $conn->prepare($sql_debug);
 
     $stmt->bindParam(':descrizione', $descrizione, PDO::PARAM_STR);
     $stmt->bindParam(':codRisposta', $codRisposta, $codRisposta === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-    $stmt->bindParam(':contatto', $contatto, PDO::PARAM_STR); // Email dell'utente
+    $stmt->bindParam(':contatto', $contatto, PDO::PARAM_STR);
     $stmt->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
+    // Data, DataPubb, OraPubb e NumLike sono gestiti direttamente nella query con NOW(), CURTIME() e 0
 
     $stmt->execute();
-    $newcommentId = $conn->lastInsertId();
+    $newCommentId = $conn->lastInsertId();
 
     $response['success'] = true;
     $response['message'] = 'Commento inviato con successo!';
-    $response['new_comment_id'] = $newcommentId; // Potrebbe essere utile al client
+    $response['new_comment_id'] = $newCommentId;
     echo json_encode($response);
 
 } catch (PDOException $e) {
-    error_log("Errore PDO in submit_comment.php: " . $e->getMessage());
-    $response['message'] = 'Errore del database durante il salvataggio del commento.';
-    // $response['debug_error'] = $e->getMessage(); // Non inviare in produzione
-    if (strpos(strtolower($e->getMessage()), 'foreign key constraint') !== false) {
-         $response['message'] = 'Errore di riferimento: l\'evento o il commento genitore potrebbero non esistere.';
-    }
+    error_log("Errore PDO in submit_comment.php: " . $e->getMessage() . " - SQL: " . $sql_debug);
+    $response['message'] = 'Errore database (submit): ' . $e->getMessage();
     http_response_code(500);
     echo json_encode($response);
+    exit;
 } catch (Exception $e) {
     error_log("Errore generico in submit_comment.php: " . $e->getMessage());
-    $response['message'] = $e->getMessage(); // Usa il messaggio dell'eccezione personalizzata
-    http_response_code(400); // Generalmente un errore del client se l'eccezione è stata lanciata da una validazione
+    $response['message'] = 'Errore: ' . $e->getMessage();
+    http_response_code(400);
     echo json_encode($response);
+    exit;
 }
 
 $conn = null;
