@@ -32,7 +32,12 @@
   --border-radius-medium: 15px;
   --border-radius-large: 24px;
   --transition-fast: all 0.2s ease-in-out;
-  --transition-medium: all 0.3s ease-in-out;
+
+  /* Variabili di transizione modificate per maggiore controllo */
+  --transition-duration-medium: 0.3s; /* NUOVA */
+  --transition-timing-medium: ease-in-out; /* NUOVA */
+  --transition-medium: all var(--transition-duration-medium) var(--transition-timing-medium); /* MODIFICATA */
+
   --navbar-height: 80px;
 }
 
@@ -210,7 +215,7 @@ img {
   width: 0;
   height: 3px;
   background-color: var(--accent);
-  transition: width var(--transition-medium);
+  transition: width var(--transition-duration-medium) var(--transition-timing-medium); /* Usiamo le nuove variabili per coerenza */
 }
 
 .navbar .menu a:hover::after, .navbar .menu a.active::after {
@@ -423,7 +428,7 @@ main > .container > h1:first-child:not(.hero-title) {
   border-radius: var(--border-radius-large);
   overflow: hidden;
   box-shadow: var(--shadow-light);
-  transition: var(--transition-medium);
+  transition: transform var(--transition-duration-medium) var(--transition-timing-medium), box-shadow var(--transition-duration-medium) var(--transition-timing-medium);
   line-height: 0;
 }
 
@@ -458,18 +463,25 @@ main > .container > h1:first-child:not(.hero-title) {
   margin-top: 2.2rem;
 }
 
-
+/* Prima definizione di .card */
 .card {
   background: var(--white);
   border-radius: var(--border-radius-medium);
   box-shadow: var(--shadow-light);
-  transition: var(--transition-medium);
+  /* La transizione qui è quella che verrà sovrascritta dalla regola più specifica più avanti,
+     ma la lasciamo per chiarezza sulla struttura originale.
+     La transizione effettiva sarà gestita dalla regola .card più in basso. */
+  /* transition: var(--transition-medium); */
   overflow: hidden;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--gray-light);
+  opacity: 1; /* Stato normale, per la logica di morphing */
+  /* La transizione effettiva per hover e morphing è definita più avanti per consolidamento */
 }
 
+
+/* .card:hover gestisce lo stato finale dell'hover. La transizione è sul .card base */
 .card:hover {
   transform: translateY(-9px);
   box-shadow: var(--shadow-medium);
@@ -563,7 +575,9 @@ main > .container > h1:first-child:not(.hero-title) {
   font-size: 1.15rem;
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition-medium);
+  transition: background-color var(--transition-duration-medium) var(--transition-timing-medium),
+  border-color var(--transition-duration-medium) var(--transition-timing-medium),
+  box-shadow var(--transition-duration-medium) var(--transition-timing-medium);
   border: 1px solid transparent;
   text-decoration: none;
   display: inline-flex;
@@ -1815,13 +1829,25 @@ body.volantino-morph-active {
   transition: opacity 0.15s ease-out, visibility 0s linear 0.15s !important;
 }
 
-/* Assicurati che la classe .card base abbia una transizione per l'opacità per la ricomparsa */
+/*
+  Regola .card specifica per la transizione di ricomparsa del morphing e HOVER.
+  Questa regola sovrascrive la `transition` definita precedentemente per .card.
+  È stata CORRETTA per usare le variabili di durata e timing in modo appropriato.
+*/
 .card {
-  /* ...tutti gli altri stili della .card... */
+  /* ...altri stili della .card definiti precedentemente sono ereditati... */
+  /* background, border-radius, box-shadow iniziale, overflow, display, border, ecc. */
   opacity: 1; /* Stato normale */
-  /* Transizione per la ricomparsa fluida quando .original-morph-hidden viene rimossa */
-  transition: opacity 0.45s ease-in-out, transform var(--transition-medium), box-shadow var(--transition-medium);
-  /* La visibility tornerà a 'visible' per default quando la classe viene rimossa, senza transizione brusca */
+  /*
+    Transizione CORRETTA:
+    - opacity: per la ricomparsa fluida quando .original-morph-hidden viene rimossa.
+    - transform: per l'effetto di "salita" al hover.
+    - box-shadow: per il cambio dell'ombra al hover.
+    Tutte usano le variabili definite in :root per durata e timing.
+  */
+  transition: opacity 0.45s ease-in-out, /* Per il morphing */
+  transform var(--transition-duration-medium) var(--transition-timing-medium), /* Per hover */
+  box-shadow var(--transition-duration-medium) var(--transition-timing-medium); /* Per hover */
 }
 
 
@@ -3212,6 +3238,4 @@ body.page-dashboard .modal-content {
   /* text-align: left; */ /* Già così dallo stile globale per .comment-form h4 */
   /* font-size: 1.65rem; */ /* Già così dallo stile globale per .comment-form h4 */
 }
-
-
 /* =============== FINE STILI PER LA SEZIONE DETTAGLI EVENTO =============== */
