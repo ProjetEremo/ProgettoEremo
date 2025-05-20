@@ -1,38 +1,61 @@
 <?php
-// require('fpdf/fpdf.php'); // Includi la libreria FPDF
+// generate_event_pdf.php
 
-// --- INIZIO: Logica di base (SENZA LIBRERIA FPDF VERA E PROPRIA) ---
-// Questa è una simulazione concettuale. Per un PDF reale, integra una libreria.
+// 1. Assicurati che il percorso alla libreria FPDF sia corretto!
+// Se hai messo la cartella 'fpdf' nella stessa directory di questo script:
+require_once('fpdf/fpdf.php');
+// Altrimenti, adatta il percorso: require_once('../libs/fpdf/fpdf.php'); ecc.
 
-header('Content-Type: application/json; charset=utf-8'); // Inizialmente JSON per feedback
-$host = "localhost"; $username = "eremofratefrancesco"; $password = ""; $dbname = "my_eremofratefrancesco";
+// --- Inizio Connessione e Recupero Dati ---
+$host = "localhost";
+$username = "eremofratefrancesco"; // Il tuo username DB
+$password = "";                   // La tua password DB
+$dbname = "my_eremofratefrancesco";   // Il tuo nome DB
+
 $conn = new mysqli($host, $username, $password, $dbname);
-if ($conn->connect_error) { die(json_encode(['success' => false, 'message' => "Errore DB."])); }
+if ($conn->connect_error) {
+    // Se c'è un errore DB prima di generare il PDF, invia un errore testuale semplice
+    // o un JSON se preferisci gestirlo diversamente dal client.
+    // Per ora, un semplice messaggio di errore.
+    header('Content-Type: text/plain; charset=utf-8');
+    die("Errore di connessione al database: " . $conn->connect_error);
+}
 $conn->set_charset("utf8mb4");
 
 $eventId = filter_input(INPUT_GET, 'event_id', FILTER_VALIDATE_INT);
 if (!$eventId) {
-    die(json_encode(['success' => false, 'message' => 'ID Evento mancante. Impossibile generare PDF.']));
+    header('Content-Type: text/plain; charset=utf-8');
+    die('ID Evento mancante o non valido. Impossibile generare PDF.');
 }
 
-// Fetch event details
-$stmtEvent = $conn->prepare("SELECT Titolo, Data, Durata FROM eventi WHERE IDEvento = ?");
+// Recupera dettagli evento
+$stmtEvent = $conn->prepare("SELECT Titolo, Data, Durata, Relatore, PrefissoRelatore, Associazione FROM eventi WHERE IDEvento = ?");
+if (!$stmtEvent) {
+    header('Content-Type: text/plain; charset=utf-8');
+    die("Errore nella preparazione della query evento: " . $conn->error);
+}
 $stmtEvent->bind_param("i", $eventId);
 $stmtEvent->execute();
 $resultEvent = $stmtEvent->get_result();
 if ($resultEvent->num_rows === 0) {
-    die(json_encode(['success' => false, 'message' => 'Evento non trovato. Impossibile generare PDF.']));
+    header('Content-Type: text/plain; charset=utf-8');
+    die('Evento non trovato. Impossibile generare PDF.');
 }
-$event = $resultEvent->fetch_assoc();
+$eventDetails = $resultEvent->fetch_assoc(); // Rinomino in $eventDetails per chiarezza
 $stmtEvent->close();
 
-// Fetch participants
+// Recupera partecipanti
+// La query sembra corretta per ottenere nome, cognome del partecipante e contatto di chi ha prenotato
 $stmtParticipants = $conn->prepare(
     "SELECT p.Nome, p.Cognome, pr.Contatto
      FROM Partecipanti p
      JOIN prenotazioni pr ON p.Progressivo = pr.Progressivo
      WHERE pr.IDEvento = ? ORDER BY p.Cognome, p.Nome"
 );
+if (!$stmtParticipants) {
+    header('Content-Type: text/plain; charset=utf-8');
+    die("Errore nella preparazione della query partecipanti: " . $conn->error);
+}
 $stmtParticipants->bind_param("i", $eventId);
 $stmtParticipants->execute();
 $resultParticipants = $stmtParticipants->get_result();
@@ -43,67 +66,123 @@ while($row = $resultParticipants->fetch_assoc()){
 $stmtParticipants->close();
 $conn->close();
 
-// --- QUI INIZIEREBBE LA LOGICA FPDF ---
-/*
-// Esempio con FPDF (necessita installazione e setup corretto del path)
-require_once('path/to/fpdf.php'); // Assicurati che il path sia corretto
+// --- Logica di Generazione PDF con FPDF ---
 
-class PDF extends FPDF {
+class PDF_Event_Participants extends FPDF {
+    private $eventData; // Proprietà per memorizzare i dati dell'evento
+
+    // Costruttore per passare i dati dell'evento
+    function __construct($orientation='P', $unit='mm', $size='A4', $event_data = []) {
+        parent::__construct($orientation, $unit, $size);
+        $this->eventData = $event_data;
+        $this->SetMargins(15, 15, 15); // Margini sinistro, alto, destro
+        $this->SetAutoPageBreak(true, 15); // Margine inferiore per il page break
+    }
+
+    // Intestazione personalizzata
     function Header() {
-        global $event; // Rendi $event accessibile
-        $this->SetFont('Arial','B',15);
-        $this->Cell(0,10, utf8_decode($event['Titolo']),0,1,'C'); // Titolo evento
-        $this->SetFont('Arial','',10);
-        $this->Cell(0,7, 'Data: ' . date("d/m/Y", strtotime($event['Data'])) . ' Orario: ' . ($event['Durata'] ?? 'N/D'),0,1,'C');
-        $this->Ln(5);
-    }
+        if (empty($this->eventData)) return;
 
-    function Footer() {
-        $this->SetY(-15);
-        $this->SetFont('Arial','I',8);
-        $this->Cell(0,10,'Pagina '.$this->PageNo().'/{nb}',0,0,'C');
-    }
+        // Logo (opzionale, se hai un logo)
+        // $this->Image('path/to/logo.png',10,6,30); // Esempio: Logo a 10mm da sx, 6mm da top, larghezza 30mm
 
-    function ParticipantTable($header, $data) {
-        $this->SetFont('Arial','B',10);
-        $w = array(15, 60, 60, 50); // Larghezze colonne: Num, Cognome, Nome, Contatto
-        for($i=0;$i<count($header);$i++)
-            $this->Cell($w[$i],7,utf8_decode($header[$i]),1,0,'C');
-        $this->Ln();
+        $this->SetFont('Arial','B',16); // Font più grande per il titolo
+        // Multicell per il titolo se può essere lungo e andare a capo
+        $this->MultiCell(0, 10, utf8_decode("Report Evento: " . $this->eventData['Titolo']), 0, 'C');
+        $this->Ln(2); // Spazio ridotto dopo il titolo
+
         $this->SetFont('Arial','',10);
-        $counter = 1;
-        foreach($data as $row) {
-            $this->Cell($w[0],6,$counter++,1,0,'C');
-            $this->Cell($w[1],6,utf8_decode($row['Cognome']),1);
-            $this->Cell($w[2],6,utf8_decode($row['Nome']),1);
-            $this->Cell($w[3],6,utf8_decode($row['Contatto']),1);
-            $this->Ln();
+        $dataFormatted = $this->eventData['Data'] ? date("d/m/Y", strtotime($this->eventData['Data'])) : 'N/D';
+        $durata = $this->eventData['Durata'] ?? 'N/D';
+        $this->Cell(0, 7, utf8_decode("Data: " . $dataFormatted . "  |  Orario/Durata: " . $durata), 0, 1, 'C');
+
+        if (!empty($this->eventData['Relatore'])) {
+            $relatoreInfo = ($this->eventData['PrefissoRelatore'] ?? 'Relatore') . ": " . $this->eventData['Relatore'];
+            if (!empty($this->eventData['Associazione'])) {
+                $relatoreInfo .= " (" . $this->eventData['Associazione'] . ")";
+            }
+            $this->Cell(0, 7, utf8_decode($relatoreInfo), 0, 1, 'C');
+        } elseif (!empty($this->eventData['Associazione'])) {
+             $this->Cell(0, 7, utf8_decode("Organizzato da: " . $this->eventData['Associazione']), 0, 1, 'C');
         }
+
+        $this->Ln(7); // Spazio prima della tabella o del contenuto principale
+    }
+
+    // Piè di pagina personalizzato
+    function Footer() {
+        $this->SetY(-15); // Posizione a 1.5 cm dal basso
+        $this->SetFont('Arial','I',8);
+        $this->Cell(0,10, utf8_decode('Pagina ').$this->PageNo().'/{nb}',0,0,'C'); // Numero pagina
+    }
+
+    // Tabella partecipanti migliorata
+    function ParticipantTable($header, $data) {
+        $this->SetFillColor(230, 230, 230); // Colore di sfondo per l'header della tabella
+        $this->SetTextColor(0);
+        $this->SetDrawColor(128, 128, 128); // Colore bordi tabella
+        $this->SetFont('Arial','B',10);
+
+        // Larghezze colonne: Num., Cognome, Nome, Contatto Email
+        // Larghezza totale A4 (210mm) - margini (15mm sx + 15mm dx = 30mm) = 180mm disponibili
+        $w = array(15, 55, 55, 55); // Adatta queste larghezze se necessario
+
+        for($i=0; $i<count($header); $i++) {
+            $this->Cell($w[$i], 8, utf8_decode($header[$i]), 1, 0, 'C', true); // Header con sfondo
+        }
+        $this->Ln();
+
+        $this->SetFont('Arial','',9); // Font più piccolo per i dati della tabella
+        $this->SetFillColor(245, 245, 245); // Sfondo alternato per righe (opzionale)
+        $fill = false;
+        $counter = 1;
+
+        if (empty($data)) {
+            $this->Cell(array_sum($w), 10, utf8_decode('Nessun partecipante registrato per questo evento.'), 1, 1, 'C');
+            return;
+        }
+
+        foreach($data as $row) {
+            $this->Cell($w[0], 7, $counter++, 1, 0, 'C', $fill);
+            $this->Cell($w[1], 7, utf8_decode($row['Cognome'] ?? ''), 'LR', 0, 'L', $fill); // LR per bordi solo laterali se vuoi
+            $this->Cell($w[2], 7, utf8_decode($row['Nome'] ?? ''), 'LR', 0, 'L', $fill);
+            $this->Cell($w[3], 7, utf8_decode($row['Contatto'] ?? ''), 'LR', 0, 'L', $fill);
+            $this->Ln();
+            $fill = !$fill; // Alterna colore di sfondo riga
+        }
+        // Linea di chiusura tabella
+        $this->Cell(array_sum($w), 0, '', 'T');
     }
 }
 
-$pdf = new PDF();
-$pdf->AliasNbPages();
+// Creazione del PDF
+$pdf = new PDF_Event_Participants('P', 'mm', 'A4', $eventDetails); // Passa i dettagli evento al costruttore
+$pdf->AliasNbPages(); // Necessario per {nb} nel footer
 $pdf->AddPage();
-$pdf->SetFont('Arial','',12);
-$pdf->Cell(0,10,utf8_decode('Lista Partecipanti'),0,1,'L');
 
-$tableHeader = array('Nr.', 'Cognome', 'Nome', 'Contatto Prenotazione');
+// Aggiunta di una breve descrizione dell'evento (opzionale)
+// if (!empty($eventDetails['Descrizione'])) { // Se hai un campo Descrizione breve
+//     $pdf->SetFont('Arial','',10);
+//     $pdf->MultiCell(0, 6, utf8_decode("Dettagli: " . $eventDetails['Descrizione']));
+//     $pdf->Ln(5);
+// }
+
+$pdf->SetFont('Arial','B',12);
+$pdf->Cell(0, 10, utf8_decode('Elenco dei Partecipanti Registrati'), 0, 1, 'L');
+$pdf->Ln(2);
+
+$tableHeader = array('Nr.', 'Cognome', 'Nome', 'Email Prenotazione');
 $pdf->ParticipantTable($tableHeader, $participants);
 
-$pdf->Output('D', 'Lista_Partecipanti_' . preg_replace('/[^A-Za-z0-9\-]/', '_', $event['Titolo']) . '.pdf'); // D per download
-exit;
-*/
+// Nome del file PDF per il download
+$pdfFileName = 'Lista_Partecipanti_' . preg_replace('/[^A-Za-z0-9_\-]/', '_', $eventDetails['Titolo']) . '.pdf';
 
-// --- FINE: Logica di base (SENZA LIBRERIA FPDF VERA E PROPRIA) ---
-// Se arrivi qui, significa che la parte FPDF è commentata.
-// Manda un JSON per indicare che i dati sono stati raccolti, ma il PDF non generato da questo script base.
-echo json_encode([
-    'success' => true,
-    'message' => 'Dati per PDF raccolti. Integrazione libreria PDF richiesta per la generazione.',
-    'event' => $event,
-    'participants_count' => count($participants),
-    // 'participants_data' => $participants // Non mandare troppi dati se non necessario per il client
-]);
+// Output del PDF
+// 'D': forza il download
+// 'I': invia al browser inline
+// 'F': salva su file locale
+// 'S': restituisce come stringa
+$pdf->Output('D', $pdfFileName);
+exit; // Termina lo script dopo aver inviato il PDF
 
 ?>
