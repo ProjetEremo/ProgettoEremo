@@ -49,9 +49,12 @@
       align-items: center;
       margin-bottom: 0.5rem;
     }
-    .prenotazione-card-past {
+    .prenotazione-card-past, .waitlist-card-unavailable { /* Aggiunta classe per coda */
       opacity: 0.7;
       background-color: #f9f9f9;
+    }
+    .prenotazione-card-past h3 {
+      /* text-decoration: line-through; */ /* Opzionale per eventi passati */
     }
     .form-message {
       margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem;
@@ -104,8 +107,7 @@
         </button>
         <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
           <a href="areapersonale.html">Il mio profilo</a>
-          <a href="gestisciprenotazioni.html">Le mie prenotazioni</a>
-          <a href="#" onclick="logout()">Esci</a>
+          <a href="gestisciprenotazioni.html">Le mie prenotazioni</a> <a href="#" onclick="logout()">Esci</a>
         </div>
       </div>
       <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
@@ -139,18 +141,9 @@
       <h2><i class="fas fa-user-edit" style="margin-right: 8px;"></i> Informazioni Personali</h2>
       <form id="profile-info-form">
         <div class="form-grid">
-          <div class="form-group">
-            <label for="nome">Nome</label>
-            <input type="text" id="nome" name="nome" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="cognome">Cognome</label>
-            <input type="text" id="cognome" name="cognome" class="form-control" required>
-          </div>
-          <div class="form-group full-width">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" class="form-control" disabled>
-          </div>
+          <div class="form-group"> <label for="nome">Nome</label> <input type="text" id="nome" name="nome" class="form-control" required> </div>
+          <div class="form-group"> <label for="cognome">Cognome</label> <input type="text" id="cognome" name="cognome" class="form-control" required> </div>
+          <div class="form-group full-width"> <label for="email">Email</label> <input type="email" id="email" name="email" class="form-control" disabled> </div>
         </div>
         <button type="submit" class="btn-save">Salva Info Personali</button>
         <p id="profile-info-message" class="form-message" style="display:none;"></p>
@@ -160,9 +153,7 @@
     <section class="profile-section">
       <h2><i class="fas fa-image" style="margin-right: 8px;"></i> Icona Profilo</h2>
       <p>Scegli un'icona che ti rappresenti:</p>
-      <div class="avatar-options-grid" id="avatar-options-container">
-        <p>Caricamento icone disponibili...</p>
-      </div>
+      <div class="avatar-options-grid" id="avatar-options-container"> <p>Caricamento icone disponibili...</p> </div>
       <button class="btn-save" id="save-icon-btn">Salva Icona</button>
       <p id="icon-save-message" class="form-message" style="display:none;"></p>
     </section>
@@ -171,19 +162,9 @@
       <h2><i class="fas fa-lock" style="margin-right: 8px;"></i> Sicurezza Account</h2>
       <form id="password-change-form">
         <div class="form-grid">
-          <div class="form-group">
-            <label for="vecchia-password">Password Attuale</label>
-            <input type="password" id="vecchia-password" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="nuova-password">Nuova Password</label>
-            <input type="password" id="nuova-password" class="form-control" required minlength="8">
-            <small>Minimo 8 caratteri.</small>
-          </div>
-          <div class="form-group">
-            <label for="conferma-password">Conferma Nuova Password</label>
-            <input type="password" id="conferma-password" class="form-control" required>
-          </div>
+          <div class="form-group"> <label for="vecchia-password">Password Attuale</label> <input type="password" id="vecchia-password" class="form-control" required> </div>
+          <div class="form-group"> <label for="nuova-password">Nuova Password</label> <input type="password" id="nuova-password" class="form-control" required minlength="8"> <small>Minimo 8 caratteri.</small> </div>
+          <div class="form-group"> <label for="conferma-password">Conferma Nuova Password</label> <input type="password" id="conferma-password" class="form-control" required> </div>
         </div>
         <button type="submit" class="btn-save">Cambia Password</button>
         <p id="password-change-message" class="form-message" style="display:none;"></p>
@@ -192,20 +173,26 @@
 
     <section class="profile-section" id="prenotazioni">
       <h2><i class="fas fa-calendar-check" style="margin-right: 8px;"></i> Le Mie Prenotazioni</h2>
-      <div id="user-bookings-grid" class="card-grid">
-        <p style="text-align:center; padding:1rem;">Caricamento prenotazioni...</p>
-      </div>
+      <div id="user-bookings-grid" class="card-grid"> <p style="text-align:center; padding:1rem;">Caricamento prenotazioni...</p> </div>
       <div id="no-bookings-message" style="display: none; text-align: center; padding: 2rem;">
         <p>Non hai nessuna prenotazione attiva al momento.</p>
         <a href="eventiincorsoaccesso.html" class="btn-primary" style="display: inline-block; margin-top: 1rem;">Scopri le attività</a>
       </div>
     </section>
+
+    <section class="profile-section" id="eventi-in-coda">
+      <h2><i class="fas fa-hourglass-half" style="margin-right: 8px;"></i> Eventi in Lista d'Attesa</h2>
+      <div id="user-waitlist-grid" class="card-grid">
+        <p style="text-align:center; padding:1rem;">Caricamento eventi in coda...</p>
+      </div>
+      <div id="no-waitlist-message" style="display: none; text-align: center; padding: 2rem;">
+        <p>Non sei in lista d'attesa per nessun evento al momento.</p>
+      </div>
+    </section>
   </div>
 </main>
 
-<footer>
-  <p>&copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
-</footer>
+<footer> <p>&copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p> </footer>
 
 <script>
   let lastScroll = 0;
@@ -219,16 +206,9 @@
   if (navbarContainer) {
     window.addEventListener('scroll', function() {
       const currentScroll = window.pageYOffset;
-      if (currentScroll <= 50) {
-        navbarContainer.classList.remove('hidden');
-        lastScroll = 0;
-        return;
-      }
-      if (currentScroll > lastScroll && !navbarContainer.classList.contains('hidden')) {
-        navbarContainer.classList.add('hidden');
-      } else if (currentScroll < lastScroll && navbarContainer.classList.contains('hidden')) {
-        navbarContainer.classList.remove('hidden');
-      }
+      if (currentScroll <= 50) { navbarContainer.classList.remove('hidden'); lastScroll = 0; return; }
+      if (currentScroll > lastScroll && !navbarContainer.classList.contains('hidden')) { navbarContainer.classList.add('hidden'); }
+      else if (currentScroll < lastScroll && navbarContainer.classList.contains('hidden')) { navbarContainer.classList.remove('hidden'); }
       lastScroll = currentScroll;
     });
   }
@@ -289,12 +269,7 @@
 
   async function callApi(url, method = 'GET', data = null) {
     const headers = { 'Content-Type': 'application/json' };
-    const options = {
-      method,
-      headers,
-      credentials: 'same-origin' // Modificato per inviare cookie di sessione PHP
-    };
-
+    const options = { method, headers, credentials: 'same-origin' };
     if (data && (method === 'POST' || method === 'PUT')) {
       options.body = JSON.stringify(data);
     }
@@ -302,18 +277,16 @@
       const response = await fetch(url, options);
       if (!response.ok) {
         let errorData = { message: `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
-        try {
-          errorData = await response.json();
-        } catch (e) { /* usa il messaggio di default se il corpo non è JSON */ }
+        try { errorData = await response.json(); } catch (e) { /* usa default */ }
         const finalErrorMessage = errorData.message || `Errore del server: ${response.status} per ${url}`;
-        console.error(finalErrorMessage); // Log dell'errore effettivo
+        console.error(finalErrorMessage);
         throw new Error(finalErrorMessage);
       }
-      if (response.status === 204) return {}; // No Content
+      if (response.status === 204) return {};
       return await response.json();
-    } catch (error) { // Errore di rete o eccezione dal blocco try
-      console.error(`Fallimento chiamata API (rete o parse) a ${url}:`, error.message);
-      throw error; // Rilancia per gestione specifica nel chiamante
+    } catch (error) {
+      console.error(`Fallimento chiamata API a ${url}:`, error.message);
+      throw error;
     }
   }
 
@@ -329,9 +302,8 @@
     if(profileGreeting) profileGreeting.textContent = 'Area Personale';
 
     const emailInput = document.getElementById('email');
-    if(emailInput) emailInput.value = ''; // Pulisci campo email
+    if(emailInput) emailInput.value = '';
 
-    // Disabilita tutti i form e i pulsanti di salvataggio
     document.querySelectorAll('#profile-info-form input:not(#email), #profile-info-form button').forEach(el => el.disabled = true);
     document.querySelectorAll('#save-icon-btn, #password-change-form input, #password-change-form button').forEach(el => el.disabled = true);
 
@@ -339,11 +311,15 @@
     if(avatarContainer) avatarContainer.innerHTML = `<p>${errorMessage}</p>`;
     const bookingsGrid = document.getElementById('user-bookings-grid');
     if(bookingsGrid) bookingsGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
+    const waitlistGrid = document.getElementById('user-waitlist-grid'); // Gestisci anche la nuova sezione
+    if(waitlistGrid) waitlistGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
+
     const noBookingsMsg = document.getElementById('no-bookings-message');
     if(noBookingsMsg) noBookingsMsg.style.display = 'none';
+    const noWaitlistMsg = document.getElementById('no-waitlist-message');
+    if(noWaitlistMsg) noWaitlistMsg.style.display = 'none';
 
-    // Mostra un messaggio generico se la funzione viene chiamata con un messaggio
-    if(errorMessage !== "Funzionalità non disponibile. Effettua il login.") { // Evita doppio messaggio
+    if(errorMessage !== "Funzionalità non disponibile. Effettua il login.") {
       displayMessage('profile-info-message', errorMessage, false);
     }
   }
@@ -361,40 +337,37 @@
         const mainAvatarImg = document.querySelector('#main-avatar img');
         const profileGreeting = document.getElementById('profile-greeting');
         const emailInput = document.getElementById('email');
+        const nomeInput = document.getElementById('nome');
+        const cognomeInput = document.getElementById('cognome');
 
         if (navbarUsername) navbarUsername.textContent = currentUserDataFromStorage.nome || 'Utente';
-        selectedIconPath = currentUserDataFromStorage.iconPath || defaultIconPath; // iconPath da localStorage
+        selectedIconPath = currentUserDataFromStorage.iconPath || defaultIconPath;
         if (navbarAvatarImg) navbarAvatarImg.src = selectedIconPath;
         if (mainAvatarImg) mainAvatarImg.src = selectedIconPath;
         if (profileGreeting) profileGreeting.textContent = `Ciao, ${currentUserDataFromStorage.nome || 'Utente'}!`;
         if (emailInput) emailInput.value = currentUserDataFromStorage.email || '';
-        // Popola anche i campi nome e cognome del form se disponibili da localStorage
-        const nomeInput = document.getElementById('nome');
-        const cognomeInput = document.getElementById('cognome');
         if(nomeInput) nomeInput.value = currentUserDataFromStorage.nome || '';
-        if(cognomeInput) cognomeInput.value = currentUserDataFromStorage.cognome || '';
-
-
+        if(cognomeInput) cognomeInput.value = currentUserDataFromStorage.cognome || ''; // Popola anche cognome se c'è
       } catch(e) {
-        console.error("Errore nel parsing di userDataEFF da localStorage:", e);
         currentUserDataFromStorage = null;
         initializeUIForGuest("Errore nel caricamento dei dati locali. Prova a ricaricare o effettua nuovamente il login.");
       }
     } else {
-      console.log("Nessun userDataEFF in localStorage. La pagina carica in modalità limitata.");
       initializeUIForGuest("Effettua il login per accedere a tutte le funzionalità.");
     }
 
     if (currentUserDataFromStorage) {
-      await loadUserProfileFromServer(); // Tenta di caricare dati aggiornati dal server
+      await loadUserProfileFromServer();
       await loadAvailableIcons();
       await loadUserBookings();
+      await loadUserWaitlist(); // Carica anche la lista d'attesa
     } else {
-      // Se non ci sono dati utente nemmeno da localStorage, le sezioni icone e prenotazioni mostreranno messaggi di errore
       const avatarContainer = document.getElementById('avatar-options-container');
       if(avatarContainer) avatarContainer.innerHTML = '<p>Effettua il login per visualizzare le icone.</p>';
       const bookingsGrid = document.getElementById('user-bookings-grid');
       if(bookingsGrid) bookingsGrid.innerHTML = '<p style="text-align:center;">Effettua il login per visualizzare le prenotazioni.</p>';
+      const waitlistGrid = document.getElementById('user-waitlist-grid');
+      if(waitlistGrid) waitlistGrid.innerHTML = '<p style="text-align:center;">Effettua il login per visualizzare gli eventi in coda.</p>';
     }
 
     if (window.location.hash === '#prenotazioni') {
@@ -409,12 +382,9 @@
     const navbarUsername = document.getElementById('navbar-username');
     const profileGreeting = document.getElementById('profile-greeting');
 
-    // Abilita i form in caso fossero stati disabilitati da initializeUIForGuest
     document.querySelectorAll('#profile-info-form input:not([disabled]), #profile-info-form button').forEach(el => el.disabled = false);
     document.querySelectorAll('#save-icon-btn, #password-change-form input, #password-change-form button').forEach(el => el.disabled = false);
-    // L'input email rimane disabilitato come da HTML
     document.getElementById('email').disabled = true;
-
 
     try {
       const apiUserData = await callApi('api/api_get_user_profile.php');
@@ -427,32 +397,23 @@
         selectedIconPath = data.icon || defaultIconPath;
         if(mainAvatarImg) mainAvatarImg.src = selectedIconPath;
         if(navbarAvatarImg) navbarAvatarImg.src = selectedIconPath;
-
         if(navbarUsername) navbarUsername.textContent = data.nome || 'Utente';
         if(profileGreeting) profileGreeting.textContent = `Ciao, ${data.nome || 'Utente'}!`;
 
-        // Aggiorna currentUserDataFromStorage e localStorage con i dati freschi
         currentUserDataFromStorage = {
           nome: data.nome,
           cognome: data.cognome,
           email: data.email,
           iconPath: selectedIconPath
-          // Mantieni altri campi da localStorage se non sovrascritti dall'API
-          // ...(currentUserDataFromStorage || {}) // Non necessario se API è la fonte di verità
         };
         localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
         updateIconSelectionVisual();
       } else if (apiUserData && !apiUserData.success) {
-        // L'API ha risposto ma con success:false (es. "Utente non autenticato" se la sessione è scaduta lato server)
         displayMessage('profile-info-message', apiUserData.message || "Errore recupero profilo.", false);
         initializeUIForGuest(apiUserData.message || "Impossibile caricare i dati del profilo. Effettua il login.");
       }
-    } catch (error) { // Errore fetch (es. 401, 404, 500, rete)
+    } catch (error) {
       displayMessage('profile-info-message', `Errore caricamento profilo: ${error.message}.`, false);
-      // Se la chiamata API fallisce criticamente, considera di resettare a uno stato ospite
-      // initializeUIForGuest(`Errore caricamento profilo: ${error.message}.`);
-      // Tuttavia, se currentUserDataFromStorage ha dati, l'utente potrebbe ancora vedere quelli.
-      // Per ora, lasciamo i dati di localStorage visibili se il fetch fallisce, con un messaggio di errore.
     }
   }
 
@@ -474,12 +435,10 @@
         container.innerHTML = '';
         iconsData.icons.forEach(path => {
           const img = document.createElement('img');
-          // Assumiamo che i percorsi da api_get_icons.php siano già corretti per il web (es. /uploads/icons/icona.png)
           img.src = path;
           img.alt = 'Icona profilo';
           img.classList.add('avatar-option-image');
           img.setAttribute('data-path', path);
-
           img.addEventListener('click', () => {
             selectedIconPath = path;
             updateIconSelectionVisual();
@@ -488,7 +447,7 @@
           });
           container.appendChild(img);
         });
-        updateIconSelectionVisual(); // Applica la selezione dell'icona corrente dell'utente
+        updateIconSelectionVisual();
       } else {
         container.innerHTML = `<p>${iconsData.message || 'Nessuna icona disponibile.'}</p>`;
       }
@@ -498,16 +457,13 @@
   }
 
   document.getElementById('save-icon-btn')?.addEventListener('click', async () => {
-    if (!currentUserDataFromStorage) { // Verifica se l'utente è considerato loggato
-      displayMessage('icon-save-message', 'Devi essere autenticato per salvare l\'icona.', false);
-      return;
-    }
+    if (!currentUserDataFromStorage) { displayMessage('icon-save-message', 'Devi essere autenticato per salvare l\'icona.', false); return; }
     try {
       const response = await callApi('api/api_update_user_icon.php', 'PUT', { icon: selectedIconPath });
       if (response.success) {
         const navbarAvatarImg = document.querySelector('#navbar-avatar img');
         if (navbarAvatarImg) navbarAvatarImg.src = selectedIconPath;
-        if(currentUserDataFromStorage) { // Aggiorna l'icona anche nei dati locali
+        if(currentUserDataFromStorage) {
           currentUserDataFromStorage.iconPath = selectedIconPath;
           localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
         }
@@ -522,10 +478,7 @@
 
   document.getElementById('profile-info-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!currentUserDataFromStorage) {
-      displayMessage('profile-info-message', 'Devi essere autenticato per salvare le informazioni.', false);
-      return;
-    }
+    if (!currentUserDataFromStorage) { displayMessage('profile-info-message', 'Devi essere autenticato per salvare le informazioni.', false); return; }
     const updatedInfo = {
       nome: document.getElementById('nome').value,
       cognome: document.getElementById('cognome').value
@@ -553,20 +506,14 @@
 
   document.getElementById('password-change-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!currentUserDataFromStorage) {
-      displayMessage('password-change-message', 'Devi essere autenticato per cambiare la password.', false);
-      return;
-    }
+    if (!currentUserDataFromStorage) { displayMessage('password-change-message', 'Devi essere autenticato per cambiare la password.', false); return; }
     const oldPassword = document.getElementById('vecchia-password').value;
     const newPassword = document.getElementById('nuova-password').value;
     const confirmPassword = document.getElementById('conferma-password').value;
 
-    if (newPassword !== confirmPassword) {
-      displayMessage('password-change-message', 'Le nuove password non coincidono!', false); return;
-    }
-    if (newPassword.length < 8) {
-      displayMessage('password-change-message', 'La nuova password deve essere di almeno 8 caratteri.', false); return;
-    }
+    if (newPassword !== confirmPassword) { displayMessage('password-change-message', 'Le nuove password non coincidono!', false); return; }
+    if (newPassword.length < 8) { displayMessage('password-change-message', 'La nuova password deve essere di almeno 8 caratteri.', false); return; }
+
     try {
       const response = await callApi('api/api_change_password.php', 'POST', { oldPassword, newPassword });
       if (response.success) {
@@ -584,10 +531,8 @@
     const bookingsGrid = document.getElementById('user-bookings-grid');
     const noBookingsMsg = document.getElementById('no-bookings-message');
     if (!bookingsGrid || !noBookingsMsg) return;
-
     bookingsGrid.innerHTML = '<p style="text-align:center; padding:1rem;">Caricamento prenotazioni...</p>';
     noBookingsMsg.style.display = 'none';
-
     try {
       const response = await callApi('api/api_get_user_bookings.php');
       if (response.success && response.bookings) {
@@ -619,9 +564,74 @@
         noBookingsMsg.style.display = 'none';
       }
     } catch (error) {
-      console.warn("Impossibile caricare le prenotazioni:", error.message);
       bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore caricamento prenotazioni: ${error.message}</p>`;
       noBookingsMsg.style.display = 'none';
+    }
+  }
+
+  async function loadUserWaitlist() {
+    const waitlistGrid = document.getElementById('user-waitlist-grid');
+    const noWaitlistMsg = document.getElementById('no-waitlist-message');
+    if (!waitlistGrid || !noWaitlistMsg) return;
+
+    waitlistGrid.innerHTML = '<p style="text-align:center; padding:1rem;">Caricamento eventi in coda...</p>';
+    noWaitlistMsg.style.display = 'none';
+
+    try {
+      const response = await callApi('api/api_get_user_waitlist.php');
+      if (response.success && response.waitlistEntries) {
+        const entries = response.waitlistEntries;
+        waitlistGrid.innerHTML = '';
+
+        if (entries.length > 0) {
+          entries.forEach(entry => {
+            const formattedDate = entry.eventDataInizio ? new Date(entry.eventDataInizio.replace(/-/g, '/')).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Data non definita';
+            let statusMessage = `Sei in coda per ${entry.numeroPostiInCoda} posto/i.`;
+            let statusColor = 'orange';
+            let cardClass = '';
+
+            if (parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile) {
+              statusMessage = `ATTENZIONE: Si sono liberati ${entry.eventPostiDisponibili} posti! Prenota ora. (Richiesti in coda: ${entry.numeroPostiInCoda})`;
+              statusColor = 'var(--success, green)';
+            } else if (!entry.eventFlagPrenotabile) {
+              statusMessage = `Evento non più prenotabile. (Richiesti in coda: ${entry.numeroPostiInCoda})`;
+              statusColor = 'var(--gray-dark, grey)';
+              cardClass = 'waitlist-card-unavailable'; // Usa la stessa classe degli eventi passati per opacità
+            }
+
+            const cardHtml = `
+                        <article class="card ${cardClass}">
+                          <div class="card-image-container">
+                              <img src="${entry.eventFotoCopertina || defaultIconPath}" alt="Evento: ${entry.eventTitolo}" class="card-image">
+                          </div>
+                          <div class="card-content">
+                              <h3>${entry.eventTitolo || 'Evento Sconosciuto'}</h3>
+                              <p class="card-info">
+                                  <b>Data Evento:</b> ${formattedDate}<br>
+                                  <b style="color: ${statusColor};">Stato Coda:</b> <span style="color: ${statusColor};">${statusMessage}</span>
+                              </p>
+                              <div class="card-actions">
+                                  <a href="evento_dettaglio_accesso.html?id=${entry.idEvento}" class="card-btn card-btn-secondary">Vedi Evento</a>
+                                  ${(parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile) ?
+                    `<a href="eventiincorsoaccesso.html" class="card-btn card-btn-primary">Prenota Ora</a>` :
+                    ''
+            }
+                                  </div>
+                          </div>
+                        </article>
+                    `;
+            waitlistGrid.insertAdjacentHTML('beforeend', cardHtml);
+          });
+        } else {
+          noWaitlistMsg.style.display = 'block';
+        }
+      } else {
+        waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento eventi in coda.'}</p>`;
+        noWaitlistMsg.style.display = 'none';
+      }
+    } catch (error) {
+      waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore caricamento eventi in coda: ${error.message}</p>`;
+      noWaitlistMsg.style.display = 'none';
     }
   }
 
@@ -643,7 +653,8 @@
         const response = await callApi('api/api_cancel_booking.php', 'POST', { idPrenotazione: bookingId });
         if (response.success) {
           alert(response.message || `Prenotazione annullata con successo.`);
-          loadUserBookings(); // Ricarica la lista
+          loadUserBookings(); // Ricarica la lista delle prenotazioni
+          loadUserWaitlist(); // Ricarica anche la lista d'attesa, perché l'annullamento potrebbe aver liberato posti e cambiato lo stato per l'utente stesso
         } else {
           alert(response.message || `Errore durante l'annullamento.`);
         }
@@ -655,19 +666,9 @@
 
   function logout() {
     localStorage.removeItem('userDataEFF');
-    // localStorage.removeItem('authTokenEFF'); // Rimuovi se dovessi implementare un sistema a token separato
-
+    // localStorage.removeItem('authTokenEFF'); // Se mai implementerai un token separato
     // Idealmente, chiamare un endpoint API per invalidare la sessione PHP lato server
-    // fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' })
-    // .then(() => {
-    //   alert('Logout effettuato. Verrai reindirizzato alla homepage.');
-    //   window.location.href = 'index.html';
-    // }).catch(err => {
-    //   console.error("Errore durante il logout API:", err);
-    //   alert('Logout effettuato (client). Verrai reindirizzato.'); // Anche se API fallisce, procedi con logout client
-    //   window.location.href = 'index.html';
-    // });
-    // Per ora, logout solo client-side e reindirizzamento:
+    // fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' }); // Esempio
     alert('Logout effettuato. Verrai reindirizzato alla homepage.');
     window.location.href = 'index.html';
   }
