@@ -5,164 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="images/logo.png" type="image/x-icon">
     <title>Dettaglio Evento - Eremo Frate Francesco</title>
-    <link rel="stylesheet" href="style.css"> {/* ASSICURATI CHE QUESTO PERCORSO SIA CORRETTO! */}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* Stili CSS (assicurati che le variabili CSS come --primary, --border-radius-medium, ecc. siano definite in style.css) */
-        body { font-family: sans-serif; margin:0; background-color: var(--background-color, #f4f4f4); color: var(--text-color, #333); }
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
-        .section-padding { padding-top: 2rem; padding-bottom: 2rem; }
-
-        .event-detail-container { padding-top: 1rem; }
-        .event-cover-image {
-            width: 100%; max-height: 450px; object-fit: cover;
-            border-radius: var(--border-radius-medium, 8px); margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-light, 0 2px 8px rgba(0,0,0,0.1)); display: none;
-        }
-        .event-title-main {
-            font-size: clamp(2rem, 4.5vw, 2.8rem); color: var(--primary, #337ab7);
-            margin-bottom: 1rem; text-align: center;
-        }
-        .event-meta-info {
-            display: flex; flex-wrap: wrap; gap: 0.8rem 1.5rem; margin-bottom: 1.5rem;
-            color: var(--gray-dark, #555); font-size: 0.95rem; border-bottom: 1px solid var(--gray-light, #ddd);
-            padding-bottom: 1rem; text-align: left; display: none;
-        }
-        .event-meta-info span { display: flex; align-items: center; gap: 0.5rem; }
-        .event-meta-info i { color: var(--secondary, #5cb85c); width: 16px; text-align: center; }
-        .event-description-full {
-            margin-bottom: 2.5rem; line-height: 1.8; text-align: left; display: none;
-        }
-        .volantino-link-container { margin: 2rem 0; text-align: left; display:none; }
-        .volantino-link-container h4{ text-align: left; margin-bottom: 0.5rem; font-size: 1.1rem; color: var(--primary, #337ab7);}
-        .btn-volantino {
-            display: inline-block; padding: 0.6em 1.2em; background-color: var(--primary, #337ab7); color: var(--white, #fff);
-            text-decoration: none; border-radius: var(--border-radius-small, 4px); transition: background-color 0.3s ease;
-        }
-        .btn-volantino:hover { background-color: var(--primary-dark, #286090); }
-        .btn-volantino i { margin-right: 0.5em; }
-
-
-        .event-gallery-container { margin-top: 2rem; margin-bottom: 3rem; }
-        .event-gallery-container > h2 {
-            text-align: center; font-size: clamp(1.8rem, 4vw, 2.3rem);
-            color: var(--primary, #337ab7); margin-bottom: 2rem; padding-left:0;
-        }
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;}
-        .gallery-item {
-            position: relative; overflow: hidden; border-radius: var(--border-radius-medium, 8px);
-            box-shadow: var(--shadow-light, 0 2px 8px rgba(0,0,0,0.1)); aspect-ratio: 4/3; background-color: var(--gray-light, #eee);
-            cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .gallery-item:hover {transform: scale(1.05); box-shadow: var(--shadow-medium, 0 4px 12px rgba(0,0,0,0.15)); }
-        .gallery-item img, .gallery-item video { width: 100%; height: 100%; object-fit: cover; display: block;}
-        .gallery-item .media-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2);
-            display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;
-        }
-        .gallery-item:hover .media-overlay { opacity: 1; }
-        .gallery-item .media-play-icon { font-size: 2.5rem; color: var(--white, #fff); text-shadow: 0 1px 5px rgba(0,0,0,0.4); }
-
-        .lightbox {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85);
-            display: flex; justify-content: center; align-items: center; z-index: 1000;
-            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s;
-        }
-        .lightbox.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s 0s; }
-        .lightbox-content { position: relative; max-width: 90%; max-height: 85%;}
-        .lightbox-content img, .lightbox-content iframe, .lightbox-content video {
-            display: block; max-width: 100%; max-height: 80vh; margin: 0 auto;
-            border: 3px solid var(--white, #fff); border-radius: var(--border-radius-small, 4px);
-        }
-        .lightbox-content iframe { width: 80vw; height: calc(80vw * 9 / 16); min-height: 300px; } /* Aspect ratio 16:9 */
-
-        .lightbox-close, .lightbox-navigation {
-            position: absolute; background: rgba(0,0,0,0.5); color: var(--white, #fff); border: none;
-            padding: 0.5rem 1rem; cursor: pointer; font-size: 1.5rem; z-index: 1001;
-            border-radius: var(--border-radius-small, 4px);
-        }
-        .lightbox-close { top: 15px; right: 15px; }
-        .lightbox-prev { left: 15px; top: 50%; transform: translateY(-50%); }
-        .lightbox-next { right: 15px; top: 50%; transform: translateY(-50%); }
-        #lightbox-caption {
-            color: var(--white, #fff); text-align: center; margin-top: 10px; padding: 0 15px;
-            font-size: 0.9rem; width: 100%; box-sizing: border-box;
-        }
-
-
-        .comments-section { margin-top: 2rem; background-color: var(--white, #fff); padding: 2rem; border-radius: var(--border-radius-medium, 8px); box-shadow: var(--shadow-light, 0 2px 8px rgba(0,0,0,0.05));}
-        .comments-section h2, .comments-section h3, .comments-section h4 {color: var(--primary, #337ab7); text-align: left;}
-        .comments-section h2 {text-align: center; margin-bottom: 1.5rem;}
-        .comment-form { margin-bottom:2rem; }
-        .comment-form-container { display:flex; gap:0.5rem; align-items: flex-start; }
-        .comment-form textarea {
-            flex-grow:1; padding:0.75rem; border:1px solid var(--gray-light, #ddd);
-            border-radius:var(--border-radius-small, 4px); font-size:1rem; min-height: 60px;
-            transition: border-color 0.3s ease;
-        }
-        .comment-form textarea:focus { border-color: var(--primary, #337ab7); outline:none; box-shadow: 0 0 0 2px rgba(var(--primary-rgb, 51,122,183), 0.2); }
-        .btn-comment {
-            padding: 0.75rem 1rem; background-color:var(--primary, #337ab7); color:var(--white, #fff);
-            border:none; border-radius:var(--border-radius-small, 4px); cursor:pointer; font-size:1rem;
-            transition: background-color 0.3s ease; white-space: nowrap;
-        }
-        .btn-comment:hover { background-color:var(--primary-dark, #286090); }
-        .btn-comment.btn-small { padding: 0.5rem 0.8rem; font-size:0.9rem;}
-        .btn-comment i { margin-right: 0.3em; }
-
-
-        .comments-list .comment {
-            margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom: 1px solid var(--gray-light, #eee);
-            text-align:left;
-        }
-        .comments-list .comment:last-child { border-bottom:none; margin-bottom:0; padding-bottom: 0;}
-        .comment-header { display:flex; align-items:center; margin-bottom:0.5rem; gap:0.75rem; }
-        .comment .user-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; background-color:var(--gray-light, #eee); }
-        .comment-meta { font-size:0.9rem; }
-        .comment-meta strong { color:var(--text-color-dark, #333); }
-        .comment-meta small { color:var(--gray-dark, #777); margin-left:0.5rem; }
-        .comment p { margin-top:0.3rem; margin-bottom:0.75rem; line-height:1.6; word-wrap:break-word; }
-        .comment-actions { display:flex; gap:1rem; margin-bottom:0.5rem; }
-        .comment-actions button { background:none; border:none; color:var(--gray-dark, #777); cursor:pointer; padding:0.2rem 0.5rem; font-size:0.85rem;}
-        .comment-actions button:hover { color:var(--primary, #337ab7); }
-        .comment-actions button i { margin-right:0.3em; }
-        .comment-actions .like-btn.active i { color: var(--danger, #d9534f); }
-        .comment-actions .like-btn.active { font-weight: bold;}
-
-        .replies { margin-left: 40px; margin-top:1rem; border-left: 2px solid var(--gray-light, #eee); padding-left:1rem; }
-        .reply .comment-header { /* Stili specifici per le risposte se necessario */ }
-        .reply-form { margin-top:0.5rem; display:none; /* Nascosto per default */ }
-        .reply-form.active { display:block; }
-        .reply-form form { display:flex; gap:0.5rem; align-items:flex-start; margin-top:0.5rem;}
-        .reply-form textarea {flex-grow:1; font-size:0.9rem; padding:0.5rem; min-height: 40px;}
-        .reply-form .form-message-local { flex-basis: 100%; margin-top: 0.5em; font-size:0.85em; }
-
-
-        .no-content-message { text-align:center; padding:2rem; color: var(--gray-dark, #777); font-style: italic; }
-
-        .loading-overlay {
-            display: none; position: absolute; top:0; left:0; width:100%; height:100%;
-            background: rgba(255,255,255,0.8); justify-content:center; align-items:center;
-            z-index:10; flex-direction: column;
-        }
-        .loading-overlay.visible { display: flex;}
-        .spinner { margin: 0 auto 20px; width: 70px; text-align: center; }
-        .spinner > div { width: 18px; height: 18px; background-color: var(--primary, #337ab7); border-radius: 100%; display: inline-block; -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both; animation: sk-bouncedelay 1.4s infinite ease-in-out both; }
-        .spinner .bounce1 { -webkit-animation-delay: -0.32s; animation-delay: -0.32s; }
-        .spinner .bounce2 { -webkit-animation-delay: -0.16s; animation-delay: -0.16s; }
-        @-webkit-keyframes sk-bouncedelay { 0%, 80%, 100% { -webkit-transform: scale(0) } 40% { -webkit-transform: scale(1.0) } }
-        @keyframes sk-bouncedelay { 0%, 80%, 100% { transform: scale(0); -webkit-transform: scale(0); } 40% { transform: scale(1.0); -webkit-transform: scale(1.0); } }
-        .spinner-mini { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.5); border-top-color: #fff; border-radius: 50%; display: inline-block; animation: spin 0.8s linear infinite; margin-right: 5px; vertical-align: middle;}
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .form-message { padding: 0.5em 0; font-size:0.9em; text-align:left; }
-        .form-message.error { color: var(--danger, #d9534f); }
-        .form-message.success { color: var(--success, #5cb85c); }
-
-        /* Stili per navbar e mobile menu (assicurati che siano consistenti con style.css) */
-        .navbar-container { /* ... */ } .navbar { /* ... */ } .logo { /* ... */ } .menu { /* ... */ } .right-menu { /* ... */ }
-        .user-dropdown { /* ... */ } .dropdown-menu { /* ... */ } .hamburger { /* ... */ } .mobile-menu { /* ... */ }
-    </style>
+    <link rel="stylesheet" href="style.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
@@ -345,9 +188,9 @@
     if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
     document.addEventListener('click', function(event) {
         if (mobileMenu && mobileMenu.classList.contains('open')) {
-            if (mobileMenu.contains(event.target) && event.target.tagName === 'A') { // Chiudi se clicco un link nel menu
+            if (mobileMenu.contains(event.target) && event.target.tagName === 'A') {
                 closeMobileMenu();
-            } else if (hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) { // Chiudi se clicco fuori
+            } else if (hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) {
                 closeMobileMenu();
             }
         }
@@ -364,43 +207,31 @@
     let currentMediaIndexInLightbox = 0;
     let galleryItemsData = [];
 
-    function getYouTubeID(url) {
-        if (!url || typeof url !== 'string') return null;
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2] && match[2].length === 11) ? match[2] : null;
-    }
-
     function openLightbox(index) {
-        if (!lightbox || !lightboxContent || !lightboxCaption || galleryItemsData.length === 0 || !galleryItemsData[index]) return;
+        if (!lightbox || !lightboxContent || !lightboxCaption || galleryItemsData.length === 0 || !galleryItemsData[index]) {
+            return;
+        }
         currentMediaIndexInLightbox = index;
         const item = galleryItemsData[index];
         lightboxContent.innerHTML = '';
 
-        if (item.type === 'youtube') {
-            const videoId = getYouTubeID(item.href);
-            if (videoId) {
-                const iframe = document.createElement('iframe');
-                iframe.src = \`https://www.youtube.com/embed/\${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0\`;
-                iframe.frameBorder = '0';
-                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-                iframe.allowFullscreen = true;
-                lightboxContent.appendChild(iframe);
-            } else {
-                lightboxContent.textContent = "ID Video YouTube non valido: " + sanitizeTextForHTML(item.href);
-            }
-        } else if (item.type === 'video') {
+        if (item.type === 'video') {
             const video = document.createElement('video');
             video.src = item.href;
-            video.controls = true; video.autoplay = true;
-            video.style.maxWidth = '100%'; video.style.maxHeight = '85vh';
+            video.controls = true;
+            video.autoplay = true;
+            video.style.maxWidth = '100%';
+            video.style.maxHeight = '85vh';
             lightboxContent.appendChild(video);
-        } else { // 'image'
+        } else if (item.type === 'image') {
             const img = document.createElement('img');
             img.src = item.href;
             img.alt = item.title || "Immagine galleria";
             lightboxContent.appendChild(img);
+        } else {
+            lightboxContent.textContent = "Tipo di media non supportato per la visualizzazione ingrandita.";
         }
+
         lightboxCaption.textContent = item.title || '';
         lightboxCaption.style.display = item.title ? 'block' : 'none';
         lightbox.classList.add('active');
@@ -413,8 +244,9 @@
         lightboxContent.innerHTML = '';
         document.body.style.overflow = '';
     }
+
     function changeLightboxMedia(direction) {
-        if(galleryItemsData.length === 0) return;
+        if (galleryItemsData.length === 0) return;
         currentMediaIndexInLightbox = (currentMediaIndexInLightbox + direction + galleryItemsData.length) % galleryItemsData.length;
         openLightbox(currentMediaIndexInLightbox);
     }
@@ -436,10 +268,10 @@
     }
 
     function sanitizeTextForHTML(str) {
-        if (typeof str !== 'string') str = String(str || ''); // Gestisce null/undefined
+        if (typeof str !== 'string') str = String(str || '');
         const temp = document.createElement('div');
         temp.textContent = str;
-        return temp.innerHTML.replace(/\\r\\n|\\r|\\n/g, '<br>');
+        return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');
     }
 
     async function fetchEventDetails(eventId) {
@@ -462,59 +294,64 @@
         });
 
         try {
-            const response = await fetch(\`get_event_details.php?id=\${encodeURIComponent(eventId)}\`);
-            if (!response.ok) throw new Error(\`Errore HTTP (\${response.status}): \${response.statusText}\`);
+            const response = await fetch('get_event_details.php?id=' + encodeURIComponent(eventId));
+            if (!response.ok) {
+                const errorText = await response.text().catch(()=> "Dettaglio errore server non disponibile.");
+                throw new Error('Errore HTTP (' + response.status + '): ' + response.statusText + ". Dettaglio: " + errorText.substring(0,200) );
+            }
 
             const contentType = response.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 const responseText = await response.text().catch(() => "Risposta non JSON e illeggibile.");
-                throw new Error(\`Risposta non attesa da get_event_details.php (non JSON): \${responseText.substring(0,200)}\`);
+                throw new Error('Risposta non attesa da get_event_details.php (tipo: ' + contentType + '): ' + responseText.substring(0,200));
             }
             const result = await response.json();
 
             if (result.success && result.data) {
-                const event = result.data.details;
+                const event = result.data.details; // Variabile 'event' (singolare)
                 const mediaItems = result.data.media || [];
                 const fetchedComments = result.data.comments || [];
 
-                if (eventTitleHeaderEl && event && event.Titolo) {
+                if (eventTitleHeaderEl && event && event.Titolo) { // Usa event.Titolo
                     eventTitleHeaderEl.textContent = event.Titolo;
-                    document.title = \`\${event.Titolo} - Eremo Frate Francesco\`;
+                    document.title = sanitizeTextForHTML(event.Titolo) + ' - Eremo Frate Francesco';
                 } else if (eventTitleHeaderEl) {
-                     eventTitleHeaderEl.textContent = "Dettaglio Evento";
+                    eventTitleHeaderEl.textContent = "Dettaglio Evento";
                 }
 
-                if (event) {
-                    if(event.FotoCopertina && eventCoverImageEl){
+                if (event) { // Controlla 'event'
+                    if(event.FotoCopertina && eventCoverImageEl){ // Usa event.FotoCopertina
                         eventCoverImageEl.src = event.FotoCopertina;
-                        eventCoverImageEl.alt = "Copertina " + sanitizeTextForHTML(event.Titolo || "evento");
+                        eventCoverImageEl.alt = "Copertina " + sanitizeTextForHTML(event.Titolo || "evento"); // Usa event.Titolo
                         eventCoverImageEl.style.display = 'block';
                     }
                     if(eventMetaInfoEl){
                         let metaHTML = '';
-                        if (event.Data) {
+                        if (event.Data) { // Usa event.Data
                             try {
-                                metaHTML += \`<span><i class="fas fa-calendar-alt"></i> \${new Date(event.Data.replace(/-/g, '/')).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'})}</span>\`;
+                                metaHTML += '<span><i class="fas fa-calendar-alt"></i> ' + new Date(event.Data.replace(/-/g, '/')).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'}) + '</span>';
                             } catch (dateError) {
-                                metaHTML += \`<span><i class="fas fa-calendar-alt"></i> \${sanitizeTextForHTML(event.Data)}</span>\`;
+                                console.warn("Formato data evento non valido:", event.Data, dateError);
+                                metaHTML += '<span><i class="fas fa-calendar-alt"></i> ' + sanitizeTextForHTML(event.Data) + '</span>';
                             }
                         }
-                        if (event.Durata) metaHTML += \`<span><i class="fas fa-clock"></i> \${sanitizeTextForHTML(event.Durata)}</span>\`;
-                        if (event.Relatore) metaHTML += \`<span><i class="fas fa-user"></i> \${sanitizeTextForHTML(event.PrefissoRelatore || 'Relatore')}: \${sanitizeTextForHTML(event.Relatore)}</span>\`;
-                        if (event.Associazione) metaHTML += \`<span><i class="fas fa-users"></i> \${sanitizeTextForHTML(event.Associazione)}</span>\`;
+                        if (event.Durata) metaHTML += '<span><i class="fas fa-clock"></i> ' + sanitizeTextForHTML(event.Durata) + '</span>'; // Usa event.Durata
+                        if (event.Relatore) metaHTML += '<span><i class="fas fa-user"></i> ' + sanitizeTextForHTML(event.PrefissoRelatore || 'Relatore') + ': ' + sanitizeTextForHTML(event.Relatore) + '</span>'; // Usa event.PrefissoRelatore, event.Relatore
+                        if (event.Associazione) metaHTML += '<span><i class="fas fa-users"></i> ' + sanitizeTextForHTML(event.Associazione) + '</span>'; // Usa event.Associazione
                         eventMetaInfoEl.innerHTML = metaHTML;
                         if (metaHTML) eventMetaInfoEl.style.display = 'flex';
                     }
-                    if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){
+                    // Area della potenziale riga 442 (o vicinanze)
+                    if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){ // Usa event.DescrizioneEstesa, event.Descrizione
                         eventDescriptionFullEl.innerHTML = sanitizeTextForHTML(event.DescrizioneEstesa || event.Descrizione);
                         eventDescriptionFullEl.style.display = 'block';
                     }
-                    if(eventVolantinoContainerEl && event.VolantinoUrl){
-                        eventVolantinoContainerEl.innerHTML = \`
-                            <h4>Volantino Evento</h4>
-                            <a href="\${encodeURI(event.VolantinoUrl)}" target="_blank" title="Visualizza volantino \${sanitizeTextForHTML(event.Titolo || '')}" class="btn-volantino">
-                                <i class="fas fa-file-pdf"></i> Visualizza Volantino
-                            </a>\`;
+                    if(eventVolantinoContainerEl && event.VolantinoUrl){ // Usa event.VolantinoUrl
+                        eventVolantinoContainerEl.innerHTML =
+                            '<h4>Volantino Evento</h4>' +
+                            '<a href="' + encodeURI(event.VolantinoUrl) + '" target="_blank" title="Visualizza volantino ' + sanitizeTextForHTML(event.Titolo || '') + '" class="btn-volantino">' + // Usa event.Titolo
+                            '<i class="fas fa-file-pdf"></i> Visualizza Volantino' +
+                            '</a>';
                         eventVolantinoContainerEl.style.display = 'block';
                     }
                 } else {
@@ -529,31 +366,33 @@
 
                     mediaItems.forEach(item => {
                         const rawPercorso = item.Percorso || '';
-                        const ytId = getYouTubeID(rawPercorso);
-                        let itemType, itemHref, thumbSrc;
-                        const mediaTitle = sanitizeTextForHTML(item.TitoloMedia || (event ? event.Titolo : '') || 'Media');
+                        let itemType = 'unknown';
+                        let itemHref = 'uploads/event_images/' + rawPercorso;
+                        let thumbSrc = 'images/file_placeholder.png';
+                        const mediaTitle = sanitizeTextForHTML(item.TitoloMedia || (event ? event.Titolo : '') || 'Media'); // Usa 'event'
 
-                        if (ytId) {
-                            itemType = 'youtube'; itemHref = rawPercorso;
-                            thumbSrc = \`https://img.youtube.com/vi/\$\${ytId}/hqdefault.jpg\`;
-                        } else {
-                            itemHref = \`uploads/event_images/\${rawPercorso}\`;
-                            if (rawPercorso.match(/\.(mp4|webm|ogg)$/i)) {
-                                itemType = 'video'; thumbSrc = 'images/video_placeholder.png';
-                            } else if (rawPercorso.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-                                itemType = 'image'; thumbSrc = itemHref;
-                            } else { itemType = 'unknown'; thumbSrc = 'images/file_placeholder.png'; }
+                        // Regex verificate per non avere flag invalidi
+                        if (rawPercorso.match(/\.(mp4|webm|ogg)$/i)) {
+                            itemType = 'video';
+                            thumbSrc = 'images/video_placeholder.png';
+                        } else if (rawPercorso.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                            itemType = 'image';
+                            thumbSrc = itemHref;
                         }
 
                         if (itemType !== 'unknown') {
                             galleryItemsData.push({ href: itemHref, title: mediaTitle, type: itemType });
                             const galleryItemDiv = document.createElement('div');
                             galleryItemDiv.className = 'gallery-item';
-                            galleryItemDiv.innerHTML = \`
-                                <a href="#" data-index="\${galleryItemsData.length - 1}" title="\${mediaTitle}">
-                                    <img src="\${thumbSrc}" alt="\${mediaTitle}">
-                                    \${(itemType === 'youtube' || itemType === 'video') ? '<div class="media-overlay"><i class="fas fa-play media-play-icon"></i></div>' : ''}
-                                </a>\`;
+
+                            let itemHtml = '<a href="#" data-index="' + (galleryItemsData.length - 1) + '" title="' + mediaTitle + '">';
+                            itemHtml += '<img src="' + thumbSrc + '" alt="' + mediaTitle + '">';
+                            if (itemType === 'video') {
+                                itemHtml += '<div class="media-overlay"><i class="fas fa-play media-play-icon"></i></div>';
+                            }
+                            itemHtml += '</a>';
+                            galleryItemDiv.innerHTML = itemHtml;
+
                             if (galleryGridEl) galleryGridEl.appendChild(galleryItemDiv);
                         }
                     });
@@ -596,60 +435,61 @@
                 throw new Error(result.message || "Formato dati evento non corretto da get_event_details.php.");
             }
         } catch (error) {
-            console.error("Errore fetchEventDetails:", error);
-            if (eventTitleHeaderEl) eventTitleHeaderEl.innerHTML = \`<p class="no-content-message">Impossibile caricare i dettagli: \${sanitizeTextForHTML(error.message)}</p>\`;
+            console.error("Errore grave in fetchEventDetails:", error);
+            if (eventTitleHeaderEl) eventTitleHeaderEl.innerHTML = "<p class='no-content-message'>Impossibile caricare i dettagli dell'evento: " + sanitizeTextForHTML(error.message) + "</p>";
         } finally {
             if (pageLoadingEl) pageLoadingEl.classList.remove('visible');
         }
-    }
+    } // Fine fetchEventDetails
 
     function displayComments(comments, parentEl) {
         parentEl.innerHTML = '';
-        comments.forEach(comment => {
-            parentEl.appendChild(createCommentElement(comment));
-        });
+        if (Array.isArray(comments)) {
+            comments.forEach(comment => {
+                parentEl.appendChild(createCommentElement(comment));
+            });
+        }
     }
 
     function createCommentElement(commentData, isReply = false) {
         const commentDiv = document.createElement('div');
         commentDiv.className = isReply ? 'comment reply' : 'comment';
-        commentDiv.id = \`comment-\${commentData.Progressivo}\`;
+        commentDiv.id = 'comment-' + commentData.Progressivo;
 
         let rawUserName = 'Anonimo';
-        if (commentData.Contatto) {
-            rawUserName = commentData.Contatto.split('@')[0];
-        }
-        if (currentUser && currentUser.email === commentData.Contatto && currentUser.nome) {
-            rawUserName = currentUser.nome;
-        }
+        if (commentData.Contatto) { rawUserName = commentData.Contatto.split('@')[0]; }
+        if (currentUser && currentUser.email === commentData.Contatto && currentUser.nome) { rawUserName = currentUser.nome; }
 
         const safeUserName = sanitizeTextForHTML(rawUserName);
         const safeCommentDate = sanitizeTextForHTML(commentData.Data);
         const sanitizedDescription = sanitizeTextForHTML(commentData.Descrizione);
-        const avatarUrl = \`https://i.pravatar.cc/40?u=\${encodeURIComponent(commentData.Contatto || 'default_user')}\`;
+        const avatarUrl = 'https://i.pravatar.cc/40?u=' + encodeURIComponent(commentData.Contatto || 'default_user');
 
-        commentDiv.innerHTML = \`
-            <div class="comment-header">
-                <img src="\${avatarUrl}" alt="Avatar \${safeUserName}" class="user-avatar">
-                <div class="comment-meta"><strong>\${safeUserName}</strong> <small>\${safeCommentDate}</small></div>
-            </div>
-            <p>\${sanitizedDescription}</p>
-            <div class="comment-actions">
-                <button class="like-btn" data-comment-id="\${commentData.Progressivo}" aria-label="Mi piace"><i class="far fa-heart"></i> <span class="like-count">0</span></button>
-                <button class="btn-reply" data-comment-id="\${commentData.Progressivo}" aria-label="Rispondi"><i class="fas fa-reply"></i> Rispondi</button>
-            </div>
-            <div class="reply-form" id="reply-form-\${commentData.Progressivo}">
-                 <form data-parent-comment-id="\${commentData.Progressivo}">
-                    <textarea name="Descrizione" placeholder="Rispondi a \${safeUserName}..." rows="2" required aria-label="Testo della risposta"></textarea>
-                    <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia</button>
-                    <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em;"></div>
-                 </form>
-            </div>
-            <div class="replies"></div>\`;
+        let commentHTML =
+            '<div class="comment-header">' +
+            '<img src="' + avatarUrl + '" alt="Avatar ' + safeUserName + '" class="user-avatar">' +
+            '<div class="comment-meta"><strong>' + safeUserName + '</strong> <small>' + safeCommentDate + '</small></div>' +
+            '</div>' +
+            '<p>' + sanitizedDescription + '</p>' +
+            '<div class="comment-actions">' +
+            '<button class="like-btn" data-comment-id="' + commentData.Progressivo + '" aria-label="Mi piace"><i class="far fa-heart"></i> <span class="like-count">0</span></button>' +
+            '<button class="btn-reply" data-comment-id="' + commentData.Progressivo + '" aria-label="Rispondi"><i class="fas fa-reply"></i> Rispondi</button>' +
+            '</div>' +
+            '<div class="reply-form" id="reply-form-' + commentData.Progressivo + '">' +
+            '<form data-parent-comment-id="' + commentData.Progressivo + '">' +
+            '<textarea name="Descrizione" placeholder="Rispondi a ' + safeUserName + '..." rows="2" required aria-label="Testo della risposta"></textarea>' +
+            '<button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia</button>' +
+            '<div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em;"></div>' +
+            '</form>' +
+            '</div>' +
+            '<div class="replies"></div>';
+        commentDiv.innerHTML = commentHTML;
 
-        if (commentData.replies && commentData.replies.length > 0) {
+        if (commentData.replies && Array.isArray(commentData.replies) && commentData.replies.length > 0) {
             const repliesContainer = commentDiv.querySelector('.replies');
-            commentData.replies.forEach(reply => repliesContainer.appendChild(createCommentElement(reply, true)));
+            if (repliesContainer) {
+                commentData.replies.forEach(reply => repliesContainer.appendChild(createCommentElement(reply, true)));
+            }
         }
         attachCommentInteractionListeners(commentDiv);
         return commentDiv;
@@ -667,24 +507,27 @@
     }
 
     function handleLikeAction(btn) {
-         const icon = btn.querySelector('i');
-         const countSpan = btn.querySelector('.like-count');
-         let count = parseInt(countSpan.textContent) || 0;
+        const icon = btn.querySelector('i');
+        const countSpan = btn.querySelector('.like-count');
+        let count = parseInt(countSpan.textContent) || 0;
         if (btn.classList.toggle('active')) {
             icon.classList.remove('far'); icon.classList.add('fas');
-            countSpan.textContent = count + 1;
+            countSpan.textContent = String(count + 1);
         } else {
             icon.classList.remove('fas'); icon.classList.add('far');
-            countSpan.textContent = Math.max(0, count - 1);
+            countSpan.textContent = String(Math.max(0, count - 1));
         }
     }
 
     function toggleReplyFormAction(btn) {
         const commentId = btn.dataset.commentId;
-        const formDiv = document.getElementById(\`reply-form-\${commentId}\`);
+        const formDiv = document.getElementById('reply-form-' + commentId);
         if(formDiv){
             const isActive = formDiv.classList.toggle('active');
-            if(isActive) formDiv.querySelector('textarea').focus();
+            if(isActive) {
+                const textarea = formDiv.querySelector('textarea');
+                if (textarea) textarea.focus();
+            }
             const localMsg = formDiv.querySelector('.form-message-local');
             if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }
         }
@@ -717,7 +560,7 @@
         const submitBtn = form.querySelector('button[type="submit"]');
         const commentFormMessageElement = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
 
-        if (!submitBtn) { return; }
+        if (!submitBtn) { console.error("Bottone di submit non trovato."); return; }
         const originalBtnText = submitBtn.innerHTML;
 
         submitBtn.disabled = true;
@@ -734,13 +577,13 @@
 
             if (!response.ok) {
                 const errorText = await response.text().catch(() => "Impossibile leggere il corpo dell'errore.");
-                throw new Error(\`Errore dal server (\${response.status} \${response.statusText}). Dettagli: \${errorText.substring(0, 200)}\`);
+                throw new Error('Errore dal server (' + response.status + ' ' + response.statusText + '). Dettagli: ' + errorText.substring(0, 200));
             }
 
             const contentType = response.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 const responseText = await response.text().catch(() => "Risposta non JSON e illeggibile.");
-                throw new Error(\`Risposta non attesa da submit_comment.php (non JSON): \${responseText.substring(0,200)}\`);
+                throw new Error('Risposta non attesa da submit_comment.php (tipo: ' + contentType + '): ' + responseText.substring(0,200));
             }
 
             const result = await response.json();
@@ -752,24 +595,22 @@
                 }
                 fetchEventDetails(eventId);
 
-                const successMessageTarget = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
-                if (successMessageTarget) {
-                    successMessageTarget.textContent = isReply ? 'Risposta inviata con successo!' : 'Commento inviato con successo!';
-                    successMessageTarget.className = 'form-message success';
-                    successMessageTarget.style.display = 'block';
-                    setTimeout(() => { if (successMessageTarget) { successMessageTarget.style.display = 'none'; } }, 3000);
+                const targetMessageEl = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
+                if (targetMessageEl) {
+                    targetMessageEl.textContent = isReply ? 'Risposta inviata!' : 'Commento inviato!';
+                    targetMessageEl.className = 'form-message success';
+                    targetMessageEl.style.display = 'block';
+                    setTimeout(() => { if (targetMessageEl) { targetMessageEl.style.display = 'none'; } }, 3000);
                 }
             } else {
-                throw new Error(result.message || "Si è verificato un errore (risposta server).");
+                throw new Error(result.message || "Errore durante l'invio (risposta server).");
             }
         } catch (error) {
-            console.error("handleCommentSubmit Errore Catturato:", error);
+            console.error("Errore Catturato in handleCommentSubmit:", error.message, error); // Logga anche l'oggetto errore completo
             if (commentFormMessageElement) {
-                let errorMessageString = "Errore sconosciuto.";
-                if (error && error.message) {
-                    errorMessageString = String(error.message).substring(0, 300);
-                }
-                commentFormMessageElement.textContent = 'Errore: ' + errorMessageString;
+                let errMsg = "Errore sconosciuto.";
+                if (error && error.message) { errMsg = String(error.message).substring(0, 300); }
+                commentFormMessageElement.textContent = 'Errore: ' + errMsg;
                 commentFormMessageElement.className = 'form-message error';
                 commentFormMessageElement.style.display = 'block';
             }
@@ -785,12 +626,10 @@
         e.preventDefault();
         const eventIdInput = document.getElementById('commentEventId');
         if (!eventIdInput || !eventIdInput.value) {
-            console.error("ID Evento non trovato nel form per la risposta.");
-            // Mostra un errore all'utente nel form di risposta, se possibile
             const form = e.target;
             const msgEl = form.querySelector('.form-message-local');
             if (msgEl) {
-                msgEl.textContent = "Errore: ID Evento mancante.";
+                msgEl.textContent = "Errore interno: ID Evento mancante.";
                 msgEl.className = 'form-message error'; msgEl.style.display = 'block';
             }
             return;
@@ -803,44 +642,57 @@
         setupUserSessionAndNavbar();
 
         const urlParams = new URLSearchParams(window.location.search);
-        const eventId = urlParams.get('id');
+        const eventId = urlParams.get('id'); // Questo è l'ID dell'evento dalla URL
 
         const newCommentForm = document.getElementById('new-comment-form');
-        const commentFormContainerEl = document.getElementById('commentFormContainer'); // Referenziato in fetchEventDetails
-        const loginToCommentMessageEl = document.getElementById('login-to-comment-message'); // Referenziato in fetchEventDetails
-        const eventIdInput = document.getElementById('commentEventId');
+        const eventIdInputForMainForm = document.getElementById('commentEventId'); // Input hidden nel form principale
 
-        // La logica per mostrare/nascondere il form dei commenti è dentro fetchEventDetails
-        // in base allo stato di currentUser. Qui impostiamo solo l'ID evento se l'utente è loggato.
-        if (currentUser && currentUser.email && eventIdInput && eventId) {
-            eventIdInput.value = eventId;
+        // Imposta l'ID dell'evento nel form principale se l'utente è loggato e l'ID è presente
+        if (currentUser && currentUser.email && eventIdInputForMainForm && eventId) {
+            eventIdInputForMainForm.value = eventId;
         }
 
-        if (newCommentForm && eventId) { // eventId deve essere valido
-            newCommentForm.addEventListener('submit', async function(e) {
+        if (newCommentForm && eventId) { // Assicurati che eventId sia valido per aggiungere il listener
+            newCommentForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 const commentTextInput = document.getElementById('comment-text');
-                const commentFormMessageGlobal = document.getElementById('comment-form-message');
+                const mainCommentMessageEl = document.getElementById('comment-form-message');
 
                 if (!commentTextInput || !commentTextInput.value.trim()) {
-                    if(commentFormMessageGlobal) {
-                        commentFormMessageGlobal.textContent = 'Il commento non può essere vuoto.';
-                        commentFormMessageGlobal.className = 'form-message error';
-                        commentFormMessageGlobal.style.display='block';
+                    if(mainCommentMessageEl) {
+                        mainCommentMessageEl.textContent = 'Il commento non può essere vuoto.';
+                        mainCommentMessageEl.className = 'form-message error';
+                        mainCommentMessageEl.style.display='block';
                     }
                     return;
                 }
+                // 'this' si riferisce al form, eventId è preso dalla closure
                 handleCommentSubmit(this, eventId, false);
             });
-        }
-
-        if (eventId) {
-            fetchEventDetails(eventId);
-        } else {
+        } else if (!eventId) { // Se eventId non è presente nell'URL
             const pageLoadingEl = document.getElementById('pageLoadingIndicator');
             const eventTitleHeaderEl = document.getElementById('eventTitleHeader');
-            if(eventTitleHeaderEl) eventTitleHeaderEl.innerHTML = "<p class='no-content-message'>ID evento non specificato.</p>";
+            if(eventTitleHeaderEl) eventTitleHeaderEl.innerHTML = "<p class='no-content-message'>ID evento non specificato nell'URL.</p>";
             if(pageLoadingEl) pageLoadingEl.classList.remove('visible');
+        }
+
+        // Carica i dettagli dell'evento solo se eventId è presente
+        if (eventId) {
+            fetchEventDetails(eventId);
+        }
+
+        const commentFormContainerEl = document.getElementById('commentFormContainer');
+        const loginToCommentMessageEl = document.getElementById('login-to-comment-message');
+        if (commentFormContainerEl && loginToCommentMessageEl) {
+            if (currentUser && currentUser.email) {
+                commentFormContainerEl.style.display = 'block';
+                loginToCommentMessageEl.style.display = 'none';
+            } else {
+                commentFormContainerEl.style.display = 'none';
+                loginToCommentMessageEl.style.display = 'block';
+                const loginLink = document.getElementById('loginLinkFromEventPage');
+                if(loginLink) loginLink.addEventListener('click', (e) => {e.preventDefault(); alert("Per favore, accedi per commentare."); });
+            }
         }
 
         const currentYearEl = document.getElementById('currentYear');
