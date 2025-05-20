@@ -1,6 +1,11 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
+// Assicurati che il file di log per questo script sia configurato se necessario
+// ini_set('log_errors', 1);
+// ini_set('error_log', __DIR__ . '/php_errors_get_event_details.log');
+
+
 $config = [
     'host' => 'localhost',
     'db'   => 'my_eremofratefrancesco',
@@ -44,17 +49,18 @@ try {
     }
 
     // 2. Recupera i media per l'evento (tabella 'media')
-    $stmtMedia = $conn->prepare("SELECT Progressivo, Percorso FROM media WHERE IDEvento = :idEvento ORDER BY Progressivo ASC");
+    // AGGIORNATO: Includi la colonna Descrizione
+    $stmtMedia = $conn->prepare("SELECT Progressivo, Percorso, Descrizione FROM media WHERE IDEvento = :idEvento ORDER BY Progressivo ASC");
     $stmtMedia->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
     $stmtMedia->execute();
     $mediaItems = $stmtMedia->fetchAll();
 
-    // 3. Recupera i commenti, includendo DataPubb e NumLike (tabella 'commenti')
+    // 3. Recupera i commenti (logica esistente, sembra corretta)
     $stmtComments = $conn->prepare(
         "SELECT Progressivo, Descrizione, DataPubb, CodRisposta, Contatto, IDEvento, NumLike
          FROM commenti
          WHERE IDEvento = :idEvento
-         ORDER BY DataPubb ASC" // Ordina per data di pubblicazione effettiva
+         ORDER BY DataPubb ASC"
     );
     $stmtComments->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
     $stmtComments->execute();
@@ -62,20 +68,18 @@ try {
 
     $commentsById = [];
     foreach ($allCommentsRaw as $comment) {
-        // Formatta DataPubb per la visualizzazione
         if (isset($comment['DataPubb'])) {
             $comment['DataVisualizzata'] = date('d/m/Y H:i', strtotime($comment['DataPubb']));
         } else {
             $comment['DataVisualizzata'] = 'Data non disponibile';
         }
-        // Assicura che NumLike sia un intero, default a 0 se null
         $comment['NumLike'] = isset($comment['NumLike']) ? (int)$comment['NumLike'] : 0;
         $comment['replies'] = [];
         $commentsById[$comment['Progressivo']] = $comment;
     }
 
     $commentsThreaded = [];
-    foreach ($commentsById as $commentId => &$commentNode) { // Usa riferimento per modificare direttamente $commentsById
+    foreach ($commentsById as $commentId => &$commentNode) {
         if ($commentNode['CodRisposta'] !== null && isset($commentsById[$commentNode['CodRisposta']])) {
             $commentsById[$commentNode['CodRisposta']]['replies'][] = &$commentNode;
         } else {
@@ -87,14 +91,14 @@ try {
     $response['success'] = true;
     $response['data'] = [
         'details'  => $eventDetails,
-        'media'    => $mediaItems,
+        'media'    => $mediaItems, // Ora $mediaItems contiene anche la Descrizione per ciascun media
         'comments' => $commentsThreaded
     ];
     echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
 } catch (PDOException $e) {
     error_log("Errore PDO in get_event_details.php: " . $e->getMessage());
-    $response['message'] = 'Errore database: ' . $e->getMessage(); // Per debug
+    $response['message'] = 'Errore database: ' . $e->getMessage();
     http_response_code(500);
     echo json_encode($response);
     exit;

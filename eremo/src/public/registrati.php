@@ -1,11 +1,12 @@
 <?php
+// Aggiungi questa riga IN CIMA al file per catturare tutti gli output
 ob_start();
 header('Content-Type: application/json');
 
 // Configurazione del database
 $host = "localhost";
-$user = "eremofratefrancesco"; //
-$password = "";    //
+$user = "eremofratefrancesco"; // Sostituisci con il tuo
+$password = "";    // Sostituisci con il tuo
 $dbname = "my_eremofratefrancesco"; // Nome esatto del DB
 
 // Connessione al database
