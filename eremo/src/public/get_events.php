@@ -4,7 +4,6 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 ini_set('log_errors', 1);
-// ini_set('error_log', $_SERVER['DOCUMENT_ROOT'] . '/php_error_log.txt');
 ini_set('error_log', __DIR__ . '/php_errors_get_events.log');
 
 
@@ -14,7 +13,7 @@ $config = [
     'host' => 'localhost',
     'db' => 'my_eremofratefrancesco', // Sostituisci con il tuo nome DB
     'user' => 'eremofratefrancesco', // Sostituisci con il tuo username DB
-    'pass' => ''                   // Sostituisci con la tua password DB
+    'pass' => ''                   // INSERISCI QUI LA TUA PASSWORD DEL DATABASE
 ];
 
 try {
@@ -29,53 +28,63 @@ try {
         ]
     );
 
-    // Determina se la vista admin è richiesta, per un eventuale diverso ordinamento
+    // Recupera l'email dell'utente corrente dal parametro GET
+    $currentUserEmail = null;
+    if (isset($_GET['user_email'])) {
+        $filteredEmail = filter_var($_GET['user_email'], FILTER_VALIDATE_EMAIL);
+        if ($filteredEmail !== false) {
+            $currentUserEmail = $filteredEmail;
+        }
+    }
+
+    // Determina se la vista admin è richiesta
     $isAdminView = isset($_GET['admin_view']) && $_GET['admin_view'] === 'true';
 
     // Filtra SEMPRE per eventi da oggi in poi
-    $sql_where = "WHERE Data >= CURDATE()";
+    $sql_where = "WHERE e.Data >= CURDATE()"; // Aggiunto alias 'e' per la tabella eventi
 
-    // L'ordinamento può ancora dipendere dalla vista, se lo desideri
-    // Ad esempio, l'admin potrebbe volerli vedere in ordine di inserimento o i più recenti prima (tra quelli futuri)
-    // Mentre la vista pubblica li vede dal più prossimo al più lontano.
     $sql_orderby = "";
     if ($isAdminView) {
-        // Per l'admin, mostriamo gli eventi futuri ordinati per data decrescente (dal più lontano al più vicino),
-        // oppure per ID decrescente se vuoi vedere gli ultimi inseriti per primi.
-        // Scegli quello che ha più senso per la gestione admin.
-        // Esempio: order by data decrescente tra quelli futuri
-        $sql_orderby = "ORDER BY Data DESC";
-        // Oppure, se vuoi per data ascendente anche per admin:
-        // $sql_orderby = "ORDER BY Data ASC";
+        // Per l'admin, ordinamento per data decrescente (dal più lontano al più vicino)
+        $sql_orderby = "ORDER BY e.Data DESC, e.IDEvento DESC"; // Aggiunto alias 'e'
     } else {
-        // La vista pubblica vede gli eventi futuri ordinati per data ascendente (dal più vicino al più lontano)
-        $sql_orderby = "ORDER BY Data ASC";
+        // Vista pubblica, ordinamento per data ascendente (dal più vicino al più lontano)
+        $sql_orderby = "ORDER BY e.Data ASC, e.IDEvento ASC"; // Aggiunto alias 'e'
     }
 
-
+    // Query principale aggiornata per includere posti_gia_prenotati_utente
     $query = "
         SELECT
-            IDEvento AS idevento,
-            Titolo AS titolo,
-            Data AS datainizio,
-            Durata AS durata,
-            Descrizione AS descrizione,
-            DescrizioneEstesa AS descrizione_estesa,
-            PostiDisponibili AS posti_disponibili,
-            FlagPrenotabile AS flagprenotabile,
-            Costo AS costo,
-            PrefissoRelatore AS prefisso_relatore,
-            Relatore AS relatore,
-            Associazione AS associazione,
-            FotoCopertina AS immagine_url,
-            VolantinoUrl AS volantino_url,
-            IDCategoria AS idcategoria
-        FROM eventi
-        {$sql_where}    -- Applica SEMPRE il filtro per data >= CURDATE()
-        {$sql_orderby}  -- Applica l'ordinamento scelto
+            e.IDEvento AS idevento,
+            e.Titolo AS titolo,
+            e.Data AS datainizio,
+            e.Durata AS durata,
+            e.Descrizione AS descrizione,
+            e.DescrizioneEstesa AS descrizione_estesa,
+            e.PostiDisponibili AS posti_disponibili,
+            e.FlagPrenotabile AS flagprenotabile,
+            e.Costo AS costo,
+            e.PrefissoRelatore AS prefisso_relatore,
+            e.Relatore AS relatore,
+            e.Associazione AS associazione,
+            e.FotoCopertina AS immagine_url,
+            e.VolantinoUrl AS volantino_url,
+            e.IDCategoria AS idcategoria,
+            (SELECT COALESCE(SUM(p.NumeroPosti), 0)
+             FROM prenotazioni p
+             WHERE p.IDEvento = e.IDEvento AND p.Contatto = :currentUserEmail
+            ) AS posti_gia_prenotati_utente
+        FROM eventi e  -- Alias 'e' per la tabella eventi
+        {$sql_where}
+        {$sql_orderby}
     ";
 
     $stmt = $conn->prepare($query);
+
+    // Associa il parametro currentUserEmail. Se $currentUserEmail è null,
+    // la condizione p.Contatto = NULL non troverà corrispondenze (risultando correttamente 0).
+    $stmt->bindParam(':currentUserEmail', $currentUserEmail, PDO::PARAM_STR);
+
     $stmt->execute();
     $events = $stmt->fetchAll();
 

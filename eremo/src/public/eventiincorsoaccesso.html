@@ -14,7 +14,7 @@
             transition: opacity 0.3s ease-in-out; backdrop-filter: blur(5px);
         }
         .booking-popup-overlay.active { display: block; opacity: 1; }
-        .booking-popup {
+        .booking-popup { /* Vale anche per waitlist-popup */
             display: none; position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 550px;
             max-height: 90vh; overflow-y: auto; background: var(--white);
@@ -55,14 +55,14 @@
             transition: var(--transition-fast);
         }
         .booking-popup .close-popup:hover { color: var(--dark); transform: rotate(90deg) scale(1.1); }
-        #bookingResponseMessage {
+        .form-message { /* Per #bookingResponseMessage e #waitlistResponseMessage */
             margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem;
             text-align: center; display: none;
         }
-        #bookingResponseMessage.success {
+        .form-message.success {
             background-color: rgba(46, 204, 113, 0.15); border: 1px solid var(--success); color: var(--dark);
         }
-        #bookingResponseMessage.error {
+        .form-message.error {
             background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--danger); color: var(--dark);
         }
         /* .spinner-mini è definito in style.css principale */
@@ -115,6 +115,7 @@
         <a href="#" id="logout-link-mobile-eventi" onclick="closeMobileMenu()">Esci</a>
     </div>
 </header>
+
 <main>
     <div class="container section-padding">
         <h1>Calendario Attività</h1>
@@ -140,8 +141,9 @@
     <form id="bookingForm">
         <input type="hidden" id="bookingEventId" name="eventId">
         <div class="form-group">
-            <label for="numeroPosti">Numero Partecipanti (max 5)</label>
+            <label for="numeroPosti">Numero Partecipanti</label>
             <input type="number" id="numeroPosti" name="numeroPosti" class="form-control" min="1" max="5" value="1" required>
+            <small id="infoPostiPrenotabili" style="display: block; margin-top: 0.3rem; font-size: 0.85rem;"></small>
         </div>
         <div id="participantFieldsContainer" class="participant-fields-container">
         </div>
@@ -152,8 +154,28 @@
     </form>
 </div>
 
+<div class="booking-popup-overlay" id="waitlistPopupOverlay"></div>
+<div class="booking-popup" id="waitlistPopup"> <button class="close-popup" id="closeWaitlistPopupBtn" aria-label="Chiudi popup">&times;</button>
+    <h2 id="waitlistPopupTitle">Entra in Lista d'Attesa</h2>
+    <form id="waitlistForm">
+        <input type="hidden" id="waitlistEventId" name="eventId">
+        <p id="waitlistEventInfo" style="text-align:center; margin-bottom:1rem;"></p>
+        <div class="form-group">
+            <label for="waitlistNumeroPosti">Numero Partecipanti (max 5)</label>
+            <input type="number" id="waitlistNumeroPosti" name="numeroPosti" class="form-control" min="1" max="5" value="1" required>
+        </div>
+        <div id="waitlistParticipantFieldsContainer" class="participant-fields-container">
+        </div>
+        <div id="waitlistResponseMessage" class="form-message" style="display:none;"></div>
+        <div class="form-actions">
+            <button type="submit" class="btn-popup">Conferma Richiesta Coda</button>
+        </div>
+    </form>
+</div>
+
+
 <script>
-    // --- SCRIPT GLOBALI PER PAGINE ACCESSO (da includere o replicare) ---
+    // --- SCRIPT GLOBALI PER PAGINE ACCESSO (dal tuo style.css o qui) ---
     let currentUser = null;
 
     function updateNavbarUserUI() {
@@ -274,22 +296,59 @@
 
     // --- LOGICA SPECIFICA DELLA PAGINA EVENTIINCORSACCESSO ---
     document.addEventListener('DOMContentLoaded', () => {
-        setupUserSessionAndNavbar(); // Imposta currentUser e UI navbar PRIMA di ogni altra logica
+        setupUserSessionAndNavbar();
 
-        if (!currentUser || !currentUser.email) { // Controllo se l'utente è effettivamente loggato
-            console.log("Utente non loggato o email mancante in eventiincorsoaccesso.html. Reindirizzamento.");
-            // Non mostrare l'alert qui, il reindirizzamento è sufficiente
-            window.location.href = 'index.html'; // Reindirizza alla pagina di login/home pubblica
-            return; // Interrompe l'esecuzione ulteriore se non loggato
+        if (!currentUser || !currentUser.email) {
+            console.log("Utente non loggato o email mancante. Reindirizzamento.");
+            window.location.href = 'index.html';
+            return;
         }
 
-        // Se l'utente è loggato, procedi:
         loadEvents();
         initializeBookingPopupHandlers();
+        initializeWaitlistPopupHandlers(); // Nuovo handler per il popup della coda
 
         const currentYearEl = document.getElementById('currentYear');
         if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
     });
+
+    // Funzione helper per generare campi nome/cognome
+    function generateParticipantFields(count, containerElement, baseIdName, maxAllowed) {
+        if (!containerElement) return;
+        containerElement.innerHTML = '';
+        let validCount = parseInt(count);
+
+        if (isNaN(validCount) || validCount < 1) validCount = 1;
+        if (validCount > maxAllowed) validCount = maxAllowed;
+
+        // Aggiorna il campo input numerico se il valore è stato corretto
+        const numInput = containerElement.closest('form').querySelector('input[type="number"]');
+        if (numInput && parseInt(numInput.value) !== validCount) {
+            numInput.value = validCount;
+        }
+
+        if (validCount > 0) {
+            for (let i = 1; i <= validCount; i++) {
+                const fieldSet = document.createElement('div');
+                fieldSet.className = 'participant-entry';
+                fieldSet.innerHTML = `
+                    <p style="margin-bottom: 0.5rem; font-weight: 500; color: var(--dark);">Partecipante ${i}:</p>
+                    <div class="form-grid">
+                        <div>
+                            <label for="${baseIdName}_nome_${i}">Nome*</label>
+                            <input type="text" id="${baseIdName}_nome_${i}" name="participant_nome[]" class="form-control" required>
+                        </div>
+                        <div>
+                            <label for="${baseIdName}_cognome_${i}">Cognome*</label>
+                            <input type="text" id="${baseIdName}_cognome_${i}" name="participant_cognome[]" class="form-control" required>
+                        </div>
+                    </div>
+                `;
+                containerElement.appendChild(fieldSet);
+            }
+        }
+    }
+
 
     function initializeBookingPopupHandlers() {
         const bookingPopupOverlay = document.getElementById('bookingPopupOverlay');
@@ -301,9 +360,10 @@
         const bookingEventIdInput = document.getElementById('bookingEventId');
         const bookingPopupTitle = document.getElementById('bookingPopupTitle');
         const bookingResponseMessage = document.getElementById('bookingResponseMessage');
+        const infoPostiPrenotabiliEl = document.getElementById('infoPostiPrenotabili');
 
-        window.openBookingPopup = function(eventId, eventTitle, postiDisponibiliEvento) {
-            if (!currentUser) { // Questo controllo ora dovrebbe essere ridondante ma lo lascio per sicurezza
+        window.openBookingPopup = function(eventId, eventTitle, postiDisponibiliEvento, postiGiaPrenotatiDallUtente) {
+            if (!currentUser) {
                 alert("Sessione scaduta o utente non valido. Effettua nuovamente il login.");
                 window.location.href = 'index.html'; return;
             }
@@ -311,16 +371,23 @@
             bookingPopupTitle.textContent = `Prenota: ${eventTitle}`;
 
             const postiDisponibiliNum = parseInt(postiDisponibiliEvento);
-            const maxPostiEffettivi = Math.min(5, postiDisponibiliNum);
+            const postiGiaPrenotatiNum = parseInt(postiGiaPrenotatiDallUtente) || 0;
 
-            if (isNaN(postiDisponibiliNum) || postiDisponibiliNum < 1 || maxPostiEffettivi < 1) {
-                alert("Spiacenti, non ci sono più posti disponibili per questo evento o l'evento non è prenotabile.");
+            const maxPostiRichiedibiliSingolaTrx = 5; // Max per questo form
+            const postiAncoraPrenotabiliDallUtenteGlobal = 5 - postiGiaPrenotatiNum; // Max globali per l'utente per questo evento
+
+            const maxPostiEffettivi = Math.min(maxPostiRichiedibiliSingolaTrx, postiDisponibiliNum, postiAncoraPrenotabiliDallUtenteGlobal);
+
+            if (maxPostiEffettivi < 1) {
+                alert("Spiacenti, non puoi prenotare ulteriori posti per questo evento. Potresti aver raggiunto il limite di 5 posti totali o non ci sono abbastanza posti disponibili.");
                 return;
             }
             numeroPostiInput.max = maxPostiEffettivi;
             numeroPostiInput.value = 1;
+            infoPostiPrenotabiliEl.textContent = `Puoi prenotare da 1 a ${maxPostiEffettivi} posti. (Già prenotati: ${postiGiaPrenotatiNum}/5)`;
 
-            generateParticipantFields(1);
+
+            generateParticipantFields(1, participantFieldsContainer, 'booking_participant', maxPostiEffettivi);
             bookingResponseMessage.style.display = 'none';
             bookingResponseMessage.textContent = '';
             bookingResponseMessage.className = 'form-message';
@@ -336,6 +403,7 @@
             document.body.style.overflow = '';
             if(participantFieldsContainer) participantFieldsContainer.innerHTML = '';
             if(bookingForm) bookingForm.reset();
+            if(infoPostiPrenotabiliEl) infoPostiPrenotabiliEl.textContent = '';
         }
 
         if (closeBookingPopupBtn) closeBookingPopupBtn.addEventListener('click', closeBookingPopup);
@@ -348,44 +416,10 @@
             }
         });
 
-        function generateParticipantFields(count) {
-            if (!participantFieldsContainer || !numeroPostiInput) return;
-            participantFieldsContainer.innerHTML = '';
-            const maxAllowed = parseInt(numeroPostiInput.max);
-            let validCount = parseInt(count);
-
-            if (isNaN(validCount) || validCount < 1) validCount = 1;
-            if (validCount > maxAllowed) validCount = maxAllowed;
-
-            if (numeroPostiInput.value != validCount) numeroPostiInput.value = validCount;
-
-            if (validCount > 0) {
-                for (let i = 1; i <= validCount; i++) {
-                    const fieldSet = document.createElement('div');
-                    fieldSet.className = 'participant-entry';
-                    fieldSet.innerHTML = `
-                        <p style="margin-bottom: 0.5rem; font-weight: 500; color: var(--dark);">Partecipante ${i}:</p>
-                        <div class="form-grid">
-                            <div>
-                                <label for="participant_nome_${i}">Nome*</label>
-                                <input type="text" id="participant_nome_${i}" name="participant_nome[]" class="form-control" required>
-                            </div>
-                            <div>
-                                <label for="participant_cognome_${i}">Cognome*</label>
-                                <input type="text" id="participant_cognome_${i}" name="participant_cognome[]" class="form-control" required>
-                            </div>
-                        </div>
-                    `;
-                    participantFieldsContainer.appendChild(fieldSet);
-                }
-            }
-        }
-
         if (numeroPostiInput) {
             numeroPostiInput.addEventListener('input', (e) => {
-                generateParticipantFields(e.target.value);
+                generateParticipantFields(e.target.value, participantFieldsContainer, 'booking_participant', parseInt(numeroPostiInput.max));
             });
-            // Non chiamare generateParticipantFields qui, verrà fatto dal listener o da openBookingPopup
         }
 
         if (bookingForm) {
@@ -448,7 +482,7 @@
                             bookingResponseMessage.textContent = result.message || 'Prenotazione confermata!';
                             bookingResponseMessage.className = 'form-message success';
                         }
-                        loadEvents();
+                        loadEvents(); // Ricarica gli eventi per aggiornare i posti e i dati utente
                         setTimeout(closeBookingPopup, 3000);
                     } else {
                         throw new Error(result.message || 'Errore durante la prenotazione.');
@@ -465,16 +499,167 @@
         }
     }
 
+    function initializeWaitlistPopupHandlers() {
+        const waitlistPopupOverlay = document.getElementById('waitlistPopupOverlay');
+        const waitlistPopup = document.getElementById('waitlistPopup');
+        const closeWaitlistPopupBtn = document.getElementById('closeWaitlistPopupBtn');
+        const waitlistForm = document.getElementById('waitlistForm');
+        const waitlistNumeroPostiInput = document.getElementById('waitlistNumeroPosti');
+        const waitlistParticipantFieldsContainer = document.getElementById('waitlistParticipantFieldsContainer');
+        const waitlistEventIdInput = document.getElementById('waitlistEventId');
+        const waitlistPopupTitle = document.getElementById('waitlistPopupTitle');
+        const waitlistEventInfo = document.getElementById('waitlistEventInfo');
+        const waitlistResponseMessage = document.getElementById('waitlistResponseMessage');
+
+        window.openWaitlistPopup = function(eventId, eventTitle) {
+            if (!currentUser) {
+                alert("Sessione scaduta o utente non valido. Effettua nuovamente il login.");
+                window.location.href = 'index.html'; return;
+            }
+            waitlistEventIdInput.value = eventId;
+            waitlistPopupTitle.textContent = `Entra in Lista d'Attesa`;
+            waitlistEventInfo.textContent = `Evento: ${eventTitle}`;
+
+            waitlistNumeroPostiInput.max = 5; // Max 5 posti per la richiesta in coda
+            waitlistNumeroPostiInput.value = 1;
+
+            generateParticipantFields(1, waitlistParticipantFieldsContainer, 'waitlist_participant', 5);
+            waitlistResponseMessage.style.display = 'none';
+            waitlistResponseMessage.textContent = '';
+            waitlistResponseMessage.className = 'form-message';
+
+            waitlistPopupOverlay.classList.add('active');
+            waitlistPopup.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Mostra un messaggio di conferma/informazione
+            const userConfirmation = confirm("L'evento selezionato è al completo. Vuoi essere aggiunto alla lista d'attesa?");
+            if (!userConfirmation) {
+                closeWaitlistPopup();
+                return;
+            }
+        }
+
+        function closeWaitlistPopup() {
+            if (waitlistPopupOverlay) waitlistPopupOverlay.classList.remove('active');
+            if (waitlistPopup) waitlistPopup.classList.remove('active');
+            document.body.style.overflow = '';
+            if(waitlistParticipantFieldsContainer) waitlistParticipantFieldsContainer.innerHTML = '';
+            if(waitlistForm) waitlistForm.reset();
+        }
+
+        if (closeWaitlistPopupBtn) closeWaitlistPopupBtn.addEventListener('click', closeWaitlistPopup);
+        if (waitlistPopupOverlay) waitlistPopupOverlay.addEventListener('click', (e) => {
+            if (e.target === waitlistPopupOverlay) closeWaitlistPopup();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && waitlistPopup && waitlistPopup.classList.contains('active')) {
+                closeWaitlistPopup();
+            }
+        });
+
+        if (waitlistNumeroPostiInput) {
+            waitlistNumeroPostiInput.addEventListener('input', (e) => {
+                generateParticipantFields(e.target.value, waitlistParticipantFieldsContainer, 'waitlist_participant', 5);
+            });
+        }
+
+        if (waitlistForm) {
+            waitlistForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                if (!currentUser || !currentUser.email) {
+                    alert("Errore: sessione utente non valida. Effettua nuovamente il login.");
+                    window.location.href = 'index.html'; return;
+                }
+
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<div class="spinner-mini"></div> Elaborazione...';
+                if(waitlistResponseMessage) waitlistResponseMessage.style.display = 'none';
+
+                const formData = new FormData();
+                formData.append('eventId', waitlistEventIdInput.value);
+                formData.append('numeroPosti', waitlistNumeroPostiInput.value);
+                formData.append('contatto', currentUser.email);
+                // I nomi dei partecipanti non sono necessari per gestisci_coda.php secondo la tabella utentiincoda attuale
+                // ma li validiamo comunque per coerenza UI se richiesto
+                const nomi = waitlistParticipantFieldsContainer.querySelectorAll('input[name="participant_nome[]"]');
+                const cognomi = waitlistParticipantFieldsContainer.querySelectorAll('input[name="participant_cognome[]"]');
+                let formIsValid = true;
+
+                if (nomi.length !== parseInt(waitlistNumeroPostiInput.value)) {
+                    formIsValid = false;
+                    if(waitlistResponseMessage) waitlistResponseMessage.textContent = 'Errore: il numero di partecipanti non corrisponde ai campi compilati.';
+                } else {
+                    for (let i = 0; i < nomi.length; i++) {
+                        if (nomi[i].value.trim() === '' || cognomi[i].value.trim() === '') {
+                            formIsValid = false;
+                            if(waitlistResponseMessage) waitlistResponseMessage.textContent = 'Nome e cognome sono obbligatori per tutti i partecipanti.';
+                            break;
+                        }
+                        // Non aggiungiamo nomi/cognomi a formData per gestisci_coda.php
+                    }
+                }
+                if (!formIsValid) {
+                    if(waitlistResponseMessage) {
+                        waitlistResponseMessage.className = 'form-message error';
+                        waitlistResponseMessage.style.display = 'block';
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                    return;
+                }
+
+
+                try {
+                    const response = await fetch('gestisci_coda.php', { method: 'POST', body: formData });
+                    const responseText = await response.text();
+                    let result;
+                    try { result = JSON.parse(responseText); }
+                    catch (error) { throw new Error("Risposta del server non valida: " + responseText.substring(0,100)); }
+
+                    if (result.success) {
+                        if(waitlistResponseMessage) {
+                            waitlistResponseMessage.textContent = result.message || "Richiesta di inserimento in coda inviata!";
+                            waitlistResponseMessage.className = 'form-message success';
+                        }
+                        // Non è necessario ricaricare gli eventi qui, a meno che non si voglia mostrare lo stato della coda
+                        setTimeout(closeWaitlistPopup, 3000);
+                    } else {
+                        throw new Error(result.message || "Errore durante l'invio della richiesta per la coda.");
+                    }
+                } catch (error) {
+                    if(waitlistResponseMessage) waitlistResponseMessage.textContent = `Errore: ${error.message}`;
+                    if(waitlistResponseMessage) waitlistResponseMessage.className = 'form-message error';
+                } finally {
+                    if(waitlistResponseMessage) waitlistResponseMessage.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                }
+            });
+        }
+    }
+
+
     async function loadEvents() {
         const eventsGrid = document.getElementById('eventiGrid');
         const loadingIndicator = document.getElementById('loadingIndicator');
         if (loadingIndicator) loadingIndicator.classList.add('visible');
         if (eventsGrid) eventsGrid.innerHTML = '';
 
+        if (!currentUser || !currentUser.email) {
+            if (eventsGrid) eventsGrid.innerHTML = '<p class="no-events error-message">Sessione utente non valida. Impossibile caricare gli eventi.</p>';
+            if (loadingIndicator) loadingIndicator.classList.remove('visible');
+            return;
+        }
+
         try {
-            const response = await fetch('get_events.php');
+            // Assicurati che get_events.php possa usare user_email per restituire posti_gia_prenotati_utente
+            const response = await fetch(`get_events.php?user_email=${encodeURIComponent(currentUser.email)}`);
             if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
             const result = await response.json();
+
             if (!result.success) throw new Error(result.message || 'Errore caricamento dati eventi.');
             if (!eventsGrid) return;
 
@@ -495,6 +680,36 @@
         card.className = 'card';
         let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event.jpg';
 
+        const postiDisponibiliOriginali = parseInt(event.posti_disponibili); // Questi sono i posti totali rimasti per l'evento
+        const postiGiaPrenotatiUtente = parseInt(event.posti_gia_prenotati_utente) || 0; // Posti che l'utente corrente ha già per QUESTO evento
+        const flagPrenotabileDB = event.flagprenotabile; // Flag dal DB se l'evento è in linea di principio prenotabile
+
+        let buttonHTML = '';
+        const maxPostiAncoraPrenotabiliUtente = 5 - postiGiaPrenotatiUtente;
+
+        if (!flagPrenotabileDB) {
+            buttonHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled>Non Prenotabile</button>`;
+        } else if (maxPostiAncoraPrenotabiliUtente <= 0) {
+            buttonHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Hai già prenotato il numero massimo di 5 posti per questo evento.">Max Posti Raggiunti</button>`;
+        } else if (postiDisponibiliOriginali > 0) {
+            // Ci sono posti E l'utente può ancora prenotare
+            buttonHTML = `<button class="card-btn card-btn-primary btn-prenota"
+                                data-action="book"
+                                data-event-id="${event.idevento}"
+                                data-event-title="${event.titolo || 'Evento senza titolo'}"
+                                data-posti-disponibili-evento="${postiDisponibiliOriginali}"
+                                data-posti-gia-prenotati-utente="${postiGiaPrenotatiUtente}">
+                            Prenota
+                        </button>`;
+        } else { // Evento pieno (postiDisponibiliOriginali == 0), ma l'utente potrebbe ancora volere posti (fino al suo limite di 5)
+            buttonHTML = `<button class="card-btn card-btn-primary btn-prenota"
+                                data-action="waitlist"
+                                data-event-id="${event.idevento}"
+                                data-event-title="${event.titolo || 'Evento senza titolo'}">
+                            Entra in Coda
+                        </button>`;
+        }
+
         card.innerHTML = `
             <div class="card-image-container">
                 <img src="${imageSrc}" alt="Copertina: ${event.titolo || 'Evento'}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
@@ -511,29 +726,34 @@
                 </p>
                 <p class="card-description">${event.descrizione || 'Nessuna descrizione breve.'}</p>
                 <p class="card-info">
-                    <b>Posti Disponibili:</b> <span class="posti-disponibili">${event.posti_disponibili !== null ? event.posti_disponibili : 'N/D'}</span>
+                    <b>Posti Disponibili:</b> <span class="posti-disponibili">${event.posti_disponibili !== null ? (parseInt(event.posti_disponibili) > 0 ? event.posti_disponibili : 'Esaurito') : 'N/D'}</span>
+                    ${postiGiaPrenotatiUtente > 0 ? `<br><b>Tuoi posti prenotati:</b> ${postiGiaPrenotatiUtente}` : ''}
                     ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0 ? '<br><b>Costo:</b> Offerta libera' : '')) : ''}
                 </p>
                 <div class="card-actions">
                     <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a>
-                    <button class="card-btn card-btn-primary btn-prenota"
-                            data-event-id="${event.idevento}"
-                            data-event-title="${event.titolo || 'Evento senza titolo'}"
-                            data-posti-disponibili="${event.posti_disponibili !== null ? event.posti_disponibili : '0'}"
-                            ${parseInt(event.posti_disponibili) === 0 || !event.flagprenotabile ? 'disabled' : ''}>
-                        ${!event.flagprenotabile ? 'Non Prenotabile' : (parseInt(event.posti_disponibili) === 0 ? 'Esaurito' : 'Prenota')}
-                    </button>
+                    ${buttonHTML}
                 </div>
             </div>
         `;
-        const prenotaBtn = card.querySelector('.btn-prenota');
-        if (prenotaBtn && event.flagprenotabile && parseInt(event.posti_disponibili) > 0) {
-            prenotaBtn.addEventListener('click', function() {
+
+        const actionBtn = card.querySelector('.btn-prenota');
+        if (actionBtn && !actionBtn.disabled) {
+            actionBtn.addEventListener('click', function() {
+                const action = this.dataset.action;
                 const eventId = this.dataset.eventId;
                 const eventTitle = this.dataset.eventTitle;
-                const postiDisponibiliEvento = parseInt(this.dataset.postiDisponibili);
-                if(typeof window.openBookingPopup === 'function') {
-                    window.openBookingPopup(eventId, eventTitle, postiDisponibiliEvento);
+
+                if (action === 'book') {
+                    const postiDisponibiliEvento = parseInt(this.dataset.postiDisponibiliEvento);
+                    const postiGiaPrenotati = parseInt(this.dataset.postiGiaPrenotatiUtente);
+                    if(typeof window.openBookingPopup === 'function') {
+                        window.openBookingPopup(eventId, eventTitle, postiDisponibiliEvento, postiGiaPrenotati);
+                    }
+                } else if (action === 'waitlist') {
+                    if(typeof window.openWaitlistPopup === 'function') {
+                        window.openWaitlistPopup(eventId, eventTitle);
+                    }
                 }
             });
         }
@@ -543,10 +763,10 @@
     function formatDate(dateString) {
         if (!dateString) return 'Data non disponibile';
         try {
-            const date = new Date(dateString.replace(/-/g, '/'));
-            if (isNaN(date.getTime())) return dateString;
+            const date = new Date(dateString.replace(/-/g, '/')); // Per compatibilità Safari con YYYY-MM-DD
+            if (isNaN(date.getTime())) return dateString; // Ritorna la stringa originale se non valida
             return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric'});
-        } catch (e) { return dateString; }
+        } catch (e) { return dateString; } // Fallback
     }
 </script>
 </body>
