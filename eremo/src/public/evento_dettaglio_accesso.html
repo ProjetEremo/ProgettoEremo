@@ -58,15 +58,17 @@
 
         <h1 id="eventTitleHeader" class="event-title-main">Dettaglio Evento</h1>
 
-        <img id="eventCoverImage" class="event-cover-image" src="" alt="Copertina evento">
-        <div id="eventMetaInfo" class="event-meta-info"></div>
-        <div id="eventDescriptionFull" class="event-description-full"></div>
-        <div id="eventVolantinoContainer" class="volantino-link-container"></div>
+        <img id="eventCoverImage" class="event-cover-image" src="" alt="Copertina evento" style="display:none;">
+        <div id="eventMetaInfo" class="event-meta-info" style="display:none;"></div>
+        <div id="eventDescriptionFull" class="event-description-full" style="display:none;"></div>
+        <div id="eventVolantinoContainer" class="volantino-link-container" style="display:none;"></div>
 
         <div id="pageLoadingIndicator" class="loading-overlay visible" style="min-height:200px; background:transparent; position:relative;">
             <div class="spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>
             <p>Caricamento contenuti dell'evento...</p>
         </div>
+        <div id="eventLoadingError" class="no-content-message" style="display:none; color:var(--danger); border-color:var(--danger);"></div>
+
 
         <section id="event-gallery" class="event-gallery-container" style="display:none;">
             <h2>Galleria Multimediale</h2>
@@ -189,9 +191,9 @@
     if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
     document.addEventListener('click', function(event) {
         if (mobileMenu && mobileMenu.classList.contains('open')) {
-            if (mobileMenu.contains(event.target) && event.target.tagName === 'A') {
+            if (mobileMenu.contains(event.target) && event.target.tagName === 'A') { // Chiude se clicco su un link nel menu mobile
                 closeMobileMenu();
-            } else if (hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) {
+            } else if (hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) { // Chiude se clicco fuori
                 closeMobileMenu();
             }
         }
@@ -210,6 +212,7 @@
 
     function openLightbox(index) {
         if (!lightbox || !lightboxContent || !lightboxCaption || galleryItemsData.length === 0 || !galleryItemsData[index]) {
+            console.warn("Lightbox o dati galleria mancanti per l'indice:", index);
             return;
         }
         currentMediaIndexInLightbox = index;
@@ -227,14 +230,17 @@
         } else if (item.type === 'image') {
             const img = document.createElement('img');
             img.src = item.href;
-            img.alt = item.title || "Immagine galleria";
+            img.alt = item.title || "Immagine galleria"; // item.title ora contiene la descrizione
             lightboxContent.appendChild(img);
         } else {
             lightboxContent.textContent = "Tipo di media non supportato per la visualizzazione ingrandita.";
         }
 
-        lightboxCaption.textContent = item.title || '';
-        lightboxCaption.style.display = item.title ? 'block' : 'none';
+        const captionText = item.title || ''; // item.title è la descrizione sanificata o 'Media'
+        lightboxCaption.textContent = captionText;
+        // Mostra la didascalia solo se ha contenuto significativo (non solo "Media" di fallback se la descrizione era vuota)
+        lightboxCaption.style.display = captionText && captionText.toLowerCase() !== 'media' ? 'block' : 'none';
+
         lightbox.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
@@ -242,7 +248,7 @@
     function closeLightbox() {
         if (!lightbox || !lightboxContent) return;
         lightbox.classList.remove('active');
-        lightboxContent.innerHTML = '';
+        lightboxContent.innerHTML = ''; // Pulisci il contenuto
         document.body.style.overflow = '';
     }
 
@@ -263,17 +269,42 @@
                 if (e.key === 'ArrowRight') changeLightboxMedia(1);
             }
         });
-        lightbox.addEventListener('click', (e) => {
+        lightbox.addEventListener('click', (e) => { // Chiudi cliccando sull'overlay
             if (e.target === lightbox) closeLightbox();
         });
     }
 
     function sanitizeTextForHTML(str) {
-        if (typeof str !== 'string') str = String(str || '');
+        if (typeof str !== 'string') str = String(str || ''); // Gestisce null o undefined
         const temp = document.createElement('div');
-        temp.textContent = str;
+        temp.textContent = str; // Inserisce come testo, così i browser fanno l'escaping
+        // Sostituisce solo i newline con <br> dopo l'escaping del browser
         return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');
     }
+
+    function displayErrorMessage(message, errorDetails = "") {
+        const errorDisplayEl = document.getElementById('eventLoadingError');
+        const titleHeaderEl = document.getElementById('eventTitleHeader');
+
+        let fullMessage = message;
+        if (errorDetails) {
+            fullMessage += " Dettaglio: " + sanitizeTextForHTML(String(errorDetails).substring(0, 300));
+        }
+
+        if (errorDisplayEl) {
+            errorDisplayEl.innerHTML = sanitizeTextForHTML(fullMessage);
+            errorDisplayEl.style.display = 'block';
+        } else if (titleHeaderEl) { // Fallback se errorDisplayEl non esiste
+            titleHeaderEl.innerHTML = "<p class='no-content-message' style='color:var(--danger);'>" + sanitizeTextForHTML(fullMessage) + "</p>";
+        } else { // Estremo fallback
+            console.error("ERRORE CRITICO:", fullMessage);
+            alert("Errore caricamento evento: " + message);
+        }
+
+        const pageLoadingEl = document.getElementById('pageLoadingIndicator');
+        if(pageLoadingEl) pageLoadingEl.classList.remove('visible');
+    }
+
 
     async function fetchEventDetails(eventId) {
         const eventTitleHeaderEl = document.getElementById('eventTitleHeader');
@@ -288,8 +319,20 @@
         const noMediaMessageEl = document.getElementById('no-media-message');
         const noCommentsMessageEl = document.getElementById('no-comments-message');
         const pageLoadingEl = document.getElementById('pageLoadingIndicator');
+        const errorDisplayEl = document.getElementById('eventLoadingError');
 
+        // Controllo iniziale se gli elementi esistono
+        if (!eventTitleHeaderEl || !pageLoadingEl || !errorDisplayEl) {
+            console.error("Elementi base della pagina (titolo, loading, errore) non trovati. Controlla gli ID HTML.");
+            alert("Errore critico nella struttura della pagina. Impossibile caricare l'evento.");
+            if(pageLoadingEl) pageLoadingEl.classList.remove('visible'); // Nascondi comunque il loading
+            return;
+        }
+
+        errorDisplayEl.style.display = 'none'; // Nascondi errori precedenti
         if (pageLoadingEl) pageLoadingEl.classList.add('visible');
+
+        // Nascondi sezioni contenuto finché non sono pronte
         [gallerySectionEl, commentsSectionEl, eventCoverImageEl, eventMetaInfoEl, eventDescriptionFullEl, eventVolantinoContainerEl].forEach(el => {
             if(el) el.style.display = 'none';
         });
@@ -298,13 +341,13 @@
             const response = await fetch('get_event_details.php?id=' + encodeURIComponent(eventId));
             if (!response.ok) {
                 const errorText = await response.text().catch(()=> "Dettaglio errore server non disponibile.");
-                throw new Error('Errore HTTP (' + response.status + '): ' + response.statusText + ". Dettaglio: " + errorText.substring(0,200) );
+                throw new Error(`Errore HTTP (${response.status}): ${response.statusText}. ${errorText}`);
             }
 
             const contentType = response.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 const responseText = await response.text().catch(() => "Risposta non JSON e illeggibile.");
-                throw new Error('Risposta non attesa da get_event_details.php (tipo: ' + contentType + '): ' + responseText.substring(0,200));
+                throw new Error(`Risposta non attesa (tipo: ${contentType}): ${responseText.substring(0,200)}`);
             }
             const result = await response.json();
 
@@ -313,11 +356,11 @@
                 const mediaItems = result.data.media || [];
                 const fetchedComments = result.data.comments || [];
 
-                if (eventTitleHeaderEl && event && event.Titolo) {
+                if (event && event.Titolo) {
                     eventTitleHeaderEl.textContent = event.Titolo;
                     document.title = sanitizeTextForHTML(event.Titolo) + ' - Eremo Frate Francesco';
-                } else if (eventTitleHeaderEl) {
-                    eventTitleHeaderEl.textContent = "Dettaglio Evento";
+                } else {
+                    eventTitleHeaderEl.textContent = "Dettaglio Evento"; // Titolo di fallback
                 }
 
                 if (event) {
@@ -328,17 +371,17 @@
                     }
                     if(eventMetaInfoEl){
                         let metaHTML = '';
-                        if (event.Data) { // Questo è il campo Data originale, non DataPubb per ora
+                        if (event.Data) {
                             try {
-                                metaHTML += '<span><i class="fas fa-calendar-alt"></i> ' + new Date(event.Data.replace(/-/g, '/')).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'}) + '</span>';
+                                metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${new Date(event.Data.replace(/-/g, '/')).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'})}</span>`;
                             } catch (dateError) {
                                 console.warn("Formato data evento non valido:", event.Data, dateError);
-                                metaHTML += '<span><i class="fas fa-calendar-alt"></i> ' + sanitizeTextForHTML(event.Data) + '</span>';
+                                metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${sanitizeTextForHTML(event.Data)}</span>`;
                             }
                         }
-                        if (event.Durata) metaHTML += '<span><i class="fas fa-clock"></i> ' + sanitizeTextForHTML(event.Durata) + '</span>';
-                        if (event.Relatore) metaHTML += '<span><i class="fas fa-user"></i> ' + sanitizeTextForHTML(event.PrefissoRelatore || 'Relatore') + ': ' + sanitizeTextForHTML(event.Relatore) + '</span>';
-                        if (event.Associazione) metaHTML += '<span><i class="fas fa-users"></i> ' + sanitizeTextForHTML(event.Associazione) + '</span>';
+                        if (event.Durata) metaHTML += `<span><i class="fas fa-clock"></i> ${sanitizeTextForHTML(event.Durata)}</span>`;
+                        if (event.Relatore) metaHTML += `<span><i class="fas fa-user"></i> ${sanitizeTextForHTML(event.PrefissoRelatore || 'Relatore')}: ${sanitizeTextForHTML(event.Relatore)}</span>`;
+                        if (event.Associazione) metaHTML += `<span><i class="fas fa-users"></i> ${sanitizeTextForHTML(event.Associazione)}</span>`;
                         eventMetaInfoEl.innerHTML = metaHTML;
                         if (metaHTML) eventMetaInfoEl.style.display = 'flex';
                     }
@@ -348,28 +391,28 @@
                     }
                     if(eventVolantinoContainerEl && event.VolantinoUrl){
                         eventVolantinoContainerEl.innerHTML =
-                            '<h4>Volantino Evento</h4>' +
-                            '<a href="' + encodeURI(event.VolantinoUrl) + '" target="_blank" title="Visualizza volantino ' + sanitizeTextForHTML(event.Titolo || '') + '" class="btn-volantino">' +
-                            '<i class="fas fa-file-pdf"></i> Visualizza Volantino' +
-                            '</a>';
+                            `<h4>Volantino Evento</h4><a href="${encodeURI(event.VolantinoUrl)}" target="_blank" title="Visualizza volantino ${sanitizeTextForHTML(event.Titolo || '')}" class="btn-volantino"><i class="fas fa-file-pdf"></i> Visualizza Volantino</a>`;
                         eventVolantinoContainerEl.style.display = 'block';
                     }
                 } else {
-                    if (eventTitleHeaderEl) eventTitleHeaderEl.textContent = "Dettaglio Evento non disponibile";
+                    displayErrorMessage("Dati dell'evento non trovati o incompleti.", "L'oggetto 'event' è nullo.");
                 }
 
-                galleryItemsData = [];
-                if (galleryGridEl) galleryGridEl.innerHTML = '';
+                galleryItemsData = []; // Resetta i dati della galleria
+                if (galleryGridEl) galleryGridEl.innerHTML = ''; // Pulisci la griglia
+
                 if (mediaItems.length > 0) {
                     if (gallerySectionEl) gallerySectionEl.style.display = 'block';
                     if (noMediaMessageEl) noMediaMessageEl.style.display = 'none';
 
                     mediaItems.forEach(item => {
                         const rawPercorso = item.Percorso || '';
+                        const mediaDescription = item.Descrizione || ''; // Ora item.Descrizione arriva dal PHP
+                        const displayTitle = sanitizeTextForHTML(mediaDescription || 'Media'); // Didascalia/titolo per il media
+
                         let itemType = 'unknown';
-                        let itemHref = 'uploads/event_images/' + rawPercorso;
+                        let itemHref = rawPercorso;
                         let thumbSrc = 'images/file_placeholder.png';
-                        const mediaTitle = sanitizeTextForHTML(item.TitoloMedia || (event ? event.Titolo : '') || 'Media');
 
                         if (rawPercorso.match(/\.(mp4|webm|ogg)$/i)) {
                             itemType = 'video';
@@ -380,12 +423,13 @@
                         }
 
                         if (itemType !== 'unknown') {
-                            galleryItemsData.push({ href: itemHref, title: mediaTitle, type: itemType });
+                            galleryItemsData.push({ href: itemHref, title: displayTitle, type: itemType });
+
                             const galleryItemDiv = document.createElement('div');
                             galleryItemDiv.className = 'gallery-item';
 
-                            let itemHtml = '<a href="#" data-index="' + (galleryItemsData.length - 1) + '" title="' + mediaTitle + '">';
-                            itemHtml += '<img src="' + thumbSrc + '" alt="' + mediaTitle + '">';
+                            let itemHtml = `<a href="#" data-index="${(galleryItemsData.length - 1)}" title="${displayTitle}">`;
+                            itemHtml += `<img src="${thumbSrc}" alt="${displayTitle}" loading="lazy" onerror="this.onerror=null; this.src='images/file_placeholder.png';">`;
                             if (itemType === 'video') {
                                 itemHtml += '<div class="media-overlay"><i class="fas fa-play media-play-icon"></i></div>';
                             }
@@ -402,12 +446,12 @@
                             openLightbox(parseInt(this.dataset.index));
                         });
                     });
-
                 } else {
-                    if (gallerySectionEl) gallerySectionEl.style.display = 'block';
-                    if (noMediaMessageEl) noMediaMessageEl.style.display = 'block';
+                    if (gallerySectionEl) gallerySectionEl.style.display = 'block'; // Mostra la sezione anche se vuota
+                    if (noMediaMessageEl) noMediaMessageEl.style.display = 'block'; // Mostra il messaggio "nessun media"
                 }
 
+                // Logica Commenti
                 const commentFormContainerEl = document.getElementById('commentFormContainer');
                 const loginToCommentMessageEl = document.getElementById('login-to-comment-message');
                 const commentEventIdInput = document.getElementById('commentEventId');
@@ -422,7 +466,7 @@
                     if (loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'block';
                 }
 
-                if (commentsListEl) commentsListEl.innerHTML = '';
+                if (commentsListEl) commentsListEl.innerHTML = ''; // Pulisci la lista
                 if (fetchedComments.length > 0) {
                     if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'none';
                     displayComments(fetchedComments, commentsListEl);
@@ -431,18 +475,18 @@
                 }
 
             } else {
-                throw new Error(result.message || "Formato dati evento non corretto da get_event_details.php.");
+                throw new Error(result.message || "Formato dati evento non corretto o evento non trovato.");
             }
         } catch (error) {
-            console.error("Errore grave in fetchEventDetails:", error);
-            if (eventTitleHeaderEl) eventTitleHeaderEl.innerHTML = "<p class='no-content-message'>Impossibile caricare i dettagli dell'evento: " + sanitizeTextForHTML(error.message) + "</p>";
+            console.error("Errore grave in fetchEventDetails:", error.message, error);
+            displayErrorMessage("Impossibile caricare i dettagli dell'evento.", error.message);
         } finally {
             if (pageLoadingEl) pageLoadingEl.classList.remove('visible');
         }
-    } // Fine fetchEventDetails
+    }
 
     function displayComments(comments, parentEl) {
-        parentEl.innerHTML = '';
+        parentEl.innerHTML = ''; // Pulisci prima di aggiungere
         if (Array.isArray(comments)) {
             comments.forEach(comment => {
                 parentEl.appendChild(createCommentElement(comment));
@@ -457,34 +501,36 @@
 
         let rawUserName = 'Anonimo';
         if (commentData.Contatto) { rawUserName = commentData.Contatto.split('@')[0]; }
-        if (currentUser && currentUser.email === commentData.Contatto && currentUser.nome) { rawUserName = currentUser.nome; }
+        // Sovrascrivi con nome completo se l'utente corrente è l'autore del commento e ha un nome
+        if (currentUser && currentUser.email === commentData.Contatto && currentUser.nome) {
+            rawUserName = currentUser.nome;
+        }
+
 
         const safeUserName = sanitizeTextForHTML(rawUserName);
-        // Usa DataVisualizzata che PHP ha formattato, includendo data e ora corretta
         const safeCommentDate = sanitizeTextForHTML(commentData.DataVisualizzata || 'Data non disponibile');
-        const sanitizedDescription = sanitizeTextForHTML(commentData.Descrizione);
-        const avatarUrl = 'https://i.pravatar.cc/40?u=' + encodeURIComponent(commentData.Contatto || 'default_user');
+        const sanitizedDescription = sanitizeTextForHTML(commentData.Descrizione); // Testo del commento
+        const avatarUrl = 'https://i.pravatar.cc/40?u=' + encodeURIComponent(commentData.Contatto || 'default_user'); // Avatar placeholder
         const numLike = commentData.NumLike !== null ? parseInt(commentData.NumLike) : 0;
 
-        let commentHTML =
-            '<div class="comment-header">' +
-            '<img src="' + avatarUrl + '" alt="Avatar ' + safeUserName + '" class="user-avatar">' +
-            '<div class="comment-meta"><strong>' + safeUserName + '</strong> <small>' + safeCommentDate + '</small></div>' +
-            '</div>' +
-            '<p>' + sanitizedDescription + '</p>' +
-            '<div class="comment-actions">' +
-            '<button class="like-btn" data-comment-id="' + commentData.Progressivo + '" aria-label="Mi piace"><i class="far fa-heart"></i> <span class="like-count">' + numLike + '</span></button>' +
-            '<button class="btn-reply" data-comment-id="' + commentData.Progressivo + '" aria-label="Rispondi"><i class="fas fa-reply"></i> Rispondi</button>' +
-            '</div>' +
-            '<div class="reply-form" id="reply-form-' + commentData.Progressivo + '">' +
-            '<form data-parent-comment-id="' + commentData.Progressivo + '">' +
-            '<textarea name="Descrizione" placeholder="Rispondi a ' + safeUserName + '..." rows="2" required aria-label="Testo della risposta"></textarea>' +
-            '<button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia</button>' +
-            '<div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em;"></div>' +
-            '</form>' +
-            '</div>' +
-            '<div class="replies"></div>';
-        commentDiv.innerHTML = commentHTML;
+        commentDiv.innerHTML = `
+            <div class="comment-header">
+                <img src="${avatarUrl}" alt="Avatar ${safeUserName}" class="user-avatar">
+                <div class="comment-meta"><strong>${safeUserName}</strong> <small>${safeCommentDate}</small></div>
+            </div>
+            <p>${sanitizedDescription}</p>
+            <div class="comment-actions">
+                <button class="like-btn" data-comment-id="${commentData.Progressivo}" aria-label="Mi piace"><i class="far fa-heart"></i> <span class="like-count">${numLike}</span></button>
+                <button class="btn-reply" data-comment-id="${commentData.Progressivo}" aria-label="Rispondi"><i class="fas fa-reply"></i> Rispondi</button>
+            </div>
+            <div class="reply-form" id="reply-form-${commentData.Progressivo}">
+                 <form data-parent-comment-id="${commentData.Progressivo}">
+                    <textarea name="Descrizione" placeholder="Rispondi a ${safeUserName}..." rows="2" required aria-label="Testo della risposta"></textarea>
+                    <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia</button>
+                    <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em;"></div>
+                 </form>
+            </div>
+            <div class="replies"></div>`; // Contenitore per le risposte
 
         if (commentData.replies && Array.isArray(commentData.replies) && commentData.replies.length > 0) {
             const repliesContainer = commentDiv.querySelector('.replies');
@@ -510,65 +556,57 @@
     async function handleLikeAction(btn) {
         if (!currentUser || !currentUser.email) {
             alert("Devi essere loggato per mettere 'Mi piace'.");
+            // Potresti reindirizzare al login o aprire un popup di login
             return;
         }
         const commentId = btn.dataset.commentId;
         const icon = btn.querySelector('i');
         const countSpan = btn.querySelector('.like-count');
 
-        btn.disabled = true;
+        btn.disabled = true; // Evita doppi click
 
         try {
             const formData = new FormData();
             formData.append('commentId', commentId);
+            // Non inviamo Contatto qui, like_comment.php dovrebbe usare la sessione PHP o un token per l'utente loggato
 
-            const response = await fetch('like_comment.php', {
-                method: 'POST',
-                body: formData
-            });
-
+            const response = await fetch('like_comment.php', { method: 'POST', body: formData });
             if (!response.ok) {
                 const errorText = await response.text().catch(() => "Dettaglio errore server non disponibile.");
-                throw new Error('Errore dal server (' + response.status + ' ' + response.statusText + '). ' + errorText.substring(0,100));
+                throw new Error(`Errore dal server (${response.status} ${response.statusText}). ${errorText.substring(0,100)}`);
             }
-
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                const responseText = await response.text().catch(() => "Risposta non JSON e illeggibile.");
-                throw new Error('Risposta non attesa da like_comment.php (tipo: ' + contentType + '): ' + responseText.substring(0,200));
-            }
-
             const result = await response.json();
 
             if (result.success) {
                 if (countSpan) countSpan.textContent = result.newLikeCount;
                 if(icon) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
-                    icon.style.color = 'var(--danger)';
+                    // Logica per cambiare l'icona del like (es. cuore pieno/vuoto)
+                    // Questa è una semplice implementazione che mostra solo il like, non l'unlike.
+                    icon.classList.remove('far'); // Rimuovi stile "vuoto"
+                    icon.classList.add('fas');    // Aggiungi stile "pieno"
+                    icon.style.color = 'var(--danger)'; // Colore per like attivo
                 }
-                // Per un sistema completo di like/unlike, qui si gestirebbe lo stato del bottone
-                // btn.classList.add('active'); // o toggle
             } else {
                 throw new Error(result.message || "Impossibile aggiornare il like.");
             }
         } catch (error) {
             console.error("Errore durante l'aggiornamento del like:", error.message);
-            // alert("Errore: " + error.message); // Opzionale: feedback all'utente
+            // Potresti voler mostrare un messaggio di errore all'utente in modo non invasivo
         } finally {
-            setTimeout(() => { if(btn) btn.disabled = false; }, 500); // Riabilita dopo un breve ritardo
+            setTimeout(() => { if(btn) btn.disabled = false; }, 500);
         }
     }
 
     function toggleReplyFormAction(btn) {
         const commentId = btn.dataset.commentId;
-        const formDiv = document.getElementById('reply-form-' + commentId);
+        const formDiv = document.getElementById(`reply-form-${commentId}`);
         if(formDiv){
-            const isActive = formDiv.classList.toggle('active');
+            const isActive = formDiv.classList.toggle('active'); // 'active' deve essere definita in CSS per mostrare/nascondere il form
             if(isActive) {
                 const textarea = formDiv.querySelector('textarea');
                 if (textarea) textarea.focus();
             }
+            // Pulisci messaggi di errore/successo precedenti nel form di risposta
             const localMsg = formDiv.querySelector('.form-message-local');
             if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }
         }
@@ -581,7 +619,7 @@
         }
 
         const formData = new FormData(form);
-        formData.append('Contatto', currentUser.email);
+        formData.append('Contatto', currentUser.email); // Aggiungi l'email dell'utente loggato
 
         if (isReply) {
             if (!formData.has('IDEvento')) { formData.append('IDEvento', eventId); }
@@ -589,6 +627,7 @@
             if (parentCommentId) {
                 formData.append('CodRisposta', parentCommentId);
             } else {
+                // Gestisci l'errore se parentCommentId non è disponibile per una risposta
                 const msgEl = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
                 if (msgEl) {
                     msgEl.textContent = 'Errore: riferimento mancante per la risposta.';
@@ -597,19 +636,20 @@
                 return;
             }
         }
+        // Per i commenti principali, IDEvento è già nel form (hidden input)
 
         const submitBtn = form.querySelector('button[type="submit"]');
         const commentFormMessageElement = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
 
-        if (!submitBtn) { console.error("Bottone di submit non trovato."); return; }
+        if (!submitBtn) { console.error("Bottone di submit non trovato nel form:", form); return; }
         const originalBtnText = submitBtn.innerHTML;
 
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-mini"></span> Invio...';
 
-        if (commentFormMessageElement) {
+        if (commentFormMessageElement) { // Pulisci messaggi precedenti
             commentFormMessageElement.textContent = '';
-            commentFormMessageElement.className = 'form-message';
+            commentFormMessageElement.className = 'form-message'; // Reset classe
             commentFormMessageElement.style.display = 'none';
         }
 
@@ -618,40 +658,35 @@
 
             if (!response.ok) {
                 const errorText = await response.text().catch(() => "Impossibile leggere il corpo dell'errore.");
-                throw new Error('Errore dal server (' + response.status + ' ' + response.statusText + '). Dettagli: ' + errorText.substring(0, 200));
+                throw new Error(`Errore dal server (${response.status} ${response.statusText}). Dettagli: ${errorText.substring(0, 200)}`);
             }
-
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                const responseText = await response.text().catch(() => "Risposta non JSON e illeggibile.");
-                throw new Error('Risposta non attesa da submit_comment.php (tipo: ' + contentType + '): ' + responseText.substring(0,200));
-            }
-
             const result = await response.json();
 
             if (result.success) {
-                form.reset();
-                if (isReply && form.closest('.reply-form')) {
+                form.reset(); // Pulisci il form
+                if (isReply && form.closest('.reply-form')) { // Nascondi il form di risposta
                     form.closest('.reply-form').classList.remove('active');
                 }
+                // Ricarica tutti i dettagli dell'evento, inclusi i commenti aggiornati
                 fetchEventDetails(eventId);
 
+                // Mostra messaggio di successo (opzionale, dato che la lista si aggiorna)
                 const targetMessageEl = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
                 if (targetMessageEl) {
-                    targetMessageEl.textContent = isReply ? 'Risposta inviata!' : 'Commento inviato!';
+                    targetMessageEl.textContent = isReply ? 'Risposta inviata con successo!' : 'Commento inviato con successo!';
                     targetMessageEl.className = 'form-message success';
                     targetMessageEl.style.display = 'block';
                     setTimeout(() => { if (targetMessageEl) { targetMessageEl.style.display = 'none'; } }, 3000);
                 }
             } else {
-                throw new Error(result.message || "Errore durante l'invio (risposta server).");
+                throw new Error(result.message || "Errore sconosciuto durante l'invio del commento.");
             }
         } catch (error) {
             console.error("Errore Catturato in handleCommentSubmit:", error.message, error);
             if (commentFormMessageElement) {
-                let errMsg = "Errore sconosciuto.";
+                let errMsg = "Si è verificato un errore.";
                 if (error && error.message) { errMsg = String(error.message).substring(0, 300); }
-                commentFormMessageElement.textContent = 'Errore: ' + errMsg;
+                commentFormMessageElement.textContent = `Errore: ${errMsg}`;
                 commentFormMessageElement.className = 'form-message error';
                 commentFormMessageElement.style.display = 'block';
             }
@@ -663,36 +698,59 @@
         }
     }
 
-    async function handleReplySubmit(e) {
+    async function handleReplySubmit(e) { // Questa funzione è il gestore dell'evento per i form di risposta
         e.preventDefault();
-        const eventIdInput = document.getElementById('commentEventId');
+        const eventIdInput = document.getElementById('commentEventId'); // ID Evento principale
         if (!eventIdInput || !eventIdInput.value) {
+            console.error("ID Evento principale non trovato per la risposta.");
             const form = e.target;
             const msgEl = form.querySelector('.form-message-local');
             if (msgEl) {
-                msgEl.textContent = "Errore interno: ID Evento mancante.";
+                msgEl.textContent = "Errore interno: ID Evento principale mancante.";
                 msgEl.className = 'form-message error'; msgEl.style.display = 'block';
             }
             return;
         }
         const eventId = eventIdInput.value;
-        handleCommentSubmit(e.target, eventId, true);
+        handleCommentSubmit(e.target, eventId, true); // e.target è il form di risposta
     }
+
 
     document.addEventListener('DOMContentLoaded', () => {
         setupUserSessionAndNavbar();
 
         const urlParams = new URLSearchParams(window.location.search);
         const eventId = urlParams.get('id');
+        const errorDisplayEl = document.getElementById('eventLoadingError'); // Aggiunto per coerenza
 
-        const newCommentForm = document.getElementById('new-comment-form');
-        const eventIdInputForMainForm = document.getElementById('commentEventId');
+        if (eventId) {
+            const commentEventIdInput = document.getElementById('commentEventId');
+            if (commentEventIdInput) {
+                commentEventIdInput.value = eventId; // Imposta per il form principale
+            }
+            fetchEventDetails(eventId);
+        } else {
+            // Se eventId non è presente nell'URL
+            const pageLoadingEl = document.getElementById('pageLoadingIndicator');
+            const eventTitleHeaderEl = document.getElementById('eventTitleHeader'); // Definisci qui per questo scope
 
-        if (currentUser && currentUser.email && eventIdInputForMainForm && eventId) {
-            eventIdInputForMainForm.value = eventId;
+            if (pageLoadingEl) pageLoadingEl.classList.remove('visible');
+            let specificErrorMessage = "ID evento non specificato nell'URL.";
+
+            if (eventTitleHeaderEl) { // Se l'elemento titolo esiste, usalo per il messaggio
+                eventTitleHeaderEl.innerHTML = `<p class='no-content-message'>${sanitizeTextForHTML(specificErrorMessage)}</p>`;
+            } else if (errorDisplayEl) { // Altrimenti usa il div di errore generico
+                errorDisplayEl.innerHTML = sanitizeTextForHTML(specificErrorMessage);
+                errorDisplayEl.style.display = 'block';
+            } else { // Fallback estremo
+                console.error(specificErrorMessage + " (Elemento titolo o errore non trovato nel DOM).");
+                alert(specificErrorMessage);
+            }
         }
 
-        if (newCommentForm && eventId) {
+        // Gestore per il form principale dei commenti
+        const newCommentForm = document.getElementById('new-comment-form');
+        if (newCommentForm && eventId) { // Assicurati che eventId sia valido prima di aggiungere il listener
             newCommentForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 const commentTextInput = document.getElementById('comment-text');
@@ -706,19 +764,12 @@
                     }
                     return;
                 }
+                // eventId è già stato impostato nel campo hidden del form o è disponibile dalla closure
                 handleCommentSubmit(this, eventId, false);
             });
-        } else if (!eventId) {
-            const pageLoadingEl = document.getElementById('pageLoadingIndicator');
-            const eventTitleHeaderEl = document.getElementById('eventTitleHeader');
-            if(eventTitleHeaderEl) eventTitleHeaderEl.innerHTML = "<p class='no-content-message'>ID evento non specificato nell'URL.</p>";
-            if(pageLoadingEl) pageLoadingEl.classList.remove('visible');
         }
 
-        if (eventId) {
-            fetchEventDetails(eventId);
-        }
-
+        // Visibilità del form commenti basata sul login
         const commentFormContainerEl = document.getElementById('commentFormContainer');
         const loginToCommentMessageEl = document.getElementById('login-to-comment-message');
         if (commentFormContainerEl && loginToCommentMessageEl) {
@@ -729,7 +780,14 @@
                 commentFormContainerEl.style.display = 'none';
                 loginToCommentMessageEl.style.display = 'block';
                 const loginLink = document.getElementById('loginLinkFromEventPage');
-                if(loginLink) loginLink.addEventListener('click', (e) => {e.preventDefault(); alert("Per favore, accedi per commentare."); });
+                if(loginLink) {
+                    loginLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        alert("Per favore, accedi per commentare.");
+                        // Qui potresti implementare la logica per mostrare il popup di login,
+                        // ad esempio: if(typeof openLoginPopup === 'function') openLoginPopup();
+                    });
+                }
             }
         }
 

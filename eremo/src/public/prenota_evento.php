@@ -1,6 +1,5 @@
 <?php
 header('Content-Type: application/json');
-// Avvia la sessione se non già attiva, per coerenza, anche se l'email viene passata dal client
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -8,9 +7,9 @@ if (session_status() == PHP_SESSION_NONE) {
 // Configurazione del database
 $config = [
     'host' => 'localhost',
-    'db'   => 'my_eremofratefrancesco',
-    'user' => 'eremofratefrancesco',
-    'pass' => '' // INSERISCI QUI LA TUA PASSWORD DEL DATABASE
+    'db'   => 'my_eremofratefrancesco', // Assicurati che sia il nome corretto del DB
+    'user' => 'eremofratefrancesco',    // Il tuo username DB
+    'pass' => ''                       // !!! INSERISCI QUI LA TUA PASSWORD DEL DATABASE !!!
 ];
 
 $conn = null;
@@ -28,8 +27,8 @@ try {
     );
 } catch (PDOException $e) {
     http_response_code(500);
-    error_log("Errore di connessione al database: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Errore di connessione al database.']);
+    error_log("Errore di connessione al database (prenota_evento.php): " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Errore di connessione al database. Riprova più tardi.']);
     exit;
 }
 
@@ -42,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Recupero e validazione dati
 $eventId = filter_input(INPUT_POST, 'eventId', FILTER_VALIDATE_INT);
 $numeroPostiRichiesti = filter_input(INPUT_POST, 'numeroPosti', FILTER_VALIDATE_INT);
-$contattoUtente = filter_input(INPUT_POST, 'contatto', FILTER_VALIDATE_EMAIL);
+$contattoUtente = filter_input(INPUT_POST, 'contatto', FILTER_VALIDATE_EMAIL); // Email dell'utente che prenota
 
 $nomiPartecipanti = isset($_POST['partecipanti_nomi']) && is_array($_POST['partecipanti_nomi']) ? $_POST['partecipanti_nomi'] : [];
 $cognomiPartecipanti = isset($_POST['partecipanti_cognomi']) && is_array($_POST['partecipanti_cognomi']) ? $_POST['partecipanti_cognomi'] : [];
@@ -51,7 +50,7 @@ $errorMessages = [];
 if (!$eventId) {
     $errorMessages[] = 'ID Evento non valido.';
 }
-if (!$numeroPostiRichiesti || $numeroPostiRichiesti < 1 || $numeroPostiRichiesti > 5) {
+if (!$numeroPostiRichiesti || $numeroPostiRichiesti < 1 || $numeroPostiRichiesti > 5) { // Limite posti per singola prenotazione
     $errorMessages[] = 'Il numero di posti richiesti deve essere tra 1 e 5.';
 }
 if (!$contattoUtente) {
@@ -74,9 +73,10 @@ if (!empty($errorMessages)) {
     exit;
 }
 
-
 try {
-    // NUOVO CONTROLLO: Limite massimo di 5 posti per utente per evento
+    $conn->beginTransaction();
+
+    // 1. Controlla se l'utente ha già prenotato il massimo dei posti consentiti per questo evento
     $stmtCheckUserBookings = $conn->prepare("SELECT SUM(NumeroPosti) AS total_booked_by_user FROM prenotazioni WHERE Contatto = :contatto AND IDEvento = :eventId");
     $stmtCheckUserBookings->bindParam(':contatto', $contattoUtente, PDO::PARAM_STR);
     $stmtCheckUserBookings->bindParam(':eventId', $eventId, PDO::PARAM_INT);
@@ -84,7 +84,7 @@ try {
     $userBookingData = $stmtCheckUserBookings->fetch();
     $postiGiaPrenotatiUtente = $userBookingData ? (int)$userBookingData['total_booked_by_user'] : 0;
 
-    if (($postiGiaPrenotatiUtente + $numeroPostiRichiesti) > 5) {
+    if (($postiGiaPrenotatiUtente + $numeroPostiRichiesti) > 5) { // Limite totale per utente per evento
         $postiAncoraPrenotabili = 5 - $postiGiaPrenotatiUtente;
         $messaggioErrore = "Limite massimo di 5 posti per utente per questo evento superato. ";
         if ($postiAncoraPrenotabili > 0) {
@@ -95,9 +95,7 @@ try {
         throw new Exception($messaggioErrore);
     }
 
-    $conn->beginTransaction();
-
-    // 1. Controlla posti disponibili e FlagPrenotabile per l'evento
+    // 2. Controlla posti disponibili e FlagPrenotabile per l'evento (con lock per concorrenza)
     $stmtEvento = $conn->prepare("SELECT Titolo, PostiDisponibili, FlagPrenotabile FROM eventi WHERE IDEvento = :idevento FOR UPDATE");
     $stmtEvento->bindParam(':idevento', $eventId, PDO::PARAM_INT);
     $stmtEvento->execute();
@@ -112,10 +110,10 @@ try {
     }
 
     if ((int)$evento['PostiDisponibili'] < $numeroPostiRichiesti) {
-        throw new Exception("Non ci sono abbastanza posti disponibili per '" . htmlspecialchars($evento['Titolo']) . "'. Posti rimasti: " . htmlspecialchars($evento['PostiDisponibili']) . ". Richiesti: " . $numeroPostiRichiesti);
+        throw new Exception("Spiacenti, non ci sono abbastanza posti disponibili per '" . htmlspecialchars($evento['Titolo']) . "'. Posti rimasti: " . htmlspecialchars($evento['PostiDisponibili']) . ". Richiesti: " . $numeroPostiRichiesti);
     }
 
-    // 2. Inserisci nella tabella prenotazioni
+    // 3. Inserisci nella tabella prenotazioni
     $sqlPrenotazione = "INSERT INTO prenotazioni (NumeroPosti, Contatto, IDEvento) VALUES (:numPosti, :contatto, :idEvento)";
     $stmtPrenotazione = $conn->prepare($sqlPrenotazione);
     $stmtPrenotazione->bindParam(':numPosti', $numeroPostiRichiesti, PDO::PARAM_INT);
@@ -123,9 +121,9 @@ try {
     $stmtPrenotazione->bindParam(':idEvento', $eventId, PDO::PARAM_INT);
     $stmtPrenotazione->execute();
 
-    $idPrenotazione = $conn->lastInsertId();
+    $idPrenotazione = $conn->lastInsertId(); // Ottieni l'ID della prenotazione appena inserita
 
-    // 3. Inserisci i partecipanti nella tabella Partecipanti
+    // 4. Inserisci i partecipanti nella tabella Partecipanti
     $sqlPartecipante = "INSERT INTO Partecipanti (Nome, Cognome, Progressivo) VALUES (:nome, :cognome, :idPrenotazione)";
     $stmtPartecipante = $conn->prepare($sqlPartecipante);
 
@@ -139,7 +137,7 @@ try {
         $stmtPartecipante->execute();
     }
 
-    // 4. Aggiorna i posti disponibili nella tabella eventi
+    // 5. Aggiorna i posti disponibili nella tabella eventi
     $nuoviPostiDisponibili = (int)$evento['PostiDisponibili'] - $numeroPostiRichiesti;
     $sqlAggiornaEvento = "UPDATE eventi SET PostiDisponibili = :nuoviPosti WHERE IDEvento = :idEvento";
     $stmtAggiornaEvento = $conn->prepare($sqlAggiornaEvento);
@@ -147,7 +145,24 @@ try {
     $stmtAggiornaEvento->bindParam(':idEvento', $eventId, PDO::PARAM_INT);
     $stmtAggiornaEvento->execute();
 
+    // Fine transazione principale
     $conn->commit();
+
+    // 6. AGGIUNTA: Rimuovi l'utente dalla coda di attesa per questo evento, se presente
+    // Questo blocco viene eseguito DOPO che la prenotazione è stata confermata.
+    try {
+        $stmtRimuoviCoda = $conn->prepare("DELETE FROM utentiincoda WHERE Contatto = :contatto AND IDEvento = :idEvento");
+        $stmtRimuoviCoda->bindParam(':contatto', $contattoUtente, PDO::PARAM_STR);
+        $stmtRimuoviCoda->bindParam(':idEvento', $eventId, PDO::PARAM_INT);
+        $stmtRimuoviCoda->execute();
+        if ($stmtRimuoviCoda->rowCount() > 0) {
+            error_log("Utente {$contattoUtente} rimosso con successo dalla coda per evento {$eventId} dopo aver effettuato la prenotazione.");
+        }
+    } catch (PDOException $eCoda) {
+        // Logga l'errore ma non far fallire la risposta di successo della prenotazione principale per questo.
+        // L'utente ha comunque prenotato.
+        error_log("ATTENZIONE: Errore durante la rimozione automatica dalla coda per utente {$contattoUtente}, evento {$eventId}: " . $eCoda->getMessage());
+    }
 
     echo json_encode([
         'success' => true,
@@ -159,8 +174,8 @@ try {
     if ($conn && $conn->inTransaction()) {
         $conn->rollBack();
     }
-    error_log("Errore durante la prenotazione: " . $e->getMessage() . " (Evento ID: " . $eventId . ", Utente: " . $contattoUtente . ")");
-    http_response_code(400); // Spesso 400 per errori di validazione o di logica di business
+    error_log("Errore durante la prenotazione (prenota_evento.php): " . $e->getMessage() . " (Evento ID: " . htmlspecialchars($eventId ?? 'N/D') . ", Utente: " . htmlspecialchars($contattoUtente ?? 'N/D') . ")");
+    http_response_code(400); // Errore client o di logica di business
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 } finally {
     $conn = null;

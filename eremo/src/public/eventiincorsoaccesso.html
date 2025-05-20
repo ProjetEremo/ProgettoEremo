@@ -7,7 +7,7 @@
     <title>Calendario Attività - Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Stili popup e spinner (dal tuo style.css o qui) */
+        /* ... (stili CSS esistenti, inclusi quelli per .booking-popup-overlay, .booking-popup, .form-message, .spinner-mini) ... */
         .booking-popup-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6); z-index: 1050; opacity: 0;
@@ -65,7 +65,6 @@
         .form-message.error {
             background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--danger); color: var(--dark);
         }
-        /* .spinner-mini è definito in style.css principale */
     </style>
 </head>
 <body>
@@ -159,12 +158,10 @@
     <h2 id="waitlistPopupTitle">Entra in Lista d'Attesa</h2>
     <form id="waitlistForm">
         <input type="hidden" id="waitlistEventId" name="eventId">
-        <p id="waitlistEventInfo" style="text-align:center; margin-bottom:1rem;"></p>
+        <p id="waitlistEventInfo" style="text-align:center; margin-bottom:1rem; font-size: 1.1rem; color: var(--primary);"></p>
         <div class="form-group">
-            <label for="waitlistNumeroPosti">Numero Partecipanti (max 5)</label>
+            <label for="waitlistNumeroPosti">Quanti posti vuoi richiedere per la lista d'attesa? (max 5)</label>
             <input type="number" id="waitlistNumeroPosti" name="numeroPosti" class="form-control" min="1" max="5" value="1" required>
-        </div>
-        <div id="waitlistParticipantFieldsContainer" class="participant-fields-container">
         </div>
         <div id="waitlistResponseMessage" class="form-message" style="display:none;"></div>
         <div class="form-actions">
@@ -175,10 +172,11 @@
 
 
 <script>
-    // --- SCRIPT GLOBALI PER PAGINE ACCESSO (dal tuo style.css o qui) ---
+    // --- SCRIPT GLOBALI PER PAGINE ACCESSO (invariati) ---
     let currentUser = null;
 
     function updateNavbarUserUI() {
+        // ... (codice invariato)
         const navbarUsernameEl = document.getElementById('navbar-username');
         const navbarAvatarEl = document.getElementById('navbar-avatar');
         if (!navbarUsernameEl || !navbarAvatarEl) return;
@@ -199,6 +197,7 @@
     }
 
     function handleLogout() {
+        // ... (codice invariato)
         localStorage.removeItem('userDataEFF');
         currentUser = null;
         alert('Logout effettuato.');
@@ -206,6 +205,7 @@
     }
 
     function setupUserSessionAndNavbar() {
+        // ... (codice invariato)
         const userDataString = localStorage.getItem('userDataEFF');
         if (userDataString) {
             try {
@@ -234,6 +234,7 @@
     }
 
     let lastScroll = 0;
+    // ... (codice scroll navbar, dropdown utente, mobile menu invariato) ...
     const navbarContainer = document.getElementById('navbarContainer');
     if (navbarContainer) {
         window.addEventListener('scroll', () => {
@@ -306,14 +307,15 @@
 
         loadEvents();
         initializeBookingPopupHandlers();
-        initializeWaitlistPopupHandlers(); // Nuovo handler per il popup della coda
+        initializeWaitlistPopupHandlers(); // Handler per il popup della coda semplificato
 
         const currentYearEl = document.getElementById('currentYear');
         if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
     });
 
-    // Funzione helper per generare campi nome/cognome
+    // Funzione helper per generare campi nome/cognome (usata solo per booking popup ora)
     function generateParticipantFields(count, containerElement, baseIdName, maxAllowed) {
+        // ... (codice invariato, ma non verrà chiamato per waitlist)
         if (!containerElement) return;
         containerElement.innerHTML = '';
         let validCount = parseInt(count);
@@ -321,7 +323,6 @@
         if (isNaN(validCount) || validCount < 1) validCount = 1;
         if (validCount > maxAllowed) validCount = maxAllowed;
 
-        // Aggiorna il campo input numerico se il valore è stato corretto
         const numInput = containerElement.closest('form').querySelector('input[type="number"]');
         if (numInput && parseInt(numInput.value) !== validCount) {
             numInput.value = validCount;
@@ -351,6 +352,7 @@
 
 
     function initializeBookingPopupHandlers() {
+        // ... (codice invariato rispetto alla versione precedente)
         const bookingPopupOverlay = document.getElementById('bookingPopupOverlay');
         const bookingPopup = document.getElementById('bookingPopup');
         const closeBookingPopupBtn = document.getElementById('closeBookingPopupBtn');
@@ -373,8 +375,8 @@
             const postiDisponibiliNum = parseInt(postiDisponibiliEvento);
             const postiGiaPrenotatiNum = parseInt(postiGiaPrenotatiDallUtente) || 0;
 
-            const maxPostiRichiedibiliSingolaTrx = 5; // Max per questo form
-            const postiAncoraPrenotabiliDallUtenteGlobal = 5 - postiGiaPrenotatiNum; // Max globali per l'utente per questo evento
+            const maxPostiRichiedibiliSingolaTrx = 5;
+            const postiAncoraPrenotabiliDallUtenteGlobal = 5 - postiGiaPrenotatiNum;
 
             const maxPostiEffettivi = Math.min(maxPostiRichiedibiliSingolaTrx, postiDisponibiliNum, postiAncoraPrenotabiliDallUtenteGlobal);
 
@@ -385,7 +387,6 @@
             numeroPostiInput.max = maxPostiEffettivi;
             numeroPostiInput.value = 1;
             infoPostiPrenotabiliEl.textContent = `Puoi prenotare da 1 a ${maxPostiEffettivi} posti. (Già prenotati: ${postiGiaPrenotatiNum}/5)`;
-
 
             generateParticipantFields(1, participantFieldsContainer, 'booking_participant', maxPostiEffettivi);
             bookingResponseMessage.style.display = 'none';
@@ -425,6 +426,7 @@
         if (bookingForm) {
             bookingForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
+                // ... (logica di submit del booking form invariata)
                 if (!currentUser || !currentUser.email) {
                     alert("Errore: sessione utente non valida. Effettua nuovamente il login.");
                     window.location.href = 'index.html'; return;
@@ -482,7 +484,7 @@
                             bookingResponseMessage.textContent = result.message || 'Prenotazione confermata!';
                             bookingResponseMessage.className = 'form-message success';
                         }
-                        loadEvents(); // Ricarica gli eventi per aggiornare i posti e i dati utente
+                        loadEvents();
                         setTimeout(closeBookingPopup, 3000);
                     } else {
                         throw new Error(result.message || 'Errore durante la prenotazione.');
@@ -505,7 +507,7 @@
         const closeWaitlistPopupBtn = document.getElementById('closeWaitlistPopupBtn');
         const waitlistForm = document.getElementById('waitlistForm');
         const waitlistNumeroPostiInput = document.getElementById('waitlistNumeroPosti');
-        const waitlistParticipantFieldsContainer = document.getElementById('waitlistParticipantFieldsContainer');
+        // Rimosso: waitlistParticipantFieldsContainer
         const waitlistEventIdInput = document.getElementById('waitlistEventId');
         const waitlistPopupTitle = document.getElementById('waitlistPopupTitle');
         const waitlistEventInfo = document.getElementById('waitlistEventInfo');
@@ -517,13 +519,14 @@
                 window.location.href = 'index.html'; return;
             }
             waitlistEventIdInput.value = eventId;
-            waitlistPopupTitle.textContent = `Entra in Lista d'Attesa`;
+            // waitlistPopupTitle rimane "Entra in Lista d'Attesa" come da HTML
             waitlistEventInfo.textContent = `Evento: ${eventTitle}`;
 
-            waitlistNumeroPostiInput.max = 5; // Max 5 posti per la richiesta in coda
-            waitlistNumeroPostiInput.value = 1;
+            waitlistNumeroPostiInput.max = 5;
+            waitlistNumeroPostiInput.value = 1; // Default a 1 posto
 
-            generateParticipantFields(1, waitlistParticipantFieldsContainer, 'waitlist_participant', 5);
+            // Rimosso: chiamata a generateParticipantFields per la coda
+
             waitlistResponseMessage.style.display = 'none';
             waitlistResponseMessage.textContent = '';
             waitlistResponseMessage.className = 'form-message';
@@ -532,19 +535,14 @@
             waitlistPopup.classList.add('active');
             document.body.style.overflow = 'hidden';
 
-            // Mostra un messaggio di conferma/informazione
-            const userConfirmation = confirm("L'evento selezionato è al completo. Vuoi essere aggiunto alla lista d'attesa?");
-            if (!userConfirmation) {
-                closeWaitlistPopup();
-                return;
-            }
+            // Rimosso il confirm() dialog da qui, il popup stesso è la richiesta.
         }
 
         function closeWaitlistPopup() {
             if (waitlistPopupOverlay) waitlistPopupOverlay.classList.remove('active');
             if (waitlistPopup) waitlistPopup.classList.remove('active');
             document.body.style.overflow = '';
-            if(waitlistParticipantFieldsContainer) waitlistParticipantFieldsContainer.innerHTML = '';
+            // Rimosso: if(waitlistParticipantFieldsContainer) waitlistParticipantFieldsContainer.innerHTML = '';
             if(waitlistForm) waitlistForm.reset();
         }
 
@@ -558,11 +556,7 @@
             }
         });
 
-        if (waitlistNumeroPostiInput) {
-            waitlistNumeroPostiInput.addEventListener('input', (e) => {
-                generateParticipantFields(e.target.value, waitlistParticipantFieldsContainer, 'waitlist_participant', 5);
-            });
-        }
+        // Rimosso: listener su waitlistNumeroPostiInput per generare campi partecipante, non più necessari.
 
         if (waitlistForm) {
             waitlistForm.addEventListener('submit', async function(e) {
@@ -580,37 +574,11 @@
 
                 const formData = new FormData();
                 formData.append('eventId', waitlistEventIdInput.value);
-                formData.append('numeroPosti', waitlistNumeroPostiInput.value);
+                formData.append('numeroPosti', waitlistNumeroPostiInput.value); // Solo numero posti
                 formData.append('contatto', currentUser.email);
-                // I nomi dei partecipanti non sono necessari per gestisci_coda.php secondo la tabella utentiincoda attuale
-                // ma li validiamo comunque per coerenza UI se richiesto
-                const nomi = waitlistParticipantFieldsContainer.querySelectorAll('input[name="participant_nome[]"]');
-                const cognomi = waitlistParticipantFieldsContainer.querySelectorAll('input[name="participant_cognome[]"]');
-                let formIsValid = true;
 
-                if (nomi.length !== parseInt(waitlistNumeroPostiInput.value)) {
-                    formIsValid = false;
-                    if(waitlistResponseMessage) waitlistResponseMessage.textContent = 'Errore: il numero di partecipanti non corrisponde ai campi compilati.';
-                } else {
-                    for (let i = 0; i < nomi.length; i++) {
-                        if (nomi[i].value.trim() === '' || cognomi[i].value.trim() === '') {
-                            formIsValid = false;
-                            if(waitlistResponseMessage) waitlistResponseMessage.textContent = 'Nome e cognome sono obbligatori per tutti i partecipanti.';
-                            break;
-                        }
-                        // Non aggiungiamo nomi/cognomi a formData per gestisci_coda.php
-                    }
-                }
-                if (!formIsValid) {
-                    if(waitlistResponseMessage) {
-                        waitlistResponseMessage.className = 'form-message error';
-                        waitlistResponseMessage.style.display = 'block';
-                    }
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalBtnText;
-                    return;
-                }
-
+                // Rimosso: validazione e aggiunta di nomi/cognomi partecipanti
+                // La validazione di base per numeroPosti (required, min, max) è gestita dagli attributi HTML.
 
                 try {
                     const response = await fetch('gestisci_coda.php', { method: 'POST', body: formData });
@@ -624,7 +592,6 @@
                             waitlistResponseMessage.textContent = result.message || "Richiesta di inserimento in coda inviata!";
                             waitlistResponseMessage.className = 'form-message success';
                         }
-                        // Non è necessario ricaricare gli eventi qui, a meno che non si voglia mostrare lo stato della coda
                         setTimeout(closeWaitlistPopup, 3000);
                     } else {
                         throw new Error(result.message || "Errore durante l'invio della richiesta per la coda.");
@@ -643,6 +610,7 @@
 
 
     async function loadEvents() {
+        // ... (codice invariato rispetto alla versione precedente)
         const eventsGrid = document.getElementById('eventiGrid');
         const loadingIndicator = document.getElementById('loadingIndicator');
         if (loadingIndicator) loadingIndicator.classList.add('visible');
@@ -655,7 +623,6 @@
         }
 
         try {
-            // Assicurati che get_events.php possa usare user_email per restituire posti_gia_prenotati_utente
             const response = await fetch(`get_events.php?user_email=${encodeURIComponent(currentUser.email)}`);
             if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
             const result = await response.json();
@@ -676,23 +643,23 @@
     }
 
     function createEventCard(event) {
+        // ... (codice invariato, la logica per "Max Posti Raggiunti" è già qui)
         const card = document.createElement('article');
         card.className = 'card';
         let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event.jpg';
 
-        const postiDisponibiliOriginali = parseInt(event.posti_disponibili); // Questi sono i posti totali rimasti per l'evento
-        const postiGiaPrenotatiUtente = parseInt(event.posti_gia_prenotati_utente) || 0; // Posti che l'utente corrente ha già per QUESTO evento
-        const flagPrenotabileDB = event.flagprenotabile; // Flag dal DB se l'evento è in linea di principio prenotabile
+        const postiDisponibiliOriginali = parseInt(event.posti_disponibili);
+        const postiGiaPrenotatiUtente = parseInt(event.posti_gia_prenotati_utente) || 0;
+        const flagPrenotabileDB = event.flagprenotabile;
 
         let buttonHTML = '';
         const maxPostiAncoraPrenotabiliUtente = 5 - postiGiaPrenotatiUtente;
 
         if (!flagPrenotabileDB) {
             buttonHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled>Non Prenotabile</button>`;
-        } else if (maxPostiAncoraPrenotabiliUtente <= 0) {
+        } else if (maxPostiAncoraPrenotabiliUtente <= 0) { // Utente ha già prenotato 5 o più posti
             buttonHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Hai già prenotato il numero massimo di 5 posti per questo evento.">Max Posti Raggiunti</button>`;
-        } else if (postiDisponibiliOriginali > 0) {
-            // Ci sono posti E l'utente può ancora prenotare
+        } else if (postiDisponibiliOriginali > 0) { // Ci sono posti E l'utente può ancora prenotare
             buttonHTML = `<button class="card-btn card-btn-primary btn-prenota"
                                 data-action="book"
                                 data-event-id="${event.idevento}"
@@ -701,7 +668,7 @@
                                 data-posti-gia-prenotati-utente="${postiGiaPrenotatiUtente}">
                             Prenota
                         </button>`;
-        } else { // Evento pieno (postiDisponibiliOriginali == 0), ma l'utente potrebbe ancora volere posti (fino al suo limite di 5)
+        } else { // Evento pieno (postiDisponibiliOriginali == 0), ma l'utente potrebbe ancora volere posti (fino al suo limite di 5) E non ha già raggiunto i 5.
             buttonHTML = `<button class="card-btn card-btn-primary btn-prenota"
                                 data-action="waitlist"
                                 data-event-id="${event.idevento}"
@@ -761,12 +728,13 @@
     }
 
     function formatDate(dateString) {
+        // ... (codice invariato)
         if (!dateString) return 'Data non disponibile';
         try {
-            const date = new Date(dateString.replace(/-/g, '/')); // Per compatibilità Safari con YYYY-MM-DD
-            if (isNaN(date.getTime())) return dateString; // Ritorna la stringa originale se non valida
+            const date = new Date(dateString.replace(/-/g, '/'));
+            if (isNaN(date.getTime())) return dateString;
             return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric'});
-        } catch (e) { return dateString; } // Fallback
+        } catch (e) { return dateString; }
     }
 </script>
 </body>
