@@ -48,19 +48,23 @@ try {
         exit;
     }
 
-    // 2. Recupera i media per l'evento (tabella 'media')
-    // AGGIORNATO: Includi la colonna Descrizione
+    // 2. Recupera i media per l'evento
     $stmtMedia = $conn->prepare("SELECT Progressivo, Percorso, Descrizione FROM media WHERE IDEvento = :idEvento ORDER BY Progressivo ASC");
     $stmtMedia->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
     $stmtMedia->execute();
     $mediaItems = $stmtMedia->fetchAll();
 
-    // 3. Recupera i commenti (logica esistente, sembra corretta)
+    // 3. Recupera i commenti con informazioni sull'utente (Nome, Cognome, Icona)
     $stmtComments = $conn->prepare(
-        "SELECT Progressivo, Descrizione, DataPubb, CodRisposta, Contatto, IDEvento, NumLike
-         FROM commenti
-         WHERE IDEvento = :idEvento
-         ORDER BY DataPubb ASC"
+        "SELECT
+            c.Progressivo, c.Descrizione, c.DataPubb, c.CodRisposta, c.Contatto, c.IDEvento, c.NumLike,
+            u.Nome AS CommenterNome,
+            u.Cognome AS CommenterCognome,
+            u.Icon AS CommenterIconPath
+         FROM commenti c
+         JOIN utentiregistrati u ON c.Contatto = u.Contatto
+         WHERE c.IDEvento = :idEvento
+         ORDER BY c.DataPubb ASC"
     );
     $stmtComments->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
     $stmtComments->execute();
@@ -74,37 +78,42 @@ try {
             $comment['DataVisualizzata'] = 'Data non disponibile';
         }
         $comment['NumLike'] = isset($comment['NumLike']) ? (int)$comment['NumLike'] : 0;
+        // Inizializza il nome completo del commentatore
+        $comment['CommenterNomeCompleto'] = trim(($comment['CommenterNome'] ?? '') . ' ' . ($comment['CommenterCognome'] ?? ''));
+        if (empty($comment['CommenterNomeCompleto'])) {
+            $comment['CommenterNomeCompleto'] = !empty($comment['Contatto']) ? explode('@', $comment['Contatto'])[0] : 'Anonimo';
+        }
         $comment['replies'] = [];
         $commentsById[$comment['Progressivo']] = $comment;
     }
 
     $commentsThreaded = [];
-    foreach ($commentsById as $commentId => &$commentNode) {
+    foreach ($commentsById as $commentId => &$commentNode) { // Usa riferimento & per modificare l'array originale
         if ($commentNode['CodRisposta'] !== null && isset($commentsById[$commentNode['CodRisposta']])) {
             $commentsById[$commentNode['CodRisposta']]['replies'][] = &$commentNode;
         } else {
             $commentsThreaded[] = &$commentNode;
         }
     }
-    unset($commentNode);
+    unset($commentNode); // Rimuovi il riferimento
 
     $response['success'] = true;
     $response['data'] = [
         'details'  => $eventDetails,
-        'media'    => $mediaItems, // Ora $mediaItems contiene anche la Descrizione per ciascun media
+        'media'    => $mediaItems,
         'comments' => $commentsThreaded
     ];
     echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
 } catch (PDOException $e) {
-    error_log("Errore PDO in get_event_details.php: " . $e->getMessage());
-    $response['message'] = 'Errore database: ' . $e->getMessage();
+    error_log("Errore PDO in get_event_details.php (ID Evento: {$idEvento}): " . $e->getMessage());
+    $response['message'] = 'Errore database durante il recupero dei dettagli.'; // Messaggio più generico per l'utente
     http_response_code(500);
     echo json_encode($response);
     exit;
 } catch (Exception $e) {
-    error_log("Errore generico in get_event_details.php: " . $e->getMessage());
-    $response['message'] = 'Errore generale: ' . $e->getMessage();
+    error_log("Errore generico in get_event_details.php (ID Evento: {$idEvento}): " . $e->getMessage());
+    $response['message'] = 'Errore generale durante il recupero dei dettagli.'; // Messaggio più generico
     http_response_code(500);
     echo json_encode($response);
     exit;

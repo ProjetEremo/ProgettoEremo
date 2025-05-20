@@ -1,9 +1,6 @@
 <?php
+session_start(); // DEVE ESSERE LA PRIMA ISTRUZIONE
 header('Content-Type: application/json; charset=utf-8');
-
-// if (session_status() == PHP_SESSION_NONE) {
-//     session_start();
-// }
 
 $config = [
     'host' => 'localhost',
@@ -13,7 +10,6 @@ $config = [
 ];
 
 $response = ['success' => false, 'message' => ''];
-$sql_debug = ''; // Inizializza per debug
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $response['message'] = 'Metodo non consentito.';
@@ -22,10 +18,22 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$idEvento = filter_input(INPUT_POST, 'IDEvento', FILTER_VALIDATE_INT);
-$descrizione = isset($_POST['Descrizione']) ? trim($_POST['Descrizione']) : '';
-$contatto = filter_input(INPUT_POST, 'Contatto', FILTER_VALIDATE_EMAIL);
-$codRisposta = filter_input(INPUT_POST, 'CodRisposta', FILTER_VALIDATE_INT);
+// Leggi l'input JSON inviato da JavaScript
+$inputData = json_decode(file_get_contents('php://input'), true);
+
+if (!isset($_SESSION['user_email'])) {
+    $response['message'] = 'Devi essere autenticato per commentare.';
+    http_response_code(401); // Unauthorized
+    echo json_encode($response);
+    exit;
+}
+$contatto_sessione = $_SESSION['user_email'];
+
+// Usa i dati dall'input JSON
+$idEvento = filter_var($inputData['IDEvento'] ?? null, FILTER_VALIDATE_INT);
+$descrizione = isset($inputData['Descrizione']) ? trim($inputData['Descrizione']) : '';
+$codRisposta = filter_var($inputData['CodRisposta'] ?? null, FILTER_VALIDATE_INT);
+
 
 if (!$idEvento || $idEvento <= 0) {
     $response['message'] = 'ID Evento mancante o non valido.';
@@ -45,17 +53,8 @@ if (mb_strlen($descrizione) > 2000) {
     echo json_encode($response);
     exit;
 }
-if (!$contatto) {
-    $response['message'] = 'Email utente non fornita o non valida.';
-    http_response_code(400);
-    echo json_encode($response);
-    exit;
-}
 
 if ($codRisposta !== null && ($codRisposta === false || $codRisposta <= 0)) {
-    $codRisposta = null;
-}
-if (isset($_POST['CodRisposta']) && empty($_POST['CodRisposta']) && $_POST['CodRisposta'] !== '0') {
     $codRisposta = null;
 }
 
@@ -79,7 +78,6 @@ try {
     }
 
     if ($codRisposta !== null) {
-        // Assicurati che il nome della tabella sia corretto (commenti vs Commenti)
         $stmtCheckParent = $conn->prepare("SELECT Progressivo FROM commenti WHERE Progressivo = :codRisposta AND IDEvento = :idEvento");
         $stmtCheckParent->bindParam(':codRisposta', $codRisposta, PDO::PARAM_INT);
         $stmtCheckParent->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
@@ -89,19 +87,14 @@ try {
         }
     }
 
-    // Query SQL CORRETTA per includere DataPubb e OraPubb
-    // La colonna 'Data' originale potrebbe non essere più necessaria se hai DataPubb e OraPubb,
-    // ma la mantengo per ora come nella tua ultima versione.
-    // Se 'Data' è ridondante, puoi rimuoverla dall'INSERT e dalla tabella.
-    $sql_debug = "INSERT INTO commenti (Descrizione, Data, DataPubb, OraPubb, CodRisposta, Contatto, IDEvento, NumLike)
-                  VALUES (:descrizione, NOW(), NOW(), CURTIME(), :codRisposta, :contatto, :idEvento, 0)";
-    $stmt = $conn->prepare($sql_debug);
+    $sql_insert = "INSERT INTO commenti (Descrizione, Data, DataPubb, OraPubb, CodRisposta, Contatto, IDEvento, NumLike)
+                   VALUES (:descrizione, CURDATE(), NOW(), CURTIME(), :codRisposta, :contatto_sessione, :idEvento, 0)";
+    $stmt = $conn->prepare($sql_insert);
 
     $stmt->bindParam(':descrizione', $descrizione, PDO::PARAM_STR);
     $stmt->bindParam(':codRisposta', $codRisposta, $codRisposta === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-    $stmt->bindParam(':contatto', $contatto, PDO::PARAM_STR);
+    $stmt->bindParam(':contatto_sessione', $contatto_sessione, PDO::PARAM_STR);
     $stmt->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
-    // Data, DataPubb, OraPubb e NumLike sono gestiti direttamente nella query con NOW(), CURTIME() e 0
 
     $stmt->execute();
     $newCommentId = $conn->lastInsertId();
@@ -112,8 +105,8 @@ try {
     echo json_encode($response);
 
 } catch (PDOException $e) {
-    error_log("Errore PDO in submit_comment.php: " . $e->getMessage() . " - SQL: " . $sql_debug);
-    $response['message'] = 'Errore database (submit): ' . $e->getMessage();
+    error_log("Errore PDO in submit_comment.php: " . $e->getMessage());
+    $response['message'] = 'Errore database durante l\'invio del commento.';
     http_response_code(500);
     echo json_encode($response);
     exit;

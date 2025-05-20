@@ -3,17 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="images/logo.png" type="image/x-icon">
-    <title>Dettaglio Evento - Eremo Frate Francesco</title>
+    <link rel="icon" href="/images/logo.png" type="image/x-icon"> <title>Dettaglio Evento - Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Stile per l'avatar immagine nella navbar */
+        .user-avatar img {
+            width: 30px; /* Puoi aggiustare la dimensione */
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            vertical-align: middle;
+        }
+        /* Stile per avatar nei commenti */
+        .comment-header .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+    </style>
 </head>
 <body>
 
 <header class="navbar-container" id="navbarContainer">
     <nav class="navbar">
         <div class="logo">
-            <a href="indexaccesso.html"><span class="emoji">🏔️</span><h2>Eremo Frate Francesco</h2></a>
+            <a href="indexaccesso.html" style="text-decoration:none; color:inherit;"><span class="emoji">🏔️</span><h2>Eremo Frate Francesco</h2></a>
         </div>
         <div class="menu">
             <a href="eventiincorsoaccesso.html">Calendario attività</a>
@@ -26,9 +44,8 @@
         </div>
         <div class="right-menu">
             <div class="user-dropdown" id="userDropdownContainer">
-                <button class="user-btn" aria-haspopup="true" aria-expanded="false">
-                    <span class="user-avatar" id="navbar-avatar">👤</span>
-                    <span class="user-name" id="navbar-username">Utente</span>
+                <button class="user-btn" onclick="toggleUserMenu(event)" aria-haspopup="true" aria-expanded="false">
+                    <span class="user-avatar" id="navbar-avatar"><img src="/uploads/icons/default_user.png" alt="User Icon"></span> <span class="user-name" id="navbar-username">Utente</span>
                     <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
@@ -37,10 +54,11 @@
                     <a href="#" id="logout-link-dropdown">Esci</a>
                 </div>
             </div>
-            <button class="hamburger" aria-label="Toggle menu">☰</button>
+            <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
         </div>
     </nav>
     <div class="mobile-menu" id="mobileMenu">
+        <a href="chi-siamoaccesso.html" onclick="closeMobileMenu()">Chi siamo</a>
         <a href="eventiincorsoaccesso.html" onclick="closeMobileMenu()">Calendario attività</a>
         <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()">Archivio attività</a>
         <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
@@ -49,31 +67,27 @@
         <hr style="border-color: rgba(255,255,255,0.1);">
         <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
         <a href="gestisciprenotazioni.html" onclick="closeMobileMenu()">Le mie prenotazioni</a>
-        <a href="#" id="logout-link-mobile" onclick="closeMobileMenu()">Esci</a>
+        <a href="#" id="logout-link-mobile" onclick="handleLogout(); closeMobileMenu();">Esci</a>
     </div>
 </header>
 
 <main>
     <div class="container event-detail-container section-padding">
-
         <h1 id="eventTitleHeader">Dettaglio Evento</h1>
-
         <img id="eventCoverImage" class="event-cover-image" src="" alt="Copertina evento" style="display:none;">
         <div id="eventMetaInfo" class="event-meta-info" style="display:none;"></div>
         <div id="eventDescriptionFull" class="event-description-full" style="display:none;"></div>
         <div id="eventVolantinoContainer" class="volantino-link-container" style="display:none;"></div>
-
         <div id="pageLoadingIndicator" class="loading-overlay visible" style="min-height:200px; background:transparent; position:relative;">
             <div class="spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>
             <p>Caricamento contenuti dell'evento...</p>
         </div>
-        <div id="eventLoadingError" class="no-content-message" style="display:none; color:var(--danger); border-color:var(--danger);"></div>
-
+        <div id="eventLoadingError" class="form-message error" style="display:none;"></div>
 
         <section id="event-gallery" class="event-gallery-container" style="display:none;">
             <h2>Galleria Multimediale</h2>
             <div class="gallery-grid" id="galleryGrid"></div>
-            <p id="no-media-message" class="no-content-message" style="display:none;">Nessun media disponibile per questo evento.</p>
+            <p id="no-media-message" class="no-content-message" style="display:none;">Nessun media disponibile.</p>
         </section>
 
         <section id="event-comments" class="comments-section" style="display:none;">
@@ -84,7 +98,7 @@
                     <input type="hidden" name="IDEvento" id="commentEventId">
                     <div class="comment-form-container">
                         <textarea id="comment-text" name="Descrizione" aria-label="Testo del commento" placeholder="Scrivi qui il tuo commento..." rows="4" required></textarea>
-                        <button type="submit" class="btn-comment"><i class="fas fa-paper-plane"></i> Invia Commento</button>
+                        <button type="submit" class="btn-comment"><i class="fas fa-paper-plane"></i> Invia</button>
                     </div>
                     <div id="comment-form-message" class="form-message"></div>
                 </form>
@@ -92,55 +106,139 @@
             <p id="login-to-comment-message" class="no-content-message" style="display:none;">
                 Per lasciare un commento, <a href="#" id="loginLinkFromEventPage">accedi</a>.
             </p>
-
             <h3>Commenti:</h3>
             <div class="comments-list" id="commentsList"></div>
-            <p id="no-comments-message" class="no-content-message" style="display:none;">Sii il primo a commentare questo evento!</p>
+            <p id="no-comments-message" class="no-content-message" style="display:none;">Sii il primo a commentare!</p>
         </section>
     </div>
 </main>
 
 <div class="lightbox" id="lightbox">
-    <span class="lightbox-close" aria-label="Chiudi visualizzazione ingrandita">×</span>
-    <button class="lightbox-navigation lightbox-prev" aria-label="Media precedente">❮</button>
+    <span class="lightbox-close" aria-label="Chiudi visualizzazione ingrandita" onclick="closeLightbox()">×</span>
+    <button class="lightbox-navigation lightbox-prev" aria-label="Media precedente" onclick="changeLightboxMedia(-1)">❮</button>
     <div class="lightbox-content"></div>
-    <button class="lightbox-navigation lightbox-next" aria-label="Media successivo">❯</button>
+    <button class="lightbox-navigation lightbox-next" aria-label="Media successivo" onclick="changeLightboxMedia(1)">❯</button>
     <div id="lightbox-caption" aria-live="polite"></div>
 </div>
-
-<footer>
-    <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
-</footer>
+<footer> <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p> </footer>
 
 <script>
-    // --- SCRIPT GLOBALI ---
     let currentUser = null;
-    function updateNavbarUserUI() {
-        const elName = document.getElementById('navbar-username');
-        const elAvatar = document.getElementById('navbar-avatar');
-        if(elName && elAvatar){
-            if(currentUser && currentUser.email){
-                elName.textContent = currentUser.nome || currentUser.email.split('@')[0];
-                elAvatar.textContent = currentUser.avatar || (currentUser.nome ? currentUser.nome.charAt(0).toUpperCase() : '👤');
-            } else {
-                elName.textContent = 'Utente';
-                elAvatar.textContent = '👤';
+    const defaultUserIconPath = '/uploads/icons/default_user.png'; // Path ASSOLUTO dalla root
+
+    // --- Funzioni Navbar e Sessione Utente ---
+    async function callApi(url, method = 'GET', data = null) {
+        console.log(`[callApi] Chiamata ${method} a ${url}`, data || '');
+        const headers = { 'Content-Type': 'application/json' };
+        const options = { method, headers, credentials: 'same-origin' };
+        if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
+            options.body = JSON.stringify(data);
+        }
+        try {
+            const response = await fetch(url, options);
+            console.log(`[callApi] Risposta da ${url} - Stato: ${response.status}`);
+            if (!response.ok) {
+                let errorData = { message: `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
+                try { errorData = await response.json(); } catch (e) { /* usa default */ }
+                const finalErrorMessage = errorData.message || `Errore del server: ${response.status} per ${url}`;
+                console.error("[callApi] Errore:", finalErrorMessage);
+                throw new Error(finalErrorMessage);
             }
+            if (response.status === 204) { console.log(`[callApi] Risposta 204 No Content da ${url}`); return {}; }
+            const responseData = await response.json();
+            console.log(`[callApi] Dati JSON da ${url} ricevuti.`); // Non mostrare responseData qui per non intasare la console
+            return responseData;
+        } catch (error) {
+            console.error(`[callApi] Fallimento chiamata API (rete/parse) a ${url}:`, error.message, error);
+            throw error;
         }
     }
+
+    function updateNavbarUserUI() {
+        const navbarUsernameEl = document.getElementById('navbar-username');
+        const navbarAvatarImgEl = document.querySelector('#navbar-avatar img');
+        if (!navbarUsernameEl || !navbarAvatarImgEl) { return; }
+        if (currentUser && currentUser.email) {
+            let displayName = currentUser.nome || currentUser.email.split('@')[0];
+            navbarUsernameEl.textContent = displayName;
+            navbarAvatarImgEl.src = currentUser.iconPath || defaultUserIconPath;
+            navbarAvatarImgEl.alt = `Icona di ${displayName}`;
+            navbarAvatarImgEl.onerror = function() { this.src = defaultUserIconPath; }; // Fallback se l'icona utente non carica
+        } else {
+            navbarUsernameEl.textContent = 'Utente';
+            navbarAvatarImgEl.src = defaultUserIconPath;
+            navbarAvatarImgEl.alt = 'Icona utente predefinita';
+        }
+        console.log("[updateNavbarUserUI] UI Navbar aggiornata. Utente:", currentUser ? currentUser.nome : "Nessuno", "Icona:", currentUser ? (currentUser.iconPath || defaultUserIconPath) : defaultUserIconPath);
+    }
+
     function handleLogout() {
-        localStorage.removeItem('userDataEFF'); currentUser = null;
-        alert('Logout effettuato.'); window.location.href = 'index.html';
+        localStorage.removeItem('userDataEFF');
+        currentUser = null;
+        alert('Logout effettuato. Verrai reindirizzato alla homepage.');
+        window.location.href = 'index.html';
     }
+
     function setupUserSessionAndNavbar() {
-        const ud_str = localStorage.getItem('userDataEFF');
-        if(ud_str){ try { currentUser = JSON.parse(ud_str); if(!currentUser || typeof currentUser.email !== 'string'){currentUser=null; localStorage.removeItem('userDataEFF');}} catch(e){currentUser=null; localStorage.removeItem('userDataEFF');}} else {currentUser=null;}
+        console.log("[setupUserSessionAndNavbar] Inizio setup.");
+        const userDataString = localStorage.getItem('userDataEFF');
+        if (userDataString) {
+            try {
+                currentUser = JSON.parse(userDataString);
+                if (!currentUser || typeof currentUser.email === 'undefined') {
+                    console.log("[setupUserSessionAndNavbar] Dati utente in localStorage non validi o email mancante.");
+                    currentUser = null; localStorage.removeItem('userDataEFF');
+                } else {
+                    console.log("[setupUserSessionAndNavbar] Dati utente caricati da localStorage:", currentUser);
+                }
+            } catch (e) {
+                currentUser = null; localStorage.removeItem('userDataEFF'); console.error("[setupUserSessionAndNavbar] Errore parsing userDataEFF:", e);
+            }
+        } else {
+            console.log("[setupUserSessionAndNavbar] Nessun userDataEFF trovato in localStorage.");
+            currentUser = null;
+        }
         updateNavbarUserUI();
-        const btnLogoutD = document.getElementById('logout-link-dropdown');
-        const btnLogoutM = document.getElementById('logout-link-mobile');
-        if(btnLogoutD) btnLogoutD.addEventListener('click', (e)=>{e.preventDefault();handleLogout();});
-        if(btnLogoutM) btnLogoutM.addEventListener('click', (e)=>{e.preventDefault();if(typeof closeMobileMenu === 'function')closeMobileMenu();handleLogout();});
+        const logoutLinkDropdown = document.getElementById('logout-link-dropdown');
+        const logoutLinkMobile = document.getElementById('logout-link-mobile');
+        if (logoutLinkDropdown) logoutLinkDropdown.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+        if (logoutLinkMobile) logoutLinkMobile.addEventListener('click', (e) => {
+            e.preventDefault(); if(typeof closeMobileMenu === 'function') closeMobileMenu(); handleLogout();
+        });
+        console.log("[setupUserSessionAndNavbar] Fine setup.");
     }
+
+    async function fetchAndUpdateUserDisplayData() {
+        console.log("[fetchAndUpdateUserDisplayData] Inizio.");
+        if (!currentUser || !currentUser.email) { // Modificato: controlla anche email per sicurezza
+            console.log("[fetchAndUpdateUserDisplayData] currentUser non valido o email mancante, skip fetch API profilo.");
+            return;
+        }
+        try {
+            console.log("[fetchAndUpdateUserDisplayData] Chiamata a api/api_get_user_profile.php");
+            const apiUserData = await callApi('api/api_get_user_profile.php'); // Script profilo UTENTE è in /api/
+            console.log("[fetchAndUpdateUserDisplayData] Dati profilo API ricevuti:", apiUserData); // Log dati grezzi
+            if (apiUserData && apiUserData.success && apiUserData.data) {
+                const freshData = apiUserData.data;
+                currentUser.nome = freshData.nome || currentUser.nome; // Fallback a dati esistenti se API non li manda
+                currentUser.email = freshData.email || currentUser.email;
+                currentUser.iconPath = freshData.icon || defaultUserIconPath; // Usa default se API manda null/undefined
+                currentUser.cognome = freshData.cognome || (currentUser.cognome || '');
+
+                localStorage.setItem('userDataEFF', JSON.stringify(currentUser));
+                console.log("[fetchAndUpdateUserDisplayData] localStorage aggiornato con dati freschi:", currentUser);
+                updateNavbarUserUI();
+            } else {
+                console.warn("[fetchAndUpdateUserDisplayData] Dati profilo non validi o API success false. Risposta API:", apiUserData);
+            }
+        } catch (error) {
+            console.warn("[fetchAndUpdateUserDisplayData] Errore fetch profilo aggiornato per navbar:", error.message);
+        }
+        console.log("[fetchAndUpdateUserDisplayData] Fine.");
+    }
+    // --- Fine Funzioni Navbar e Sessione Utente ---
+
+    // --- Logica Menu (Scroll, Dropdown, Hamburger) ---
     let lastScroll = 0;
     const navbarContainer = document.getElementById('navbarContainer');
     if (navbarContainer) {
@@ -154,21 +252,13 @@
     }
     const userDropdownButton = document.querySelector('#userDropdownContainer .user-btn');
     const userDropdownMenu = document.querySelector('#userDropdownContainer .dropdown-menu');
-    if (userDropdownButton && userDropdownMenu) {
-        userDropdownButton.addEventListener('click', function(event) {
-            event.stopPropagation();
+    function toggleUserMenu(event) {
+        if(event) event.stopPropagation();
+        if (userDropdownMenu && userDropdownButton) {
             const isCurrentlyOpen = userDropdownMenu.style.display === 'block';
             userDropdownMenu.style.display = isCurrentlyOpen ? 'none' : 'block';
-            this.setAttribute('aria-expanded', String(!isCurrentlyOpen));
-        });
-        document.addEventListener('click', function(event) {
-            if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
-                if (userDropdownButton && !userDropdownButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
-                    userDropdownMenu.style.display = 'none';
-                    if (userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
-                }
-            }
-        });
+            userDropdownButton.setAttribute('aria-expanded', String(!isCurrentlyOpen));
+        }
     }
     const mobileMenu = document.getElementById("mobileMenu");
     const hamburger = document.querySelector(".navbar .hamburger");
@@ -190,17 +280,23 @@
             document.body.style.overflow = '';
         }
     }
-    if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function(globalEvent) {
+        if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
+            const userDropdownContainer = document.getElementById('userDropdownContainer');
+            if (userDropdownContainer && !userDropdownContainer.contains(globalEvent.target)) {
+                userDropdownMenu.style.display = 'none';
+                if (userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
+            }
+        }
         if (mobileMenu && mobileMenu.classList.contains('open')) {
-            if (mobileMenu.contains(event.target) && event.target.tagName === 'A') {
+            if (mobileMenu.contains(globalEvent.target) && globalEvent.target.tagName === 'A' && globalEvent.target.closest('.mobile-menu')) {
                 closeMobileMenu();
-            } else if (hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) {
+            } else if (hamburger && !mobileMenu.contains(globalEvent.target) && !hamburger.contains(globalEvent.target)) {
                 closeMobileMenu();
             }
         }
     });
-    // --- FINE SCRIPT GLOBALI ---
+    // --- Fine Logica Menu ---
 
     // --- Logica Specifica per Pagina Evento Dettaglio ---
     const lightbox = document.getElementById('lightbox');
@@ -213,344 +309,195 @@
     let galleryItemsData = [];
 
     function openLightbox(index) {
+        console.log("[openLightbox] Apro lightbox per indice:", index, galleryItemsData[index]);
         if (!lightbox || !lightboxContent || !lightboxCaption || galleryItemsData.length === 0 || !galleryItemsData[index]) {
-            console.warn("Lightbox o dati galleria mancanti per l'indice:", index);
+            console.warn("[openLightbox] Condizioni non soddisfatte per aprire lightbox.");
             return;
         }
         currentMediaIndexInLightbox = index;
         const item = galleryItemsData[index];
         lightboxContent.innerHTML = '';
-
         if (item.type === 'video') {
-            const video = document.createElement('video');
-            video.src = item.href;
-            video.controls = true;
-            video.autoplay = true;
-            video.style.maxWidth = '100%';
-            video.style.maxHeight = '85vh';
+            const video = document.createElement('video'); video.src = item.href; video.controls = true; video.autoplay = true; video.style.maxWidth = '100%'; video.style.maxHeight = '85vh';
             lightboxContent.appendChild(video);
         } else if (item.type === 'image') {
-            const img = document.createElement('img');
-            img.src = item.href;
-            img.alt = item.title || "Immagine galleria";
+            const img = document.createElement('img'); img.src = item.href; img.alt = item.title || "Immagine galleria";
             lightboxContent.appendChild(img);
-        } else {
-            lightboxContent.textContent = "Tipo di media non supportato per la visualizzazione ingrandita.";
-        }
-
+        } else { lightboxContent.textContent = "Tipo media non supportato."; }
         const captionText = item.title || '';
-        lightboxCaption.innerHTML = captionText;
-        lightboxCaption.style.display = captionText && captionText.toLowerCase() !== 'media' && captionText.toLowerCase() !== '&lt;br&gt;' ? 'block' : 'none';
-
-        lightbox.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        lightboxCaption.innerHTML = sanitizeTextForHTML(captionText);
+        lightboxCaption.style.display = captionText && captionText.toLowerCase() !== 'media' && captionText.toLowerCase() !== '&lt;br&gt;' && captionText.trim() !== '' ? 'block' : 'none';
+        lightbox.classList.add('active'); document.body.style.overflow = 'hidden';
     }
-
-    function closeLightbox() {
-        if (!lightbox || !lightboxContent) return;
-        lightbox.classList.remove('active');
-        lightboxContent.innerHTML = '';
-        document.body.style.overflow = '';
-    }
-
-    function changeLightboxMedia(direction) {
-        if (galleryItemsData.length === 0) return;
-        currentMediaIndexInLightbox = (currentMediaIndexInLightbox + direction + galleryItemsData.length) % galleryItemsData.length;
-        openLightbox(currentMediaIndexInLightbox);
-    }
-
+    function closeLightbox() { if (!lightbox || !lightboxContent) return; lightbox.classList.remove('active'); lightboxContent.innerHTML = ''; document.body.style.overflow = ''; }
+    function changeLightboxMedia(direction) { if (galleryItemsData.length === 0) return; currentMediaIndexInLightbox = (currentMediaIndexInLightbox + direction + galleryItemsData.length) % galleryItemsData.length; openLightbox(currentMediaIndexInLightbox); }
     if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
     if (lightboxPrevBtn) lightboxPrevBtn.addEventListener('click', () => changeLightboxMedia(-1));
     if (lightboxNextBtn) lightboxNextBtn.addEventListener('click', () => changeLightboxMedia(1));
     if (lightbox) {
-        document.addEventListener('keydown', (e) => {
-            if (lightbox.classList.contains('active')) {
-                if (e.key === 'Escape') closeLightbox();
-                if (e.key === 'ArrowLeft') changeLightboxMedia(-1);
-                if (e.key === 'ArrowRight') changeLightboxMedia(1);
-            }
-        });
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) closeLightbox();
-        });
+        document.addEventListener('keydown', (e) => { if (lightbox.classList.contains('active')) { if (e.key === 'Escape') closeLightbox(); if (e.key === 'ArrowLeft') changeLightboxMedia(-1); if (e.key === 'ArrowRight') changeLightboxMedia(1); } });
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
     }
 
     function sanitizeTextForHTML(str) {
         if (typeof str !== 'string') str = String(str || '');
-        const temp = document.createElement('div');
-        temp.textContent = str;
-        return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');
+        const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');
     }
-
-    function displayErrorMessage(message, errorDetails = "") {
+    function displayErrorMessageOnPage(message, errorDetails = "") {
+        console.error("[displayErrorMessageOnPage]", message, errorDetails);
         const errorDisplayEl = document.getElementById('eventLoadingError');
         const titleHeaderEl = document.getElementById('eventTitleHeader');
-
-        let fullMessage = message;
-        if (errorDetails) {
-            fullMessage += " Dettaglio: " + String(errorDetails).substring(0, 300);
-        }
-
+        let fullMessage = message; if (errorDetails) fullMessage += " Dettaglio: " + String(errorDetails).substring(0, 300);
         const sanitizedFullMessage = sanitizeTextForHTML(fullMessage);
-
-        if (errorDisplayEl) {
-            errorDisplayEl.innerHTML = sanitizedFullMessage;
-            errorDisplayEl.style.display = 'block';
-        } else if (titleHeaderEl) {
-            titleHeaderEl.innerHTML = `<p class='no-content-message' style='color:var(--danger);'>${sanitizedFullMessage}</p>`;
-        } else {
-            console.error("ERRORE CRITICO (elementi UI mancanti):", fullMessage);
-            // alert("Errore caricamento evento: " + message); // Evita alert se possibile
-        }
-
+        if (errorDisplayEl) { errorDisplayEl.innerHTML = sanitizedFullMessage; errorDisplayEl.style.display = 'block'; errorDisplayEl.className = 'form-message error';}
+        else if (titleHeaderEl) { titleHeaderEl.innerHTML = `<p class='no-content-message form-message error' style='display:block;'>${sanitizedFullMessage}</p>`; }
         const pageLoadingEl = document.getElementById('pageLoadingIndicator');
         if(pageLoadingEl) pageLoadingEl.style.display = 'none';
     }
 
-
     async function fetchEventDetails(eventId) {
+        console.log(`[fetchEventDetails] Inizio caricamento per evento ID ${eventId}`);
+        const pageLoadingEl = document.getElementById('pageLoadingIndicator');
+        const errorDisplayEl = document.getElementById('eventLoadingError');
         const eventTitleHeaderEl = document.getElementById('eventTitleHeader');
         const eventCoverImageEl = document.getElementById('eventCoverImage');
         const eventMetaInfoEl = document.getElementById('eventMetaInfo');
         const eventDescriptionFullEl = document.getElementById('eventDescriptionFull');
         const eventVolantinoContainerEl = document.getElementById('eventVolantinoContainer');
         const gallerySectionEl = document.getElementById('event-gallery');
-        const commentsSectionEl = document.getElementById('event-comments');
         const galleryGridEl = document.getElementById('galleryGrid');
-        const commentsListEl = document.getElementById('commentsList');
         const noMediaMessageEl = document.getElementById('no-media-message');
+        const commentsSectionEl = document.getElementById('event-comments');
+        const commentsListEl = document.getElementById('commentsList');
         const noCommentsMessageEl = document.getElementById('no-comments-message');
-        const pageLoadingEl = document.getElementById('pageLoadingIndicator');
-        const errorDisplayEl = document.getElementById('eventLoadingError');
-
-        if (!eventTitleHeaderEl || !pageLoadingEl || !errorDisplayEl) {
-            console.error("Elementi base della pagina (titolo, loading, errore) non trovati.");
-            // Non mostrare alert qui, l'utente potrebbe non aver ancora interagito
-            if(pageLoadingEl) pageLoadingEl.style.display = 'none';
-            return;
-        }
 
         if(errorDisplayEl) errorDisplayEl.style.display = 'none';
         if (pageLoadingEl) pageLoadingEl.style.display = 'flex';
-
         [gallerySectionEl, commentsSectionEl, eventCoverImageEl, eventMetaInfoEl, eventDescriptionFullEl, eventVolantinoContainerEl].forEach(el => {
             if(el) el.style.display = 'none';
         });
 
         try {
-            const response = await fetch('get_event_details.php?id=' + encodeURIComponent(eventId));
-            if (!response.ok) {
-                const errorText = await response.text().catch(()=> "Dettaglio errore server non recuperabile.");
-                throw new Error(`Errore HTTP (${response.status}): ${response.statusText}. ${errorText}`);
-            }
-
-            const result = await response.json().catch(async () => { // Rimossa la variabile jsonErr non usata
-                const responseText = await response.text().catch(() => "Risposta non JSON e illeggibile.");
-                console.error("JSON Parse Error. Response text:", responseText.substring(0, 500));
-                throw new Error(`Risposta dal server non valida (non JSON). Inizio risposta: ${responseText.substring(0,200)}`);
-            });
+            console.log(`[fetchEventDetails] Chiamata a get_event_details.php?id=${eventId}`);
+            const result = await callApi('get_event_details.php?id=' + encodeURIComponent(eventId)); // Script nella ROOT
+            console.log("[fetchEventDetails] Dati evento ricevuti:", result);
 
             if (result.success && result.data) {
                 const event = result.data.details;
                 const mediaItems = result.data.media || [];
                 const fetchedComments = result.data.comments || [];
 
-                if (event && event.Titolo) {
-                    eventTitleHeaderEl.textContent = event.Titolo;
-                    document.title = event.Titolo + ' - Eremo Frate Francesco';
-                } else if (eventTitleHeaderEl) { // Assicura che esista prima di modificarlo
-                    eventTitleHeaderEl.textContent = "Dettaglio Evento";
-                } else {
-                    // Se anche eventTitleHeaderEl è null qui, c'è un problema più profondo.
-                    console.warn("Elemento eventTitleHeader non trovato per il titolo di fallback.");
-                }
-
+                if (eventTitleHeaderEl && event && event.Titolo) { eventTitleHeaderEl.textContent = event.Titolo; document.title = event.Titolo + ' - Eremo FF'; }
+                else if (eventTitleHeaderEl) { eventTitleHeaderEl.textContent = "Dettaglio Evento"; }
 
                 if (event) {
-                    if(event.FotoCopertina && eventCoverImageEl){
-                        eventCoverImageEl.src = event.FotoCopertina;
-                        eventCoverImageEl.alt = "Copertina " + (event.Titolo || "evento");
-                        eventCoverImageEl.style.display = 'block';
-                    }
+                    if(event.FotoCopertina && eventCoverImageEl){ eventCoverImageEl.src = event.FotoCopertina; eventCoverImageEl.alt = "Copertina " + (event.Titolo || "evento"); eventCoverImageEl.style.display = 'block'; }
                     if(eventMetaInfoEl){
                         let metaHTML = '';
-                        if (event.Data) {
-                            try {
-                                metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${new Date(event.Data.replace(/-/g, '/')).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'})}</span>`;
-                            } catch (dateError) {
-                                metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${sanitizeTextForHTML(event.Data)}</span>`;
-                            }
-                        }
+                        if (event.Data) { try { metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${new Date(event.Data.replace(/-/g, '/')).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'})}</span>`; } catch (dateError) { metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${sanitizeTextForHTML(event.Data)}</span>`;}}
                         if (event.Durata) metaHTML += `<span><i class="fas fa-clock"></i> ${sanitizeTextForHTML(event.Durata)}</span>`;
                         if (event.Relatore) metaHTML += `<span><i class="fas fa-user"></i> ${sanitizeTextForHTML(event.PrefissoRelatore || 'Relatore')}: ${sanitizeTextForHTML(event.Relatore)}</span>`;
                         if (event.Associazione) metaHTML += `<span><i class="fas fa-users"></i> ${sanitizeTextForHTML(event.Associazione)}</span>`;
-                        eventMetaInfoEl.innerHTML = metaHTML;
-                        if (metaHTML) eventMetaInfoEl.style.display = 'flex';
+                        eventMetaInfoEl.innerHTML = metaHTML; if (metaHTML) eventMetaInfoEl.style.display = 'flex';
                     }
-                    if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){
-                        eventDescriptionFullEl.innerHTML = sanitizeTextForHTML(event.DescrizioneEstesa || event.Descrizione);
-                        eventDescriptionFullEl.style.display = 'block';
-                    }
-                    if(eventVolantinoContainerEl && event.VolantinoUrl){
-                        eventVolantinoContainerEl.innerHTML =
-                            `<h4>Volantino Evento</h4><a href="${encodeURI(event.VolantinoUrl)}" target="_blank" title="Visualizza volantino ${sanitizeTextForHTML(event.Titolo || '')}" class="btn-volantino"><i class="fas fa-file-pdf"></i> Visualizza Volantino</a>`;
-                        eventVolantinoContainerEl.style.display = 'block';
-                    }
-                } else {
-                    displayErrorMessage("Dati dell'evento non disponibili.", "L'oggetto evento principale è mancante nella risposta del server.");
-                }
+                    if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){ eventDescriptionFullEl.innerHTML = sanitizeTextForHTML(event.DescrizioneEstesa || event.Descrizione); eventDescriptionFullEl.style.display = 'block'; }
+                    if(eventVolantinoContainerEl && event.VolantinoUrl){ eventVolantinoContainerEl.innerHTML = `<h4>Volantino Evento</h4><a href="${encodeURI(event.VolantinoUrl)}" target="_blank" title="Visualizza volantino ${sanitizeTextForHTML(event.Titolo || '')}" class="btn-volantino"><i class="fas fa-file-pdf"></i> Visualizza Volantino</a>`; eventVolantinoContainerEl.style.display = 'block'; }
+                } else { displayErrorMessageOnPage("Dati dell'evento non disponibili.", "L'oggetto evento principale è mancante."); }
 
                 galleryItemsData = [];
                 if (galleryGridEl) galleryGridEl.innerHTML = '';
-
-                if (mediaItems.length > 0) {
+                if (mediaItems.length > 0 && galleryGridEl) {
                     if (gallerySectionEl) gallerySectionEl.style.display = 'block';
                     if (noMediaMessageEl) noMediaMessageEl.style.display = 'none';
-
-                    mediaItems.forEach(item => {
-                        const rawPercorso = item.Percorso || item.url_media || '';
-                        const mediaDescription = item.Descrizione || '';
-                        const displayTitle = sanitizeTextForHTML(mediaDescription || 'Media');
-
-                        let itemType = 'unknown';
-                        let itemHref = rawPercorso;
-                        let thumbSrc = 'images/file_placeholder.png';
-
-                        if (rawPercorso.match(/\.(mp4|webm|ogg)$/i)) {
-                            itemType = 'video';
-                            thumbSrc = 'images/video_placeholder.png';
-                        } else if (rawPercorso.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-                            itemType = 'image';
-                            thumbSrc = itemHref;
-                        }
-
-                        if (itemType !== 'unknown') {
-                            galleryItemsData.push({ href: itemHref, title: displayTitle, type: itemType });
-
-                            const galleryItemDiv = document.createElement('div');
-                            galleryItemDiv.className = 'gallery-item';
-
-                            let itemHtml = `<a href="#" data-index="${(galleryItemsData.length - 1)}" title="${displayTitle}">`;
-                            itemHtml += `<img src="${thumbSrc}" alt="${displayTitle}" loading="lazy" onerror="this.onerror=null; this.src='images/file_placeholder.png';">`;
-                            if (itemType === 'video') {
-                                itemHtml += '<div class="media-overlay"><i class="fas fa-play media-play-icon"></i></div>';
-                            }
-                            itemHtml += '</a>';
-                            galleryItemDiv.innerHTML = itemHtml;
-
-                            if (galleryGridEl) galleryGridEl.appendChild(galleryItemDiv);
-                        }
+                    mediaItems.forEach((item, index) => {
+                        const rawPercorso = item.Percorso || ''; const mediaDescription = item.Descrizione || '';
+                        const displayTitle = sanitizeTextForHTML(mediaDescription || `Media ${index + 1}`);
+                        let itemType = 'image'; let thumbSrc = rawPercorso; let itemHref = rawPercorso;
+                        if (rawPercorso.match(/\.(mp4|webm|ogg)$/i)) { itemType = 'video'; thumbSrc = 'images/video_placeholder.png';}
+                        else if (!rawPercorso.match(/\.(jpeg|jpg|gif|png|webp)$/i)) { thumbSrc = 'images/file_placeholder.png'; itemType = 'document';}
+                        galleryItemsData.push({ href: itemHref, title: displayTitle, type: itemType });
+                        const galleryItemDiv = document.createElement('div'); galleryItemDiv.className = 'gallery-item';
+                        let itemHtml = `<a href="${itemType !== 'document' ? '#' : encodeURI(itemHref)}" ${itemType !== 'document' ? `data-index="${index}"` : 'target="_blank"'} title="${displayTitle}">`;
+                        itemHtml += `<img src="${thumbSrc}" alt="${displayTitle}" loading="lazy" onerror="this.onerror=null; this.src='images/file_placeholder.png';">`;
+                        if (itemType === 'video') itemHtml += '<div class="media-overlay"><i class="fas fa-play media-play-icon"></i></div>';
+                        itemHtml += '</a>'; galleryItemDiv.innerHTML = itemHtml;
+                        galleryGridEl.appendChild(galleryItemDiv);
                     });
-
-                    document.querySelectorAll('#galleryGrid .gallery-item a').forEach(anchor => {
-                        anchor.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            openLightbox(parseInt(this.dataset.index));
-                        });
+                    document.querySelectorAll('#galleryGrid .gallery-item a[data-index]').forEach(anchor => {
+                        anchor.addEventListener('click', function(e) { e.preventDefault(); openLightbox(parseInt(this.dataset.index)); });
                     });
                 } else {
                     if (gallerySectionEl) gallerySectionEl.style.display = 'block';
                     if (noMediaMessageEl) noMediaMessageEl.style.display = 'block';
                 }
 
-                // Commenti
                 const commentFormContainerEl = document.getElementById('commentFormContainer');
                 const loginToCommentMessageEl = document.getElementById('login-to-comment-message');
-                const commentEventIdInput = document.getElementById('commentEventId');
-
                 if (commentsSectionEl) commentsSectionEl.style.display = 'block';
                 if (currentUser && currentUser.email) {
-                    if (commentFormContainerEl) commentFormContainerEl.style.display = 'block';
-                    if (loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'none';
-                    if (commentEventIdInput) commentEventIdInput.value = eventId;
+                    if(commentFormContainerEl) commentFormContainerEl.style.display = 'block';
+                    if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'none';
                 } else {
-                    if (commentFormContainerEl) commentFormContainerEl.style.display = 'none';
-                    if (loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'block';
+                    if(commentFormContainerEl) commentFormContainerEl.style.display = 'none';
+                    if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'block';
                 }
 
                 if (commentsListEl) commentsListEl.innerHTML = '';
                 if (fetchedComments.length > 0) {
                     if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'none';
                     displayComments(fetchedComments, commentsListEl);
-                } else {
-                    if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'block';
-                }
+                } else { if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'block'; }
 
-            } else {
-                throw new Error(result.message || "Formato dati non corretto o evento non trovato.");
-            }
+            } else { throw new Error(result.message || "Dati evento non validi dalla API."); }
         } catch (error) {
-            console.error("Errore grave in fetchEventDetails:", error.message, error);
-            displayErrorMessage("Impossibile caricare i dettagli dell'evento.", error.message);
+            console.error("[fetchEventDetails] Errore catturato:", error.message, error);
+            displayErrorMessageOnPage("Impossibile caricare i dettagli dell'evento.", error.message);
         } finally {
+            console.log("[fetchEventDetails] Blocco finally, nascondo indicatore caricamento.");
             if (pageLoadingEl) pageLoadingEl.style.display = 'none';
         }
     }
 
     function displayComments(comments, parentEl, depth = 0) {
-        if (depth === 0 && parentEl) { // Aggiunto controllo per parentEl
-            parentEl.innerHTML = '';
-        }
+        if (depth === 0 && parentEl) { parentEl.innerHTML = ''; }
         if (!Array.isArray(comments) || comments.length === 0) {
-            if (depth === 0 && parentEl) parentEl.innerHTML = '<p id="no-comments-message" class="no-content-message">Sii il primo a commentare!</p>';
+            if (depth === 0 && parentEl) parentEl.innerHTML = '<p id="no-comments-message" class="no-content-message" style="display:block;">Sii il primo a commentare!</p>'; // Assicurati che sia visibile
             return;
         }
-
         const ul = document.createElement('ul');
-        if (depth > 0) {
-            ul.style.marginLeft = `${depth * 25}px`;
-            ul.classList.add('replies-list-level-' + depth);
-        }
-
-
+        if (depth > 0) { ul.style.marginLeft = `${depth * 20}px`; ul.classList.add('replies-list-level-' + depth); }
+        else { ul.style.listStyleType = 'none'; ul.style.paddingLeft = '0';}
         comments.forEach(comment => {
             const commentElement = createCommentElement(comment, depth > 0);
             ul.appendChild(commentElement);
             if (comment.replies && comment.replies.length > 0) {
-                const repliesContainer = commentElement.querySelector('.replies'); // Cerca .replies dentro commentElement
-                if (repliesContainer) { // Assicurati che esista
-                    displayComments(comment.replies, repliesContainer, depth + 1);
-                }
+                const repliesContainer = commentElement.querySelector('.replies');
+                if (repliesContainer) displayComments(comment.replies, repliesContainer, depth + 1);
             }
         });
-        if (parentEl) parentEl.appendChild(ul); // Aggiungi solo se parentEl esiste
+        if (parentEl) parentEl.appendChild(ul);
     }
 
     function createCommentElement(commentData, isReply = false) {
         const commentDiv = document.createElement('div');
         commentDiv.className = isReply ? 'comment reply' : 'comment';
         commentDiv.id = 'comment-' + commentData.Progressivo;
-
-        let rawUserName = 'Anonimo';
-        // Prova a usare UtenteNomeCompleto se fornito dal PHP (get_event_details.php)
-        if (commentData.UtenteNomeCompleto && commentData.UtenteNomeCompleto.trim() !== '') {
-            rawUserName = commentData.UtenteNomeCompleto;
-        } else if (commentData.Contatto) {
-            rawUserName = commentData.Contatto.split('@')[0];
-        }
-        // Sovrascrivi con nome utente locale se è l'autore e ha un nome nel client
-        if (currentUser && currentUser.email === commentData.Contatto && currentUser.nome) {
-            rawUserName = currentUser.nome;
-        }
-
-
-        const safeUserName = sanitizeTextForHTML(rawUserName);
-        const safeCommentDate = sanitizeTextForHTML(commentData.DataVisualizzata || commentData.DataPubb || 'Data non disponibile');
+        const safeUserName = sanitizeTextForHTML(commentData.CommenterNomeCompleto || 'Anonimo');
+        const safeCommentDate = sanitizeTextForHTML(commentData.DataVisualizzata || 'Data non disponibile');
         const sanitizedCommentText = sanitizeTextForHTML(commentData.Descrizione);
-        const avatarUrl = commentData.AvatarUtente || 'https://i.pravatar.cc/40?u=' + encodeURIComponent(commentData.Contatto || Date.now()); // Aggiunto Date.now() per fallback univoco
+        const avatarUrl = commentData.CommenterIconPath || defaultUserIconPath;
         const numLike = commentData.NumLike !== null ? parseInt(commentData.NumLike) : 0;
         const isLikedByCurrentUser = commentData.is_liked_by_current_user || false;
 
         commentDiv.innerHTML = `
             <div class="comment-header">
-                <img src="${avatarUrl}" alt="Avatar ${safeUserName}" class="user-avatar">
+                <img src="${avatarUrl}" alt="Avatar di ${safeUserName}" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';">
                 <div class="comment-meta"><strong>${safeUserName}</strong> <small>${safeCommentDate}</small></div>
             </div>
             <p>${sanitizedCommentText}</p>
             <div class="comment-actions">
                 <button class="like-btn ${isLikedByCurrentUser ? 'active' : ''}" data-comment-id="${commentData.Progressivo}" aria-label="Mi piace">
-                    <i class="${isLikedByCurrentUser ? 'fas' : 'far'} fa-heart"></i>
-                    <span class="like-count">${numLike}</span>
+                    <i class="${isLikedByCurrentUser ? 'fas' : 'far'} fa-heart"></i> <span class="like-count">${numLike}</span>
                 </button>
                 <button class="btn-reply" data-comment-id="${commentData.Progressivo}" aria-label="Rispondi"><i class="fas fa-reply"></i> Rispondi</button>
             </div>
@@ -561,7 +508,7 @@
                     <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em;"></div>
                  </form>
             </div>
-            <div class="replies"></div>`;
+            <div class="replies" style="list-style-type: none; padding-left: 0;"></div>`;
         attachCommentInteractionListeners(commentDiv);
         return commentDiv;
     }
@@ -569,54 +516,32 @@
     function attachCommentInteractionListeners(el) {
         const likeBtn = el.querySelector('.like-btn');
         if(likeBtn) likeBtn.addEventListener('click',()=>handleLikeAction(likeBtn));
-
         const replyBtn = el.querySelector('.btn-reply');
         if(replyBtn) replyBtn.addEventListener('click',()=>toggleReplyFormAction(replyBtn));
-
         const replyFormEl = el.querySelector('.reply-form form');
         if(replyFormEl) replyFormEl.addEventListener('submit', handleReplySubmit);
     }
 
     async function handleLikeAction(btn) {
-        if (!currentUser || !currentUser.email) {
-            alert("Devi essere loggato per mettere 'Mi piace'.");
-            return;
-        }
+        console.log("[handleLikeAction] Inizio");
+        if (!currentUser || !currentUser.email) { alert("Devi essere loggato per mettere 'Mi piace'."); return; }
         const commentId = btn.dataset.commentId;
-        const icon = btn.querySelector('i');
-        const countSpan = btn.querySelector('.like-count');
-
-        const wasLiked = btn.classList.contains('active');
+        const action = btn.classList.contains('active') ? 'unlike' : 'like';
+        const originalIconClass = btn.querySelector('i').className;
         btn.disabled = true;
-
         try {
-            const formData = new FormData();
-            formData.append('commentId', commentId);
-            formData.append('action', wasLiked ? 'unlike' : 'like');
-
-            const response = await fetch('like_comment.php', { method: 'POST', body: formData });
-            if (!response.ok) {
-                const errorText = await response.text().catch(() => "Dettaglio errore server non disponibile.");
-                throw new Error(`Errore dal server (${response.status} ${response.statusText}). ${errorText.substring(0,100)}`);
-            }
-            const result = await response.json();
-
+            const result = await callApi('like_comment.php', 'POST', { commentId, action }); // SENZA 'api/'
+            console.log("[handleLikeAction] Risposta da like_comment.php:", result);
             if (result.success) {
+                const icon = btn.querySelector('i'); const countSpan = btn.querySelector('.like-count');
                 if (countSpan) countSpan.textContent = result.newLikeCount;
-                if(icon) {
-                    btn.classList.toggle('active', result.liked);
-                    icon.classList.toggle('fas', result.liked);
-                    icon.classList.toggle('far', !result.liked);
-                    icon.style.color = result.liked ? 'var(--danger)' : '';
-                }
-            } else {
-                throw new Error(result.message || "Impossibile aggiornare il like.");
-            }
+                if(icon) { btn.classList.toggle('active', result.liked); icon.className = result.liked ? 'fas fa-heart' : 'far fa-heart'; }
+            } else { alert(result.message || "Impossibile aggiornare like."); btn.querySelector('i').className = originalIconClass; }
         } catch (error) {
-            console.error("Errore aggiornamento like:", error.message);
-        } finally {
-            setTimeout(() => { if(btn) btn.disabled = false; }, 300);
+            console.error("[handleLikeAction] Errore:", error.message); alert("Errore azione like: " + error.message);
+            btn.querySelector('i').className = originalIconClass;
         }
+        finally { setTimeout(() => { if(btn) btn.disabled = false; }, 300); console.log("[handleLikeAction] Fine"); }
     }
 
     function toggleReplyFormAction(btn) {
@@ -624,144 +549,114 @@
         const formDiv = document.getElementById(`reply-form-${commentId}`);
         if(formDiv){
             const isActive = formDiv.classList.toggle('active');
-            if(isActive) {
-                const textarea = formDiv.querySelector('textarea');
-                if (textarea) textarea.focus();
-            }
+            if(isActive) { const textarea = formDiv.querySelector('textarea'); if (textarea) textarea.focus(); }
             const localMsg = formDiv.querySelector('.form-message-local');
             if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }
         }
     }
 
     async function handleCommentSubmit(form, eventId, isReply = false) {
-        if (!currentUser || !currentUser.email) {
-            alert("Devi essere loggato per commentare.");
+        console.log(`[handleCommentSubmit] Inizio. IsReply: ${isReply}`);
+        if (!currentUser || !currentUser.email) { alert("Devi essere loggato per commentare."); return; }
+        const descrizioneValue = form.querySelector('textarea[name="Descrizione"]').value;
+        const msgEl = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
+        if (!descrizioneValue.trim()) {
+            if(msgEl) { msgEl.textContent = 'Il commento non può essere vuoto.'; msgEl.className = 'form-message error'; msgEl.style.display='block'; }
             return;
         }
-        const formData = new FormData(form);
-        formData.append('Contatto', currentUser.email);
-        if (isReply) {
-            if (!formData.has('IDEvento')) { formData.append('IDEvento', eventId); }
-            const parentCommentId = form.dataset.parentCommentId;
-            if (parentCommentId) { formData.append('CodRisposta', parentCommentId); }
-            else { /* ... gestione errore ... */ return; }
-        }
+        const commentDataForApi = { IDEvento: eventId, Descrizione: descrizioneValue };
+        if (isReply) { commentDataForApi.CodRisposta = form.dataset.parentCommentId; }
         const submitBtn = form.querySelector('button[type="submit"]');
-        const commentFormMessageElement = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
-        if (!submitBtn) { console.error("Bottone submit non trovato:", form); return; }
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-mini"></span> Invio...';
-        if (commentFormMessageElement) { commentFormMessageElement.textContent = ''; commentFormMessageElement.className = 'form-message'; commentFormMessageElement.style.display = 'none'; }
+        const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Invia';
+        if(submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-mini"></span> Invio...';}
+        if (msgEl) { msgEl.textContent = ''; msgEl.className = 'form-message'; msgEl.style.display = 'none'; }
 
         try {
-            const response = await fetch('submit_comment.php', { method: 'POST', body: formData });
-            if (!response.ok) {
-                const errorText = await response.text().catch(() => "Impossibile leggere corpo errore.");
-                throw new Error(`Errore server (${response.status}). Dettagli: ${errorText.substring(0, 200)}`);
-            }
-            const result = await response.json();
-            if (result.success) {
+            const resultJson = await callApi('submit_comment.php', 'POST', commentDataForApi); // SENZA 'api/'
+            console.log("[handleCommentSubmit] Risposta da submit_comment.php:", resultJson);
+            if (resultJson.success) {
                 form.reset();
                 if (isReply && form.closest('.reply-form')) { form.closest('.reply-form').classList.remove('active'); }
-                fetchEventDetails(eventId);
-                const targetMessageEl = form.querySelector('.form-message-local') || document.getElementById('comment-form-message');
-                if (targetMessageEl) {
-                    targetMessageEl.textContent = isReply ? 'Risposta inviata!' : 'Commento inviato!';
-                    targetMessageEl.className = 'form-message success'; // Usa classi CSS
-                    targetMessageEl.style.display = 'block';
-                    setTimeout(() => { if (targetMessageEl) { targetMessageEl.style.display = 'none'; } }, 3000);
+                if (msgEl) {
+                    msgEl.textContent = isReply ? 'Risposta inviata!' : 'Commento inviato!';
+                    msgEl.className = 'form-message success'; msgEl.style.display = 'block';
+                    setTimeout(() => { if (msgEl) { msgEl.style.display = 'none'; } }, 3000);
                 }
-            } else { throw new Error(result.message || "Errore invio (risposta server)."); }
+                await fetchEventDetails(eventId);
+            } else { throw new Error(resultJson.message || "Errore invio commento (risposta server)."); }
         } catch (error) {
-            console.error("Errore handleCommentSubmit:", error.message, error);
-            if (commentFormMessageElement) {
-                let errMsg = "Errore."; if (error && error.message) { errMsg = String(error.message).substring(0, 300); }
-                commentFormMessageElement.textContent = `Errore: ${errMsg}`;
-                commentFormMessageElement.className = 'form-message error'; // Usa classi CSS
-                commentFormMessageElement.style.display = 'block';
+            console.error("[handleCommentSubmit] Errore:", error.message, error);
+            if (msgEl) {
+                msgEl.textContent = `Errore: ${String(error.message).substring(0,100)}`;
+                msgEl.className = 'form-message error'; msgEl.style.display = 'block';
             }
         } finally {
             if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; }
+            console.log("[handleCommentSubmit] Fine");
         }
     }
-
     async function handleReplySubmit(e) {
         e.preventDefault();
         const eventIdInput = document.getElementById('commentEventId');
-        if (!eventIdInput || !eventIdInput.value) {
-            console.error("ID Evento principale non trovato per risposta.");
-            return;
-        }
+        if (!eventIdInput || !eventIdInput.value) { console.error("ID Evento principale non trovato per risposta."); return; }
         const eventId = eventIdInput.value;
         handleCommentSubmit(e.target, eventId, true);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        setupUserSessionAndNavbar();
+    document.addEventListener('DOMContentLoaded', async () => {
+        console.log("DOMContentLoaded: Inizio");
+        setupUserSessionAndNavbar(); // Setup iniziale da localStorage
+        // console.log("DOMContentLoaded: currentUser dopo setupUserSessionAndNavbar:", currentUser);
+
+        if (currentUser && currentUser.email) {
+            await fetchAndUpdateUserDisplayData(); // Tenta di aggiornare con dati freschi dal server
+            // console.log("DOMContentLoaded: currentUser dopo fetchAndUpdateUserDisplayData:", currentUser);
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
         const eventId = urlParams.get('id');
-        const errorDisplayEl = document.getElementById('eventLoadingError');
+        console.log(`DOMContentLoaded: ID Evento dall'URL: ${eventId}`);
+
+        const loginToCommentMessageEl = document.getElementById('login-to-comment-message');
+        const commentFormContainerEl = document.getElementById('commentFormContainer');
 
         if (eventId) {
             const commentEventIdInput = document.getElementById('commentEventId');
             if (commentEventIdInput) commentEventIdInput.value = eventId;
-            fetchEventDetails(eventId);
-        } else {
-            const pageLoadingEl = document.getElementById('pageLoadingIndicator');
-            const eventTitleHeaderEl = document.getElementById('eventTitleHeader');
-            if (pageLoadingEl) pageLoadingEl.style.display = 'none';
-            let specificErrorMessage = "ID evento non specificato nell'URL.";
-            if (eventTitleHeaderEl) {
-                eventTitleHeaderEl.innerHTML = `<p class='no-content-message'>${sanitizeTextForHTML(specificErrorMessage)}</p>`;
-            } else if (errorDisplayEl) {
-                errorDisplayEl.innerHTML = sanitizeTextForHTML(specificErrorMessage);
-                errorDisplayEl.style.display = 'block';
-            } else {
-                console.error(specificErrorMessage + " (Elementi UI mancanti).");
-            }
-        }
 
-        const newCommentForm = document.getElementById('new-comment-form');
-        if (newCommentForm && eventId) {
-            newCommentForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const commentTextInput = document.getElementById('comment-text');
-                const mainCommentMessageEl = document.getElementById('comment-form-message');
-                if (!commentTextInput || !commentTextInput.value.trim()) {
-                    if(mainCommentMessageEl) {
-                        mainCommentMessageEl.textContent = 'Il commento non può essere vuoto.';
-                        mainCommentMessageEl.className = 'form-message error';
-                        mainCommentMessageEl.style.display='block';
-                    }
-                    return;
-                }
-                handleCommentSubmit(this, eventId, false);
-            });
-        }
+            await fetchEventDetails(eventId);
 
-        const commentFormContainerEl = document.getElementById('commentFormContainer');
-        const loginToCommentMessageEl = document.getElementById('login-to-comment-message');
-        if (commentFormContainerEl && loginToCommentMessageEl) {
             if (currentUser && currentUser.email) {
-                commentFormContainerEl.style.display = 'block';
-                loginToCommentMessageEl.style.display = 'none';
+                if(commentFormContainerEl) commentFormContainerEl.style.display = 'block';
+                if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'none';
             } else {
-                commentFormContainerEl.style.display = 'none';
-                loginToCommentMessageEl.style.display = 'block';
+                if(commentFormContainerEl) commentFormContainerEl.style.display = 'none';
+                if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'block';
                 const loginLink = document.getElementById('loginLinkFromEventPage');
                 if(loginLink) {
                     loginLink.addEventListener('click', (e) => {
                         e.preventDefault();
                         alert("Per favore, accedi per commentare.");
-                        // if(typeof openLoginPopupGlobal === 'function') openLoginPopupGlobal();
                     });
                 }
             }
+        } else {
+            displayErrorMessageOnPage("ID evento non specificato nell'URL.", "");
+            if(commentFormContainerEl) commentFormContainerEl.style.display = 'none';
+            if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'block';
+        }
+
+        const newCommentForm = document.getElementById('new-comment-form');
+        if (newCommentForm && eventId) {
+            newCommentForm.addEventListener('submit', function(eForm) {
+                eForm.preventDefault();
+                handleCommentSubmit(this, eventId, false);
+            });
         }
 
         const currentYearEl = document.getElementById('currentYear');
         if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
+        console.log("DOMContentLoaded: Fine");
     });
 </script>
 </body>
