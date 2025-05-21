@@ -34,9 +34,9 @@
   --transition-fast: all 0.2s ease-in-out;
 
   /* Variabili di transizione modificate per maggiore controllo */
-  --transition-duration-medium: 0.3s; /* NUOVA */
-  --transition-timing-medium: ease-in-out; /* NUOVA */
-  --transition-medium: all var(--transition-duration-medium) var(--transition-timing-medium); /* MODIFICATA */
+  --transition-duration-medium: 0.3s;
+  --transition-timing-medium: ease-in-out;
+  --transition-medium: all var(--transition-duration-medium) var(--transition-timing-medium);
 
   --navbar-height: 80px;
 }
@@ -115,8 +115,8 @@ img {
 }
 
 .section-padding {
-  padding-top: clamp(1.2rem, 3vw, 2rem);    /* Valori ulteriormente ridotti */
-  padding-bottom: clamp(1.2rem, 3vw, 2rem); /* Valori ulteriormente ridotti */
+  padding-top: clamp(1.2rem, 3vw, 2rem);
+  padding-bottom: clamp(1.2rem, 3vw, 2rem);
 }
 
 .text-center { text-align: center !important; }
@@ -192,7 +192,7 @@ img {
 
 .navbar .menu {
   display: none;
-  gap: clamp(0.8rem, 1.5vw, 1.2rem); /* Valori del gap ridotti */
+  gap: clamp(0.8rem, 1.5vw, 1.2rem);
   align-items: center;
   list-style: none;
   padding: 0;
@@ -215,7 +215,7 @@ img {
   width: 0;
   height: 3px;
   background-color: var(--accent);
-  transition: width var(--transition-duration-medium) var(--transition-timing-medium); /* Usiamo le nuove variabili per coerenza */
+  transition: width var(--transition-duration-medium) var(--transition-timing-medium);
 }
 
 .navbar .menu a:hover::after, .navbar .menu a.active::after {
@@ -463,25 +463,21 @@ main > .container > h1:first-child:not(.hero-title) {
   margin-top: 2.2rem;
 }
 
-/* Prima definizione di .card */
 .card {
   background: var(--white);
   border-radius: var(--border-radius-medium);
   box-shadow: var(--shadow-light);
-  /* La transizione qui è quella che verrà sovrascritta dalla regola più specifica più avanti,
-     ma la lasciamo per chiarezza sulla struttura originale.
-     La transizione effettiva sarà gestita dalla regola .card più in basso. */
-  /* transition: var(--transition-medium); */
   overflow: hidden;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--gray-light);
-  opacity: 1; /* Stato normale, per la logica di morphing */
-  /* La transizione effettiva per hover e morphing è definita più avanti per consolidamento */
+  opacity: 1;
+  transition: opacity 0.45s ease-in-out,
+  transform var(--transition-duration-medium) var(--transition-timing-medium),
+  box-shadow var(--transition-duration-medium) var(--transition-timing-medium);
 }
 
 
-/* .card:hover gestisce lo stato finale dell'hover. La transizione è sul .card base */
 .card:hover {
   transform: translateY(-9px);
   box-shadow: var(--shadow-medium);
@@ -529,7 +525,7 @@ main > .container > h1:first-child:not(.hero-title) {
   text-align: left;
 }
 .card-description {
-  flex-grow: 1; /* Spinge le azioni in basso */
+  flex-grow: 1;
   min-height: 6em;
 }
 
@@ -548,7 +544,7 @@ main > .container > h1:first-child:not(.hero-title) {
 }
 
 .card-actions {
-  margin-top: auto; /* Spinge i bottoni in fondo alla card-content */
+  margin-top: auto;
   padding-top: 1.4rem;
   display: flex;
   gap: 1.05rem;
@@ -610,7 +606,7 @@ main > .container > h1:first-child:not(.hero-title) {
   background-color: var(--primary);
   border-color: var(--primary);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
-  color: var(--white); /* AGGIUNGI QUESTA RIGA */
+  color: var(--white);
 }
 
 .card-btn-secondary {
@@ -628,17 +624,14 @@ main > .container > h1:first-child:not(.hero-title) {
   min-height: 160px;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centra il contenuto se non ci sono .card-actions */
+  justify-content: center;
 }
-/* Se .info-card avesse .card-actions, la logica generale di .card-actions con margin-top:auto funzionerebbe.
-   Per centrare solo il blocco h3+p se sono gli unici figli e poi avere azioni in basso: */
-.info-card .card-content > div:first-child:last-child:not(.card-actions) { /* Se c'è solo un div (contenitore di testo) */
-  margin-top: auto;    /* Centra verticalmente questo div */
+.info-card .card-content > div:first-child:last-child:not(.card-actions) {
+  margin-top: auto;
   margin-bottom: auto;
 }
-.info-card .card-content > *:not(.card-actions):first-child { /* Contenuto testuale */
-  flex-grow: 1; /* Permette al testo di occupare spazio, spingendo .card-actions in basso */
-  /* Questo potrebbe non essere necessario se il testo è breve e vogliamo solo centrarlo */
+.info-card .card-content > *:not(.card-actions):first-child {
+  flex-grow: 1;
 }
 .info-card .card-content h3,
 .info-card .card-content p {
@@ -683,9 +676,9 @@ footer p {
 .chi-siamo-section {
   display: flex;
   flex-direction: column;
-  gap: 3.5rem; /* Questo gap è tra l'immagine e il testo DENTRO ogni chi-siamo-section */
+  gap: 3.5rem;
   align-items: center;
-  margin-bottom: 1.5rem; /* Valore significativamente ridotto */
+  margin-bottom: 1.5rem;
 }
 
 .chi-siamo-content {
@@ -966,19 +959,17 @@ footer p {
   text-decoration: none;
 }
 
-/* Stile per uniformare l'altezza dei pulsanti nella sezione contatti */
 .btn-contatto {
-  min-height: 50px; /* Altezza minima per entrambi i pulsanti */
+  min-height: 50px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Assicura che i pulsanti mantengano la stessa altezza anche su dispositivi mobili */
 @media (max-width: 767px) {
   .btn-contatto {
     width: 100%;
-    margin-bottom: 10px; /* Aggiunge spazio tra i pulsanti su mobile */
+    margin-bottom: 10px;
   }
 }
 
@@ -992,25 +983,21 @@ footer p {
   opacity: 0.95;
 }
 
-/* Fix altezza bottoni contatti */
 .btn-contatto {
-  height: 50px; /* Altezza fissa per tutti */
+  height: 50px;
   padding: 0 20px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 52px; /* aggiunta per uniformare altezza */
-
+  min-height: 52px;
 }
-
-
 
 /* ----- Pagina Dove Siamo ----- */
 .btn-contatto:hover,
 .btn-contatto:active {
-  color: var(--white) !important; /* Mantiene il colore del testo bianco */
-  text-decoration: none; /* Assicura che non ci sia sottolineatura */
+  color: var(--white) !important;
+  text-decoration: none;
 }
 
 .map-section {
@@ -1085,7 +1072,7 @@ footer p {
   align-items: center;
   justify-content: center;
   gap: 0.7rem;
-  font-size: 0.9rem; /* Più piccolo */
+  font-size: 0.9rem;
 }
 .location-actions a i {
   display: none;
@@ -1281,11 +1268,11 @@ footer p {
   overflow-y: auto;
 }
 .login-popup-overlay.active {
-  display: block;
+  display: block; /* Modificato da flex a block per popup di login standard */
   opacity: 1;
 }
 .login-popup.active {
-  display: block;
+  display: block; /* Modificato da flex a block */
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
 }
@@ -1377,7 +1364,7 @@ footer p {
 .close-popup:hover { color: var(--dark); transform: rotate(90deg) scale(1.08); }
 
 /* ----- Media Queries per Responsive ----- */
-@media (min-width: 1300px) { /* Breakpoint aumentato */
+@media (min-width: 1300px) {
   .navbar .menu {
     display: flex;
   }
@@ -1389,7 +1376,7 @@ footer p {
   }
 }
 
-@media (max-width: 991px) { /* Tablet */
+@media (max-width: 991px) {
   body { font-size: 20px; }
   main section:first-of-type.hero-section {
     margin-top: calc(-1 * var(--navbar-height));
@@ -1411,7 +1398,7 @@ footer p {
   }
 }
 
-@media (max-width: 767px) { /* Mobile */
+@media (max-width: 767px) {
   body { font-size: 19px; }
   :root { --navbar-height: 75px; }
 
@@ -1782,7 +1769,7 @@ footer p {
   vertical-align: middle;
   margin-right: 5.5px;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* @keyframes spin è già definito sopra, non serve ripeterlo */
 
 /* ----- Animazione FadeIn Generica ----- */
 @keyframes fadeIn {
@@ -1790,9 +1777,9 @@ footer p {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ----- Morphing Volantino (Calendario Attività) ----- */
+/* ----- NUOVA ANIMAZIONE VOLANTINO (SOSTITUISCE QUELLA PRECEDENTE) ----- */
 body.volantino-morph-active {
-  overflow: hidden;
+  overflow: hidden; /* Mantenuto: previene lo scroll della pagina quando il popup è attivo */
 }
 
 .volantino-morph-overlay {
@@ -1801,254 +1788,174 @@ body.volantino-morph-active {
   left: 0;
   width: 100%;
   height: 100%;
-
-  background-color: rgba(var(--dark-rgb), 0.85);
-  backdrop-filter: blur(6px);
-
-  display: flex;
+  background-color: rgba(var(--dark-rgb), 0.85); /* Sfondo scuro semitrasparente */
+  backdrop-filter: blur(6px); /* Effetto sfocato */
+  display: flex; /* Usato per centrare il popup del volantino */
   justify-content: center;
   align-items: center;
-  z-index: 2000;
-
+  z-index: 2000; /* Assicura che sia sopra il resto del contenuto */
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-
-  -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 0.1%);
-  mask-image: radial-gradient(circle at center, black 0%, transparent 0.1%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-
-  transition-property: opacity, -webkit-mask-image, mask-image, visibility, pointer-events;
-  transition-duration: 0.3s, 0.5s, 0.5s, 0s, 0s;
-  transition-timing-function: ease-in-out, ease-out, ease-out, linear, linear;
-
-  /* Ritardi per la transizione IN USCITA (quando .active viene rimossa):
-     - opacity e mask iniziano subito
-     - visibility e pointer-events cambiano solo dopo che tutto è finito
-  */
-  transition-delay: 0s, 0s, 0s, 0.5s, 0.5s; /* Ritardo per dare tempo a opacity e mask di finire */
+  /* Transizione SEMPLIFICATA solo per opacità e visibilità */
+  transition: opacity 0.25s ease-in-out, visibility 0s linear 0.25s;
 }
 
 .volantino-morph-overlay.active {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-
-  -webkit-mask-image: radial-gradient(circle at center, black 150%, transparent 150.1%);
-  mask-image: radial-gradient(circle at center, black 150%, transparent 150.1%);
-
-  /* Ritardi per la transizione IN ENTRATA (quando .active viene aggiunta) */
-  transition-delay: 0s, 0.1s, 0.1s, 0s, 0s; /* Ritardo per opacity, -webkit-mask, mask, visibility, pointer-events */
+  transition-delay: 0s; /* Rimuove ritardi non necessari quando diventa attivo */
+  /* Rimosse proprietà mask-image e relative transizioni complesse */
 }
 
+/* Stile per la card/popup che contiene il volantino */
+.card.morph-active-card { /* Questa classe è usata dal JS per creare il contenitore del volantino */
+  position: fixed; /* Posizionamento fisso per centrarlo nella viewport */
+  top: 50%;
+  left: 50%;
 
-/* Il resto del tuo CSS rimane invariato: */
+  width: auto; /* Larghezza determinata dal contenuto, con un massimo */
+  height: auto; /* Altezza determinata dal contenuto, con un massimo */
+  max-width: 90vw;  /* Massimo 90% della larghezza della viewport */
+  max-height: 90vh; /* Massimo 90% dell'altezza della viewport */
 
-.card.morph-active-card {
-  position: absolute; /* Cruciale per il posizionamento animato */
-  z-index: 2001;
-  background-color: var(--white);
+  background-color: var(--dark); /* Sfondo per il contenitore del volantino */
   border-radius: var(--border-radius-medium);
-  box-shadow: 0 14px 48px rgba(0, 0, 0, 0.42);
-  overflow: hidden; /* Nasconde contenuto che esce durante il resize */
-  /* Transizioni più fluide per il movimento e la dimensione della card */
-  transition: width 0.55s ease-in-out,
-  height 0.55s ease-in-out,
-  top 0.55s ease-in-out,
-  left 0.55s ease-in-out,
-  opacity 0.4s ease-in-out; /* Opacità per il ritorno */
-  transform-origin: center center;
-}
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3); /* Ombra per effetto popup */
+  overflow: hidden; /* Nasconde contenuto che potrebbe eccedere (es. bordi immagine) */
 
-/* Stile per la card originale quando è nascosta durante il morphing */
-.card.original-morph-hidden {
-  opacity: 0 !important; /* Assicura che sia nascosta */
-  visibility: hidden !important; /* Assicura che non occupi spazio e non sia interagibile */
-  pointer-events: none !important;
-  /* Transizione per la scomparsa (veloce) e la ricomparsa (più lenta, definita sulla classe .card base) */
-  transition: opacity 0.15s ease-out, visibility 0s linear 0.15s !important;
-}
+  display: flex; /* Per centrare l'immagine/contenuto del volantino al suo interno */
+  justify-content: center;
+  align-items: center;
 
-/*
-  Regola .card specifica per la transizione di ricomparsa del morphing e HOVER.
-  Questa regola sovrascrive la `transition` definita precedentemente per .card.
-  È stata CORRETTA per usare le variabili di durata e timing in modo appropriato.
-*/
-.card {
-  /* ...altri stili della .card definiti precedentemente sono ereditati... */
-  /* background, border-radius, box-shadow iniziale, overflow, display, border, ecc. */
-  opacity: 1; /* Stato normale */
-  /*
-    Transizione CORRETTA:
-    - opacity: per la ricomparsa fluida quando .original-morph-hidden viene rimossa.
-    - transform: per l'effetto di "salita" al hover.
-    - box-shadow: per il cambio dell'ombra al hover.
-    Tutte usano le variabili definite in :root per durata e timing.
-  */
-  transition: opacity 0.45s ease-in-out, /* Per il morphing */
-  transform var(--transition-duration-medium) var(--transition-timing-medium), /* Per hover */
-  box-shadow var(--transition-duration-medium) var(--transition-timing-medium); /* Per hover */
-}
-
-
-/* Contenuto interno della card che fa il morphing */
-.morph-content-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border-radius: inherit;
-}
-
-/* Immagine di copertina dentro la card morphing */
-.morph-content-wrapper .card-image-container-morph {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 280px; /* Sincronizza con l'altezza dell'immagine nella card normale */
-  transition: opacity 0.4s ease-in-out 0.1s, height 0.5s cubic-bezier(0.6, -0.28, 0.735, 0.045);
-  z-index: 1;
-  overflow: hidden;
-  border-radius: var(--border-radius-medium) var(--border-radius-medium) 0 0;
-}
-
-.morph-content-wrapper .card-image-container-morph img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Immagine del volantino dentro la card morphing */
-.morph-content-wrapper .volantino-image-container-morph {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   opacity: 0;
-  transition: opacity 0.4s ease-in-out 0.25s;
-  z-index: 2;
-  overflow: hidden;
-  border-radius: inherit;
+  visibility: hidden;
+  /* Animazione leggera: compare con fade-in e leggero scale-up */
+  transform: translate(-50%, -50%) scale(0.95);
+  /* Transizione SEMPLIFICATA per opacità, transform e visibilità */
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out, visibility 0s linear 0.25s;
+  z-index: 2001; /* Sopra l'overlay */
+  /* Rimosse transizioni complesse per width, height, top, left della vecchia animazione morph */
+}
+
+/* Stato attivo per il popup del volantino */
+/* La logica JS esistente aggiunge .zoomed-in e poi .volantino-visible.
+   Usiamo questa combinazione per attivare il popup semplificato. */
+.card.morph-active-card.zoomed-in.volantino-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1); /* Scala alla dimensione normale */
+  transition-delay: 0s;
+}
+
+/* Contenitore interno per l'immagine del volantino o messaggio */
+.morph-content-wrapper { /* Mantenuto se il JS lo usa ancora per strutturare il contenuto interno */
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--dark); /* Sfondo per il volantino */
+  overflow: hidden;
+  padding: 10px; /* Opzionale: piccolo spazio attorno al contenuto del volantino */
+}
+
+.morph-content-wrapper .volantino-image-container-morph {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  opacity: 1; /* Sempre visibile quando il popup è attivo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent; /* Lo sfondo è già su .card.morph-active-card */
 }
 
 .morph-content-wrapper .volantino-image-container-morph img {
   max-width: 100%;
-  max-height: 100%;
+  max-height: calc(90vh - 60px); /* Es: 90vh meno padding e spazio per bottone chiusura */
   object-fit: contain;
-  border-radius: inherit;
-  padding: 8px; /* Leggero spazio attorno all'immagine del volantino */
+  border-radius: calc(var(--border-radius-medium) - 5px); /* Raggio leggermente inferiore a quello del popup, se il popup ha padding */
+  display: block;
 }
-
-/* Contenuto testuale dentro la card morphing */
-.morph-content-wrapper .card-content-morph {
-  position: relative;
-  padding: 1.8rem; /* Come la .card-content originale */
-  opacity: 1; /* Inizia visibile */
-  transition: opacity 0.25s ease-out;
-  overflow-y: auto;
-  z-index: 0; /* Sotto la copertina inizialmente */
-  margin-top: 280px; /* Spazio per la copertina, sincronizza con height di card-image-container-morph */
-  height: calc(100% - 280px);
-  background-color: var(--white);
-}
-
-/* Stati durante l'animazione morphing (logica originale che andava bene) */
-.card.morph-active-card.zoomed-in.morphing .card-image-container-morph {
-  height: 100%; /* L'immagine di copertina si espande */
-  border-radius: inherit;
-}
-
-.card.morph-active-card.zoomed-in.morphing .card-content-morph {
-  opacity: 0; /* Il testo scompare */
-  pointer-events: none;
-}
-
-.card.morph-active-card.zoomed-in.volantino-visible .card-image-container-morph {
-  opacity: 0; /* La copertina scompare per far posto al volantino */
-}
-
-.card.morph-active-card.zoomed-in.volantino-visible .volantino-image-container-morph {
-  opacity: 1; /* Il volantino appare */
-}
-
-.card.morph-active-card.zoomed-in.volantino-visible .card-content-morph {
-  opacity: 0; /* Il testo rimane nascosto mentre il volantino è visibile */
-  pointer-events: none;
-}
-
-/* Al ritorno, il testo riappare quando la card si sta restringendo */
-.card.morph-active-card:not(.volantino-visible):not(.morphing) .card-content-morph {
-  opacity: 1;
-  transition: opacity 0.3s ease-in 0.2s; /* Ritarda leggermente la riapparizione del testo */
-  pointer-events: auto;
-}
-
 
 .volantino-image-container-morph .volantino-message-display {
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   color: var(--light);
-  padding: 32px;
+  padding: 20px;
   text-align: center;
 }
+.volantino-message-display p { color: var(--light); margin-bottom: 1rem; font-size: 1.1rem; }
+.volantino-message-display a { color: var(--accent); text-decoration: underline; font-weight: 500; }
 
-.volantino-message-display p {
-  color: var(--light);
-  margin-bottom: 1.6rem;
-  font-size: 1.35rem;
-}
 
-.volantino-message-display a {
-  color: var(--accent);
-  text-decoration: underline;
-  font-weight: 500;
-}
-
+/* Pulsante di chiusura per il nuovo popup del volantino */
 .close-morph-volantino-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 2.4rem;
+  top: 10px;
+  right: 10px;
+  font-size: 2rem;
   color: var(--white);
-  background: rgba(0, 0, 0, 0.64);
+  background: rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 50%;
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 100; /* Sopra il contenuto del volantino */
+  z-index: 2002;
   transition: var(--transition-fast);
   line-height: 1;
-  opacity: 0;
+  opacity: 0; /* Nascosto inizialmente */
   pointer-events: none;
 }
 
-.card.morph-active-card.zoomed-in .close-morph-volantino-btn {
-  opacity: 1;
+/* Mostra il pulsante di chiusura quando il popup del volantino è completamente visibile */
+.card.morph-active-card.zoomed-in.volantino-visible .close-morph-volantino-btn {
+  opacity: 0.8;
   pointer-events: auto;
-  transition-delay: 0.5s; /* Appare dopo che l'animazione principale è stabilizzata */
+  transition: opacity 0.3s ease-out 0.15s, transform 0.2s ease-out; /* Appare dopo che il popup è stabile */
 }
 
 .close-morph-volantino-btn:hover {
   background: var(--danger);
-  transform: scale(1.12) rotate(180deg);
+  opacity: 1;
+  transform: scale(1.1) rotate(90deg);
 }
+
+/* RIMUOVERE O COMMENTARE QUESTI STILI RELATIVI ALLA VECCHIA ANIMAZIONE MORPHING */
+/*
+.card.original-morph-hidden { ... } -> La logica di opacità è ancora usata dal JS per la card originale, quindi mantenerla se serve.
+.card.morph-active-card { ... le vecchie transizioni per width, height, top, left ... }
+.morph-content-wrapper .card-image-container-morph { ... vecchie transizioni e posizionamenti assoluti per l'animazione ... }
+.morph-content-wrapper .card-content-morph { ... vecchi stili per animazione del testo ... }
+.card.morph-active-card.zoomed-in.morphing .card-image-container-morph { ... }
+.card.morph-active-card.zoomed-in.morphing .card-content-morph { ... }
+.card.morph-active-card.zoomed-in.volantino-visible .card-image-container-morph { ... } // Ora gestito sopra
+.card.morph-active-card.zoomed-in.volantino-visible .card-content-morph { opacity: 0; pointer-events: none; } // Mantenere per nascondere il testo clonato
+.card.morph-active-card:not(.volantino-visible):not(.morphing) .card-content-morph { ... }
+*/
+
+/* MANTENERE questo per nascondere il contenuto clonato della card quando il volantino è visibile */
+.card.morph-active-card.zoomed-in.volantino-visible .card-content-morph {
+  opacity: 0;
+  pointer-events: none;
+}
+/* MANTENERE questo per nascondere l'immagine di copertina clonata quando il volantino è visibile */
+.card.morph-active-card.zoomed-in.volantino-visible .card-image-container-morph {
+  opacity: 0;
+  pointer-events: none;
+}
+/* ----- FINE MODIFICHE VOLANTINO ----- */
+
 
 /* ----- Popup Prenotazione (Calendario Attività) ----- */
 .booking-popup-overlay {
@@ -3845,34 +3752,33 @@ body.page-dashboard .modal-content {
 }
 /* ----- FINE NUOVI STILI DASHBOARD ----- */
 
-/* ----- INIZIO STILI PER COMMENTI STAFF (EVENTO DETTAGLIO ACCESSO) ----- */
+/* ----- INIZIO NUOVI STILI PER COMMENTI STAFF (EVENTO DETTAGLIO ACCESSO) ----- */
 
-/* Stile per evidenziare i commenti dello Staff/Admin */
-.comment.admin-comment-highlight {
-  border-left-color: var(--accent) !important; /* Usa un colore distintivo per il bordo sinistro */
-  background-color: #fffaf0 !important; /* Sfondo leggermente diverso, es. un crema/giallo pallido */
-  /* Puoi aggiungere un padding leggermente diverso se vuoi differenziarlo ulteriormente */
-  /* padding: 1.6rem; */
+/* Opzionale: Stile generale per il box di un commento admin */
+.comment.commento-admin-stile { /* Nuova classe per lo stile generale del div admin */
+  border-left-color: var(--accent) !important;
+  background-color: #fffaf0; /* Leggermente diverso da .comment.reply e dal default .comment */
 }
 
-/* Aggiunge un'etichetta "(Staff)" o "(Admin)" dopo il nome dell'autore */
-.comment.admin-comment-highlight .comment-meta strong::after {
-  content: " (Staff)"; /* Puoi cambiarlo in " (Admin)" o " (Eremo)" */
-  font-size: 0.8em;     /* Rendi l'etichetta leggermente più piccola del nome */
-  font-weight: normal;  /* Non grassetto per l'etichetta */
-  color: var(--accent); /* Colore dell'etichetta */
-  margin-left: 0.5em;   /* Spazio tra il nome e l'etichetta */
-  background-color: rgba(209, 140, 96, 0.1); /* Sfondo leggero per l'etichetta, usando --accent con opacità */
-  padding: 0.15em 0.5em; /* Padding interno per l'etichetta */
-  border-radius: 4px;   /* Angoli arrotondati per l'etichetta */
-  border: 1px solid rgba(209, 140, 96, 0.3); /* Bordo leggero per l'etichetta */
-  text-transform: uppercase; /* Opzionale: rendi l'etichetta maiuscola */
-  letter-spacing: 0.5px;   /* Opzionale: leggera spaziatura tra le lettere */
-}
-
-/* Opzionale: se vuoi che l'avatar dell'admin sia leggermente diverso */
-.comment.admin-comment-highlight .comment-header .user-avatar {
+/* Opzionale: Stile per l'avatar dell'admin se vuoi differenziarlo */
+.comment.commento-admin-stile .comment-header .user-avatar {
   border-color: var(--accent); /* Esempio: bordo avatar admin con colore accent */
 }
 
-/* ----- FINE STILI PER COMMENTI STAFF ----- */
+/* NUOVO STILE PER IL BADGE STAFF (elemento SPAN) */
+.badge-staff {
+  display: inline-block; /* Per permettere padding e margin */
+  margin-left: 0.6em;  /* Spazio dal nome dell'autore */
+  padding: 0.2em 0.6em; /* Padding interno al badge */
+  font-size: 0.75em;    /* Dimensione font del badge, più piccolo del nome */
+  font-weight: bold;   /* Grassetto per il badge */
+  color: var(--white);      /* Colore testo badge */
+  background-color: var(--accent); /* Colore di sfondo del badge */
+  border-radius: 4px;       /* Angoli arrotondati */
+  line-height: 1.2;         /* Altezza linea per allineamento verticale */
+  vertical-align: middle;   /* Allinea il badge con il testo del nome */
+  text-transform: uppercase; /* Opzionale */
+  letter-spacing: 0.5px;   /* Opzionale */
+}
+
+/* ----- FINE NUOVI STILI PER COMMENTI STAFF ----- */
