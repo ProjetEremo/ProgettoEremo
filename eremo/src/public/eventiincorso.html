@@ -6,6 +6,33 @@
   <link rel="icon" href="images/logo.png" type="image/x-icon" />
   <title>Calendario Attività - Eremo Frate Francesco</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Stili aggiuntivi per coerenza con index.html se necessario, es. error-border */
+    .login-popup input.form-control.error-border {
+      border-color: red !important;
+    }
+    .login-popup input:-webkit-autofill,
+    .login-popup input:-webkit-autofill:hover,
+    .login-popup input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+      -webkit-text-fill-color: #333 !important; /* O il colore del testo che usi */
+    }
+    .spinner-mini-light { /* Aggiunto per coerenza con index.html se usi spinner */
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-radius: 50%;
+      border-top-color: #000; /* O il colore che preferisci */
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-left: 5px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
 <header class="navbar-container" id="navbarContainer">
@@ -43,16 +70,16 @@
           <a href="#" id="logout-btn-dropdown">Esci</a>
         </div>
       </div>
-      <button class="hamburger" aria-label="Toggle menu">☰</button>
+      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="eventiincorso.html">Calendario attività</a>
-    <a href="eventipassati.html">Archivio attività</a>
-    <a href="incontrisullaparola.html">Incontri sulla parola</a>
-    <a href="dovesiamo.html">Dove siamo</a>
-    <a href="contatti.html">Contatti</a>
-    <a href="#" id="login-btn-mobile">Accedi</a>
+    <a href="eventiincorso.html" onclick="closeMobileMenuOnLinkClick()">Calendario attività</a>
+    <a href="eventipassati.html" onclick="closeMobileMenuOnLinkClick()">Archivio attività</a>
+    <a href="incontrisullaparola.html" onclick="closeMobileMenuOnLinkClick()">Incontri sulla parola</a>
+    <a href="dovesiamo.html" onclick="closeMobileMenuOnLinkClick()">Dove siamo</a>
+    <a href="contatti.html" onclick="closeMobileMenuOnLinkClick()">Contatti</a>
+    <a href="#" id="login-btn-mobile" onclick="openLoginPopup(); closeMobileMenuOnLinkClick();">Accedi</a>
   </div>
 </header>
 
@@ -94,8 +121,10 @@
       <input
               type="email"
               id="login-email-popup"
-              class="form-control"
-              required
+              name="login-email" /* NAME AGGIUNTO */
+      class="form-control"
+      required
+      autocomplete="email"
       />
     </div>
     <div class="form-group">
@@ -103,10 +132,13 @@
       <input
               type="password"
               id="login-password-popup"
-              class="form-control"
-              required
+              name="login-password" /* NAME AGGIUNTO */
+      class="form-control"
+      required
+      autocomplete="current-password"
       />
     </div>
+    <div id="login-error-message-popup" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
     <div class="form-actions">
       <button type="submit" class="btn-popup">Accedi</button>
     </div>
@@ -117,8 +149,21 @@
       <input
               type="text"
               id="register-name-popup"
-              class="form-control"
-              required
+              name="register-name" /* NAME AGGIUNTO */
+      class="form-control"
+      required
+      autocomplete="given-name"
+      />
+    </div>
+    <div class="form-group">
+      <label for="register-surname-popup">Cognome</label> {/* Aggiunto per coerenza se registrati.php lo richiede */}
+      <input
+              type="text"
+              id="register-surname-popup"
+              name="register-surname" /* NAME AGGIUNTO */
+      class="form-control"
+      required
+      autocomplete="family-name"
       />
     </div>
     <div class="form-group">
@@ -126,8 +171,10 @@
       <input
               type="email"
               id="register-email-popup"
-              class="form-control"
-              required
+              name="register-email" /* NAME AGGIUNTO */
+      class="form-control"
+      required
+      autocomplete="email"
       />
     </div>
     <div class="form-group">
@@ -135,11 +182,19 @@
       <input
               type="password"
               id="register-password-popup"
-              class="form-control"
-              required
-              minlength="8"
+              name="register-password" /* NAME AGGIUNTO */
+      class="form-control"
+      required
+      minlength="8"
+      autocomplete="new-password"
       />
+      <small>Minimo 8 caratteri.</small>
     </div>
+    <div class="terms-checkbox mb-3"> {/* Aggiunto per coerenza se registrati.php lo richiede */}
+      <input type="checkbox" id="register-terms-popup" name="register-terms" required>
+      <label for="register-terms-popup">Accetto i <a href="/termini" target="_blank">termini e condizioni</a></label>
+    </div>
+    <div id="register-error-message-popup" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
     <div class="form-actions">
       <button type="submit" class="btn-popup">Registrati</button>
     </div>
@@ -158,49 +213,68 @@
     return document.getElementById(id);
   }
 
-  // --- Navbar & Mobile Menu (Codice Completo) ---
+  const defaultUserIconPath = 'uploads/icons/default_user.png'; // Definisci icona di default per localStorage
+
+  // --- Navbar & Mobile Menu ---
   const navbarContainerEl = gebi("navbarContainer");
   const mobileMenuEl = gebi("mobileMenu");
-  const hamburgerEl = document.querySelector(".hamburger");
+  const hamburgerEl = document.querySelector(".navbar .hamburger"); // Selettore più specifico
   let lastScrollNav = 0;
+
   if (navbarContainerEl) {
     window.addEventListener("scroll", function () {
-      const currentScroll = window.pageYOffset;
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
       if (currentScroll <= 50) {
         navbarContainerEl.classList.remove("hidden");
+        lastScrollNav = 0;
         return;
       }
-      if (
-              currentScroll > lastScrollNav &&
-              currentScroll > navbarContainerEl.offsetHeight
-      ) {
+      if (currentScroll > lastScrollNav && !navbarContainerEl.classList.contains("hidden")) {
         navbarContainerEl.classList.add("hidden");
-      } else {
+      } else if (currentScroll < lastScrollNav && navbarContainerEl.classList.contains("hidden")) {
         navbarContainerEl.classList.remove("hidden");
       }
-      lastScrollNav = currentScroll <= 0 ? 0 : currentScroll;
+      lastScrollNav = currentScroll;
     });
   }
+
   function toggleMobileMenu() {
     if (mobileMenuEl && hamburgerEl) {
-      mobileMenuEl.classList.toggle("open");
-      document.body.style.overflow = mobileMenuEl.classList.contains("open")
-              ? "hidden"
-              : "";
+      const isOpen = mobileMenuEl.classList.toggle("open");
+      hamburgerEl.classList.toggle("open"); // Per stile hamburger (es. X)
+      hamburgerEl.setAttribute("aria-expanded", String(isOpen));
+      document.body.style.overflow = isOpen ? "hidden" : "";
     }
   }
-  function closeMobileMenuOnLinkClick() {
-    if (mobileMenuEl && mobileMenuEl.classList.contains("open"))
-      toggleMobileMenu();
-  }
-  if (hamburgerEl) hamburgerEl.addEventListener("click", toggleMobileMenu);
-  document
-          .querySelectorAll("#mobileMenu a")
-          .forEach((link) =>
-                  link.addEventListener("click", closeMobileMenuOnLinkClick)
-          );
 
-  // --- Login Popup (Codice Completo) ---
+  function closeMobileMenuOnLinkClick() {
+    if (mobileMenuEl && hamburgerEl && mobileMenuEl.classList.contains("open")) {
+      mobileMenuEl.classList.remove("open");
+      hamburgerEl.classList.remove("open");
+      hamburgerEl.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    }
+  }
+
+  if (hamburgerEl) hamburgerEl.addEventListener("click", toggleMobileMenu);
+
+  document.querySelectorAll("#mobileMenu a").forEach((link) => {
+    // Non serve più closeMobileMenuOnLinkClick separata se i link hanno già onclick
+    // Ma assicuriamoci che la logica di apertura popup Accedi funzioni bene con closeMobileMenu
+    if (link.id !== 'login-btn-mobile') { // login-btn-mobile ha già una sua logica onclick
+      link.addEventListener("click", closeMobileMenuOnLinkClick);
+    }
+  });
+  document.addEventListener('click', function(event) {
+    if (mobileMenuEl && mobileMenuEl.classList.contains('open') &&
+            hamburgerEl && !mobileMenuEl.contains(event.target) &&
+            !hamburgerEl.contains(event.target)) {
+      closeMobileMenuOnLinkClick();
+    }
+  });
+
+
+  // --- Login Popup ---
   const loginOverlay = gebi("loginOverlay"),
           loginPopup = gebi("loginPopup"),
           closeLoginPopupBtn = gebi("closeLoginPopupBtn");
@@ -208,14 +282,18 @@
           loginForms = document.querySelectorAll(".login-popup .login-form");
   const loginBtnHeader = gebi("login-btn-header"),
           loginBtnMobile = gebi("login-btn-mobile");
+  const loginErrorMessagePopup = gebi('login-error-message-popup');
+  const registerErrorMessagePopup = gebi('register-error-message-popup');
+
+
   function openLoginPopup() {
     if (loginOverlay && loginPopup) {
       loginOverlay.classList.add("active");
       loginPopup.classList.add("active");
       document.body.style.overflow = "hidden";
+      resetFormErrors();
       const activeForm = loginPopup.querySelector(".login-form.active");
-      if (activeForm)
-        activeForm.querySelector('input:not([type="hidden"])')?.focus();
+      if (activeForm) activeForm.querySelector('input:not([type="hidden"])')?.focus();
     }
   }
   function closeLoginPopup() {
@@ -223,19 +301,33 @@
       loginOverlay.classList.remove("active");
       loginPopup.classList.remove("active");
       document.body.style.overflow = "";
+      resetFormErrors();
     }
   }
-  if (loginBtnHeader)
-    loginBtnHeader.addEventListener("click", openLoginPopup);
-  if (loginBtnMobile)
-    loginBtnMobile.addEventListener("click", (e) => {
-      e.preventDefault();
-      openLoginPopup();
-      if (mobileMenuEl.classList.contains("open")) toggleMobileMenu();
+
+  function resetFormErrors() {
+    loginForms.forEach(form => {
+      form.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border'));
     });
-  if (closeLoginPopupBtn)
-    closeLoginPopupBtn.addEventListener("click", closeLoginPopup);
-  if (loginOverlay) loginOverlay.addEventListener("click", closeLoginPopup);
+    if (loginErrorMessagePopup) loginErrorMessagePopup.style.display = 'none';
+    if (registerErrorMessagePopup) registerErrorMessagePopup.style.display = 'none';
+  }
+
+
+  if (loginBtnHeader) loginBtnHeader.addEventListener("click", openLoginPopup);
+  if (loginBtnMobile) {
+    loginBtnMobile.addEventListener("click", (e) => { // Assicurati che openLoginPopup e closeMobileMenu siano chiamate
+      e.preventDefault();
+      closeMobileMenuOnLinkClick(); // Chiude prima il menu mobile
+      openLoginPopup(); // Poi apre il popup
+    });
+  }
+
+  if (closeLoginPopupBtn) closeLoginPopupBtn.addEventListener("click", closeLoginPopup);
+  if (loginOverlay) loginOverlay.addEventListener("click", (e) => {
+    if (e.target === loginOverlay) closeLoginPopup();
+  });
+
   loginTabs.forEach((tab) => {
     tab.addEventListener("click", function () {
       loginTabs.forEach((t) => t.classList.remove("active"));
@@ -250,15 +342,17 @@
         targetForm.classList.add("active");
         targetForm.querySelector('input:not([type="hidden"])')?.focus();
       }
+      resetFormErrors();
     });
   });
 
-  // --- User Dropdown & Logic (Codice Completo) ---
+  // --- User Dropdown & Logic ---
   const userDropdownContainerEl = gebi("userDropdownContainer"),
           userBtnEl = userDropdownContainerEl?.querySelector(".user-btn");
-  let currentUser = null;
+  let currentUser = null; // Sarà popolato da localStorage o dopo login
   const logoutBtnDropdown = gebi("logout-btn-dropdown");
-  if (userBtnEl)
+
+  if (userBtnEl) {
     userBtnEl.addEventListener("click", (e) => {
       e.stopPropagation();
       userDropdownContainerEl.classList.toggle("show");
@@ -267,6 +361,7 @@
               userDropdownContainerEl.classList.contains("show").toString()
       );
     });
+  }
   document.addEventListener("click", (e) => {
     if (
             userDropdownContainerEl?.classList.contains("show") &&
@@ -276,70 +371,228 @@
       userBtnEl?.setAttribute("aria-expanded", "false");
     }
   });
+
   function updateNavbarUserUI() {
-    const navbarAvatarEl = gebi("navbar-avatar"),
-            navbarUsernameEl = gebi("navbar-username");
-    if (currentUser) {
-      if (navbarAvatarEl)
-        navbarAvatarEl.textContent = currentUser.avatar || "👤";
-      if (navbarUsernameEl)
-        navbarUsernameEl.textContent = currentUser.nome || "Utente";
-      if (userDropdownContainerEl)
-        userDropdownContainerEl.style.display = "inline-block";
+    const navbarAvatarEl = gebi("navbar-avatar"); // Questo è uno SPAN in eventiincorso.html
+    const navbarUsernameEl = gebi("navbar-username");
+
+    if (currentUser && currentUser.nome) { // Controlla currentUser e currentUser.nome
+      if (navbarAvatarEl) {
+        // Se currentUser.iconPath esiste E navbarAvatarEl ha un figlio img, aggiorna src.
+        // Altrimenti, usa il testo o l'avatar di testo.
+        const imgAvatar = navbarAvatarEl.querySelector('img');
+        if (imgAvatar && currentUser.iconPath) {
+          imgAvatar.src = currentUser.iconPath;
+          imgAvatar.alt = `Icona di ${currentUser.nome}`;
+          imgAvatar.style.display = ''; // Assicura sia visibile
+          // Potresti voler nascondere il testo di fallback se l'immagine carica
+          const textNode = Array.from(navbarAvatarEl.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+          if (textNode) textNode.textContent = '';
+        } else {
+          // Fallback a testo se non c'è img o iconPath, o se lo span non è predisposto per img
+          navbarAvatarEl.textContent = currentUser.avatar || (currentUser.nome ? currentUser.nome.charAt(0).toUpperCase() : "👤");
+        }
+      }
+      if (navbarUsernameEl) navbarUsernameEl.textContent = currentUser.nome;
+
+      if (userDropdownContainerEl) userDropdownContainerEl.style.display = "inline-block";
       if (loginBtnHeader) loginBtnHeader.style.display = "none";
-      if (loginBtnMobile) loginBtnMobile.style.display = "none";
+      if (loginBtnMobile) { // loginBtnMobile è un link <a> ora.
+        const mobileLoginLink = gebi('login-btn-mobile');
+        if(mobileLoginLink) mobileLoginLink.style.display = "none";
+      }
     } else {
-      if (userDropdownContainerEl)
-        userDropdownContainerEl.style.display = "none";
+      if (navbarAvatarEl) { // Reset avatar allo stato di default (testo o img di default)
+        const imgAvatar = navbarAvatarEl.querySelector('img');
+        if (imgAvatar) {
+          imgAvatar.src = defaultUserIconPath; // o un placeholder
+          imgAvatar.alt = 'User Icon';
+        } else {
+          navbarAvatarEl.textContent = "👤";
+        }
+      }
+      if (navbarUsernameEl) navbarUsernameEl.textContent = "Utente";
+      if (userDropdownContainerEl) userDropdownContainerEl.style.display = "none";
       if (loginBtnHeader) loginBtnHeader.style.display = "inline-block";
-      if (loginBtnMobile) {
-        loginBtnMobile.style.display = "block";
-        loginBtnMobile.textContent = "Accedi";
+
+      const mobileLoginLink = gebi('login-btn-mobile');
+      if(mobileLoginLink) {
+        mobileLoginLink.style.display = "block"; // O 'inline-block' a seconda del layout del menu mobile
+        // loginBtnMobile.textContent = "Accedi"; // Già così
       }
     }
   }
-  gebi("loginFormPopup")?.addEventListener("submit", (e) => {
+
+
+  // --- LOGIN FORM SUBMISSION (MODIFICATO) ---
+  gebi("loginFormPopup")?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = gebi("login-email-popup").value;
-    currentUser = {
-      nome: email.split("@")[0] || "Utente Loggato",
-      avatar: "🧘",
-    };
-    localStorage.setItem("userDataEFF", JSON.stringify(currentUser));
-    updateNavbarUserUI();
-    closeLoginPopup();
-    const p = localStorage.getItem("pending_booking_event_id_eff");
-    if (
-            p &&
-            confirm(`Login OK. Completare prenotazione per evento ${p}?`)
-    ) {
+    const loginButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = loginButton.innerHTML;
+    loginButton.disabled = true;
+    loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>';
+
+    const emailInput = gebi('login-email-popup');
+    const passwordInput = gebi('login-password-popup');
+    emailInput.classList.remove('error-border');
+    passwordInput.classList.remove('error-border');
+    if(loginErrorMessagePopup) loginErrorMessagePopup.style.display = 'none';
+
+    try {
+      const response = await fetch('login.php', {
+        method: 'POST',
+        body: new FormData(e.target) // Assicura che gli input abbiano l'attributo 'name'
+      });
+
+      if (!response.ok) {
+        let errorData = { message: `Errore HTTP: ${response.status}` };
+        try { errorData = await response.json(); } catch (e) { /* Ignora se non è JSON */ }
+        throw new Error(errorData.message || `Errore HTTP: ${response.status}`);
+      }
+      const result = await response.json();
+
+      if (result.success) {
+        const userDataToStore = {
+          nome: result.nome,
+          email: result.email,
+          iconPath: defaultUserIconPath // login.php non fornisce iconPath, lo prenderemo da areapersonale o user_profile_api
+        };
+        localStorage.setItem('userDataEFF', JSON.stringify(userDataToStore));
+
+        // Aggiorna currentUser per l'UI immediata (opzionale, dato il redirect)
+        currentUser = userDataToStore;
+        // updateNavbarUserUI(); // Chiamata opzionale, la pagina ricaricherà comunque
+
+        closeLoginPopup();
+        // REINDIRIZZAMENTO CORRETTO
+        window.location.href = result.is_admin ? 'indexadmin.html' : 'eventiincorsoaccesso.html';
+      } else {
+        emailInput.classList.add('error-border');
+        passwordInput.classList.add('error-border');
+        if(loginErrorMessagePopup) {
+          loginErrorMessagePopup.textContent = result.message || "Credenziali non valide.";
+          loginErrorMessagePopup.style.display = 'block';
+        } else {
+          alert(result.message || "Credenziali non valide.");
+        }
+      }
+    } catch (error) {
+      emailInput.classList.add('error-border');
+      passwordInput.classList.add('error-border');
+      if(loginErrorMessagePopup) {
+        loginErrorMessagePopup.textContent = "Errore di connessione o risposta non valida.";
+        loginErrorMessagePopup.style.display = 'block';
+      } else {
+        alert("Errore di connessione o risposta non valida dal server.");
+      }
+      console.error("Errore login:", error);
+    } finally {
+      loginButton.disabled = false;
+      loginButton.innerHTML = originalButtonText;
     }
-    localStorage.removeItem("pending_booking_event_id_eff");
   });
-  gebi("registerFormPopup")?.addEventListener("submit", (e) => {
+
+  // --- REGISTER FORM SUBMISSION (MODIFICATO) ---
+  gebi("registerFormPopup")?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    currentUser = {
-      nome: gebi("register-name-popup").value || "Nuovo Utente",
-      avatar: "👤",
-    };
-    localStorage.setItem("userDataEFF", JSON.stringify(currentUser));
-    updateNavbarUserUI();
-    closeLoginPopup();
+    const registerButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = registerButton.innerHTML;
+    registerButton.disabled = true;
+    registerButton.innerHTML = 'Registrazione... <div class="spinner-mini-light"></div>';
+    if(registerErrorMessagePopup) registerErrorMessagePopup.style.display = 'none';
+    e.target.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border'));
+
+
+    try {
+      const response = await fetch('registrati.php', {
+        method: 'POST',
+        body: new FormData(e.target) // Assicura che gli input abbiano l'attributo 'name'
+      });
+
+      if (!response.ok) {
+        let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+        try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; }
+        catch(err) { /* Ignora */ }
+        throw new Error(errorMsg);
+      }
+      const result = await response.json();
+
+      if (result.success) {
+        alert(result.message || "Registrazione completata! Ora puoi effettuare il login.");
+        // Passa automaticamente al tab di login
+        document.querySelector('.login-tab[data-tab="login"]').click();
+        gebi('login-email-popup').value = gebi('register-email-popup').value; // Precompila email
+        gebi('registerFormPopup').reset();
+      } else {
+        if(registerErrorMessagePopup) {
+          registerErrorMessagePopup.textContent = result.message || "Errore durante la registrazione.";
+          registerErrorMessagePopup.style.display = 'block';
+        } else {
+          alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+        }
+        // Potresti voler evidenziare campi specifici se il backend fornisce dettagli
+        if (result.errors) {
+          for (const field in result.errors) {
+            const inputElement = gebi(`register-${field}-popup`) || e.target.elements[`register-${field}`];
+            if (inputElement) {
+              inputElement.classList.add('error-border');
+            }
+          }
+        }
+      }
+    } catch (error) {
+      if(registerErrorMessagePopup) {
+        registerErrorMessagePopup.textContent = "Errore: " + error.message;
+        registerErrorMessagePopup.style.display = 'block';
+      } else {
+        alert("Errore durante la registrazione: " + error.message);
+      }
+      console.error("Dettaglio errore registrazione:", error);
+    } finally {
+      registerButton.disabled = false;
+      registerButton.innerHTML = originalButtonText;
+    }
   });
+
+
   function logout() {
     currentUser = null;
     localStorage.removeItem("userDataEFF");
     updateNavbarUserUI();
+    // Se sei su una pagina "accesso" e fai logout, potresti voler reindirizzare a quella non "accesso"
+    if (window.location.pathname.includes('accesso.html')) {
+      window.location.href = window.location.pathname.replace('accesso.html', '.html');
+    }
   }
+
   function checkLoginStatusOnLoad() {
-    const d = localStorage.getItem("userDataEFF");
-    currentUser = d ? JSON.parse(d) : null;
+    const userDataString = localStorage.getItem("userDataEFF");
+    if (userDataString) {
+      try {
+        currentUser = JSON.parse(userDataString);
+        // Assicurati che currentUser abbia la struttura attesa da updateNavbarUserUI,
+        // specialmente se proviene da un login precedente con una struttura diversa.
+        // Per eventiincorso.html, updateNavbarUserUI si aspetta .nome e .avatar (testuale).
+        // Se localStorage ha iconPath, possiamo adattarlo o usare un default.
+        if (currentUser && !currentUser.avatar && currentUser.iconPath) { // Adattamento per la UI di questa pagina
+          currentUser.avatar = currentUser.nome ? currentUser.nome.charAt(0).toUpperCase() : "👤";
+        }
+      } catch (e) {
+        console.error("Errore parsing userDataEFF da localStorage:", e);
+        currentUser = null;
+        localStorage.removeItem("userDataEFF"); // Rimuovi dati corrotti
+      }
+    } else {
+      currentUser = null;
+    }
     updateNavbarUserUI();
   }
-  if (logoutBtnDropdown)
-    logoutBtnDropdown.addEventListener("click", logout);
+  if (logoutBtnDropdown) logoutBtnDropdown.addEventListener("click", (e) => {
+    e.preventDefault();
+    logout();
+  });
 
-  // --- Logica Caricamento Eventi & Morphing Volantino ---
+  // --- Logica Caricamento Eventi & Morphing Volantino (INVARIATA DAL TUO CODICE ORIGINALE) ---
   const volantinoMorphOverlay = gebi("volantinoMorphOverlay");
   let morphingCard = null;
   let originalCardForMorph = null;
@@ -350,7 +603,7 @@
     if (loadingIndicator) loadingIndicator.classList.add("visible");
     if (eventsGrid) eventsGrid.innerHTML = "";
     try {
-      const response = await fetch("get_events.php");
+      const response = await fetch("get_events.php"); // Assumendo che get_events.php sia accessibile dalla root
       const responseText = await response.text();
       if (!response.ok)
         throw new Error(
@@ -369,7 +622,7 @@
       if (!eventsGrid) return;
       if (result.data.length === 0) {
         eventsGrid.innerHTML =
-                '<p class="no-events">Nessun evento in programma.</p>';
+                '<p class="no-events" style="text-align:center; padding:20px;">Nessun evento in programma.</p>';
       } else {
         result.data.forEach((event) =>
                 eventsGrid.appendChild(createEventCard(event))
@@ -378,7 +631,7 @@
     } catch (error) {
       console.error("loadEvents err:", error);
       if (eventsGrid)
-        eventsGrid.innerHTML = `<div class="error-message" style="width:100%;"><p><strong>Errore:</strong> ${error.message}</p><button onclick="loadEvents()" class="btn-popup">Riprova</button></div>`;
+        eventsGrid.innerHTML = `<div class="error-message" style="width:100%; text-align:center; padding:20px;"><p><strong>Errore:</strong> ${error.message}</p><button onclick="loadEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></div>`;
     } finally {
       if (loadingIndicator) loadingIndicator.classList.remove("visible");
     }
@@ -390,13 +643,26 @@
     cardOriginal.dataset.eventId = event.idevento;
     let imageSrc = event.immagine_url?.trim()
             ? event.immagine_url
-            : "images/default-event.jpg";
+            : "images/default-event.jpg"; // Assicurati che questo path sia corretto
     let volantinoBtnHtml = "";
     if (event.volantino_url?.trim()) {
-      volantinoBtnHtml = `<button class="card-btn btn-visualizza-volantino"
+      // NOTA: è stato rimosso "Volantino</button>" dal data-copertina-url qui sotto, sembrava un typo.
+      volantinoBtnHtml = `<button class="card-btn btn-visualizza-volantino card-btn-secondary"
                                         data-volantino-url="${event.volantino_url}"
-                                        data-copertina-url="${imageSrc}">Visualizza Volantino</button>`;
+                                        data-copertina-url="${imageSrc}">Volantino</button>`;
     }
+
+    // Modifica per il bottone "Prenota / Dettagli / Esaurito"
+    let primaryButtonHtml = '';
+    if (!event.flagprenotabile) { // Se l'evento non è prenotabile (flag a 0 o false)
+      primaryButtonHtml = `<a href="evento_dettaglio.html?id=${event.idevento}" class="card-btn card-btn-primary">Dettagli</a>`;
+    } else if (parseInt(event.posti_disponibili) === 0) { // Se è prenotabile ma i posti sono esauriti
+      primaryButtonHtml = `<button class="card-btn card-btn-primary" disabled>Esaurito</button>`;
+    } else { // Se è prenotabile e ci sono posti
+      primaryButtonHtml = `<button class="card-btn card-btn-primary btn-prenota-rapido" data-event-id="${event.idevento}">Prenota</button>`;
+    }
+
+
     cardOriginal.innerHTML = `
             <div class="card-image-container">
                 <img src="${imageSrc}" alt="Copertina: ${
@@ -420,8 +686,8 @@
                 <p class="card-description">${
             event.descrizione || "Nessuna descrizione breve."
     }</p>
-                <p class="card-info"><b>Posti:</b> <span class="posti-disponibili">${
-            event.posti_disponibili ?? "N/D"
+                <p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">${
+            event.posti_disponibili !== null ? (parseInt(event.posti_disponibili) > 0 ? event.posti_disponibili : 'Esaurito') : 'N/D'
     }</span>${
             event.costo !== null
                     ? parseFloat(event.costo) > 0
@@ -431,30 +697,20 @@
                                     : ""
                     : ""
     }</p>
-                <div class="card-actions">
+                <div class="card-actions ${!volantinoBtnHtml ? 'single-action' : ''}">
                     ${volantinoBtnHtml}
-                    <button class="card-btn card-btn-primary btn-prenota-rapido" data-event-id="${
-            event.idevento
-    }" ${
-            parseInt(event.posti_disponibili) === 0 || !event.flagprenotabile
-                    ? "disabled"
-                    : ""
-    }>
-                        ${
-            !event.flagprenotabile
-                    ? "Info Dettagli"
-                    : parseInt(event.posti_disponibili) === 0
-                            ? "Esaurito"
-                            : "Prenota"
-    }
-                    </button>
+                    ${primaryButtonHtml}
                 </div>
             </div>`;
-    cardOriginal
-            .querySelector(".btn-prenota-rapido")
-            ?.addEventListener("click", function () {
-              handleRapidBooking(this, event.idevento);
-            });
+
+    // Aggiungi event listener solo se il bottone "Prenota" esiste ed è attivo
+    const prenotaBtn = cardOriginal.querySelector(".btn-prenota-rapido");
+    if (prenotaBtn && !prenotaBtn.disabled) {
+      prenotaBtn.addEventListener("click", function () {
+        handleRapidBooking(this, event.idevento, event.titolo);
+      });
+    }
+
     cardOriginal
             .querySelector(".btn-visualizza-volantino")
             ?.addEventListener("click", function () {
@@ -478,17 +734,16 @@
     const rect = originalCardForMorph.getBoundingClientRect();
 
     morphingCard = document.createElement("article");
-    morphingCard.className = "card morph-active-card preparing-morph";
+    morphingCard.className = "card morph-active-card"; // Rimosso preparing-morph per ora
 
     morphingCard.style.width = `${rect.width}px`;
     morphingCard.style.height = `${rect.height}px`;
-    morphingCard.style.top = `${rect.top}px`;
-    morphingCard.style.left = `${rect.left}px`;
+    morphingCard.style.top = `${rect.top + window.scrollY}px`; // Aggiunto scrollY
+    morphingCard.style.left = `${rect.left + window.scrollX}px`; // Aggiunto scrollX
 
     const morphContentWrapper = document.createElement("div");
     morphContentWrapper.className = "morph-content-wrapper";
 
-    // Immagine di copertina (per il morph iniziale)
     const copertinaContainer = document.createElement("div");
     copertinaContainer.className = "card-image-container-morph";
     const imgCopertina = document.createElement("img");
@@ -496,20 +751,22 @@
     imgCopertina.alt = "Copertina Evento";
     copertinaContainer.appendChild(imgCopertina);
 
-    // Contenuto testuale originale (per la visualizzazione iniziale durante lo zoom)
     const cardContentOriginal =
             originalCardForMorph.querySelector(".card-content");
     let cardContentCloned = null;
     if (cardContentOriginal) {
       cardContentCloned = cardContentOriginal.cloneNode(true);
-      cardContentCloned.className = "card-content-morph"; // Applica classe per controllo transizione
-      // Rimuovi/disabilita bottoni nel contenuto clonato
-      cardContentCloned.querySelectorAll("button").forEach((btn) => {
-        const newBtn = btn.cloneNode(true); // Rimuove listener
+      cardContentCloned.className = "card-content-morph";
+      cardContentCloned.querySelectorAll("button, a").forEach((btn) => {
+        const newBtn = btn.cloneNode(true);
         if (newBtn.classList.contains("btn-prenota-rapido")) {
           newBtn.addEventListener("click", () =>
-                  handleRapidBooking(newBtn, originalCardForMorph.dataset.eventId)
+                  handleRapidBooking(newBtn, originalCardForMorph.dataset.eventId, originalCardForMorph.querySelector('h3').textContent)
           );
+        } else if (newBtn.classList.contains("btn-visualizza-volantino")) {
+          newBtn.disabled = true; // Disabilita il bottone volantino dentro il morph
+        } else if (newBtn.tagName === 'A' && newBtn.href.includes('evento_dettaglio.html')) {
+          // Mantieni link ai dettagli, ma potrebbe essere ridondante
         } else {
           newBtn.disabled = true;
         }
@@ -517,15 +774,12 @@
       });
     }
 
-    // Contenitore per l'immagine del volantino o messaggio
     const volantinoContainer = document.createElement("div");
     volantinoContainer.className = "volantino-image-container-morph";
-    // Il contenuto del volantino (img o messaggio) verrà aggiunto dopo
 
     morphContentWrapper.appendChild(copertinaContainer);
-    if (cardContentCloned)
-      morphContentWrapper.appendChild(cardContentCloned);
-    morphContentWrapper.appendChild(volantinoContainer); // Aggiunto vuoto, verrà popolato
+    if (cardContentCloned) morphContentWrapper.appendChild(cardContentCloned);
+    morphContentWrapper.appendChild(volantinoContainer);
     morphingCard.appendChild(morphContentWrapper);
 
     const closeBtn = document.createElement("button");
@@ -537,183 +791,185 @@
 
     volantinoMorphOverlay.innerHTML = "";
     volantinoMorphOverlay.appendChild(morphingCard);
+
+    // Transizione per il mask e opacity dell'overlay
+    volantinoMorphOverlay.style.transitionDelay = '0s, 0.1s, 0.1s, 0s, 0s'; // Ritardi come da CSS .active
     volantinoMorphOverlay.classList.add("active");
+
     document.body.classList.add("volantino-morph-active");
-    if (originalCardForMorph)
-      originalCardForMorph.classList.add("original-morph-hidden");
+    if (originalCardForMorph) originalCardForMorph.classList.add("original-morph-hidden");
 
-    void morphingCard.offsetWidth; // Forza reflow
+    requestAnimationFrame(() => { // Permette al browser di applicare stili iniziali
+      requestAnimationFrame(() => { // Doppio RAF per sicurezza su alcuni browser
+        morphingCard.classList.add("zoomed-in"); // Applica la classe che fa lo zoom
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
 
-    morphingCard.classList.remove("preparing-morph");
-    morphingCard.classList.add("zoomed-in");
-    const finalWidth = Math.min(window.innerWidth * 0.9, 700);
-    const finalHeight = Math.min(window.innerHeight * 0.85, 800);
-    morphingCard.style.width = `${finalWidth}px`;
-    morphingCard.style.height = `${finalHeight}px`;
-    morphingCard.style.top = `${(window.innerHeight - finalHeight) / 2}px`;
-    morphingCard.style.left = `${(window.innerWidth - finalWidth) / 2}px`;
+        const cardAspectRatio = 700 / 800; // Esempio aspect ratio del volantino o card ingrandita
+        let finalWidth, finalHeight;
 
-    console.log("Volantino URL per il morph:", volantinoUrl);
-
-    // Popola e attiva il volantino dopo l'animazione di zoom
-    // La durata dello zoom è 0.6s nel CSS
-    setTimeout(() => {
-      if (!morphingCard) return;
-      morphingCard.classList.add("morphing"); // Attiva le transizioni per copertina e contenuto
-
-      volantinoContainer.innerHTML = ""; // Pulisci prima di aggiungere nuovo contenuto
-      if (volantinoUrl && volantinoUrl.trim() !== "") {
-        if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-          const imgVol = document.createElement("img");
-          imgVol.src = volantinoUrl;
-          imgVol.alt = "Volantino Evento";
-          // Non serve classe specifica se .volantino-image-container-morph img è già stilizzato
-          imgVol.onerror = () => {
-            console.error(
-                    "Errore caricamento immagine volantino:",
-                    volantinoUrl
-            );
-            volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Impossibile caricare volantino.</p><a href="${volantinoUrl}" target="_blank">Apri link</a></div>`;
-          };
-          volantinoContainer.appendChild(imgVol);
-        } else {
-          volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Volantino PDF/Link.</p><a href="${volantinoUrl}" target="_blank">Apri</a></div>`;
+        if (viewportWidth / viewportHeight > cardAspectRatio) { // Viewport più largo dell'immagine
+          finalHeight = Math.min(viewportHeight * 0.9, 800);
+          finalWidth = finalHeight * cardAspectRatio;
+        } else { // Viewport più alto dell'immagine
+          finalWidth = Math.min(viewportWidth * 0.9, 700);
+          finalHeight = finalWidth / cardAspectRatio;
         }
-      } else {
-        volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Volantino non disponibile.</p></div>`;
-      }
-      // Attiva la visibilità del volantino (che triggera l'opacità)
-      morphingCard.classList.add("volantino-visible");
-    }, parseFloat(getComputedStyle(morphingCard).transitionDuration.split(",")[0] || "0.6") * 1000); // Basato sulla durata della transizione di zoom
+        finalWidth = Math.max(finalWidth, rect.width); // Non più piccolo dell'originale
+        finalHeight = Math.max(finalHeight, rect.height);
+
+
+        morphingCard.style.width = `${finalWidth}px`;
+        morphingCard.style.height = `${finalHeight}px`;
+        morphingCard.style.top = `${(viewportHeight - finalHeight) / 2 + window.scrollY}px`;
+        morphingCard.style.left = `${(viewportWidth - finalWidth) / 2 + window.scrollX}px`;
+
+        // Popola e attiva il volantino dopo l'animazione di zoom
+        const zoomDuration = parseFloat(getComputedStyle(morphingCard).transitionDuration.split(",")[1] || getComputedStyle(morphingCard).transitionDuration || "0.55") * 1000;
+
+        setTimeout(() => {
+          if (!morphingCard) return;
+          morphingCard.classList.add("morphing");
+
+          volantinoContainer.innerHTML = "";
+          if (volantinoUrl && volantinoUrl.trim() !== "") {
+            if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+              const imgVol = document.createElement("img");
+              imgVol.src = volantinoUrl;
+              imgVol.alt = "Volantino Evento";
+              imgVol.onerror = () => {
+                volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Impossibile caricare il volantino.</p><a href="${volantinoUrl}" target="_blank" rel="noopener noreferrer">Apri link diretto</a></div>`;
+              };
+              volantinoContainer.appendChild(imgVol);
+            } else { // Assume sia un PDF o altro link
+              volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Il volantino è disponibile come file esterno.</p><a href="${volantinoUrl}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`;
+            }
+          } else {
+            volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Volantino non disponibile per questo evento.</p></div>`;
+          }
+          morphingCard.classList.add("volantino-visible");
+        }, zoomDuration);
+      });
+    });
   }
+
 
   function hideVolantinoWithMorph() {
-    if (morphingCard && volantinoMorphOverlay) {
-      morphingCard.classList.remove("volantino-visible"); // Inizia a nascondere il volantino
-      morphingCard.classList.remove("morphing"); // Ferma l'espansione dell'img di copertina e fa riapparire il contenuto
+    if (!morphingCard || !volantinoMorphOverlay || !originalCardForMorph) return;
 
-      // Fai riapparire il contenuto testuale originale (se era stato nascosto)
-      const clonedCardContent = morphingCard.querySelector(
-              ".card-content-morph"
-      );
-      if (clonedCardContent) {
-        clonedCardContent.style.display = ""; // O il suo display originale
-        setTimeout(() => {
-          // Permetti al display di applicarsi prima dell'opacità
-          if (clonedCardContent) clonedCardContent.style.opacity = "1";
-        }, 0);
-      }
-      const originalCopertinaContainer = morphingCard.querySelector(
-              ".card-image-container-morph"
-      );
-      if (originalCopertinaContainer) {
-        originalCopertinaContainer.style.height = "200px"; // Torna all'altezza originale
-        originalCopertinaContainer.style.borderRadius =
-                "var(--border-radius-medium) var(--border-radius-medium) 0 0";
-      }
+    morphingCard.classList.remove("volantino-visible");
+    morphingCard.classList.remove("morphing");
 
-      if (originalCardForMorph) {
-        const rect = originalCardForMorph.getBoundingClientRect();
-        morphingCard.style.width = `${rect.width}px`;
-        morphingCard.style.height = `${rect.height}px`;
-        morphingCard.style.top = `${rect.top}px`;
-        morphingCard.style.left = `${rect.left}px`;
-      }
-      morphingCard.classList.remove("zoomed-in");
+    // Ripristina la visualizzazione del contenuto originale nella card morphing (opzionale, se vuoi che si veda durante il restringimento)
+    const clonedContent = morphingCard.querySelector('.card-content-morph');
+    if (clonedContent) clonedContent.style.opacity = '1'; // O come era prima del morphing
+    const morphCopertina = morphingCard.querySelector('.card-image-container-morph');
+    if (morphCopertina) morphCopertina.style.height = '280px'; // Altezza originale della copertina nella card
 
-      const transitionDuration =
-              parseFloat(
-                      getComputedStyle(morphingCard).transitionDuration.split(",")[0] ||
-                      "0.6"
-              ) * 1000;
-      let transitionEnded = false;
+    const rect = originalCardForMorph.getBoundingClientRect();
+    morphingCard.style.width = `${rect.width}px`;
+    morphingCard.style.height = `${rect.height}px`;
+    morphingCard.style.top = `${rect.top + window.scrollY}px`;
+    morphingCard.style.left = `${rect.left + window.scrollX}px`;
+    morphingCard.classList.remove("zoomed-in");
 
-      function onTransitionEnd(e) {
-        if (
-                e.target === morphingCard &&
-                e.propertyName.includes("transform") &&
-                !transitionEnded
-        ) {
-          transitionEnded = true;
-          cleanUpMorphingCard();
-          if (morphingCard)
-            morphingCard.removeEventListener(
-                    "transitionend",
-                    onTransitionEnd
-            );
-        }
-      }
-      morphingCard.addEventListener("transitionend", onTransitionEnd);
 
-      setTimeout(() => {
-        if (
-                !transitionEnded &&
-                volantinoMorphOverlay.contains(morphingCard)
-        ) {
-          cleanUpMorphingCard();
-        }
-      }, transitionDuration + 100);
-    }
+    const overlayTransitionDuration = parseFloat(getComputedStyle(volantinoMorphOverlay).transitionDuration.split(",")[0] || "0.3") * 1000; // Durata transizione opacità overlay
+    const cardShrinkDuration = parseFloat(getComputedStyle(morphingCard).transitionDuration.split(",")[1] || getComputedStyle(morphingCard).transitionDuration || "0.55") * 1000;
+
+    // Rimuovi l'overlay *dopo* che la card è tornata al suo posto e l'overlay è diventato trasparente
+    // Usa la durata più lunga tra le due per il cleanup finale.
+    const cleanupDelay = Math.max(overlayTransitionDuration, cardShrinkDuration);
+
+    // Inizia la transizione dell'overlay (maschera e opacità) per farlo scomparire
+    volantinoMorphOverlay.style.transitionDelay = '0s, 0s, 0s, 0s, 0s'; // Resetta i ritardi per l'uscita
+    volantinoMorphOverlay.classList.remove("active");
+
+
+    setTimeout(() => {
+      cleanUpMorphingCard();
+    }, cleanupDelay + 50); // Aggiungi un piccolo buffer
   }
 
+
   function cleanUpMorphingCard() {
-    if (volantinoMorphOverlay.classList.contains("active")) {
-      volantinoMorphOverlay.classList.remove("active");
-      volantinoMorphOverlay.innerHTML = "";
-      document.body.classList.remove("volantino-morph-active");
-      if (originalCardForMorph)
-        originalCardForMorph.classList.remove("original-morph-hidden");
+    if (morphingCard) {
+      morphingCard.remove(); // Rimuove la card clippata dal DOM
       morphingCard = null;
+    }
+    if (volantinoMorphOverlay.classList.contains("active")) { // Controllo ridondante ma sicuro
+      volantinoMorphOverlay.classList.remove("active"); // Assicura sia rimosso
+    }
+    volantinoMorphOverlay.innerHTML = ""; // Pulisce overlay per sicurezza
+    document.body.classList.remove("volantino-morph-active");
+    if (originalCardForMorph) {
+      originalCardForMorph.classList.remove("original-morph-hidden");
       originalCardForMorph = null;
     }
   }
 
-  if (volantinoMorphOverlay)
-    volantinoMorphOverlay.addEventListener("click", (e) => {
-      if (e.target === volantinoMorphOverlay) hideVolantinoWithMorph();
-    });
 
-  function handleRapidBooking(buttonElement, eventId) {
+  if (volantinoMorphOverlay) {
+    volantinoMorphOverlay.addEventListener("click", (e) => {
+      if (e.target === volantinoMorphOverlay && morphingCard && morphingCard.classList.contains('zoomed-in')) {
+        hideVolantinoWithMorph();
+      }
+    });
+  }
+
+
+  function handleRapidBooking(buttonElement, eventId, eventTitle) {
     if (currentUser) {
-      alert(
-              `Prenotazione evento ${eventId} per ${currentUser.nome}. (Simulato)`
-      );
+      // Qui, invece di un alert, dovresti aprire il popup di prenotazione vero e proprio,
+      // passando eventId e eventTitle. Questo popup sarà gestito in eventiincorsoaccesso.html.
+      // Per ora, simuliamo che l'utente debba andare alla pagina accesso.
+      alert(`Per prenotare l'evento "${eventTitle}", effettua il login e vai alla sezione calendario attività dell'area riservata.`);
+      openLoginPopup(); // O reindirizza direttamente se preferisci
+      // Potresti salvare l'ID evento nel localStorage per riprenderlo dopo il login
+      localStorage.setItem("pending_booking_event_id_eff", eventId);
+
     } else {
       openLoginPopup();
+      // Salva l'ID evento per riprenderlo dopo il login, se necessario
       localStorage.setItem("pending_booking_event_id_eff", eventId);
     }
   }
+
   function formatDate(dateString) {
     if (!dateString) return "N/D";
     try {
       let date;
+      // Gestisce sia 'YYYY-MM-DD HH:MM:SS' che 'YYYY-MM-DD'
       if (/^\d{4}-\d{2}-\d{2}/.test(dateString)) {
-        const p = dateString.substring(0, 10).split("-");
-        date = new Date(Date.UTC(p[0], parseInt(p[1]) - 1, p[2]));
+        const parts = dateString.substring(0, 10).split("-");
+        // Mese è 0-indexed in JS Date constructor
+        date = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
       } else {
-        date = new Date(dateString);
+        date = new Date(dateString); // Fallback per altri formati, potrebbe non essere UTC
       }
-      if (isNaN(date.getTime())) return dateString;
+      if (isNaN(date.getTime())) return dateString; // Restituisce stringa originale se parsing fallisce
       return date.toLocaleDateString("it-IT", {
         day: "numeric",
         month: "long",
         year: "numeric",
-        timeZone: "UTC",
+        timeZone: 'UTC' // Importante se le date dal DB sono UTC e vuoi visualizzarle correttamente
       });
     } catch (e) {
-      return dateString;
+      console.warn("Errore formattazione data:", dateString, e);
+      return dateString; // Fallback alla stringa originale in caso di errore
     }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    gebi("currentYear").textContent = new Date().getFullYear();
+    const currentYearEl = gebi("currentYear");
+    if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
     checkLoginStatusOnLoad();
     loadEvents();
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         if (loginPopup?.classList.contains("active")) closeLoginPopup();
-        if (volantinoMorphOverlay?.classList.contains("active"))
-          hideVolantinoWithMorph();
+        if (volantinoMorphOverlay?.classList.contains("active")) hideVolantinoWithMorph();
       }
     });
   });
