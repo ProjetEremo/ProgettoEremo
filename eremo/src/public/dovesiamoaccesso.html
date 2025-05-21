@@ -3,17 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="images/logo.png" type="image/x-icon">
-    <title>Dove Siamo (Accesso) - Eremo Frate Francesco</title>
+    <link rel="icon" href="/images/logo.png" type="image/x-icon"> <title>Dove Siamo (Accesso) - Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Stile per l'avatar immagine nella navbar */
+        .user-avatar img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            vertical-align: middle;
+        }
+        /* Stili aggiuntivi per la mappa (se necessario, o mantieni quelli del tuo style.css) */
+        .map-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: flex-start; /* Allinea gli elementi all'inizio */
+        }
+        .map-container {
+            flex: 2; /* Lascia più spazio alla mappa */
+            min-width: 300px; /* Larghezza minima per la mappa */
+            height: 450px; /* Altezza fissa per la mappa */
+            border-radius: var(--border-radius-medium);
+            overflow: hidden; /* Per i bordi arrotondati dell'iframe */
+            box-shadow: var(--shadow-light);
+        }
+        .iframe-map {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .location-description {
+            flex: 1; /* Meno spazio alla descrizione */
+            min-width: 280px;
+        }
+        .location-description h2 { color: var(--primary); margin-top:0; }
+        .location-actions { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; }
+        .location-info-cards { margin-top: 3rem; }
+        .pb-0 { padding-bottom: 0 !important; }
+        .pt-0 { padding-top: 0 !important; }
+        .mb-4 { margin-bottom: 1.5rem !important; } /* Utilità per margine */
+    </style>
 </head>
 <body>
 
 <header class="navbar-container" id="navbarContainer">
     <nav class="navbar">
         <div class="logo">
-            <a href="indexaccesso.html"><span class="emoji">🏔️</span><h2>Eremo Frate Francesco</h2></a>
+            <a href="indexaccesso.html" style="text-decoration:none; color:inherit;"><span class="emoji">🏔️</span><h2>Eremo Frate Francesco</h2></a>
         </div>
         <div class="menu">
             <a href="eventiincorsoaccesso.html">Calendario attività</a>
@@ -26,8 +65,9 @@
         </div>
         <div class="right-menu">
             <div class="user-dropdown" id="userDropdownContainer">
-                <button class="user-btn" aria-haspopup="true" aria-expanded="false">
-                    <span class="user-avatar" id="navbar-avatar">👤</span>
+                <button class="user-btn" onclick="toggleUserMenu(event)" aria-haspopup="true" aria-expanded="false">
+                    <span class="user-avatar" id="navbar-avatar">
+                        <img src="/uploads/icons/default_user.png" alt="User Icon"> </span>
                     <span class="user-name" id="navbar-username">Utente</span>
                     <span class="dropdown-arrow">▼</span>
                 </button>
@@ -37,11 +77,10 @@
                     <a href="#" id="logout-link-dropdown">Esci</a>
                 </div>
             </div>
-            <button class="hamburger" aria-label="Toggle menu">☰</button>
+            <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
         </div>
     </nav>
     <div class="mobile-menu" id="mobileMenu">
-        <a href="chi-siamoaccesso.html" onclick="closeMobileMenu()">Chi siamo</a>
         <a href="eventiincorsoaccesso.html" onclick="closeMobileMenu()">Calendario attività</a>
         <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()">Archivio attività</a>
         <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
@@ -50,7 +89,7 @@
         <hr style="border-color: rgba(255,255,255,0.1);">
         <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
         <a href="gestisciprenotazioni.html" onclick="closeMobileMenu()">Le mie prenotazioni</a>
-        <a href="#" id="logout-link-mobile" onclick="closeMobileMenu()">Esci</a>
+        <a href="#" id="logout-link-mobile" onclick="handleLogout(); closeMobileMenu();">Esci</a>
     </div>
 </header>
 
@@ -60,9 +99,8 @@
     <div class="container section-padding pt-0">
         <section class="map-section">
             <div class="map-container">
-                {/* NOTA: Sostituisci src con il tuo link embed di Google Maps corretto e funzionante */}
                 <iframe class="iframe-map"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2789.6855555555555!2d9.729582315560000!3d45.751247979105000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47814f7b1e042899%3A0x257872162a925076!2sChiesa%20di%20San%20Vito%20Martire!5e0!3m2!1sit!2sit!4v1620000000000!5m2!1sit!2sit"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2790.096519106704!2d9.74895301550194!3d45.74823977910569!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47815f785a513f0b%3A0x95898415466aad5b!2sChiesa%20di%20San%20Vito!5e0!3m2!1sit!2sit!4v1620000000000!5m2!1sit!2sit"
                         allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
                         title="Mappa Eremo Frate Francesco">
                 </iframe>
@@ -74,7 +112,7 @@
                 <p><strong>Indicazioni:</strong> Dalla SP35, seguire per Nembro centro e poi per San Vito. L'eremo si trova nella parte alta della frazione.</p>
                 <p><strong>Parcheggio:</strong> Disponibile nelle vicinanze.</p>
                 <div class="location-actions">
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=Chiesa+di+San+Vito+Martire+Nembro" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=Chiesa+di+San+Vito+Nembro+BG" target="_blank" rel="noopener noreferrer" class="btn-primary">
                         <i class="fas fa-directions"></i> Indicazioni Stradali
                     </a>
                     <a href="contattiaccesso.html" class="btn-secondary">
@@ -117,110 +155,184 @@
 </footer>
 
 <script>
-    // --- SCRIPT GLOBALI PER PAGINE ACCESSO (COPIATO DA INDEXACCESSO.HTML FUNZIONANTE) ---
     let currentUser = null;
-    function updateNavbarUserUI() { /* ... implementazione (copia da indexaccesso.html) ... */
-        const navbarUsernameEl = document.getElementById('navbar-username');
-        const navbarAvatarEl = document.getElementById('navbar-avatar');
-        if (!navbarUsernameEl || !navbarAvatarEl) return;
-        if (currentUser) {
-            let displayName = 'Utente';
-            if (currentUser.nome && currentUser.nome.trim() !== '') {displayName = currentUser.nome;}
-            else if (currentUser.email) { displayName = currentUser.email.split('@')[0];}
-            navbarUsernameEl.textContent = displayName;
-            if (currentUser.avatar) navbarAvatarEl.textContent = currentUser.avatar;
-        } else {
-            navbarUsernameEl.textContent = 'Utente';
-            navbarAvatarEl.textContent = '👤';
+    const defaultUserIconPath = '/uploads/icons/default_user.png'; // Path ASSOLUTO
+
+    // --- FUNZIONI NAVBAR E SESSIONE UTENTE (STANDARD) ---
+    async function callApi(url, method = 'GET', data = null) {
+        const headers = { 'Content-Type': 'application/json' };
+        const options = { method, headers, credentials: 'same-origin' };
+        if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
+            options.body = JSON.stringify(data);
+        }
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                let errorData = { message: `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
+                try { errorData = await response.json(); } catch (e) { /* usa default */ }
+                const finalErrorMessage = errorData.message || `Errore del server: ${response.status} per ${url}`;
+                console.error("[callApi] Errore:", finalErrorMessage);
+                throw new Error(finalErrorMessage);
+            }
+            if (response.status === 204) return {};
+            return await response.json();
+        } catch (error) {
+            console.error(`[callApi] Fallimento chiamata API (rete/parse) a ${url}:`, error.message);
+            throw error;
         }
     }
-    function handleLogout() { /* ... implementazione (copia da indexaccesso.html) ... */
-        localStorage.removeItem('userDataEFF'); currentUser = null;
-        alert('Logout effettuato.'); window.location.href = 'index.html';
+
+    function updateNavbarUserUI() {
+        const navbarUsernameEl = document.getElementById('navbar-username');
+        const navbarAvatarImgEl = document.querySelector('#navbar-avatar img');
+        if (!navbarUsernameEl || !navbarAvatarImgEl) { return; }
+
+        if (currentUser && currentUser.email) {
+            let displayName = currentUser.nome || currentUser.email.split('@')[0];
+            navbarUsernameEl.textContent = displayName;
+            navbarAvatarImgEl.src = currentUser.iconPath || defaultUserIconPath;
+            navbarAvatarImgEl.alt = `Icona di ${displayName}`;
+            navbarAvatarImgEl.onerror = function() { this.src = defaultUserIconPath; };
+        } else {
+            navbarUsernameEl.textContent = 'Utente';
+            navbarAvatarImgEl.src = defaultUserIconPath;
+            navbarAvatarImgEl.alt = 'Icona utente predefinita';
+        }
     }
-    function setupUserSessionAndNavbar() { /* ... implementazione (copia da indexaccesso.html) ... */
+
+    function handleLogout() {
+        localStorage.removeItem('userDataEFF');
+        currentUser = null;
+        alert('Logout effettuato. Verrai reindirizzato alla homepage.');
+        window.location.href = 'index.html';
+    }
+
+    function setupUserSessionAndNavbar() {
         const userDataString = localStorage.getItem('userDataEFF');
         if (userDataString) {
             try {
                 currentUser = JSON.parse(userDataString);
-                if (!currentUser || !currentUser.email) { currentUser = null; localStorage.removeItem('userDataEFF');}
-            } catch (e) {currentUser = null; localStorage.removeItem('userDataEFF');}
-        } else {currentUser = null;}
+                if (!currentUser || typeof currentUser.email === 'undefined') {
+                    currentUser = null; localStorage.removeItem('userDataEFF');
+                }
+            } catch (e) {
+                currentUser = null; localStorage.removeItem('userDataEFF'); console.error("Errore parsing userDataEFF:", e);
+            }
+        } else {
+            currentUser = null;
+        }
         updateNavbarUserUI();
+
         const logoutLinkDropdown = document.getElementById('logout-link-dropdown');
         const logoutLinkMobile = document.getElementById('logout-link-mobile');
+
         if (logoutLinkDropdown) logoutLinkDropdown.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
-        if (logoutLinkMobile) logoutLinkMobile.addEventListener('click', (e) => { e.preventDefault(); if(typeof closeMobileMenu === 'function') closeMobileMenu(); handleLogout(); });
+        if (logoutLinkMobile) logoutLinkMobile.addEventListener('click', (e) => {
+            e.preventDefault();
+            if(typeof closeMobileMenu === 'function') closeMobileMenu();
+            handleLogout();
+        });
     }
+
+    async function fetchAndUpdateUserDisplayData() {
+        if (!currentUser || !currentUser.email) { return; }
+        try {
+            const apiUserData = await callApi('api/api_get_user_profile.php'); // Script profilo UTENTE è in /api/
+            if (apiUserData && apiUserData.success && apiUserData.data) {
+                const freshData = apiUserData.data;
+                currentUser.nome = freshData.nome || currentUser.nome;
+                currentUser.email = freshData.email || currentUser.email;
+                currentUser.iconPath = freshData.icon || defaultUserIconPath;
+                currentUser.cognome = freshData.cognome || (currentUser.cognome || '');
+
+                localStorage.setItem('userDataEFF', JSON.stringify(currentUser));
+                updateNavbarUserUI();
+            }
+        } catch (error) {
+            console.warn("DoveSiamo: Errore fetch profilo aggiornato per navbar:", error.message);
+        }
+    }
+    // --- FINE FUNZIONI NAVBAR E SESSIONE UTENTE ---
+
+    // --- Logica Menu (Scroll, Dropdown, Hamburger) ---
     let lastScroll = 0;
     const navbarContainer = document.getElementById('navbarContainer');
-    if (navbarContainer) { /* ... scroll logic ... */
+    if (navbarContainer) {
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
             if (currentScroll <= 50) { navbarContainer.classList.remove('hidden'); lastScroll = 0; return; }
             if (currentScroll > lastScroll && !navbarContainer.classList.contains('hidden')) {navbarContainer.classList.add('hidden');}
             else if (currentScroll < lastScroll && navbarContainer.classList.contains('hidden')) {navbarContainer.classList.remove('hidden');}
             lastScroll = currentScroll;
-        });
+        }, {passive: true});
     }
     const userDropdownButton = document.querySelector('#userDropdownContainer .user-btn');
     const userDropdownMenu = document.querySelector('#userDropdownContainer .dropdown-menu');
-    if (userDropdownButton && userDropdownMenu) { /* ... dropdown logic ... */
-        userDropdownButton.addEventListener('click', function(event) {
-            event.stopPropagation();
+    function toggleUserMenu(event) { // Chiamata da onclick nell'HTML
+        if(event) event.stopPropagation();
+        if (userDropdownMenu && userDropdownButton) {
             const isCurrentlyOpen = userDropdownMenu.style.display === 'block';
             userDropdownMenu.style.display = isCurrentlyOpen ? 'none' : 'block';
-            this.setAttribute('aria-expanded', String(!isCurrentlyOpen));
-        });
+            userDropdownButton.setAttribute('aria-expanded', String(!isCurrentlyOpen));
+        }
     }
-    document.addEventListener('click', function(event) { /* ... close dropdown on outside click ... */
+    const mobileMenu = document.getElementById("mobileMenu");
+    const hamburger = document.querySelector(".navbar .hamburger");
+    function toggleMobileMenu() { // Chiamata da onclick nell'HTML
+        if (mobileMenu && hamburger) {
+            const isOpen = mobileMenu.classList.toggle("open");
+            hamburger.classList.toggle("open");
+            hamburger.setAttribute("aria-expanded", isOpen.toString());
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+        }
+    }
+    function closeMobileMenu() { // Chiamata da onclick nei link del mobile menu
+        if (mobileMenu && hamburger && mobileMenu.classList.contains("open")) {
+            mobileMenu.classList.remove("open");
+            if(hamburger.classList.contains("open")){
+                hamburger.classList.remove("open");
+                hamburger.setAttribute("aria-expanded", "false");
+            }
+            document.body.style.overflow = '';
+        }
+    }
+    // Listener globale per chiudere i menu al click esterno
+    document.addEventListener('click', function(globalEvent) {
         if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
-            if (userDropdownButton && !userDropdownButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
+            const userDropdownContainer = document.getElementById('userDropdownContainer');
+            if (userDropdownContainer && !userDropdownContainer.contains(globalEvent.target)) {
                 userDropdownMenu.style.display = 'none';
                 if (userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
             }
         }
-    });
-    const mobileMenu = document.getElementById("mobileMenu");
-    const hamburger = document.querySelector(".navbar .hamburger");
-    if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
-    function toggleMobileMenu() { /* ... implementazione ... */
-        if (mobileMenu && hamburger) {
-            const isOpen = mobileMenu.classList.toggle("open");
-            hamburger.classList.toggle("open"); hamburger.setAttribute("aria-expanded", isOpen.toString());
-            document.body.style.overflow = isOpen ? 'hidden' : '';
-        }
-    }
-    function closeMobileMenu() { /* ... implementazione ... */
-        if (mobileMenu && hamburger) {
-            mobileMenu.classList.remove("open");
-            if (hamburger.classList.contains("open")) { hamburger.classList.remove("open"); hamburger.setAttribute("aria-expanded", "false");}
-            document.body.style.overflow = '';
-        }
-    }
-    document.addEventListener('click', function(event) { /* ... close mobile menu on outside click ... */
         if (mobileMenu && mobileMenu.classList.contains('open')) {
-            if (!mobileMenu.contains(event.target) && hamburger && !hamburger.contains(event.target)) {
+            if (mobileMenu.contains(globalEvent.target) && globalEvent.target.tagName === 'A' && globalEvent.target.closest('.mobile-menu')) {
+                closeMobileMenu();
+            } else if (hamburger && !mobileMenu.contains(globalEvent.target) && !hamburger.contains(globalEvent.target)) {
                 closeMobileMenu();
             }
         }
     });
-    // --- FINE SCRIPT GLOBALI ---
+    // --- FINE LOGICA MENU ---
 
-    document.addEventListener('DOMContentLoaded', () => {
-        setupUserSessionAndNavbar();
+    // --- Logica Specifica per dovesiamoaccesso.html ---
+    document.addEventListener('DOMContentLoaded', async () => { // Reso async
+        setupUserSessionAndNavbar(); // Setup iniziale da localStorage
 
-        if (!currentUser) {
-            console.log("Utente non loggato su dovesiamoaccesso.html. Reindirizzamento a index.html");
+        if (!currentUser) { // Reindirizza se non loggato
+            // console.log("Utente non loggato su dovesiamoaccesso.html. Reindirizzamento.");
             window.location.href = 'index.html';
             return;
         }
+
+        // Dopo il setup iniziale, e DOPO il controllo di redirect, chiama per aggiornare la navbar
+        await fetchAndUpdateUserDisplayData();
 
         const currentYearEl = document.getElementById('currentYear');
         if (currentYearEl) {
             currentYearEl.textContent = new Date().getFullYear();
         }
-        // Nessuna logica JS specifica aggiuntiva per dovesiamo.html oltre alla sessione.
+        // Qui non c'è altra logica JS specifica per caricare contenuti dinamici oltre alla navbar.
     });
 </script>
 
