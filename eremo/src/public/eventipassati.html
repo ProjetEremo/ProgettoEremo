@@ -6,6 +6,9 @@
   <link rel="icon" href="images/logo.png" type="image/x-icon" />
   <title>Archivio Attività - Eremo Frate Francesco</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
   <style>
     /* Stili specifici per i filtri, se necessario */
     .event-filters {
@@ -58,6 +61,7 @@
       bottom: 0;
       background-color: rgba(255, 255, 255, 0.8);
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       z-index: 10;
@@ -69,13 +73,25 @@
       visibility: visible;
       opacity: 1;
     }
-    .spinner {
+    .loading-overlay .spinner { /* Spinner per il caricamento pagina */
       border: 4px solid rgba(0, 0, 0, 0.1);
       width: 36px;
       height: 36px;
       border-radius: 50%;
       border-left-color: var(--primary);
       animation: spin 1s ease infinite;
+      margin-bottom: 0.5rem;
+    }
+    .spinner-mini-light { /* Spinner per bottoni */
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-radius: 50%;
+      border-top-color: #000;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-left: 5px;
     }
     @keyframes spin {
       to {
@@ -86,6 +102,44 @@
       text-align: center;
       padding: 2rem;
       color: var(--gray-dark);
+    }
+    .login-popup input.form-control.error-border {
+      border-color: var(--danger, red) !important;
+    }
+    .login-popup input:-webkit-autofill,
+    .login-popup input:-webkit-autofill:hover,
+    .login-popup input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0px 1000px var(--white, white) inset !important;
+      -webkit-text-fill-color: var(--dark, #333) !important;
+    }
+    .form-message.error {
+      color: var(--danger, red);
+      background-color: rgba(var(--danger-rgb, 231, 76, 60), 0.1);
+      border: 1px solid rgba(var(--danger-rgb, 231, 76, 60), 0.3);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.9em;
+      margin-top: 0.5em;
+      text-align: left;
+    }
+    .terms-checkbox {
+      text-align: left;
+      font-size: 0.9em;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      color: var(--gray-dark);
+    }
+    .terms-checkbox input[type="checkbox"] {
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+    .terms-checkbox label {
+      font-weight: normal;
+      color: var(--gray-dark); /* Stesso colore di style.css */
+    }
+    .terms-checkbox a { /* Stesso colore di style.css */
+      color: var(--primary);
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -171,6 +225,7 @@
     <div id="eventiGridContainer" style="position: relative">
       <div id="loadingIndicator" class="loading-overlay">
         <div class="spinner"></div>
+        <p style="margin-top: 0.5rem; color: var(--primary);">Caricamento eventi...</p>
       </div>
       <div class="card-grid" id="eventiPassatiGrid"></div>
     </div>
@@ -199,9 +254,10 @@
       <input
               type="email"
               id="login-email-popup"
-              name="email"
-              class="form-control"
-              required
+              name="login-email" /* NAME CORRETTO */
+      class="form-control"
+      required
+      autocomplete="email"
       />
     </div>
     <div class="form-group">
@@ -209,11 +265,13 @@
       <input
               type="password"
               id="login-password-popup"
-              name="password"
-              class="form-control"
-              required
+              name="login-password" /* NAME CORRETTO */
+      class="form-control"
+      required
+      autocomplete="current-password"
       />
     </div>
+    <div id="login-error-message-popup" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
     <div class="form-actions">
       <button type="submit" class="btn-popup">Accedi</button>
     </div>
@@ -224,9 +282,21 @@
       <input
               type="text"
               id="register-name-popup"
-              name="nome"
-              class="form-control"
-              required
+              name="register-name" /* NAME CORRETTO */
+      class="form-control"
+      required
+      autocomplete="given-name"
+      />
+    </div>
+    <div class="form-group">
+      <label for="register-surname-popup">Cognome</label> {/* CAMPO AGGIUNTO */}
+      <input
+              type="text"
+              id="register-surname-popup"
+              name="register-surname" /* NAME AGGIUNTO */
+      class="form-control"
+      required
+      autocomplete="family-name"
       />
     </div>
     <div class="form-group">
@@ -234,9 +304,10 @@
       <input
               type="email"
               id="register-email-popup"
-              name="email"
-              class="form-control"
-              required
+              name="register-email" /* NAME CORRETTO */
+      class="form-control"
+      required
+      autocomplete="email"
       />
     </div>
     <div class="form-group">
@@ -244,12 +315,19 @@
       <input
               type="password"
               id="register-password-popup"
-              name="password"
-              class="form-control"
-              required
-              minlength="8"
+              name="register-password" /* NAME CORRETTO */
+      class="form-control"
+      required
+      minlength="8"
+      autocomplete="new-password"
       />
+      <small>Minimo 8 caratteri.</small>
     </div>
+    <div class="terms-checkbox"> {/* CAMPO AGGIUNTO */}
+      <input type="checkbox" id="register-terms-popup" name="register-terms" required>
+      <label for="register-terms-popup">Accetto i <a href="/termini" target="_blank">termini e condizioni</a></label>
+    </div>
+    <div id="register-error-message-popup" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
     <div class="form-actions">
       <button type="submit" class="btn-popup">Registrati</button>
     </div>
@@ -272,8 +350,9 @@
   function gebi(id) {
     return document.getElementById(id);
   }
+  const defaultUserIconPath = '/uploads/icons/default_user.png'; // Definisci icona di default per localStorage
 
-  // --- Navbar Scroll Logic (invariato) ---
+  // --- Navbar Scroll Logic ---
   let lastScroll = 0;
   const navbarContainer = gebi("navbarContainer");
   if (navbarContainer) {
@@ -293,30 +372,41 @@
     }, false );
   }
 
-  // --- Mobile Menu Logic (invariato) ---
+  // --- Mobile Menu Logic ---
   const mobileMenu = gebi("mobileMenu");
-  const hamburger = document.querySelector(".hamburger");
+  const hamburger = document.querySelector(".navbar .hamburger");
   function toggleMobileMenu() {
     if (mobileMenu && hamburger) {
       const isOpen = mobileMenu.classList.toggle("open");
-      hamburger.setAttribute("aria-expanded", isOpen);
+      hamburger.classList.toggle("open");
+      hamburger.setAttribute("aria-expanded", String(isOpen));
       document.body.style.overflow = isOpen ? "hidden" : "";
     }
   }
   function closeMobileMenu() {
-    if (mobileMenu && hamburger) {
+    if (mobileMenu && hamburger && mobileMenu.classList.contains("open")) {
       mobileMenu.classList.remove("open");
+      hamburger.classList.remove("open");
       hamburger.setAttribute("aria-expanded", "false");
       document.body.style.overflow = "";
     }
   }
+  if (hamburger) hamburger.addEventListener("click", toggleMobileMenu);
+
+  document.querySelectorAll("#mobileMenu a").forEach((link) => {
+    if (link.id !== 'login-btn-mobile') {
+      link.addEventListener("click", closeMobileMenu);
+    }
+  });
   document.addEventListener("click", function (event) {
-    if ( mobileMenu && mobileMenu.classList.contains("open") && !mobileMenu.contains(event.target) && hamburger && !hamburger.contains(event.target) ) {
+    if ( mobileMenu && mobileMenu.classList.contains("open") &&
+            hamburger && !mobileMenu.contains(event.target) &&
+            !hamburger.contains(event.target) ) {
       closeMobileMenu();
     }
   });
 
-  // --- Login Popup Logic (invariato) ---
+  // --- Login Popup Logic ---
   const loginBtn = gebi("login-btn");
   const loginBtnMobile = gebi("login-btn-mobile");
   const loginOverlay = gebi("loginOverlay");
@@ -324,27 +414,36 @@
   const closePopupBtn = gebi("closePopupBtn");
   const loginTabs = document.querySelectorAll(".login-tab");
   const loginForms = document.querySelectorAll(".login-popup .login-form");
+  const loginErrorMessagePopup = gebi('login-error-message-popup');
+  const registerErrorMessagePopup = gebi('register-error-message-popup');
 
   function openLoginPopup() {
     if (loginOverlay) loginOverlay.classList.add("active");
     if (loginPopup) loginPopup.classList.add("active");
     document.body.style.overflow = "hidden";
+    resetFormErrors();
+    const activeForm = loginPopup.querySelector(".login-form.active");
+    if (activeForm) activeForm.querySelector('input:not([type="hidden"])')?.focus();
   }
 
   function closeLoginPopup() {
     if (loginOverlay) loginOverlay.classList.remove("active");
     if (loginPopup) loginPopup.classList.remove("active");
     document.body.style.overflow = "";
+    resetFormErrors();
+  }
+
+  function resetFormErrors() {
+    loginForms.forEach(form => {
+      form.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border'));
+    });
+    if (loginErrorMessagePopup) loginErrorMessagePopup.style.display = 'none';
+    if (registerErrorMessagePopup) registerErrorMessagePopup.style.display = 'none';
   }
 
   if (loginBtn) loginBtn.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); });
-  if (loginBtnMobile) {
-    loginBtnMobile.addEventListener("click", (e) => {
-      e.preventDefault();
-      closeMobileMenu();
-      openLoginPopup();
-    });
-  }
+  // loginBtnMobile ha già onclick="openLoginPopup(); closeMobileMenu();" nell'HTML
+
   if (closePopupBtn) closePopupBtn.addEventListener("click", closeLoginPopup);
   if (loginOverlay) loginOverlay.addEventListener("click", (e) => { if (e.target === loginOverlay) closeLoginPopup(); });
 
@@ -355,42 +454,70 @@
       tab.classList.add("active");
       loginForms.forEach((form) => {
         form.classList.remove("active");
-        if (form.id === `${tabId}FormPopup`) { // Aggiornato per ID univoci dei form nel popup
+        if (form.id === `${tabId}FormPopup`) {
           form.classList.add("active");
+          form.querySelector('input:not([type="hidden"])')?.focus();
         }
       });
+      resetFormErrors();
     });
   });
 
+  // --- LOGIN FORM SUBMISSION (MODIFICATO) ---
   gebi("loginFormPopup")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const loginButton = e.target.querySelector('button[type="submit"]');
-    const originalButtonText = loginButton.innerHTML;
+    const originalButtonText = loginButton.textContent;
     loginButton.disabled = true;
     loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>';
+
+    const emailInput = gebi('login-email-popup');
+    const passwordInput = gebi('login-password-popup');
+    emailInput.classList.remove('error-border');
+    passwordInput.classList.remove('error-border');
+    if(loginErrorMessagePopup) loginErrorMessagePopup.style.display = 'none';
 
     try {
       const response = await fetch('login.php', {
         method: 'POST',
         body: new FormData(e.target)
       });
-      if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
+
+      if (!response.ok) {
+        let errorData = { message: `Errore HTTP: ${response.status}` };
+        try { errorData = await response.json(); } catch (e) { /* Ignora se non è JSON */ }
+        throw new Error(errorData.message || `Errore HTTP: ${response.status}`);
+      }
       const result = await response.json();
 
       if (result.success) {
         const userDataToStore = {
           nome: result.nome,
           email: result.email,
-          iconPath: result.iconPath || '/uploads/icons/default_user.png',
+          iconPath: defaultUserIconPath
         };
         localStorage.setItem('userDataEFF', JSON.stringify(userDataToStore));
         closeLoginPopup();
-        window.location.href = result.is_admin ? 'indexadmin.html' : 'indexaccesso.html';
+        window.location.href = result.is_admin ? 'indexadmin.html' : 'eventipassatiaccesso.html'; // <<< REINDIRIZZAMENTO CORRETTO
       } else {
-        alert(result.message || "Credenziali non valide.");
+        emailInput.classList.add('error-border');
+        passwordInput.classList.add('error-border');
+        if(loginErrorMessagePopup) {
+          loginErrorMessagePopup.textContent = result.message || "Credenziali non valide.";
+          loginErrorMessagePopup.style.display = 'block';
+        } else {
+          alert(result.message || "Credenziali non valide.");
+        }
       }
     } catch (error) {
-      alert("Errore di connessione o risposta non valida dal server.");
+      emailInput.classList.add('error-border');
+      passwordInput.classList.add('error-border');
+      if(loginErrorMessagePopup) {
+        loginErrorMessagePopup.textContent = "Errore di connessione o risposta non valida dal server.";
+        loginErrorMessagePopup.style.display = 'block';
+      } else {
+        alert("Errore di connessione o risposta non valida dal server.");
+      }
       console.error("Errore login:", error);
     } finally {
       loginButton.disabled = false;
@@ -398,27 +525,35 @@
     }
   });
 
+  // --- REGISTER FORM SUBMISSION (MODIFICATO E COMPLETATO) ---
   gebi("registerFormPopup")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const registerButton = e.target.querySelector('button[type="submit"]');
-    const originalButtonText = registerButton.innerHTML;
+    const originalButtonText = registerButton.textContent;
     registerButton.disabled = true;
-    registerButton.innerHTML = 'Registrazione...';
+    registerButton.innerHTML = 'Registrazione... <div class="spinner-mini-light"></div>';
+    if(registerErrorMessagePopup) registerErrorMessagePopup.style.display = 'none';
+    e.target.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border'));
+
     try {
       const response = await fetch('registrati.php', {
         method: 'POST',
         body: new FormData(e.target)
       });
+
       if (!response.ok) {
         let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
         try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; }
-        catch(err) { /* Ignora */ }
+        catch(err) { /* Ignora se non è JSON */ }
         throw new Error(errorMsg);
       }
       const result = await response.json();
+
       if (result.success) {
         alert(result.message || "Registrazione completata! Ora puoi effettuare il login.");
-        document.querySelector('.login-tab[data-tab="login"]').click();
+        const loginTabButton = document.querySelector('.login-tab[data-tab="login"]');
+        if (loginTabButton) loginTabButton.click();
+
         const loginEmailPopup = gebi('login-email-popup');
         const registerEmailPopup = gebi('register-email-popup');
         if (loginEmailPopup && registerEmailPopup) {
@@ -426,10 +561,28 @@
         }
         e.target.reset();
       } else {
-        alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+        if(registerErrorMessagePopup) {
+          registerErrorMessagePopup.textContent = result.message || "Errore durante la registrazione.";
+          registerErrorMessagePopup.style.display = 'block';
+        } else {
+          alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+        }
+        if (result.errors) {
+          for (const fieldNameFromError in result.errors) {
+            const inputElement = e.target.elements[fieldNameFromError] || gebi(`register-${fieldNameFromError}-popup`);
+            if (inputElement) {
+              inputElement.classList.add('error-border');
+            }
+          }
+        }
       }
     } catch (error) {
-      alert("Errore durante la registrazione: " + error.message);
+      if(registerErrorMessagePopup) {
+        registerErrorMessagePopup.textContent = "Errore: " + error.message;
+        registerErrorMessagePopup.style.display = 'block';
+      } else {
+        alert("Errore durante la registrazione: " + error.message);
+      }
       console.error("Dettaglio errore registrazione:", error);
     } finally {
       registerButton.disabled = false;
@@ -438,12 +591,17 @@
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && loginPopup && loginPopup.classList.contains("active") ) {
-      closeLoginPopup();
+    if (event.key === "Escape") {
+      if (loginPopup && loginPopup.classList.contains("active") ) {
+        closeLoginPopup();
+      }
+      if (loginRequiredPopup && loginRequiredPopup.classList.contains("active")) {
+        closeLoginRequiredPopup();
+      }
     }
   });
 
-  // --- Logica Popup "Accesso Richiesto" ---
+  // --- Logica Popup "Accesso Richiesto" (invariata) ---
   const loginRequiredOverlay = gebi("loginRequiredOverlay");
   const loginRequiredPopup = gebi("loginRequiredPopup");
   const closeLoginRequiredPopupBtn = gebi("closeLoginRequiredPopupBtn");
@@ -459,7 +617,7 @@
   function closeLoginRequiredPopup() {
     if (loginRequiredOverlay) loginRequiredOverlay.classList.remove("active");
     if (loginRequiredPopup) loginRequiredPopup.classList.remove("active");
-    if (!loginPopup || !loginPopup.classList.contains("active")) { // Solo se il popup di login principale non è attivo
+    if (!loginPopup || !loginPopup.classList.contains("active")) {
       document.body.style.overflow = "";
     }
   }
@@ -475,17 +633,12 @@
   if (loginRequiredLoginBtn) {
     loginRequiredLoginBtn.addEventListener("click", () => {
       closeLoginRequiredPopup();
-      openLoginPopup(); // Apre il popup di login/registrazione principale
+      openLoginPopup();
     });
   }
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && loginRequiredPopup && loginRequiredPopup.classList.contains("active")) {
-      closeLoginRequiredPopup();
-    }
-  });
-
 
   // --- Logica Caricamento e Filtro Eventi Passati ---
+  // La funzione createPastEventCard è ripristinata alla versione originale fornita.
   const eventiPassatiGrid = gebi("eventiPassatiGrid");
   const loadingIndicator = gebi("loadingIndicator");
   let allPastEvents = [];
@@ -493,12 +646,25 @@
   function formatDate(dateString) {
     if (!dateString) return "Data non disponibile";
     try {
-      const date = new Date( dateString.includes("T") ? dateString : dateString + "T00:00:00" );
-      if (isNaN(date.getTime())) return dateString;
+      // Tenta di gestire formati come "YYYY-MM-DD" o "YYYY-MM-DD HH:MM:SS"
+      // Aggiungendo 'T00:00:00Z' per trattare la data come UTC se manca l'ora.
+      const normalizedDateString = dateString.length === 10 ? dateString + "T00:00:00Z" : dateString.replace(" ", "T") + "Z";
+      const date = new Date(normalizedDateString);
+      if (isNaN(date.getTime())) {
+        // Fallback per formati non standard, provando a interpretare YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateString.substring(0,10))) {
+          const parts = dateString.substring(0,10).split('-');
+          const utcDate = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+          if (!isNaN(utcDate.getTime())) {
+            return utcDate.toLocaleDateString("it-IT", {
+              day: "numeric", month: "long", year: "numeric", timeZone: 'UTC'
+            });
+          }
+        }
+        return dateString; // Ritorna la stringa originale se il parsing fallisce
+      }
       return date.toLocaleDateString("it-IT", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
+        day: "numeric", month: "long", year: "numeric", timeZone: 'UTC'
       });
     } catch (e) {
       console.warn("Errore formattazione data:", dateString, e);
@@ -506,7 +672,7 @@
     }
   }
 
-  function createPastEventCard(event) {
+  function createPastEventCard(event) { // RIPRISTINATA ALLA VERSIONE ORIGINALE FORNITA
     const card = document.createElement("article");
     card.className = "card";
     card.dataset.title = event.titolo?.toLowerCase() || "";
@@ -515,7 +681,6 @@
 
     let imageSrc = event.immagine_url && event.immagine_url.trim() !== "" ? event.immagine_url : "images/default-event-past.jpg";
 
-    // MODIFICHE QUI:
     card.innerHTML = `
             <div class="card-image-container">
                 <img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento passato"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
@@ -554,21 +719,15 @@
 
       if (result.success && result.data) {
         allPastEvents = result.data;
-        if (allPastEvents.length > 0) {
-          allPastEvents.forEach((event) => {
-            eventiPassatiGrid.appendChild(createPastEventCard(event));
-          });
-        } else {
-          eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
-        }
+        filterEvents(); // Applica filtri (che mostreranno tutti se i filtri sono vuoti)
       } else {
         throw new Error( result.message || "Errore nel caricamento degli eventi passati." );
       }
     } catch (error) {
       console.error("Errore caricamento eventi passati:", error);
-      eventiPassatiGrid.innerHTML = `<p class="no-events error-message">Si è verificato un errore durante il caricamento degli eventi. (${error.message})</p>`;
+      if(eventiPassatiGrid) eventiPassatiGrid.innerHTML = `<p class="no-events error-message">Si è verificato un errore durante il caricamento degli eventi. (${error.message})</p>`;
     } finally {
-      loadingIndicator.classList.remove("visible");
+      if(loadingIndicator) loadingIndicator.classList.remove("visible");
     }
   }
 
@@ -579,17 +738,18 @@
     const dateFilter = gebi("searchDate").value;
     const speakerFilter = gebi("searchSpeaker").value.toLowerCase().trim();
 
-    eventiPassatiGrid.innerHTML = ''; // Pulisci e ripopola con card filtrate
-    let visibleCards = 0;
+    eventiPassatiGrid.innerHTML = '';
+    let visibleCardsCount = 0;
 
     const filteredEvents = allPastEvents.filter(event => {
       const eventTitle = event.titolo?.toLowerCase() || "";
-      const eventDate = event.datainizio || "";
+      const eventDateMonthYear = (event.datainizio && typeof event.datainizio === 'string') ? event.datainizio.substring(0, 7) : "";
       const eventSpeaker = event.relatore?.toLowerCase() || "";
 
-      let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
-      let dateMatch = !dateFilter || (eventDate && eventDate.substring(0, 7) === dateFilter);
-      let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
+      const titleMatch = !titleFilter || eventTitle.includes(titleFilter);
+      const dateMatch = !dateFilter || (eventDateMonthYear === dateFilter);
+      const speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
+
       return titleMatch && dateMatch && speakerMatch;
     });
 
@@ -597,32 +757,35 @@
       filteredEvents.forEach(event => {
         eventiPassatiGrid.appendChild(createPastEventCard(event));
       });
-      visibleCards = filteredEvents.length;
+      visibleCardsCount = filteredEvents.length;
     }
 
-    const noResultsMessageEl = gebi("noResultsMessage");
-    if (noResultsMessageEl) noResultsMessageEl.remove();
+    const existingNoResultsMessage = gebi("noResultsMessage");
+    if (existingNoResultsMessage) existingNoResultsMessage.remove();
 
-    if (visibleCards === 0 && (titleFilter || dateFilter || speakerFilter) ) { // Mostra messaggio solo se ci sono filtri attivi E nessun risultato
+    if (visibleCardsCount === 0) {
       const p = document.createElement("p");
       p.id = "noResultsMessage";
       p.className = "no-events";
-      p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
-      eventiPassatiGrid.appendChild(p);
-    } else if (visibleCards === 0 && allPastEvents.length === 0) { // Se non ci sono eventi in assoluto (nessun filtro)
-      const p = document.createElement("p");
-      p.id = "noResultsMessage";
-      p.className = "no-events";
-      p.textContent = "Nessun evento passato trovato.";
-      eventiPassatiGrid.appendChild(p);
+      if (titleFilter || dateFilter || speakerFilter) {
+        p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
+      } else if (allPastEvents.length === 0 && !(titleFilter || dateFilter || speakerFilter) ) {
+        p.textContent = "Nessun evento passato trovato in archivio.";
+      }
+      if (p.textContent) {
+        eventiPassatiGrid.appendChild(p);
+      }
     }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    gebi("currentYear").textContent = new Date().getFullYear();
+    const currentYearEl = gebi("currentYear");
+    if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
     loadPastEvents();
 
     gebi("searchTitle").addEventListener("input", filterEvents);
+    // Usare "input" invece di "change" per type="month" può dare un feedback più immediato in alcuni browser,
+    // ma "change" è più standard per quando il valore è finalizzato. Lascio "change" come nel tuo codice.
     gebi("searchDate").addEventListener("change", filterEvents);
     gebi("searchSpeaker").addEventListener("input", filterEvents);
   });
