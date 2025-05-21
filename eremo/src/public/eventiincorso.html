@@ -57,8 +57,9 @@
     </header>
 
     <main>
-      <div class="container section-padding">
-        <h1>Calendario Attività</h1>
+      <div class="container section-padding pb-0"><h1>Calendario Attività</h1></div>
+
+      <div class="container section-padding pt-0">
         <div id="eventiGridContainer">
           <div id="loadingIndicator" class="loading-overlay">
             <div class="spinner">
@@ -77,75 +78,104 @@
 
     <div class="login-popup-overlay" id="loginOverlay"></div>
     <div class="login-popup" id="loginPopup">
-      <button
-        class="close-popup"
-        id="closeLoginPopupBtn"
-        aria-label="Chiudi popup"
-      >
-        &times;
+      <button class="close-popup" id="closePopup" aria-label="Chiudi popup">
+        ×
       </button>
       <div class="login-tabs">
         <div class="login-tab active" data-tab="login">Accedi</div>
         <div class="login-tab" data-tab="register">Registrati</div>
       </div>
-      <form class="login-form active" id="loginFormPopup">
-        <div class="form-group">
-          <label for="login-email-popup">Email</label>
+      <form class="login-form active" id="loginForm" method="POST">
+        <div class="form-group mb-3">
+          <label for="login-email">Email</label>
           <input
             type="email"
-            id="login-email-popup"
+            id="login-email"
+            name="login-email"
             class="form-control"
             required
+            autocomplete="email"
           />
         </div>
-        <div class="form-group">
-          <label for="login-password-popup">Password</label>
+        <div class="form-group mb-3">
+          <label for="login-password">Password</label>
           <input
             type="password"
-            id="login-password-popup"
+            id="login-password"
+            name="login-password"
             class="form-control"
             required
+            autocomplete="current-password"
           />
         </div>
         <div class="form-actions">
           <button type="submit" class="btn-popup">Accedi</button>
         </div>
       </form>
-      <form class="login-form" id="registerFormPopup">
-        <div class="form-group">
-          <label for="register-name-popup">Nome</label>
+      <form class="login-form" id="registerForm" method="POST">
+        <div class="form-group mb-3">
+          <label for="register-name">Nome</label>
           <input
             type="text"
-            id="register-name-popup"
+            id="register-name"
+            name="register-name"
             class="form-control"
             required
+            autocomplete="given-name"
           />
         </div>
-        <div class="form-group">
-          <label for="register-email-popup">Email</label>
+        <div class="form-group mb-3">
+          <label for="register-surname">Cognome</label>
+          <input
+            type="text"
+            id="register-surname"
+            name="register-surname"
+            class="form-control"
+            required
+            autocomplete="family-name"
+          />
+        </div>
+        <div class="form-group mb-3">
+          <label for="register-email">Email</label>
           <input
             type="email"
-            id="register-email-popup"
+            id="register-email"
+            name="register-email"
             class="form-control"
             required
+            autocomplete="email"
           />
         </div>
-        <div class="form-group">
-          <label for="register-password-popup">Password</label>
+        <div class="form-group mb-3">
+          <label for="register-password">Password</label>
           <input
             type="password"
-            id="register-password-popup"
+            id="register-password"
+            name="register-password"
             class="form-control"
             required
             minlength="8"
+            autocomplete="new-password"
           />
+          <small>Minimo 8 caratteri.</small>
+        </div>
+        <div class="terms-checkbox mb-3">
+          <input
+            type="checkbox"
+            id="register-terms"
+            name="register-terms"
+            required
+          />
+          <label for="register-terms"
+            >Accetto i
+            <a href="termini.html" target="_blank">termini e condizioni</a></label
+          >
         </div>
         <div class="form-actions">
           <button type="submit" class="btn-popup">Registrati</button>
         </div>
       </form>
     </div>
-
     <footer>
       <p>
         &copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i
@@ -158,7 +188,7 @@
         return document.getElementById(id);
       }
 
-      // --- Navbar & Mobile Menu (Codice Completo) ---
+      // --- Navbar & Mobile Menu (Codice Originale, non modificato) ---
       const navbarContainerEl = gebi("navbarContainer");
       const mobileMenuEl = gebi("mobileMenu");
       const hamburgerEl = document.querySelector(".hamburger");
@@ -200,14 +230,15 @@
           link.addEventListener("click", closeMobileMenuOnLinkClick)
         );
 
-      // --- Login Popup (Codice Completo) ---
-      const loginOverlay = gebi("loginOverlay"),
-        loginPopup = gebi("loginPopup"),
-        closeLoginPopupBtn = gebi("closeLoginPopupBtn");
-      const loginTabs = document.querySelectorAll(".login-tab"),
-        loginForms = document.querySelectorAll(".login-popup .login-form");
-      const loginBtnHeader = gebi("login-btn-header"),
-        loginBtnMobile = gebi("login-btn-mobile");
+      // --- Login Popup (Codice MODIFICATO per allinearsi a dovesiamo.html) ---
+      const loginBtnHeader = gebi("login-btn-header");
+      const loginBtnMobile = gebi("login-btn-mobile");
+      const loginOverlay = gebi("loginOverlay");
+      const loginPopup = gebi("loginPopup");
+      const closePopupBtn = gebi("closePopup"); // ID aggiornato per coerenza con dovesiamo.html
+      const loginTabs = document.querySelectorAll(".login-tab");
+      const loginForms = document.querySelectorAll(".login-popup .login-form");
+
       function openLoginPopup() {
         if (loginOverlay && loginPopup) {
           loginOverlay.classList.add("active");
@@ -218,6 +249,7 @@
             activeForm.querySelector('input:not([type="hidden"])')?.focus();
         }
       }
+
       function closeLoginPopup() {
         if (loginOverlay && loginPopup) {
           loginOverlay.classList.remove("active");
@@ -225,27 +257,40 @@
           document.body.style.overflow = "";
         }
       }
-      if (loginBtnHeader)
-        loginBtnHeader.addEventListener("click", openLoginPopup);
-      if (loginBtnMobile)
-        loginBtnMobile.addEventListener("click", (e) => {
+
+      if (loginBtnHeader) {
+        loginBtnHeader.addEventListener("click", (e) => {
           e.preventDefault();
           openLoginPopup();
-          if (mobileMenuEl.classList.contains("open")) toggleMobileMenu();
         });
-      if (closeLoginPopupBtn)
-        closeLoginPopupBtn.addEventListener("click", closeLoginPopup);
-      if (loginOverlay) loginOverlay.addEventListener("click", closeLoginPopup);
+      }
+      if (loginBtnMobile) {
+        loginBtnMobile.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (mobileMenuEl.classList.contains("open")) {
+            // Chiudi il menu mobile se aperto prima di aprire il popup
+            toggleMobileMenu();
+          }
+          openLoginPopup();
+        });
+      }
+
+      if (closePopupBtn) {
+        closePopupBtn.addEventListener("click", closeLoginPopup);
+      }
+      if (loginOverlay) {
+        loginOverlay.addEventListener("click", closeLoginPopup);
+      }
+
+      // Gestione cambio tab Login/Registrazione
       loginTabs.forEach((tab) => {
         tab.addEventListener("click", function () {
           loginTabs.forEach((t) => t.classList.remove("active"));
           loginForms.forEach((f) => f.classList.remove("active"));
           this.classList.add("active");
           const targetForm = gebi(
-            this.getAttribute("data-tab") === "login"
-              ? "loginFormPopup"
-              : "registerFormPopup"
-          );
+            this.getAttribute("data-tab") === "login" ? "loginForm" : "registerForm"
+          ); // Nomi ID aggiornati (loginForm, registerForm)
           if (targetForm) {
             targetForm.classList.add("active");
             targetForm.querySelector('input:not([type="hidden"])')?.focus();
@@ -253,11 +298,12 @@
         });
       });
 
-      // --- User Dropdown & Logic (Codice Completo) ---
+      // --- User Dropdown & Logic (Codice Originale, ma con ID aggiornate per coerenza) ---
       const userDropdownContainerEl = gebi("userDropdownContainer"),
         userBtnEl = userDropdownContainerEl?.querySelector(".user-btn");
       let currentUser = null;
       const logoutBtnDropdown = gebi("logout-btn-dropdown");
+
       if (userBtnEl)
         userBtnEl.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -276,6 +322,7 @@
           userBtnEl?.setAttribute("aria-expanded", "false");
         }
       });
+
       function updateNavbarUserUI() {
         const navbarAvatarEl = gebi("navbar-avatar"),
           navbarUsernameEl = gebi("navbar-username");
@@ -298,48 +345,140 @@
           }
         }
       }
-      gebi("loginFormPopup")?.addEventListener("submit", (e) => {
+
+      // --- Gestione Invio Form con Fetch API (MODIFICATO per allinearsi a dovesiamo.html) ---
+
+      // LOGIN Form Submission
+      document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const email = gebi("login-email-popup").value;
-        currentUser = {
-          nome: email.split("@")[0] || "Utente Loggato",
-          avatar: "🧘",
-        };
-        localStorage.setItem("userDataEFF", JSON.stringify(currentUser));
-        updateNavbarUserUI();
-        closeLoginPopup();
-        const p = localStorage.getItem("pending_booking_event_id_eff");
-        if (
-          p &&
-          confirm(`Login OK. Completare prenotazione per evento ${p}?`)
-        ) {
+        const loginButton = e.target.querySelector('button[type="submit"]');
+        const originalButtonText = loginButton.innerHTML;
+        loginButton.disabled = true;
+        loginButton.innerHTML = "Accesso...";
+
+        try {
+          const response = await fetch("login.php", {
+            method: "POST",
+            body: new FormData(e.target),
+          });
+
+          if (!response.ok) {
+            let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+            try {
+              const errorData = await response.json();
+              errorMsg = errorData.message || errorMsg;
+            } catch (e) {
+              /* Ignora se il corpo non è JSON */
+            }
+            throw new Error(errorMsg);
+          }
+
+          const result = await response.json();
+
+          if (result.success) {
+            currentUser = {
+              nome: result.username || "Utente Loggato",
+              avatar: result.avatar || "🧘",
+            };
+            localStorage.setItem("userDataEFF", JSON.stringify(currentUser));
+            updateNavbarUserUI();
+            closeLoginPopup();
+
+            const p = localStorage.getItem("pending_booking_event_id_eff");
+            if (
+              p &&
+              confirm(`Login OK. Completare prenotazione per evento ${p}?`)
+            ) {
+              // Qui puoi aggiungere la logica per completare la prenotazione
+            }
+            localStorage.removeItem("pending_booking_event_id_eff");
+
+            if (result.is_admin) {
+              window.location.href = "indexadmin.html";
+            } else {
+              window.location.href = "indexaccesso.html";
+            }
+          } else {
+            alert("Errore Login: " + (result.message || "Credenziali non valide."));
+          }
+        } catch (error) {
+          alert("Errore durante il login: " + error.message);
+          console.error("Dettaglio errore login:", error);
+        } finally {
+          loginButton.disabled = false;
+          loginButton.innerHTML = originalButtonText;
         }
-        localStorage.removeItem("pending_booking_event_id_eff");
       });
-      gebi("registerFormPopup")?.addEventListener("submit", (e) => {
+
+      // REGISTRATION Form Submission
+      document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        currentUser = {
-          nome: gebi("register-name-popup").value || "Nuovo Utente",
-          avatar: "👤",
-        };
-        localStorage.setItem("userDataEFF", JSON.stringify(currentUser));
-        updateNavbarUserUI();
-        closeLoginPopup();
+        const registerButton = e.target.querySelector('button[type="submit"]');
+        const originalButtonText = registerButton.innerHTML;
+        registerButton.disabled = true;
+        registerButton.innerHTML = "Registrazione...";
+
+        try {
+          const response = await fetch("registrati.php", {
+            method: "POST",
+            body: new FormData(e.target),
+          });
+
+          if (!response.ok) {
+            let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+            try {
+              const errorData = await response.json();
+              errorMsg = errorData.message || errorMsg;
+            } catch (e) {
+              /* Ignora se il corpo non è JSON */
+            }
+            throw new Error(errorMsg);
+          }
+
+          const result = await response.json();
+
+          if (result.success) {
+            alert(result.message || "Registrazione completata con successo!");
+            closeLoginPopup();
+            // Puoi scegliere se effettuare il login automatico qui o reindirizzare alla pagina di login
+          } else {
+            alert(
+              "Errore Registrazione: " +
+                (result.message || "Si è verificato un errore.")
+            );
+          }
+        } catch (error) {
+          alert("Errore durante la registrazione: " + error.message);
+          console.error("Dettaglio errore registrazione:", error);
+        } finally {
+          registerButton.disabled = false;
+          registerButton.innerHTML = originalButtonText;
+        }
       });
+
       function logout() {
         currentUser = null;
         localStorage.removeItem("userDataEFF");
         updateNavbarUserUI();
       }
+
       function checkLoginStatusOnLoad() {
         const d = localStorage.getItem("userDataEFF");
         currentUser = d ? JSON.parse(d) : null;
         updateNavbarUserUI();
       }
+
       if (logoutBtnDropdown)
         logoutBtnDropdown.addEventListener("click", logout);
 
-      // --- Logica Caricamento Eventi & Morphing Volantino ---
+      // Chiudi popup con tasto Esc (Aggiunto per coerenza con dovesiamo.html)
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && loginPopup.classList.contains("active")) {
+          closeLoginPopup();
+        }
+      });
+
+      // --- Logica Caricamento Eventi & Morphing Volantino (Codice Originale, non modificato) ---
       const volantinoMorphOverlay = gebi("volantinoMorphOverlay");
       let morphingCard = null;
       let originalCardForMorph = null;
@@ -395,7 +534,7 @@
         if (event.volantino_url?.trim()) {
           volantinoBtnHtml = `<button class="card-btn btn-visualizza-volantino"
                                         data-volantino-url="${event.volantino_url}"
-                                        data-copertina-url="${imageSrc}">Volantino</button>`;
+                                        data-copertina-url="${imageSrc}">Visualizza Volantino</button>`;
         }
         cardOriginal.innerHTML = `
             <div class="card-image-container">
