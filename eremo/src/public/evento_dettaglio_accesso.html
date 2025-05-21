@@ -18,22 +18,24 @@
             object-fit: cover; margin-right: 10px; flex-shrink: 0;
         }
         /* Stile per evidenziare commenti/risposte dello Staff */
-        .comment.admin-comment-highlight { /* Rinominata per chiarezza se usata in CSS specifico per admin */
+        .comment.admin-comment-highlight {
             border-left-color: var(--accent) !important;
-            background-color: #fffaf0 !important; /* Un colore leggermente diverso */
+            background-color: #fffaf0 !important;
         }
-        .comment.admin-comment-highlight .comment-meta strong::after {
+        /* Questo CSS era per lo pseudo-elemento, lo lasciamo nel caso tu voglia ripristinarlo o per riferimento */
+        /* .comment.admin-comment-highlight .comment-meta strong::after {
             content: " (Staff)";
             font-size: 0.8em; font-weight: normal; color: var(--accent);
             margin-left: 0.4em; background-color: var(--light);
-            padding: 0.1em 0.4em; border-radius: 4px; border: 1px solid #f0e0d0; /* Esempio di bordo */
-        }
-        /* Stile per .badge-staff (da usare nell'HTML del commento se is_admin_comment è true) */
+            padding: 0.1em 0.4em; border-radius: 4px; border: 1px solid #f0e0d0;
+        } */
+        /* Nuovo Stile per .badge-staff (usato dal JS) */
         .badge-staff {
             font-size: 0.8em; font-weight: normal; color: var(--accent);
             margin-left: 0.4em; background-color: rgba(209, 140, 96, 0.1); /* --accent con opacità */
             padding: 0.1em 0.4em; border-radius: 4px; border: 1px solid rgba(209, 140, 96, 0.3);
             text-transform: uppercase; letter-spacing: 0.5px;
+            display: inline-block; /* Per assicurare che padding e margin siano applicati correttamente */
         }
 
     </style>
@@ -201,6 +203,7 @@
         updateNavbarUserUI();
         document.getElementById('logout-link-dropdown')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
         document.getElementById('logout-link-mobile')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenu(); });
+
     }
 
     async function fetchAndUpdateUserDisplayData() {
@@ -266,10 +269,9 @@
             }
         }
         if (mobileMenu && mobileMenu.classList.contains('open')) {
-            if (globalEvent.target.closest('.mobile-menu a')) { // Se il click è su un link del menu
+            if (globalEvent.target.closest('.mobile-menu a')) {
                 closeMobileMenu();
             } else if (hamburger && !hamburger.contains(globalEvent.target) && !mobileMenu.contains(globalEvent.target)) {
-                // Se il click è fuori dal menu E non sull'hamburger
                 closeMobileMenu();
             }
         }
@@ -299,7 +301,7 @@
             img.src = item.href; img.alt = item.title || "Immagine ingrandita";
             img.style.maxWidth = '100%'; img.style.maxHeight = '85vh';
             lightboxContent.appendChild(img);
-        } else { // Per documenti o tipi non visualizzabili direttamente
+        } else {
             lightboxContent.innerHTML = `<div style="color:white; text-align:center; padding:20px;">Anteprima non disponibile per questo tipo di file. <br><a href="${item.href}" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:underline;">Apri media in una nuova scheda</a></div>`;
         }
         const captionText = item.title || '';
@@ -317,7 +319,7 @@
     }
     function updateLightboxNavButtons() {
         if (!lightboxPrevBtn || !lightboxNextBtn) return;
-        lightboxPrevBtn.style.display = galleryItemsData.length > 1 ? 'flex' : 'none'; // Usiamo flex per allineare icona
+        lightboxPrevBtn.style.display = galleryItemsData.length > 1 ? 'flex' : 'none';
         lightboxNextBtn.style.display = galleryItemsData.length > 1 ? 'flex' : 'none';
     }
     function changeLightboxMedia(direction) {
@@ -405,8 +407,7 @@
                         let metaHTML = '';
                         if (event.Data) {
                             try {
-                                // Assumiamo che event.Data sia in formato "YYYY-MM-DD" o "YYYY-MM-DD HH:MM:SS"
-                                const dateObj = new Date(event.Data.replace(/-/g, '/')); // Sostituisci '-' con '/' per compatibilità cross-browser
+                                const dateObj = new Date(event.Data.replace(/-/g, '/'));
                                 if (!isNaN(dateObj.getTime())) {
                                     metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${dateObj.toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric', timeZone: 'Europe/Rome'})}</span>`;
                                 } else {
@@ -423,7 +424,7 @@
                         if (metaHTML) eventMetaInfoEl.style.display = 'flex';
                     }
                     if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){
-                        eventDescriptionFullEl.innerHTML = sanitizeTextForHTML(event.DescrizioneEstesa || event.Descrizione); // Usa sanitizeTextForHTML qui
+                        eventDescriptionFullEl.innerHTML = sanitizeTextForHTML(event.DescrizioneEstesa || event.Descrizione);
                         eventDescriptionFullEl.style.display = 'block';
                     }
                     if(eventVolantinoContainerEl && event.VolantinoUrl){
@@ -461,7 +462,7 @@
                     });
                     document.querySelectorAll('#galleryGrid .gallery-item a[data-index]').forEach(a => a.addEventListener('click', function(e) { e.preventDefault(); openLightbox(parseInt(this.dataset.index)); }));
                 } else {
-                    if (gallerySectionEl) gallerySectionEl.style.display = 'block'; // Mostra comunque il titolo della sezione
+                    if (gallerySectionEl) gallerySectionEl.style.display = 'block';
                     if (noMediaMessageEl) noMediaMessageEl.style.display = 'block';
                 }
 
@@ -484,22 +485,19 @@
                     if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'block';
                 }
 
-                // MODIFICA: Scroll to hash if present
+                // MODIFICA PER SCROLL TO HASH
                 if (window.location.hash) {
                     const hash = window.location.hash;
                     setTimeout(() => {
                         try {
                             const targetElement = document.querySelector(hash);
                             if (targetElement) {
-                                console.log("Scrolling to:", hash);
                                 targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            } else {
-                                console.warn("Target element for hash not found:", hash);
                             }
                         } catch (e) {
-                            console.error("Error scrolling to hash:", e);
+                            console.error("Errore nello scroll all'ancora:", e);
                         }
-                    }, 200); // Aumentato leggermente il delay per sicurezza
+                    }, 250); // Delay per permettere il rendering
                 }
 
             } else {
@@ -516,7 +514,7 @@
 
     function displayComments(comments, parentUlElement, depth = 0) {
         if (depth === 0) {
-            parentUlElement.innerHTML = ''; // Pulisci solo al primo livello
+            parentUlElement.innerHTML = '';
             const noCommentsMsgEl = document.getElementById('no-comments-message');
             if (!comments || comments.length === 0) {
                 if(noCommentsMsgEl) noCommentsMsgEl.style.display = 'block';
@@ -526,15 +524,13 @@
             }
         }
 
-        // Se parentUlElement non è un UL (es. è il div .replies), crea un UL al suo interno
         let listToAppendTo = parentUlElement;
         if (parentUlElement.tagName !== 'UL') {
             listToAppendTo = document.createElement('ul');
             listToAppendTo.style.listStyleType = 'none';
-            listToAppendTo.style.paddingLeft = '0'; // L'indentazione è gestita da .replies in CSS
+            listToAppendTo.style.paddingLeft = '0';
             parentUlElement.appendChild(listToAppendTo);
         }
-
 
         comments.forEach(commentData => {
             const commentItemLi = document.createElement('li');
@@ -542,7 +538,7 @@
             listToAppendTo.appendChild(commentItemLi);
 
             if (commentData.replies && commentData.replies.length > 0) {
-                const repliesContainerDiv = commentItemLi.querySelector('.replies'); // Assicurati che .replies esista
+                const repliesContainerDiv = commentItemLi.querySelector('.replies');
                 if (repliesContainerDiv) {
                     displayComments(commentData.replies, repliesContainerDiv, depth + 1);
                 }
@@ -550,20 +546,29 @@
         });
     }
 
-
     function createCommentElement(commentData, isReply = false) {
         const commentDiv = document.createElement('div');
         commentDiv.className = isReply ? 'comment reply' : 'comment';
         commentDiv.id = 'comment-' + commentData.Progressivo;
 
-        const isAdminComment = commentData.is_admin_comment === true || commentData.is_admin_comment === 1; // Gestisce sia booleano che intero da PHP/DB
+        // MODIFICA PER CONTROLLO PIÙ FLESSIBILE DI is_admin_comment
+        const isAdminComment = commentData.is_admin_comment === true ||
+            commentData.is_admin_comment === 1 ||
+            String(commentData.is_admin_comment).toLowerCase() === 'true' ||
+            String(commentData.is_admin_comment) === '1';
 
         if (isAdminComment) {
-            commentDiv.classList.add('admin-comment-highlight'); // Applica la classe per lo stile speciale admin
+            commentDiv.classList.add('admin-comment-highlight');
         }
 
         const avatarUrl = (commentData.CommenterIconPath && commentData.CommenterIconPath.trim() !== '') ? commentData.CommenterIconPath : defaultUserIconPath;
         const commenterDisplayName = sanitizeTextForHTML(commentData.CommenterNomeCompleto || 'Anonimo');
+
+        let staffBadgeHTML = '';
+        if (isAdminComment) {
+            staffBadgeHTML = '<span class="badge-staff">(Staff)</span>';
+        }
+
         const commentDate = sanitizeTextForHTML(commentData.DataVisualizzata || 'Data non disponibile');
         const commentDescription = sanitizeTextForHTML(commentData.Descrizione);
         const likeCount = commentData.NumLike !== null ? parseInt(commentData.NumLike) : 0;
@@ -574,6 +579,7 @@
                 <img src="${avatarUrl}" alt="Avatar di ${commenterDisplayName}" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';">
                 <div class="comment-meta">
                     <strong>${commenterDisplayName}</strong>
+                    ${staffBadgeHTML}
                     <small>${commentDate}</small>
                 </div>
             </div>
@@ -591,7 +597,7 @@
                     <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em; display:none;"></div>
                 </form>
             </div>
-            <div class="replies"></div>`; // Contenitore per le risposte
+            <div class="replies"></div>`;
 
         attachCommentInteractionListeners(commentDiv);
         return commentDiv;
@@ -705,14 +711,15 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        const currentYearEl = document.getElementById('currentYear');
+        if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
+
         setupUserSessionAndNavbar();
 
-        if (!currentUser) { // Se non c'è utente dopo il setup, reindirizza a index.html
+        if (!currentUser) {
             window.location.href = 'index.html';
-            return; // Interrompi l'esecuzione per evitare errori
+            return;
         }
-        // Solo se l'utente è valido, procedi con il fetch dei dati aggiornati per la navbar
         if (currentUser?.email) await fetchAndUpdateUserDisplayData();
 
 
@@ -724,7 +731,7 @@
         }
 
         if (eventId) {
-            await fetchEventDetails(eventId); // fetchEventDetails ora gestisce lo scroll
+            await fetchEventDetails(eventId);
         } else {
             displayErrorMessageOnPage("ID evento non specificato nella URL.");
         }
@@ -739,9 +746,6 @@
 
         const loginLink = document.getElementById('loginLinkFromEventPage');
         if(loginLink){
-            // Questa logica è per la pagina pubblica, qui l'utente è già loggato
-            // quindi il messaggio "accedi per commentare" non dovrebbe apparire.
-            // Assicuriamoci che il form per i commenti sia visibile se l'utente è loggato.
             const commentFormContainerEl = document.getElementById('commentFormContainer');
             const loginToCommentMessageEl = document.getElementById('login-to-comment-message');
 
@@ -749,12 +753,13 @@
                 if(commentFormContainerEl) commentFormContainerEl.style.display = 'block';
                 if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'none';
             } else {
-                // Se per qualche motivo l'utente non è loggato (non dovrebbe succedere qui)
                 if(commentFormContainerEl) commentFormContainerEl.style.display = 'none';
                 if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'block';
                 loginLink.addEventListener('click', (e) => {
                     e.preventDefault();
-                    // Potrebbe aprire un popup di login se non si volesse reindirizzare
+                    // Qui potresti aprire un popup di login se esistesse in questa pagina,
+                    // o reindirizzare a una pagina di login. Dato che siamo in una pagina "accesso",
+                    // questo scenario non dovrebbe verificarsi se il controllo iniziale di sessione funziona.
                     alert("Per favore, accedi per commentare.");
                 });
             }
