@@ -258,12 +258,12 @@
 
 <div class="login-popup-overlay" id="loginRequiredOverlay"></div>
 <div class="login-popup" id="loginRequiredPopup">
-    <button class="close-popup" id="closeLoginRequiredPopupBtn" aria-label="Chiudi popup">&times;</button>
-    <h2 style="color: var(--primary); margin-top: 0; margin-bottom: 1.5rem; text-align: center; font-size: 1.8rem;">Accesso Richiesto</h2>
-    <p style="text-align: center; margin-bottom: 1.5rem; font-size: 1.2rem; color: var(--dark);">Per visualizzare i dettagli completi dell'evento e i commenti, è necessario effettuare l'accesso.</p>
-    <div class="form-actions" style="text-align: center;">
-        <button type="button" class="btn-popup" id="loginRequiredLoginBtn">Accedi / Registrati</button>
-    </div>
+  <button class="close-popup" id="closeLoginRequiredPopupBtn" aria-label="Chiudi popup">&times;</button>
+  <h2 style="color: var(--primary); margin-top: 0; margin-bottom: 1.5rem; text-align: center; font-size: 1.8rem;">Accesso Richiesto</h2>
+  <p style="text-align: center; margin-bottom: 1.5rem; font-size: 1.2rem; color: var(--dark);">Per visualizzare i dettagli completi dell'evento e i commenti, è necessario effettuare l'accesso.</p>
+  <div class="form-actions" style="text-align: center;">
+    <button type="button" class="btn-popup" id="loginRequiredLoginBtn">Accedi / Registrati</button>
+  </div>
 </div>
 
 
@@ -370,31 +370,31 @@
     loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>';
 
     try {
-        const response = await fetch('login.php', {
-            method: 'POST',
-            body: new FormData(e.target)
-        });
-        if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
-        const result = await response.json();
+      const response = await fetch('login.php', {
+        method: 'POST',
+        body: new FormData(e.target)
+      });
+      if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
+      const result = await response.json();
 
-        if (result.success) {
-            const userDataToStore = {
-                nome: result.nome,
-                email: result.email,
-                iconPath: result.iconPath || '/uploads/icons/default_user.png',
-            };
-            localStorage.setItem('userDataEFF', JSON.stringify(userDataToStore));
-            closeLoginPopup();
-            window.location.href = result.is_admin ? 'indexadmin.html' : 'indexaccesso.html';
-        } else {
-            alert(result.message || "Credenziali non valide.");
-        }
+      if (result.success) {
+        const userDataToStore = {
+          nome: result.nome,
+          email: result.email,
+          iconPath: result.iconPath || '/uploads/icons/default_user.png',
+        };
+        localStorage.setItem('userDataEFF', JSON.stringify(userDataToStore));
+        closeLoginPopup();
+        window.location.href = result.is_admin ? 'indexadmin.html' : 'indexaccesso.html';
+      } else {
+        alert(result.message || "Credenziali non valide.");
+      }
     } catch (error) {
-        alert("Errore di connessione o risposta non valida dal server.");
-        console.error("Errore login:", error);
+      alert("Errore di connessione o risposta non valida dal server.");
+      console.error("Errore login:", error);
     } finally {
-        loginButton.disabled = false;
-        loginButton.innerHTML = originalButtonText;
+      loginButton.disabled = false;
+      loginButton.innerHTML = originalButtonText;
     }
   });
 
@@ -405,35 +405,35 @@
     registerButton.disabled = true;
     registerButton.innerHTML = 'Registrazione...';
     try {
-        const response = await fetch('registrati.php', {
-            method: 'POST',
-            body: new FormData(e.target)
-        });
-        if (!response.ok) {
-            let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
-            try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; }
-            catch(err) { /* Ignora */ }
-            throw new Error(errorMsg);
+      const response = await fetch('registrati.php', {
+        method: 'POST',
+        body: new FormData(e.target)
+      });
+      if (!response.ok) {
+        let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+        try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; }
+        catch(err) { /* Ignora */ }
+        throw new Error(errorMsg);
+      }
+      const result = await response.json();
+      if (result.success) {
+        alert(result.message || "Registrazione completata! Ora puoi effettuare il login.");
+        document.querySelector('.login-tab[data-tab="login"]').click();
+        const loginEmailPopup = gebi('login-email-popup');
+        const registerEmailPopup = gebi('register-email-popup');
+        if (loginEmailPopup && registerEmailPopup) {
+          loginEmailPopup.value = registerEmailPopup.value;
         }
-        const result = await response.json();
-        if (result.success) {
-            alert(result.message || "Registrazione completata! Ora puoi effettuare il login.");
-            document.querySelector('.login-tab[data-tab="login"]').click();
-            const loginEmailPopup = gebi('login-email-popup');
-            const registerEmailPopup = gebi('register-email-popup');
-            if (loginEmailPopup && registerEmailPopup) {
-                loginEmailPopup.value = registerEmailPopup.value;
-            }
-            e.target.reset();
-        } else {
-            alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
-        }
+        e.target.reset();
+      } else {
+        alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+      }
     } catch (error) {
-        alert("Errore durante la registrazione: " + error.message);
-        console.error("Dettaglio errore registrazione:", error);
+      alert("Errore durante la registrazione: " + error.message);
+      console.error("Dettaglio errore registrazione:", error);
     } finally {
-        registerButton.disabled = false;
-        registerButton.innerHTML = originalButtonText;
+      registerButton.disabled = false;
+      registerButton.innerHTML = originalButtonText;
     }
   });
 
@@ -460,7 +460,7 @@
     if (loginRequiredOverlay) loginRequiredOverlay.classList.remove("active");
     if (loginRequiredPopup) loginRequiredPopup.classList.remove("active");
     if (!loginPopup || !loginPopup.classList.contains("active")) { // Solo se il popup di login principale non è attivo
-        document.body.style.overflow = "";
+      document.body.style.overflow = "";
     }
   }
 
@@ -469,16 +469,16 @@
   }
   if (loginRequiredOverlay) {
     loginRequiredOverlay.addEventListener("click", (e) => {
-        if (e.target === loginRequiredOverlay) closeLoginRequiredPopup();
+      if (e.target === loginRequiredOverlay) closeLoginRequiredPopup();
     });
   }
   if (loginRequiredLoginBtn) {
     loginRequiredLoginBtn.addEventListener("click", () => {
-        closeLoginRequiredPopup();
-        openLoginPopup(); // Apre il popup di login/registrazione principale
+      closeLoginRequiredPopup();
+      openLoginPopup(); // Apre il popup di login/registrazione principale
     });
   }
-   document.addEventListener("keydown", (event) => {
+  document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && loginRequiredPopup && loginRequiredPopup.classList.contains("active")) {
       closeLoginRequiredPopup();
     }
@@ -583,38 +583,38 @@
     let visibleCards = 0;
 
     const filteredEvents = allPastEvents.filter(event => {
-        const eventTitle = event.titolo?.toLowerCase() || "";
-        const eventDate = event.datainizio || "";
-        const eventSpeaker = event.relatore?.toLowerCase() || "";
+      const eventTitle = event.titolo?.toLowerCase() || "";
+      const eventDate = event.datainizio || "";
+      const eventSpeaker = event.relatore?.toLowerCase() || "";
 
-        let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
-        let dateMatch = !dateFilter || (eventDate && eventDate.substring(0, 7) === dateFilter);
-        let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
-        return titleMatch && dateMatch && speakerMatch;
+      let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
+      let dateMatch = !dateFilter || (eventDate && eventDate.substring(0, 7) === dateFilter);
+      let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
+      return titleMatch && dateMatch && speakerMatch;
     });
 
     if (filteredEvents.length > 0) {
-        filteredEvents.forEach(event => {
-            eventiPassatiGrid.appendChild(createPastEventCard(event));
-        });
-        visibleCards = filteredEvents.length;
+      filteredEvents.forEach(event => {
+        eventiPassatiGrid.appendChild(createPastEventCard(event));
+      });
+      visibleCards = filteredEvents.length;
     }
 
     const noResultsMessageEl = gebi("noResultsMessage");
-    if (noResultsMessageEl) noResultsMessageEl.remove(); 
+    if (noResultsMessageEl) noResultsMessageEl.remove();
 
     if (visibleCards === 0 && (titleFilter || dateFilter || speakerFilter) ) { // Mostra messaggio solo se ci sono filtri attivi E nessun risultato
-        const p = document.createElement("p");
-        p.id = "noResultsMessage";
-        p.className = "no-events";
-        p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
-        eventiPassatiGrid.appendChild(p);
+      const p = document.createElement("p");
+      p.id = "noResultsMessage";
+      p.className = "no-events";
+      p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
+      eventiPassatiGrid.appendChild(p);
     } else if (visibleCards === 0 && allPastEvents.length === 0) { // Se non ci sono eventi in assoluto (nessun filtro)
-         const p = document.createElement("p");
-        p.id = "noResultsMessage";
-        p.className = "no-events";
-        p.textContent = "Nessun evento passato trovato.";
-        eventiPassatiGrid.appendChild(p);
+      const p = document.createElement("p");
+      p.id = "noResultsMessage";
+      p.className = "no-events";
+      p.textContent = "Nessun evento passato trovato.";
+      eventiPassatiGrid.appendChild(p);
     }
   }
 
