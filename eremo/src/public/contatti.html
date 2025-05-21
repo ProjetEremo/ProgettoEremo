@@ -1,503 +1,600 @@
 <!DOCTYPE html>
 <html lang="it">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Contatta i volontari dell'Eremo Frate Francesco tramite telefono o email"
-    />
-    <link rel="icon" href="images/logo.png" type="image/x-icon" />
-    <title>Contatti - Eremo Frate Francesco</title>
-    <link rel="stylesheet" href="style.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-  </head>
-  <body>
-    <header class="navbar-container" id="navbarContainer">
-      <nav class="navbar">
-        <div class="logo">
-          <a href="index.html">
-            <span class="emoji">🏔️</span>
-            <h2>Eremo Frate Francesco</h2>
-          </a>
-        </div>
-        <div class="menu">
-          <a href="eventiincorso.html">Calendario attività</a>
-          <a href="eventipassati.html">Archivio attività</a>
-          <span class="separator">|</span>
-          <a href="incontrisullaparola.html">Incontri sulla parola</a>
-          <span class="separator">|</span>
-          <a href="dovesiamo.html">Dove siamo</a>
-          <a href="contatti.html" class="active">Contatti</a>
-        </div>
-        <div class="right-menu">
-          <button id="login-btn" class="login-btn">Accedi</button>
-          <button
-            class="hamburger"
-            onclick="toggleMobileMenu()"
-            aria-label="Toggle menu"
-          >
-            ☰
-          </button>
-        </div>
-      </nav>
-      <div class="mobile-menu" id="mobileMenu">
-        <a href="eventiincorso.html" onclick="closeMobileMenu()"
-          >Calendario attività</a
-        >
-        <a href="eventipassati.html" onclick="closeMobileMenu()"
-          >Archivio attività</a
-        >
-        <a href="incontrisullaparola.html" onclick="closeMobileMenu()"
-          >Incontri sulla parola</a
-        >
-        <a href="dovesiamo.html" onclick="closeMobileMenu()">Dove siamo</a>
-        <a href="contatti.html" onclick="closeMobileMenu()">Contatti</a>
-        <a
-          href="#"
-          id="login-btn-mobile"
-          onclick="openLoginPopup(); closeMobileMenu();"
-          >Accedi</a
-        >
-      </div>
-    </header>
-
-    <main>
-      <div class="container section-padding">
-        <h1 class="text-center mb-4">Contattaci</h1>
-        <p
-          class="text-center mb-4"
-          style="max-width: 700px; margin-left: auto; margin-right: auto"
-        >
-          Siamo a disposizione per informazioni sulle nostre attività,
-          sull'ospitalità o per qualsiasi altra domanda. Non esitare a
-          contattarci!
-        </p>
-
-        <div class="contatti-grid">
-          <div class="contatto-card">
-            <div class="contatto-icon">
-              <i
-                class="fas fa-mobile-alt fa-2x"
-                style="color: var(--secondary)"
-              ></i>
-            </div>
-            <h3>Referente Ospitalità</h3>
-            <p>Per informazioni specifiche sui ritiri e l'accoglienza.</p>
-            <p style="font-weight: bold; font-size: 1.1rem">+39 098 765432</p>
-            <button
-              class="btn-contatto"
-              onclick="copyPhoneNumber('0987654321', this)"
-            >
-              <i class="fas fa-copy" style="margin-right: 5px"></i> Copia Numero
-            </button>
-          </div>
-
-          <div class="contatto-card">
-            <div class="contatto-icon">
-              <i
-                class="fas fa-envelope fa-2x"
-                style="color: var(--secondary)"
-              ></i>
-            </div>
-            <h3>Indirizzo Email</h3>
-            <p>Per richieste scritte e invio documentazione.</p>
-            <p style="font-weight: bold; font-size: 1.1rem">
-              info.eremofrancesco@email.it
-            </p>
-            <a href="mailto:info.eremofrancesco@email.it" class="btn-contatto">
-              <i class="fas fa-paper-plane" style="margin-right: 5px"></i>
-              Scrivici
-            </a>
-          </div>
-        </div>
-
-        <div class="text-center mt-4">
-          <h2 class="mb-3">Dove Trovarci</h2>
-          <p>Via San Vito, 24027 Nembro BG</p>
-          <a
-            href="dovesiamo.html"
-            class="btn-contatto"
-            style="background-color: var(--accent)"
-          >
-            <i class="fas fa-map-marked-alt" style="margin-right: 5px"></i> Vedi
-            Mappa e Indicazioni
-          </a>
-        </div>
-      </div>
-    </main>
-
-    <div class="login-popup-overlay" id="loginOverlay"></div>
-    <div class="login-popup" id="loginPopup">
-      <button class="close-popup" id="closePopup" aria-label="Chiudi popup">
-        &times;
-      </button>
-      <div class="login-tabs">
-        <div class="login-tab active" data-tab="login">Accedi</div>
-        <div class="login-tab" data-tab="register">Registrati</div>
-      </div>
-      <form class="login-form active" id="loginForm" method="POST">
-        <div class="form-group mb-3">
-          <label for="login-email">Email</label>
-          <input
-            type="email"
-            id="login-email"
-            name="login-email"
-            class="form-control"
-            required
-            autocomplete="email"
-          />
-        </div>
-        <div class="form-group mb-3">
-          <label for="login-password">Password</label>
-          <input
-            type="password"
-            id="login-password"
-            name="login-password"
-            class="form-control"
-            required
-            autocomplete="current-password"
-          />
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-popup">Accedi</button>
-        </div>
-      </form>
-      <form class="login-form" id="registerForm" method="POST">
-        <div class="form-group mb-3">
-          <label for="register-name">Nome</label>
-          <input
-            type="text"
-            id="register-name"
-            name="register-name"
-            class="form-control"
-            required
-            autocomplete="given-name"
-          />
-        </div>
-        <div class="form-group mb-3">
-          <label for="register-surname">Cognome</label>
-          <input
-            type="text"
-            id="register-surname"
-            name="register-surname"
-            class="form-control"
-            required
-            autocomplete="family-name"
-          />
-        </div>
-        <div class="form-group mb-3">
-          <label for="register-email">Email</label>
-          <input
-            type="email"
-            id="register-email"
-            name="register-email"
-            class="form-control"
-            required
-            autocomplete="email"
-          />
-        </div>
-        <div class="form-group mb-3">
-          <label for="register-password">Password</label>
-          <input
-            type="password"
-            id="register-password"
-            name="register-password"
-            class="form-control"
-            required
-            minlength="8"
-            autocomplete="new-password"
-          />
-          <small>Minimo 8 caratteri.</small>
-        </div>
-        <div class="terms-checkbox mb-3">
-          <input
-            type="checkbox"
-            id="register-terms"
-            name="register-terms"
-            required
-          />
-          <label for="register-terms"
-            >Accetto i
-            <a href="/termini" target="_blank">termini e condizioni</a></label
-          >
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-popup">Registrati</button>
-        </div>
-      </form>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+          name="description"
+          content="Contatta i volontari dell'Eremo Frate Francesco tramite telefono o email"
+  />
+  <link rel="icon" href="images/logo.png" type="image/x-icon" />
+  <title>Contatti - Eremo Frate Francesco</title>
+  <link rel="stylesheet" href="style.css" />
+  <link
+          href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+  />
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+  />
+  <style>
+    /* Stili aggiuntivi per coerenza e messaggi di errore */
+    .login-popup input.form-control.error-border {
+      border-color: var(--danger, red) !important;
+    }
+    .login-popup input:-webkit-autofill,
+    .login-popup input:-webkit-autofill:hover,
+    .login-popup input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0px 1000px var(--white, white) inset !important;
+      -webkit-text-fill-color: var(--dark, #333) !important;
+    }
+    .form-message.error {
+      color: var(--danger, red);
+      background-color: rgba(var(--danger-rgb, 231, 76, 60), 0.1);
+      border: 1px solid rgba(var(--danger-rgb, 231, 76, 60), 0.3);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.9em;
+      margin-top: 0.5em;
+      text-align: left;
+    }
+    .spinner-mini-light { /* Spinner per bottoni */
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border: 2px solid rgba(0,0,0,0.2); /* Colore base spinner */
+      border-radius: 50%;
+      border-top-color: #000; /* Colore del loader che gira */
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-left: 5px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Assicurati che .terms-checkbox sia stilizzato se non lo è già globalmente in style.css */
+    .terms-checkbox {
+      text-align: left;
+      font-size: 0.9em;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem; /* Default da style.css è .mb-3 */
+      color: var(--gray-dark);
+    }
+    .terms-checkbox input[type="checkbox"] {
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+    .terms-checkbox label {
+      font-weight: normal;
+      color: var(--gray-dark);
+    }
+    .terms-checkbox a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<header class="navbar-container" id="navbarContainer">
+  <nav class="navbar">
+    <div class="logo">
+      <a href="index.html">
+        <span class="emoji">🏔️</span>
+        <h2>Eremo Frate Francesco</h2>
+      </a>
     </div>
+    <div class="menu">
+      <a href="eventiincorso.html">Calendario attività</a>
+      <a href="eventipassati.html">Archivio attività</a>
+      <span class="separator">|</span>
+      <a href="incontrisullaparola.html">Incontri sulla parola</a>
+      <span class="separator">|</span>
+      <a href="dovesiamo.html">Dove siamo</a>
+      <a href="contatti.html" class="active">Contatti</a>
+    </div>
+    <div class="right-menu">
+      <button id="login-btn" class="login-btn">Accedi</button>
+      <button
+              class="hamburger"
+              onclick="toggleMobileMenu()"
+              aria-label="Toggle menu"
+      >
+        ☰
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="eventiincorso.html" onclick="closeMobileMenu()"
+    >Calendario attività</a
+    >
+    <a href="eventipassati.html" onclick="closeMobileMenu()"
+    >Archivio attività</a
+    >
+    <a href="incontrisullaparola.html" onclick="closeMobileMenu()"
+    >Incontri sulla parola</a
+    >
+    <a href="dovesiamo.html" onclick="closeMobileMenu()">Dove siamo</a>
+    <a href="contatti.html" onclick="closeMobileMenu()">Contatti</a>
+    <a
+            href="#"
+            id="login-btn-mobile"
+            onclick="openLoginPopup(); closeMobileMenu();"
+    >Accedi</a
+    >
+  </div>
+</header>
+
+<main>
+  <div class="container section-padding">
+    <h1 class="text-center mb-4">Contattaci</h1>
+    <p
+            class="text-center mb-4"
+            style="max-width: 700px; margin-left: auto; margin-right: auto"
+    >
+      Siamo a disposizione per informazioni sulle nostre attività,
+      sull'ospitalità o per qualsiasi altra domanda. Non esitare a
+      contattarci!
+    </p>
+
+    <div class="contatti-grid">
+      <div class="contatto-card">
+        <div class="contatto-icon">
+          <i
+                  class="fas fa-mobile-alt fa-2x"
+                  style="color: var(--secondary)"
+          ></i>
+        </div>
+        <h3>Referente Ospitalità</h3>
+        <p>Per informazioni specifiche sui ritiri e l'accoglienza.</p>
+        <p style="font-weight: bold; font-size: 1.1rem">+39 098 765432</p>
+        <button
+                class="btn-contatto"
+                onclick="copyPhoneNumber('0987654321', this)"
+        >
+          <i class="fas fa-copy" style="margin-right: 5px"></i> Copia Numero
+        </button>
+      </div>
+
+      <div class="contatto-card">
+        <div class="contatto-icon">
+          <i
+                  class="fas fa-envelope fa-2x"
+                  style="color: var(--secondary)"
+          ></i>
+        </div>
+        <h3>Indirizzo Email</h3>
+        <p>Per richieste scritte e invio documentazione.</p>
+        <p style="font-weight: bold; font-size: 1.1rem">
+          info.eremofrancesco@email.it
+        </p>
+        <a href="mailto:info.eremofrancesco@email.it" class="btn-contatto">
+          <i class="fas fa-paper-plane" style="margin-right: 5px"></i>
+          Scrivici
+        </a>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <h2 class="mb-3">Dove Trovarci</h2>
+      <p>Via San Vito, 24027 Nembro BG</p>
+      <a
+              href="dovesiamo.html"
+              class="btn-contatto"
+              style="background-color: var(--accent)"
+      >
+        <i class="fas fa-map-marked-alt" style="margin-right: 5px"></i> Vedi
+        Mappa e Indicazioni
+      </a>
+    </div>
+  </div>
+</main>
+
+<div class="login-popup-overlay" id="loginOverlay"></div>
+<div class="login-popup" id="loginPopup">
+  <button class="close-popup" id="closePopup" aria-label="Chiudi popup">
+    &times;
+  </button>
+  <div class="login-tabs">
+    <div class="login-tab active" data-tab="login">Accedi</div>
+    <div class="login-tab" data-tab="register">Registrati</div>
+  </div>
+  <form class="login-form active" id="loginForm" method="POST">
+    <div class="form-group mb-3">
+      <label for="login-email">Email</label>
+      <input
+              type="email"
+              id="login-email"
+              name="login-email"
+              class="form-control"
+              required
+              autocomplete="email"
+      />
+    </div>
+    <div class="form-group mb-3">
+      <label for="login-password">Password</label>
+      <input
+              type="password"
+              id="login-password"
+              name="login-password"
+              class="form-control"
+              required
+              autocomplete="current-password"
+      />
+    </div>
+    <div id="login-error-message" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
+    <div class="form-actions">
+      <button type="submit" class="btn-popup">Accedi</button>
+    </div>
+  </form>
+  <form class="login-form" id="registerForm" method="POST">
+    <div class="form-group mb-3">
+      <label for="register-name">Nome</label>
+      <input
+              type="text"
+              id="register-name"
+              name="register-name"
+              class="form-control"
+              required
+              autocomplete="given-name"
+      />
+    </div>
+    <div class="form-group mb-3">
+      <label for="register-surname">Cognome</label>
+      <input
+              type="text"
+              id="register-surname"
+              name="register-surname"
+              class="form-control"
+              required
+              autocomplete="family-name"
+      />
+    </div>
+    <div class="form-group mb-3">
+      <label for="register-email">Email</label>
+      <input
+              type="email"
+              id="register-email"
+              name="register-email"
+              class="form-control"
+              required
+              autocomplete="email"
+      />
+    </div>
+    <div class="form-group mb-3">
+      <label for="register-password">Password</label>
+      <input
+              type="password"
+              id="register-password"
+              name="register-password"
+              class="form-control"
+              required
+              minlength="8"
+              autocomplete="new-password"
+      />
+      <small>Minimo 8 caratteri.</small>
+    </div>
+    <div class="terms-checkbox mb-3">
+      <input
+              type="checkbox"
+              id="register-terms"
+              name="register-terms"
+              required
+      />
+      <label for="register-terms"
+      >Accetto i
+        <a href="/termini" target="_blank">termini e condizioni</a></label
+      >
+    </div>
+    <div id="register-error-message" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
+    <div class="form-actions">
+      <button type="submit" class="btn-popup">Registrati</button>
+    </div>
+  </form>
+</div>
 
 <footer>
   <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia</p>
 </footer>
 
-    <script>
-      // --- Navbar Scroll Logic ---
-      let lastScroll = 0;
-      const navbarContainer = document.getElementById("navbarContainer");
-      window.addEventListener(
-        "scroll",
-        function () {
-          const currentScroll =
-            window.pageYOffset || document.documentElement.scrollTop;
-          if (currentScroll <= 50) {
-            // Buffer aggiunto
-            navbarContainer.classList.remove("hidden");
-            lastScroll = 0;
-            return;
-          }
-          if (
-            currentScroll > lastScroll &&
-            !navbarContainer.classList.contains("hidden")
-          ) {
-            // Scroll Down
-            navbarContainer.classList.add("hidden");
-          } else if (
-            currentScroll < lastScroll &&
-            navbarContainer.classList.contains("hidden")
-          ) {
-            // Scroll Up
-            navbarContainer.classList.remove("hidden");
-          }
-          lastScroll = currentScroll;
-        },
-        false
-      );
+<script>
+  const defaultUserIconPath = '/uploads/icons/default_user.png'; // Definisci icona di default
 
-      // --- Mobile Menu Logic ---
-      const mobileMenu = document.getElementById("mobileMenu");
-      const hamburger = document.querySelector(".hamburger");
-      function toggleMobileMenu() {
-        const isOpen = mobileMenu.classList.toggle("open");
-        hamburger.setAttribute("aria-expanded", isOpen);
-        document.body.style.overflow = isOpen ? "hidden" : ""; // Blocca/sblocca scroll
-      }
-      function closeMobileMenu() {
-        mobileMenu.classList.remove("open");
-        hamburger.setAttribute("aria-expanded", "false");
-        document.body.style.overflow = "";
-      }
-      // Chiudi menu cliccando fuori
-      document.addEventListener("click", function (event) {
-        if (
-          mobileMenu.classList.contains("open") &&
-          !mobileMenu.contains(event.target) &&
-          !hamburger.contains(event.target)
-        ) {
-          closeMobileMenu();
-        }
-      });
-
-      // --- Login Popup Logic ---
-      const loginBtn = document.getElementById("login-btn");
-      const loginBtnMobile = document.getElementById("login-btn-mobile");
-      const loginOverlay = document.getElementById("loginOverlay");
-      const loginPopup = document.getElementById("loginPopup");
-      const closePopupBtn = document.getElementById("closePopup");
-      const loginTabs = document.querySelectorAll(".login-tab");
-      const loginForms = document.querySelectorAll(".login-form");
-
-      function openLoginPopup() {
-        loginOverlay.classList.add("active");
-        loginPopup.classList.add("active");
-        document.body.style.overflow = "hidden";
-      }
-
-      function closeLoginPopup() {
-        loginOverlay.classList.remove("active");
-        loginPopup.classList.remove("active");
-        document.body.style.overflow = "";
-      }
-
-      if (loginBtn) {
-        loginBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          openLoginPopup();
-        });
-      }
-      if (loginBtnMobile) {
-        loginBtnMobile.addEventListener("click", (e) => {
-          e.preventDefault();
-          closeMobileMenu();
-          openLoginPopup();
-        });
-      }
-
-      if (closePopupBtn) {
-        closePopupBtn.addEventListener("click", closeLoginPopup);
-      }
-      if (loginOverlay) {
-        loginOverlay.addEventListener("click", closeLoginPopup);
-      }
-
-      // Login Tabs Switch
-      loginTabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          const tabId = tab.getAttribute("data-tab");
-          loginTabs.forEach((t) => t.classList.remove("active"));
-          tab.classList.add("active");
-          loginForms.forEach((form) => {
-            form.classList.remove("active");
-            if (form.id === `${tabId}Form`) {
-              form.classList.add("active");
-            }
-          });
-        });
-      });
-
-      // --- Gestione Invio Form con Fetch API ---
-
-      // LOGIN
-      document
-        .getElementById("loginForm")
-        ?.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const loginButton = e.target.querySelector('button[type="submit"]');
-          const originalButtonText = loginButton.innerHTML;
-          loginButton.disabled = true;
-          loginButton.innerHTML = "Accesso..."; // Feedback visivo
-
-          try {
-            const response = await fetch("login.php", {
-              // Assicurati che il percorso 'login.php' sia corretto
-              method: "POST",
-              // Non serve 'Content-Type' header quando si usa FormData con fetch
-              body: new FormData(e.target), // Invia i dati del form
-            });
-
-            // Controlla se la risposta è OK (status 200-299)
-            if (!response.ok) {
-              // Prova a leggere l'errore dal corpo se possibile, altrimenti usa statusText
-              let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
-              try {
-                const errorData = await response.json();
-                errorMsg = errorData.message || errorMsg;
-              } catch (e) {
-                /* Ignora se il corpo non è JSON */
+  // --- Navbar Scroll Logic ---
+  let lastScroll = 0;
+  const navbarContainer = document.getElementById("navbarContainer");
+  if (navbarContainer) { // Aggiunto controllo
+    window.addEventListener(
+            "scroll",
+            function () {
+              const currentScroll =
+                      window.pageYOffset || document.documentElement.scrollTop;
+              if (currentScroll <= 50) {
+                navbarContainer.classList.remove("hidden");
+                lastScroll = 0;
+                return;
               }
-              throw new Error(errorMsg);
-            }
-
-            const result = await response.json(); // Aspetta risposta JSON
-
-            if (result.success) {
-              // alert(result.message); // Puoi mostrare un messaggio meno invasivo
-              closeLoginPopup();
-              // Reindirizzamento differenziato
-              if (result.is_admin) {
-                window.location.href = "indexadmin.html"; // Pagina admin
-              } else {
-                window.location.href = "indexaccesso.html"; // Pagina utente loggato
+              if (
+                      currentScroll > lastScroll &&
+                      !navbarContainer.classList.contains("hidden")
+              ) {
+                navbarContainer.classList.add("hidden");
+              } else if (
+                      currentScroll < lastScroll &&
+                      navbarContainer.classList.contains("hidden")
+              ) {
+                navbarContainer.classList.remove("hidden");
               }
-            } else {
-              // Mostra errore specifico dal backend
-              alert(
-                "Errore Login: " + (result.message || "Credenziali non valide.")
-              );
-            }
-          } catch (error) {
-            // Errore di rete o nella fetch o nel parsing JSON
-            alert("Errore durante il login: " + error.message);
-            console.error("Dettaglio errore login:", error);
-          } finally {
-            // Riabilita il bottone indipendentemente dal risultato
-            loginButton.disabled = false;
-            loginButton.innerHTML = originalButtonText;
-          }
-        });
+              lastScroll = currentScroll;
+            },
+            false
+    );
+  }
 
-      // REGISTRAZIONE
-      document
-        .getElementById("registerForm")
-        ?.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const registerButton = e.target.querySelector(
-            'button[type="submit"]'
-          );
-          const originalButtonText = registerButton.innerHTML;
-          registerButton.disabled = true;
-          registerButton.innerHTML = "Registrazione..."; // Feedback visivo
+  // --- Mobile Menu Logic ---
+  const mobileMenu = document.getElementById("mobileMenu");
+  const hamburger = document.querySelector(".navbar .hamburger"); // Selettore più specifico
 
-          try {
-            const response = await fetch("registrati.php", {
-              // Assicurati che 'registrati.php' sia corretto
-              method: "POST",
-              body: new FormData(e.target),
-            });
-
-            if (!response.ok) {
-              let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
-              try {
-                const errorData = await response.json();
-                errorMsg = errorData.message || errorMsg;
-              } catch (e) {
-                /* Ignora se il corpo non è JSON */
-              }
-              throw new Error(errorMsg);
-            }
-
-            const result = await response.json();
-
-            if (result.success) {
-              alert(result.message || "Registrazione completata con successo!");
-              closeLoginPopup();
-              // Potresti voler effettuare il login automatico qui o reindirizzare alla pagina di login
-              // openLoginPopup(); // Riapri per login?
-              // document.querySelector('.login-tab[data-tab="login"]').click(); // Seleziona tab login
-            } else {
-              alert(
-                "Errore Registrazione: " +
-                  (result.message || "Si è verificato un errore.")
-              );
-            }
-          } catch (error) {
-            alert("Errore durante la registrazione: " + error.message);
-            console.error("Dettaglio errore registrazione:", error);
-          } finally {
-            registerButton.disabled = false;
-            registerButton.innerHTML = originalButtonText;
-          }
-        });
-
-      // Chiudi popup con tasto Esc
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && loginPopup.classList.contains("active")) {
-          closeLoginPopup();
-        }
-      });
-
-      // --- Funzione Copia Numero ---
-      function copyPhoneNumber(phoneNumber, button) {
-        navigator.clipboard
-          .writeText(phoneNumber)
-          .then(() => {
-            const originalText = button.innerHTML;
-            button.innerHTML =
-              '<i class="fas fa-check" style="margin-right: 5px;"></i> Copiato!';
-            button.style.backgroundColor = "#28a745"; // Verde successo
-            setTimeout(() => {
-              button.innerHTML = originalText;
-              button.style.backgroundColor = ""; // Ripristina colore originale
-            }, 2000);
-          })
-          .catch((err) => {
-            console.error("Errore durante la copia: ", err);
-            alert("Errore nella copia del numero. Selezionalo manualmente.");
-        });
+  function toggleMobileMenu() {
+    if (mobileMenu && hamburger) { // Aggiunto controllo
+      const isOpen = mobileMenu.classList.toggle("open");
+      hamburger.classList.toggle("open");
+      hamburger.setAttribute("aria-expanded", String(isOpen));
+      document.body.style.overflow = isOpen ? "hidden" : "";
     }
+  }
+  function closeMobileMenu() {
+    if (mobileMenu && hamburger && mobileMenu.classList.contains("open")) { // Aggiunto controllo
+      mobileMenu.classList.remove("open");
+      hamburger.classList.remove("open");
+      hamburger.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    }
+  }
+  if (hamburger) hamburger.addEventListener("click", toggleMobileMenu);
 
-    const currentYearSpan = document.querySelector("footer p span");
-        if (currentYearSpan) {
-            currentYearSpan.textContent = new Date().getFullYear();
+  document.querySelectorAll("#mobileMenu a").forEach((link) => {
+    if (link.id !== 'login-btn-mobile') {
+      link.addEventListener("click", closeMobileMenu);
+    }
+  });
+  document.addEventListener("click", function (event) {
+    if (
+            mobileMenu && mobileMenu.classList.contains("open") &&
+            hamburger && !mobileMenu.contains(event.target) &&
+            !hamburger.contains(event.target)
+    ) {
+      closeMobileMenu();
+    }
+  });
+
+  // --- Login Popup Logic ---
+  const loginBtn = document.getElementById("login-btn");
+  const loginBtnMobile = document.getElementById("login-btn-mobile");
+  const loginOverlay = document.getElementById("loginOverlay");
+  const loginPopup = document.getElementById("loginPopup");
+  const closePopupBtn = document.getElementById("closePopup");
+  const loginTabs = document.querySelectorAll(".login-tab");
+  const loginForms = document.querySelectorAll(".login-popup .login-form"); // Selettore più generico
+  const loginErrorMessage = document.getElementById('login-error-message');
+  const registerErrorMessage = document.getElementById('register-error-message');
+
+  function openLoginPopup() {
+    if(loginOverlay) loginOverlay.classList.add("active");
+    if(loginPopup) loginPopup.classList.add("active");
+    document.body.style.overflow = "hidden";
+    resetFormErrors();
+    const activeForm = loginPopup?.querySelector(".login-form.active");
+    activeForm?.querySelector('input:not([type="hidden"])')?.focus();
+  }
+
+  function closeLoginPopup() {
+    if(loginOverlay) loginOverlay.classList.remove("active");
+    if(loginPopup) loginPopup.classList.remove("active");
+    document.body.style.overflow = "";
+    resetFormErrors();
+  }
+
+  function resetFormErrors() {
+    loginForms.forEach(form => {
+      form.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border'));
+    });
+    if (loginErrorMessage) loginErrorMessage.style.display = 'none';
+    if (registerErrorMessage) registerErrorMessage.style.display = 'none';
+  }
+
+  if (loginBtn) {
+    loginBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      openLoginPopup();
+    });
+  }
+  // loginBtnMobile ha già onclick nell'HTML
+
+  if (closePopupBtn) {
+    closePopupBtn.addEventListener("click", closeLoginPopup);
+  }
+  if (loginOverlay) { // Modificato per chiudere solo su click overlay
+    loginOverlay.addEventListener("click",  (e) => {
+      if (e.target === loginOverlay) {
+        closeLoginPopup();
+      }
+    });
+  }
+
+  loginTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const tabId = tab.getAttribute("data-tab");
+      loginTabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      loginForms.forEach((form) => {
+        form.classList.remove("active");
+        if (form.id === `${tabId}Form`) {
+          form.classList.add("active");
+          form.querySelector('input:not([type="hidden"])')?.focus();
         }
+      });
+      resetFormErrors();
+    });
+  });
+
+  // --- Gestione Invio Form con Fetch API ---
+  document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const loginButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = loginButton.textContent; // Salva testo originale
+    loginButton.disabled = true;
+    loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>';
+
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
+    emailInput.classList.remove('error-border');
+    passwordInput.classList.remove('error-border');
+    if(loginErrorMessage) loginErrorMessage.style.display = 'none';
+
+    try {
+      const response = await fetch("login.php", {
+        method: "POST",
+        body: new FormData(e.target),
+      });
+
+      if (!response.ok) {
+        let errorData = { message: `Errore HTTP: ${response.status}` };
+        try { errorData = await response.json(); } catch (e) { /* Ignora */ }
+        throw new Error(errorData.message || `Errore HTTP: ${response.status}`);
+      }
+      const result = await response.json();
+
+      if (result.success) {
+        const userDataToStore = {
+          nome: result.nome,
+          email: result.email,
+          iconPath: defaultUserIconPath
+        };
+        localStorage.setItem('userDataEFF', JSON.stringify(userDataToStore));
+        closeLoginPopup();
+        // REINDIRIZZAMENTO CORRETTO per contatti.html
+        window.location.href = result.is_admin ? "indexadmin.html" : "contattiaccesso.html";
+      } else {
+        emailInput.classList.add('error-border');
+        passwordInput.classList.add('error-border');
+        if(loginErrorMessage) {
+          loginErrorMessage.textContent = result.message || "Credenziali non valide.";
+          loginErrorMessage.style.display = 'block';
+        } else {
+          alert(result.message || "Credenziali non valide.");
+        }
+      }
+    } catch (error) {
+      emailInput.classList.add('error-border');
+      passwordInput.classList.add('error-border');
+      if(loginErrorMessage) {
+        loginErrorMessage.textContent = "Errore di connessione o risposta non valida dal server.";
+        loginErrorMessage.style.display = 'block';
+      } else {
+        alert("Errore di connessione o risposta non valida dal server.");
+      }
+      console.error("Errore login:", error);
+    } finally {
+      loginButton.disabled = false;
+      loginButton.innerHTML = originalButtonText; // Ripristina testo originale
+    }
+  });
+
+  document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const registerButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = registerButton.textContent; // Salva testo originale
+    registerButton.disabled = true;
+    registerButton.innerHTML = 'Registrazione... <div class="spinner-mini-light"></div>';
+    if(registerErrorMessage) registerErrorMessage.style.display = 'none';
+    e.target.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border'));
+
+    try {
+      const response = await fetch("registrati.php", {
+        method: "POST",
+        body: new FormData(e.target),
+      });
+
+      if (!response.ok) {
+        let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+        try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; }
+        catch(err) { /* Ignora se non è JSON */ }
+        throw new Error(errorMsg);
+      }
+      const result = await response.json();
+
+      if (result.success) {
+        alert(result.message || "Registrazione completata con successo! Ora puoi effettuare il login.");
+        const loginTabButton = document.querySelector('.login-tab[data-tab="login"]');
+        if(loginTabButton) loginTabButton.click();
+
+        const loginEmailInput = document.getElementById('login-email');
+        const registerEmailInput = document.getElementById('register-email');
+        if(loginEmailInput && registerEmailInput) {
+          loginEmailInput.value = registerEmailInput.value;
+        }
+        e.target.reset();
+      } else {
+        if(registerErrorMessage) {
+          registerErrorMessage.textContent = result.message || "Errore durante la registrazione.";
+          registerErrorMessage.style.display = 'block';
+        } else {
+          alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+        }
+        if (result.errors) {
+          for (const fieldNameFromError in result.errors) {
+            const inputElement = e.target.elements[fieldNameFromError] || document.getElementById(`register-${fieldNameFromError}`);
+            if (inputElement) {
+              inputElement.classList.add('error-border');
+            }
+          }
+        }
+      }
+    } catch (error) {
+      if(registerErrorMessage) {
+        registerErrorMessage.textContent = "Errore: " + error.message;
+        registerErrorMessage.style.display = 'block';
+      } else {
+        alert("Errore durante la registrazione: " + error.message);
+      }
+      console.error("Dettaglio errore registrazione:", error);
+    } finally {
+      registerButton.disabled = false;
+      registerButton.innerHTML = originalButtonText; // Ripristina testo originale
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && loginPopup && loginPopup.classList.contains("active")) { // Aggiunto controllo per loginPopup
+      closeLoginPopup();
+    }
+  });
+
+  // --- Funzione Copia Numero ---
+  function copyPhoneNumber(phoneNumber, button) {
+    navigator.clipboard
+            .writeText(phoneNumber)
+            .then(() => {
+              const originalText = button.innerHTML;
+              button.innerHTML =
+                      '<i class="fas fa-check" style="margin-right: 5px;"></i> Copiato!';
+              button.style.backgroundColor = "var(--success, #28a745)"; // Usa variabile CSS o fallback
+              setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.backgroundColor = "";
+              }, 2000);
+            })
+            .catch((err) => {
+              console.error("Errore durante la copia: ", err);
+              alert("Errore nella copia del numero. Selezionalo manualmente.");
+            });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() { // DOMContentLoaded per script alla fine del body
+    const currentYearEl = document.getElementById("currentYear");
+    if (currentYearEl) {
+      currentYearEl.textContent = new Date().getFullYear();
+    }
+  });
 </script>
 
 </body>
