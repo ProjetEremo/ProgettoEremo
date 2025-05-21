@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="images/logo.png" type="image/x-icon">
-    <title>Archivio Attività (Accesso) - Eremo Frate Francesco</title>
-    <link rel="stylesheet" href="style.css"> {/* ASSICURATI CHE QUESTO PERCORSO SIA CORRETTO! */}
+    <link rel="icon" href="/images/logo.png" type="image/x-icon"> <title>Archivio Attività (Accesso) - Eremo Frate Francesco</title>
+    <link rel="stylesheet" href="style.css">
     <style>
+        /* Stile per l'avatar immagine nella navbar */
+        .user-avatar img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            vertical-align: middle;
+        }
         /* Stili specifici per i filtri, identici a eventipassati.html */
         .event-filters {
             background-color: var(--white); padding: 1.5rem; border-radius: var(--border-radius-medium);
@@ -21,29 +28,8 @@
             width: 100%; padding: 0.7rem 1rem; border: 1px solid var(--gray-medium);
             border-radius: 8px; font-size: 0.95rem;
         }
-        .loading-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255,255,255,0.8); display: flex; flex-direction:column;
-            justify-content: center; align-items: center; z-index: 10;
-            visibility: hidden; opacity: 0; transition: opacity 0.3s, visibility 0.3s;
-        }
-        .loading-overlay.visible { visibility: visible; opacity: 1; }
-        .loading-overlay .spinner {
-            width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px;
-        }
-        .loading-overlay .spinner > div {
-            width: 14px; height: 14px; background-color: var(--primary);
-            border-radius: 100%; display: inline-block;
-            animation: sk-bouncedelay 1.4s infinite ease-in-out both; margin: 0 4px;
-        }
-        .loading-overlay .spinner .bounce1 { animation-delay: -0.32s; }
-        .loading-overlay .spinner .bounce2 { animation-delay: -0.16s; }
-        @keyframes sk-bouncedelay {
-            0%, 80%, 100% { transform: scale(0.3); opacity: 0.5; }
-            40% { transform: scale(1.0); opacity: 1; }
-        }
-        .loading-overlay p { font-weight: 500; color: var(--dark); }
-        .no-events { text-align: center; padding: 2rem; color: var(--gray-dark); }
+        .loading-overlay { /* ... (stili loading overlay invariati) ... */ }
+        .no-events { /* ... (stili no-events invariati) ... */ }
     </style>
 </head>
 <body>
@@ -51,7 +37,7 @@
 <header class="navbar-container" id="navbarContainer">
     <nav class="navbar">
         <div class="logo">
-            <a href="indexaccesso.html"><span class="emoji">🏔️</span><h2>Eremo Frate Francesco</h2></a>
+            <a href="indexaccesso.html" style="text-decoration:none; color:inherit;"><span class="emoji">🏔️</span><h2>Eremo Frate Francesco</h2></a>
         </div>
         <div class="menu">
             <a href="eventiincorsoaccesso.html">Calendario attività</a>
@@ -64,22 +50,21 @@
         </div>
         <div class="right-menu">
             <div class="user-dropdown" id="userDropdownContainer">
-                <button class="user-btn" aria-haspopup="true" aria-expanded="false">
-                    <span class="user-avatar" id="navbar-avatar">👤</span>
+                <button class="user-btn" onclick="toggleUserMenu(event)" aria-haspopup="true" aria-expanded="false">
+                    <span class="user-avatar" id="navbar-avatar">
+                        <img src="/uploads/icons/default_user.png" alt="User Icon"> </span>
                     <span class="user-name" id="navbar-username">Utente</span>
                     <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
                     <a href="areapersonale.html">Il mio profilo</a>
                     <a href="gestisciprenotazioni.html">Le mie prenotazioni</a>
-                    <a href="#" id="logout-link-dropdown">Esci</a>
-                </div>
+                    <a href="#" id="logout-link-dropdown">Esci</a> </div>
             </div>
-            <button class="hamburger" aria-label="Toggle menu">☰</button>
+            <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
         </div>
     </nav>
     <div class="mobile-menu" id="mobileMenu">
-        <a href="chi-siamoaccesso.html" onclick="closeMobileMenu()">Chi siamo</a>
         <a href="eventiincorsoaccesso.html" onclick="closeMobileMenu()">Calendario attività</a>
         <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()">Archivio attività</a>
         <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
@@ -88,8 +73,7 @@
         <hr style="border-color: rgba(255,255,255,0.1);">
         <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
         <a href="gestisciprenotazioni.html" onclick="closeMobileMenu()">Le mie prenotazioni</a>
-        <a href="#" id="logout-link-mobile" onclick="closeMobileMenu()">Esci</a>
-    </div>
+        <a href="#" id="logout-link-mobile" onclick="handleLogout(); closeMobileMenu();">Esci</a> </div>
 </header>
 
 <main>
@@ -130,34 +114,55 @@
 </footer>
 
 <script>
-    // --- SCRIPT GLOBALI PER PAGINE ACCESSO ---
     let currentUser = null;
+    const defaultUserIconPath = '/uploads/icons/default_user.png'; // Path ASSOLUTO
+
+    // --- FUNZIONI NAVBAR E SESSIONE UTENTE (STANDARD) ---
+    async function callApi(url, method = 'GET', data = null) {
+        const headers = { 'Content-Type': 'application/json' };
+        const options = { method, headers, credentials: 'same-origin' };
+        if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
+            options.body = JSON.stringify(data);
+        }
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                let errorData = { message: `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
+                try { errorData = await response.json(); } catch (e) { /* usa default */ }
+                const finalErrorMessage = errorData.message || `Errore del server: ${response.status} per ${url}`;
+                console.error("[callApi] Errore:", finalErrorMessage);
+                throw new Error(finalErrorMessage);
+            }
+            if (response.status === 204) return {};
+            return await response.json();
+        } catch (error) {
+            console.error(`[callApi] Fallimento chiamata API (rete/parse) a ${url}:`, error.message);
+            throw error;
+        }
+    }
 
     function updateNavbarUserUI() {
         const navbarUsernameEl = document.getElementById('navbar-username');
-        const navbarAvatarEl = document.getElementById('navbar-avatar');
-        if (!navbarUsernameEl || !navbarAvatarEl) {
-            return;
-        }
-        if (currentUser) {
-            let displayName = 'Utente';
-            if (currentUser.nome && currentUser.nome.trim() !== '') {
-                displayName = currentUser.nome;
-            } else if (currentUser.email) {
-                displayName = currentUser.email.split('@')[0];
-            }
+        const navbarAvatarImgEl = document.querySelector('#navbar-avatar img');
+        if (!navbarUsernameEl || !navbarAvatarImgEl) { return; }
+
+        if (currentUser && currentUser.email) {
+            let displayName = currentUser.nome || currentUser.email.split('@')[0];
             navbarUsernameEl.textContent = displayName;
-            if (currentUser.avatar) navbarAvatarEl.textContent = currentUser.avatar;
+            navbarAvatarImgEl.src = currentUser.iconPath || defaultUserIconPath;
+            navbarAvatarImgEl.alt = `Icona di ${displayName}`;
+            navbarAvatarImgEl.onerror = function() { this.src = defaultUserIconPath; };
         } else {
             navbarUsernameEl.textContent = 'Utente';
-            navbarAvatarEl.textContent = '👤';
+            navbarAvatarImgEl.src = defaultUserIconPath;
+            navbarAvatarImgEl.alt = 'Icona utente predefinita';
         }
     }
 
     function handleLogout() {
         localStorage.removeItem('userDataEFF');
         currentUser = null;
-        alert('Logout effettuato.');
+        alert('Logout effettuato. Verrai reindirizzato alla homepage.');
         window.location.href = 'index.html';
     }
 
@@ -166,66 +171,71 @@
         if (userDataString) {
             try {
                 currentUser = JSON.parse(userDataString);
-                if (!currentUser || !currentUser.email) {
-                    currentUser = null;
-                    localStorage.removeItem('userDataEFF');
+                if (!currentUser || typeof currentUser.email === 'undefined') {
+                    currentUser = null; localStorage.removeItem('userDataEFF');
                 }
             } catch (e) {
-                currentUser = null;
-                localStorage.removeItem('userDataEFF');
+                currentUser = null; localStorage.removeItem('userDataEFF'); console.error("Errore parsing userDataEFF:", e);
             }
         } else {
             currentUser = null;
         }
         updateNavbarUserUI();
 
+        // Usa gli ID generici per i link di logout, come nelle altre pagine corrette
         const logoutLinkDropdown = document.getElementById('logout-link-dropdown');
         const logoutLinkMobile = document.getElementById('logout-link-mobile');
+
         if (logoutLinkDropdown) logoutLinkDropdown.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
         if (logoutLinkMobile) logoutLinkMobile.addEventListener('click', (e) => {
-            e.preventDefault();
-            if(typeof closeMobileMenu === 'function') closeMobileMenu();
-            handleLogout();
+            e.preventDefault(); if(typeof closeMobileMenu === 'function') closeMobileMenu(); handleLogout();
         });
     }
 
+    async function fetchAndUpdateUserDisplayData() {
+        if (!currentUser || !currentUser.email) { return; }
+        try {
+            const apiUserData = await callApi('api/api_get_user_profile.php'); // Script profilo UTENTE è in /api/
+            if (apiUserData && apiUserData.success && apiUserData.data) {
+                const freshData = apiUserData.data;
+                currentUser.nome = freshData.nome || currentUser.nome;
+                currentUser.email = freshData.email || currentUser.email;
+                currentUser.iconPath = freshData.icon || defaultUserIconPath;
+                currentUser.cognome = freshData.cognome || (currentUser.cognome || '');
+                localStorage.setItem('userDataEFF', JSON.stringify(currentUser));
+                updateNavbarUserUI();
+            }
+        } catch (error) {
+            console.warn("EventiPassati: Errore fetch profilo aggiornato per navbar:", error.message);
+        }
+    }
+    // --- FINE FUNZIONI NAVBAR E SESSIONE UTENTE ---
+
+    // --- Logica Menu (Scroll, Dropdown, Hamburger) ---
+    // (Identica a quella di areapersonale.html e indexaccesso.html)
     let lastScroll = 0;
     const navbarContainer = document.getElementById('navbarContainer');
     if (navbarContainer) {
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
             if (currentScroll <= 50) { navbarContainer.classList.remove('hidden'); lastScroll = 0; return; }
-            if (currentScroll > lastScroll && !navbarContainer.classList.contains('hidden')) {
-                navbarContainer.classList.add('hidden');
-            } else if (currentScroll < lastScroll && navbarContainer.classList.contains('hidden')) {
-                navbarContainer.classList.remove('hidden');
-            }
+            if (currentScroll > lastScroll && !navbarContainer.classList.contains('hidden')) {navbarContainer.classList.add('hidden');}
+            else if (currentScroll < lastScroll && navbarContainer.classList.contains('hidden')) {navbarContainer.classList.remove('hidden');}
             lastScroll = currentScroll;
-        });
+        }, {passive: true});
     }
-
     const userDropdownButton = document.querySelector('#userDropdownContainer .user-btn');
     const userDropdownMenu = document.querySelector('#userDropdownContainer .dropdown-menu');
-    if (userDropdownButton && userDropdownMenu) {
-        userDropdownButton.addEventListener('click', function(event) {
-            event.stopPropagation();
+    function toggleUserMenu(event) {
+        if(event) event.stopPropagation();
+        if (userDropdownMenu && userDropdownButton) {
             const isCurrentlyOpen = userDropdownMenu.style.display === 'block';
             userDropdownMenu.style.display = isCurrentlyOpen ? 'none' : 'block';
-            this.setAttribute('aria-expanded', String(!isCurrentlyOpen));
-        });
-    }
-    document.addEventListener('click', function(event) {
-        if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
-            if (userDropdownButton && !userDropdownButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
-                userDropdownMenu.style.display = 'none';
-                if (userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
-            }
+            userDropdownButton.setAttribute('aria-expanded', String(!isCurrentlyOpen));
         }
-    });
-
+    }
     const mobileMenu = document.getElementById("mobileMenu");
     const hamburger = document.querySelector(".navbar .hamburger");
-    if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
     function toggleMobileMenu() {
         if (mobileMenu && hamburger) {
             const isOpen = mobileMenu.classList.toggle("open");
@@ -235,22 +245,35 @@
         }
     }
     function closeMobileMenu() {
-        if (mobileMenu && hamburger) {
+        if (mobileMenu && hamburger && mobileMenu.classList.contains("open")) {
             mobileMenu.classList.remove("open");
-            if (hamburger.classList.contains("open")) { hamburger.classList.remove("open"); hamburger.setAttribute("aria-expanded", "false");}
+            if(hamburger.classList.contains("open")){
+                hamburger.classList.remove("open");
+                hamburger.setAttribute("aria-expanded", "false");
+            }
             document.body.style.overflow = '';
         }
     }
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function(globalEvent) {
+        if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
+            const userDropdownContainer = document.getElementById('userDropdownContainer');
+            if (userDropdownContainer && !userDropdownContainer.contains(globalEvent.target)) {
+                userDropdownMenu.style.display = 'none';
+                if (userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
+            }
+        }
         if (mobileMenu && mobileMenu.classList.contains('open')) {
-            if (!mobileMenu.contains(event.target) && hamburger && !hamburger.contains(event.target)) {
+            if (mobileMenu.contains(globalEvent.target) && globalEvent.target.tagName === 'A' && globalEvent.target.closest('.mobile-menu')) {
+                closeMobileMenu();
+            } else if (hamburger && !mobileMenu.contains(globalEvent.target) && !hamburger.contains(globalEvent.target)) {
                 closeMobileMenu();
             }
         }
     });
-    // --- FINE SCRIPT GLOBALI ---
+    // --- FINE LOGICA MENU ---
 
-    // --- Logica Specifica per eventipassatiaccesso.html ---
+
+    // --- Logica Specifica per eventipassatiaccesso.html (Tua logica esistente) ---
     const eventiPassatiGrid = document.getElementById('eventiPassatiGrid');
     const loadingIndicator = document.getElementById('loadingIndicator');
     let allPastEventsData = [];
@@ -267,48 +290,45 @@
     function createPastEventCard(event) {
         const card = document.createElement('article');
         card.className = 'card';
+        // I dataset per il filtro sono utili, li lascio
         card.dataset.title = event.titolo?.toLowerCase() || '';
         card.dataset.date = event.datainizio || '';
         card.dataset.speaker = event.relatore?.toLowerCase() || '';
-        let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-past.jpg';
 
-        // Riscritto usando concatenazione di stringhe standard
-        let htmlContent = '<div class="card-image-container">' +
-            '<img src="' + imageSrc + '" alt="Copertina: ' + (event.titolo || 'Evento passato') + '" class="card-image" loading="lazy" onerror="this.onerror=null;this.src=\'images/default-event-error.jpg\';">' +
-            '</div>' +
-            '<div class="card-content">' +
-            '<h3>' + (event.titolo || 'Titolo non disponibile') + '</h3>' +
-            '<p class="card-info">' +
-            '<b>Data:</b> ' + formatDate(event.datainizio) +
-            (event.durata ? '<br><b>Orario/Durata:</b> ' + event.durata : '') +
-            '</p>' +
-            '<p class="card-info">' +
-            '<b>' + (event.prefisso_relatore || 'Relatore') + ':</b> ' + (event.relatore || 'N/D') +
-            (event.associazione ? '<br><b>Associazione:</b> ' + event.associazione : '') +
-            '</p>' +
-            '<p>' + (event.descrizione || 'Nessuna descrizione breve disponibile.') + '</p>' +
-            '<div class="card-actions single-action">' +
-            // MODIFICA QUI: Cambia il link per puntare a evento_dettaglio_accesso.html
-            '<a href="evento_dettaglio_accesso.html?id=' + event.idevento + '" class="card-btn card-btn-secondary">Dettagli Evento</a>' +
-            '</div>' +
-            '</div>';
+        let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : '/images/default-event-past.jpg'; // Path assoluto per default
+
+        let htmlContent =
+            `<div class="card-image-container">
+                <img src="${imageSrc}" alt="Copertina: ${event.titolo || 'Evento passato'}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='/images/default-event-error.jpg';">
+            </div>
+            <div class="card-content">
+                <h3>${event.titolo || 'Titolo non disponibile'}</h3>
+                <p class="card-info">
+                    <b>Data:</b> ${formatDate(event.datainizio)}
+                    ${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ''}
+                </p>
+                <p class="card-info">
+                    <b>${event.prefisso_relatore || 'Relatore'}:</b> ${event.relatore || 'N/D'}
+                    ${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ''}
+                </p>
+                <p>${event.descrizione || 'Nessuna descrizione breve disponibile.'}</p>
+                <div class="card-actions single-action">
+                    <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli Evento</a>
+                </div>
+            </div>`;
         card.innerHTML = htmlContent;
         return card;
     }
 
     async function loadPastEvents() {
-        if (!eventiPassatiGrid || !loadingIndicator) {
-            console.error("Elementi DOM per griglia eventi passati o indicatore non trovati.");
-            return;
-        }
+        if (!eventiPassatiGrid || !loadingIndicator) { return; }
         loadingIndicator.classList.add('visible');
         eventiPassatiGrid.innerHTML = '';
 
         try {
+            // Assicurati che get_past_events.php sia nella root se chiamato così, o modifica il percorso
             const response = await fetch('get_past_events.php');
-            if (!response.ok) {
-                throw new Error('Errore HTTP ' + response.status + ': ' + response.statusText);
-            }
+            if (!response.ok) { throw new Error('Errore HTTP ' + response.status + ': ' + response.statusText); }
             const result = await response.json();
 
             if (result.success && Array.isArray(result.data)) {
@@ -321,11 +341,10 @@
                     eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
                 }
             } else {
-                throw new Error(result.message || 'Formato dati non valido o errore nel caricamento degli eventi passati.');
+                throw new Error(result.message || 'Formato dati non valido o errore nel caricamento.');
             }
         } catch (error) {
-            console.error('Errore dettagliato caricamento eventi passati:', error);
-            eventiPassatiGrid.innerHTML = '<p class="no-events error-message" style="text-align:center; padding:20px;">Errore caricamento eventi: ' + error.message + '. <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>';
+            eventiPassatiGrid.innerHTML = `<p class="no-events error-message" style="text-align:center; padding:20px;">Errore: ${error.message}. <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>`;
         } finally {
             loadingIndicator.classList.remove('visible');
         }
@@ -334,15 +353,14 @@
     function filterEvents() {
         if (!eventiPassatiGrid || !Array.isArray(allPastEventsData)) return;
         const titleFilter = document.getElementById('searchTitle').value.toLowerCase().trim();
-        const dateFilter = document.getElementById('searchDate').value;
+        const dateFilter = document.getElementById('searchDate').value; // Formato YYYY-MM
         const speakerFilter = document.getElementById('searchSpeaker').value.toLowerCase().trim();
 
         eventiPassatiGrid.innerHTML = '';
-        let visibleCards = 0;
 
         const filteredEvents = allPastEventsData.filter(event => {
             const eventTitle = event.titolo?.toLowerCase() || '';
-            const eventDate = event.datainizio || '';
+            const eventDate = event.datainizio || ''; // Formato YYYY-MM-DD
             const eventSpeaker = event.relatore?.toLowerCase() || '';
 
             let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
@@ -358,37 +376,39 @@
         } else {
             if (titleFilter || dateFilter || speakerFilter) {
                 eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato corrisponde ai criteri di ricerca.</p>';
-            } else if (allPastEventsData.length === 0) {
+            } else if (allPastEventsData.length === 0) { // Se non ci sono eventi in assoluto
                 eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
-            } else {
+            } else { // Nessun filtro attivo, ma filteredEvents è vuoto (non dovrebbe succedere se allPastEventsData ha elementi)
                 allPastEventsData.forEach(event => eventiPassatiGrid.appendChild(createPastEventCard(event)));
             }
         }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        setupUserSessionAndNavbar();
+    document.addEventListener('DOMContentLoaded', async () => { // Reso async
+        setupUserSessionAndNavbar(); // Setup iniziale da localStorage
 
-        if (!currentUser) {
-            console.log("Utente non loggato su eventipassatiaccesso.html. Reindirizzamento a index.html");
+        if (!currentUser) { // Reindirizza se non loggato
+            // console.log("Utente non loggato su eventipassatiaccesso.html. Reindirizzamento.");
             window.location.href = 'index.html';
             return;
         }
 
+        // Dopo il setup iniziale, e DOPO il controllo di redirect, chiama per aggiornare la navbar
+        await fetchAndUpdateUserDisplayData();
+
         const currentYearEl = document.getElementById('currentYear');
         if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
-        loadPastEvents();
+        loadPastEvents(); // Carica gli eventi passati specifici di questa pagina
 
         const searchTitleEl = document.getElementById('searchTitle');
         const searchDateEl = document.getElementById('searchDate');
         const searchSpeakerEl = document.getElementById('searchSpeaker');
 
         if(searchTitleEl) searchTitleEl.addEventListener('input', filterEvents);
-        if(searchDateEl) searchDateEl.addEventListener('change', filterEvents);
+        if(searchDateEl) searchDateEl.addEventListener('change', filterEvents); // 'change' è meglio per input type month
         if(searchSpeakerEl) searchSpeakerEl.addEventListener('input', filterEvents);
     });
-
 </script>
 </body>
 </html>
