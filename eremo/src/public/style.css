@@ -192,7 +192,7 @@ img {
 
 .navbar .menu {
   display: none;
-  gap: clamp(1.2rem, 2.4vw, 1.7rem);
+  gap: clamp(0.8rem, 1.5vw, 1.2rem); /* Valori del gap ridotti */
   align-items: center;
   list-style: none;
   padding: 0;
@@ -201,7 +201,7 @@ img {
 
 .navbar .menu a {
   color: var(--light);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   padding: 0.8rem 0;
   position: relative;
   text-decoration: none;
@@ -1376,7 +1376,7 @@ footer p {
 .close-popup:hover { color: var(--dark); transform: rotate(90deg) scale(1.08); }
 
 /* ----- Media Queries per Responsive ----- */
-@media (min-width: 992px) {
+@media (min-width: 1300px) { /* Breakpoint aumentato */
   .navbar .menu {
     display: flex;
   }
@@ -3501,48 +3501,214 @@ body.page-dashboard .modal-content {
 }
 /* =============== FINE STILI PER LA SEZIONE DETTAGLI EVENTO =============== */
 
-/* ----- INIZIO NUOVI STILI DASHBOARD PER FILTRI E SEZIONI MESE/ANNO ----- */
+/* ----- INIZIO NUOVI STILI DASHBOARD PER TABS, FILTRI MIGLIORATI, CARD UNIFORMI ----- */
 
-.event-filters-section {
-  margin-bottom: 2rem;
-}
-.event-filters-section h2 {
-  margin-bottom: 1rem; /* Riduci un po' il margine sotto il titolo dei filtri */
-}
-
-.event-filters-dashboard {
-  background-color: var(--white);
-  padding: 1rem 1.5rem; /* Padding più contenuto per dashboard */
-  border-radius: var(--border-radius-medium);
+/* Tabs per Eventi Futuri/Passati */
+.event-tabs-container {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--gray-light);
+  background-color: var(--white); /* Sfondo per i tab */
+  padding: 0.5rem 1rem 0 1rem; /* Padding per contenere i tab */
+  border-radius: var(--border-radius-medium) var(--border-radius-medium) 0 0; /* Arrotonda angoli superiori */
   box-shadow: var(--shadow-light);
+}
+
+.event-tab-button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--gray-dark);
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent; /* Bordo per tab attivo */
+  cursor: pointer;
+  transition: color 0.2s ease, border-bottom-color 0.2s ease;
+  margin-bottom: -2px; /* Per allineare il bordo con quello del container */
+}
+
+.event-tab-button:hover {
+  color: var(--primary);
+}
+
+.event-tab-button.active {
+  color: var(--primary);
+  border-bottom-color: var(--accent);
+}
+
+/* Il contenitore delle sezioni ora è sotto i tab */
+#eventManagementContent .dashboard-section {
+  border-top-left-radius: 0; /* Rimuovi arrotondamento se i tab sono sopra */
+  border-top-right-radius: 0;
+  margin-top: -1px; /* Sovrapponi leggermente al bordo dei tab per continuità */
+}
+
+
+/* Miglioramento Barra Filtri */
+.event-filters-section {
+  margin-bottom: 1rem; /* Riduci spazio se i tab sono subito dopo */
+}
+.event-filters-dashboard {
+  background-color: transparent; /* Rimuovi sfondo se sopra altra section */
+  padding: 0; /* Rimuovi padding se ora è dentro .event-filters-section */
+  box-shadow: none; /* Rimuovi ombra se ora è dentro .event-filters-section */
+  border: 1px solid var(--gray-medium); /* Aggiungi un bordo leggero */
+  border-radius: var(--border-radius-medium);
+  padding: 1rem; /* Padding interno per i filtri */
+  background-color: var(--white);
+  /* gap: 1rem; è già presente e va bene */
+}
+.event-filters-dashboard .form-group {
+  margin-bottom: 0; /* Già presente */
+}
+.event-filters-dashboard .btn-admin {
+  height: auto; /* Lascia che l'altezza si adatti al padding */
+  /* padding: 0.7rem 1rem; è già presente e va bene */
+}
+
+
+/* Card Admin Uniformi */
+.admin-event-grid {
+  display: grid;
+  /* Per mantenere una dimensione più uniforme, limita la larghezza massima di 1fr */
+  /* oppure usa un numero fisso di colonne se preferisci, es. grid-template-columns: repeat(3, 1fr); */
+  /* Questa soluzione cerca di mantenere la flessibilità ma con un limite superiore più stretto per '1fr' */
+  grid-template-columns: repeat(auto-fit, minmax(340px, 400px)); /* Base 340px, max 400px */
+  gap: 1.5rem; /* Riduci gap se preferisci */
+  justify-content: center; /* Centra le card se c'è spazio extra nella riga */
+}
+
+/* Intestazioni Mese/Anno */
+.month-year-header {
+  font-size: 1.5rem; /* Leggermente più grande */
+  color: var(--accent);
+  margin-top: 2.5rem; /* Più spazio sopra */
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--accent);
+  text-align: left;
+  font-weight: 600;
+  grid-column: 1 / -1; /* Assicura che occupi tutta la larghezza della griglia eventi */
+}
+/* Rimuovi margine superiore per la prima intestazione di mese in ogni lista */
+#upcomingEventsGrid > .month-year-header:first-child,
+#pastEventsGrid > .month-year-header:first-child {
+  margin-top: 0.5rem;
+}
+
+/* Riorganizzazione Pulsanti Card */
+.admin-event-card-actions { /* Contenitore generico per le azioni */
+  display: grid;
+  gap: 0.6rem; /* Gap tra i bottoni */
+}
+.admin-event-card-actions.top-actions {
+  grid-template-columns: repeat(3, 1fr); /* 3 bottoni per riga */
+  margin-bottom: 0.8rem;
+}
+.admin-event-card-actions.bottom-actions {
+  grid-template-columns: repeat(3, 1fr); /* 3 bottoni per riga */
+  border-top: 1px solid var(--gray-light);
+  padding-top: 0.8rem;
+  margin-top: 0.8rem;
+}
+/* Stili specifici per i bottoni se necessario (es. colore per 'Prenotazioni') */
+.admin-event-card-actions .btn-bookings {
+  background-color: var(--info); /* Esempio colore per Prenotazioni */
+  color: var(--white);
+  border-color: var(--info);
+}
+.admin-event-card-actions .btn-bookings:hover {
+  background-color: #2980b9; /* Scurisci --info */
+  border-color: #2471a3;
+}
+.admin-event-card-actions .btn-edit { /* Stile bottone Modifica come da richiesta precedente */
+  background-color: var(--accent);
+  color: var(--white);
+  border-color: var(--accent);
+}
+.admin-event-card-actions .btn-edit:hover {
+  background-color: #b8734a;
+  border-color: #b8734a;
+}
+
+
+/* Modal Prenotazioni */
+#manageBookingsModal .modal-content {
+  max-width: 800px; /* Più largo per la lista prenotazioni */
+}
+#bookingsListContainerModal .user-booking-group { /* Stili ripresi da .event-details-admin */
+  border: 1px solid var(--gray-light);
+  border-radius: var(--border-radius-medium);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #fdfdfd;
+}
+#bookingsListContainerModal .user-booking-group h5 {
+  font-size: 1.05rem; color: var(--primary); margin-top: 0;
+  margin-bottom: 0.8rem; padding-bottom: 0.5rem;
+  border-bottom: 1px dotted var(--gray-medium);
+}
+#bookingsListContainerModal .single-booking-details {
+  padding: 0.5rem; margin-bottom: 0.5rem;
+  border-left: 3px solid var(--secondary); background-color: var(--white);
+}
+#bookingsListContainerModal .single-booking-details > p { font-size: 0.9rem; margin-bottom: 0.3rem; }
+#bookingsListContainerModal .participant-list-inline { list-style: none; padding-left: 0; margin-bottom: 0.5rem; font-size: 0.85rem; }
+#bookingsListContainerModal .participant-list-inline li { display: inline-block; margin-right: 0.8rem; padding: 0.2rem 0.5rem; background-color: var(--light); border-radius: 4px; border: 1px solid var(--gray-light); }
+#bookingsListContainerModal .single-booking-details .btn-admin.btn-sm { display: inline-block; margin-top: 0.5rem; }
+
+#bookingsManagementFeedbackModal p { /* Per messaggi di feedback nel modal prenotazioni */
+  margin: 0; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid transparent;
+  font-size: 0.9rem;
+}
+#bookingsManagementFeedbackModal p.success-message {
+  background-color: rgba(var(--success-rgb), 0.15); border-color: var(--success); color: var(--dark);
+}
+#bookingsManagementFeedbackModal p.error-message {
+  background-color: rgba(var(--danger-rgb), 0.15); border-color: var(--danger); color: var(--dark);
+}
+
+
+/* ----- FINE NUOVI STILI DASHBOARD ----- */
+
+/* ... (TUTTI GLI STILI PRECEDENTI INVARIATI) ... */
+
+/* ----- INIZIO NUOVI STILI DASHBOARD PER TABS, FILTRI MIGLIORATI, CARD UNIFORMI (SOSTITUISCI/AGGIUNGI) ----- */
+
+/* Sezione Filtri Migliorata */
+.event-filters-section {
+  margin-bottom: 2rem; /* Spazio dopo i filtri */
+  /* La section non ha bisogno di un suo sfondo/bordo se i filtri interni ce l'hanno */
+}
+.event-filters-dashboard { /* Questo è il contenitore dei campi filtro */
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem 1.5rem; /* Gap tra gli elementi del filtro */
-  align-items: flex-end; /* Allinea il bottone reset in basso con gli input */
+  gap: 1rem 1.5rem;
+  padding: 1.5rem; /* Padding interno per distanziare dal bordo */
+  border: 1px solid var(--gray-light); /* Bordo singolo e pulito */
+  border-radius: var(--border-radius-medium);
+  background-color: var(--white); /* Sfondo bianco per il box filtri */
+  box-shadow: var(--shadow-light); /* Leggera ombra */
 }
-
 .event-filters-dashboard .form-group {
-  flex: 1 1 220px; /* Permette agli input di crescere ma con una base */
-  margin-bottom: 0; /* Rimuovi margine inferiore dal form-group qui */
+  flex: 1 1 250px; /* Base per gli input, permette un po' di crescita */
+  min-width: 200px; /* Non diventano troppo piccoli */
+  max-width: 350px; /* Limita espansione eccessiva */
 }
-
 .event-filters-dashboard label {
   font-size: 0.9rem;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.3rem;
   color: var(--primary);
   display: block;
   font-weight: 500;
 }
-
 .event-filters-dashboard input[type="text"],
-.event-filters-dashboard input[type="month"],
-.event-filters-dashboard select { /* Se aggiungerai un select */
+.event-filters-dashboard input[type="month"] {
   width: 100%;
-  padding: 0.7rem 0.9rem; /* Padding input filtro */
+  padding: 0.75rem 1rem;
   border: 1px solid var(--gray-medium);
-  border-radius: 8px; /* Arrotondamento input filtro */
-  font-size: 0.95rem;
-  background-color: var(--white);
+  border-radius: 8px;
+  font-size: 1rem;
 }
 .event-filters-dashboard input[type="text"]:focus,
 .event-filters-dashboard input[type="month"]:focus {
@@ -3550,55 +3716,211 @@ body.page-dashboard .modal-content {
   box-shadow: 0 0 0 3px rgba(141, 177, 135, 0.25);
   outline: none;
 }
-
-.event-filters-dashboard .btn-admin {
-  height: calc(0.7rem * 2 + 0.95rem * 1.5 + 2px); /* Per allineare altezza con input, da aggiustare */
-  padding: 0.7rem 1rem;
+.event-filters-dashboard #resetFiltersBtn {
+  align-self: flex-end; /* Allinea il bottone in basso con gli input */
+  padding: 0.75rem 1.2rem; /* Adatta padding per coerenza altezza */
+  background-color: var(--gray-dark);
+  color: white;
+  border-color: var(--gray-dark);
+  min-width: 120px; /* Larghezza minima per il bottone reset */
+  text-align: center;
+}
+.event-filters-dashboard #resetFiltersBtn:hover {
+  background-color: var(--dark);
+  border-color: var(--dark);
 }
 
 
-.month-year-header {
-  font-size: 1.4rem;
-  color: var(--accent);
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--accent);
-  text-align: left;
+/* Contenitore per Tabs e Pulsante "Nuovo Evento" */
+.tabs-and-actions-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem; /* Spazio prima del contenuto dei tab */
+  flex-wrap: wrap; /* Per mobile */
+  gap: 1rem;
+}
+
+/* Stile Tabs Eventi */
+.event-tabs-container {
+  display: flex;
+  background-color: var(--white);
+  border-radius: var(--border-radius-medium) var(--border-radius-medium) 0 0;
+  box-shadow: var(--shadow-light);
+  overflow: hidden; /* Per contenere i bordi dei tab */
+  border-bottom: 2px solid var(--accent); /* Linea di accento sotto i tab */
+}
+.event-tab-button {
+  padding: 0.9rem 1.8rem;
+  font-size: 1.05rem; /* Leggermente più piccolo se necessario */
+  font-weight: 500;
+  color: var(--gray-dark);
+  background-color: var(--gray-light);
+  border: none;
+  border-right: 1px solid var(--gray-medium); /* Separatore tra tab */
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.event-tab-button:last-child {
+  border-right: none;
+}
+.event-tab-button:hover {
+  background-color: #e0e0e0; /* Leggero hover */
+  color: var(--primary);
+}
+.event-tab-button.active {
+  color: var(--white);
+  background-color: var(--accent);
   font-weight: 600;
 }
-#upcomingEventsList .month-year-header:first-child,
-#pastEventsList .month-year-header:first-child {
-  margin-top: 0.5rem; /* Riduci margine superiore per la prima intestazione di mese */
+.event-tab-button.active i {
+  color: var(--white); /* Colore icona nel tab attivo */
+}
+.event-tab-button i {
+  color: var(--primary); /* Colore icona tab normale */
+  transition: color 0.2s ease;
+}
+.event-tab-button:hover i {
+  color: var(--primary);
 }
 
+
+/* Contenitore del contenuto dei Tab */
+#eventManagementContent.dashboard-section {
+  margin-top: 0; /* Rimuovi margine se i tab sono direttamente sopra */
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  padding-top: 1.5rem; /* Padding per il contenuto sotto i tab */
+}
+.event-tab-content { /* Nascondi contenuto non attivo */
+  /* display: none; è già gestito da JS */
+}
+.event-tab-content.active {
+  /* display: block; è già gestito da JS */
+  animation: fadeIn 0.3s ease-out;
+}
+
+
+/* Pulsante "Nuovo Evento" */
+#addEventBtnDashboard {
+  /* Gli stili inline sono già presenti, puoi spostarli qui se preferisci */
+  background-color: var(--primary);
+  color: var(--white);
+  /* ...altri stili per coerenza con .add-event-btn se necessario... */
+}
+#addEventBtnDashboard:hover {
+  background-color: var(--dark);
+}
+
+
+/* Card Admin Uniformi */
+.admin-event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 380px)); /* Base 330px, max 380px */
+  gap: 1.8rem;
+  justify-content: center; /* Centra le card se c'è spazio (es. ultima riga) */
+}
+.admin-event-card {
+  max-width: 380px; /* Assicura che le card non superino questa larghezza anche se 1fr darebbe più spazio */
+  margin-left: auto; /* Utile con justify-content: center per centrare l'ultima card se dispari */
+  margin-right: auto;
+  /* Altri stili della card rimangono invariati */
+}
+
+
+/* Riorganizzazione Pulsanti Card */
+.admin-event-card-actions {
+  display: grid;
+  gap: 0.7rem;
+}
 .admin-event-card-actions.top-actions {
-  margin-bottom: 0.5rem; /* Spazio ridotto se ci sono azioni sotto */
-  /* I bottoni qui occuperanno lo spazio disponibile equamente */
+  grid-template-columns: repeat(3, 1fr); /* 3 bottoni per riga */
+  margin-bottom: 1rem; /* Più spazio prima della riga inferiore */
 }
 .admin-event-card-actions.bottom-actions {
+  grid-template-columns: repeat(3, 1fr); /* 3 bottoni per riga */
   border-top: 1px solid var(--gray-light);
-  padding-top: 0.8rem;
-  margin-top: 0.8rem; /* Spazio sopra i bottoni inferiori */
+  padding-top: 1rem;
+  margin-top: 1rem; /* Spazio per separare chiaramente le due file di azioni */
 }
-.admin-event-card-actions.bottom-actions .btn-edit {
-  background-color: var(--accent);
+/* Colori specifici per i bottoni (riprendi quelli già definiti se vanno bene) */
+.admin-event-card-actions .btn-bookings {
+  background-color: var(--info); /* Esempio */
   color: var(--white);
 }
-.admin-event-card-actions.bottom-actions .btn-edit:hover {
+.admin-event-card-actions .btn-bookings:hover {
+  background-color: #2980b9; /* Scurisci --info */
+}
+.admin-event-card-actions .btn-edit {
+  background-color: var(--accent); /* Esempio */
+  color: var(--white);
+}
+.admin-event-card-actions .btn-edit:hover {
   background-color: #b8734a; /* Scurisci --accent */
 }
 
-
-/* Stili per il messaggio "Nessun evento" specifico per le sezioni */
-#upcomingEventsList .no-events-dashboard p,
-#pastEventsList .no-events-dashboard p {
-  padding: 1.5rem;
-  font-size: 1rem;
-  color: var(--gray-dark);
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  text-align: center;
+/* Stili Modal Prenotazioni (generalmente ereditati da .modal e .modal-content) */
+#manageBookingsModal .modal-content {
+  max-width: 750px; /* O la larghezza che preferisci per questo modal */
 }
+#bookingsListContainerModal .user-booking-group {
+  border: 1px solid var(--gray-light);
+  border-radius: 8px; /* Meno arrotondamento per un look più compatto */
+  padding: 0.8rem;
+  margin-bottom: 0.8rem;
+  background-color: #fdfdfd;
+}
+/* ... (Altri stili per #bookingsListContainerModal come da versione precedente) ... */
 
+
+@media (max-width: 767px) {
+  .event-filters-dashboard {
+    flex-direction: column; /* Filtri in colonna su mobile */
+    align-items: stretch; /* Allunga gli elementi */
+  }
+  .event-filters-dashboard .form-group,
+  .event-filters-dashboard #resetFiltersBtn {
+    max-width: none; /* Permetti di occupare tutta la larghezza */
+    width: 100%;
+  }
+  .event-filters-dashboard #resetFiltersBtn {
+    margin-top: 0.5rem; /* Spazio sopra il bottone reset se va in colonna */
+  }
+
+  .tabs-and-actions-container {
+    flex-direction: column;
+    align-items: stretch; /* Allunga tab e bottone */
+  }
+  .event-tabs-container {
+    width: 100%;
+    justify-content: space-around; /* Distribuisci i tab */
+    border-radius: var(--border-radius-medium); /* Arrotonda tutti gli angoli su mobile */
+    margin-bottom: 1rem; /* Spazio se il bottone "Nuovo Evento" va sotto */
+  }
+  .event-tab-button {
+    flex-grow: 1; /* Fa sì che i tab occupino lo spazio disponibile */
+    text-align: center;
+    padding: 0.8rem 0.5rem; /* Riduci padding orizzontale su mobile */
+    font-size: 0.95rem;
+  }
+  #addEventBtnDashboard {
+    width: 100%; /* Bottone a larghezza piena su mobile */
+    justify-content: center;
+  }
+
+  /* Per le card su mobile, una colonna è già gestita da auto-fill, ma puoi forzarla */
+  .admin-event-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-event-card {
+    max-width: none; /* Permetti alla card di occupare la colonna */
+  }
+  .admin-event-card-actions.top-actions,
+  .admin-event-card-actions.bottom-actions {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* Più flessibile su mobile */
+  }
+}
 /* ----- FINE NUOVI STILI DASHBOARD ----- */
