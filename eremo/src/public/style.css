@@ -610,6 +610,7 @@ main > .container > h1:first-child:not(.hero-title) {
   background-color: var(--primary);
   border-color: var(--primary);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
+  color: var(--white); /* AGGIUNGI QUESTA RIGA */
 }
 
 .card-btn-secondary {
@@ -2439,19 +2440,148 @@ body.page-dashboard .modal-content {
 .participant-list-inline li { display: inline-block; margin-right: 0.8rem; padding: 0.2rem 0.5rem; background-color: var(--light); border-radius: 4px; border: 1px solid var(--gray-light); }
 .single-booking-details .btn-admin.btn-sm { display: inline-block; margin-top: 0.5rem; }
 
-/* Stili per commenti threaded nel modal admin */
-#manageCommentsModal .modal-content-scrollable { padding: 1rem; } /* Padding per area scrollabile commenti */
-.modal-content .comment-thread-list,
-.modal-content .comment-replies-list { list-style: none; padding-left: 0; margin-top: 0.5rem;}
-.modal-content .comment-replies-list { border-left: 2px dotted var(--gray-medium); padding-left: 15px; /* L'indentazione JS è in aggiunta */ }
-.modal-content .comment-item-admin { padding: 0.6rem 0.3rem; border-bottom: 1px solid var(--gray-light); display: flex; justify-content: space-between; align-items: flex-start; }
-.modal-content .comment-item-admin:last-child { border-bottom: none; }
-.modal-content .comment-item-content { flex-grow: 1; margin-right: 0.5rem; }
-.modal-content .comment-item-content p { margin: 0.15rem 0; font-size: 0.85rem; line-height: 1.4; }
-.modal-content .comment-item-content p strong { color: var(--primary); font-weight: 500; }
-.modal-content .comment-item-content p small { color: var(--gray-dark); font-size: 0.8em; }
-.modal-content .comment-item-content p.comment-text-admin { font-size: 0.8rem; margin-top: 0.2rem; }
-.modal-content .comment-item-admin .btn-admin.btn-sm { flex-shrink: 0; }
+/* Stili base per i commenti nel modal, ispirati a evento_dettaglio_accesso.html */
+#manageCommentsModal .comments-list-admin-styled { /* Nuovo contenitore per i commenti stilizzati */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#manageCommentsModal .comment-item-admin-styled {
+  background: var(--white);
+  border-radius: var(--border-radius-medium);
+  padding: 1.5rem; /* Più padding per un aspetto migliore */
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-light);
+  border-left: 4px solid var(--secondary); /* Bordo colorato come in evento_dettaglio */
+}
+#manageCommentsModal .comment-item-admin-styled:last-child {
+  margin-bottom: 0;
+}
+
+#manageCommentsModal .comment-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem; /* Spazio tra avatar e meta */
+  margin-bottom: 0.8rem;
+}
+
+#manageCommentsModal .comment-header .user-avatar {
+  width: 40px; /* Dimensioni avatar come in evento_dettaglio */
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--gray-light); /* Leggero bordo all'avatar */
+}
+
+#manageCommentsModal .comment-meta strong {
+  font-size: 1rem; /* Dimensione nome utente */
+  color: var(--dark);
+  font-weight: 600;
+}
+#manageCommentsModal .comment-meta small {
+  font-size: 0.8rem; /* Dimensione data e ID */
+  color: var(--gray-dark);
+  margin-left: 0.5rem;
+  display: block; /* Per far andare ID a capo se necessario */
+}
+#manageCommentsModal .comment-meta small.comment-id-details {
+  font-style: italic;
+  font-size: 0.75rem;
+}
+
+
+#manageCommentsModal .comment-text-admin {
+  font-size: 0.95rem; /* Dimensione testo commento */
+  color: var(--dark);
+  line-height: 1.6;
+  margin-bottom: 1rem; /* Spazio prima delle azioni */
+  word-wrap: break-word;
+}
+
+#manageCommentsModal .comment-actions-admin {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--gray-light); /* Separatore leggero */
+}
+
+#manageCommentsModal .btn-admin-reply,
+#manageCommentsModal .btn-admin-delete-comment { /* Classi più specifiche per i bottoni nel modal */
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+  gap: 0.3em;
+}
+#manageCommentsModal .btn-admin-reply {
+  background-color: var(--secondary);
+  color: white;
+}
+#manageCommentsModal .btn-admin-reply:hover {
+  background-color: var(--primary);
+}
+
+
+/* Stile per il form di risposta admin */
+#manageCommentsModal .reply-form-admin {
+  display: none; /* Nascosto di default, mostrato da JS */
+  margin-top: 1rem;
+  margin-left: 50px; /* Indentazione per la risposta, allineata dopo l'avatar */
+  padding: 1rem;
+  background-color: var(--light);
+  border-radius: 8px;
+  border: 1px solid var(--gray-light);
+}
+#manageCommentsModal .reply-form-admin.active {
+  display: block;
+  animation: fadeIn 0.3s ease-out;
+}
+#manageCommentsModal .reply-form-admin textarea {
+  width: 100%;
+  min-height: 70px;
+  padding: 0.6rem;
+  border: 1px solid var(--gray-medium);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  resize: vertical;
+}
+#manageCommentsModal .reply-form-admin .form-actions-reply {
+  text-align: right;
+}
+#manageCommentsModal .reply-form-admin .form-message-local {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+
+/* Stile per evidenziare risposte/commenti dell'Admin */
+#manageCommentsModal .comment-item-admin-styled.admin-reply-highlight {
+  border-left-color: var(--accent); /* Bordo arancione per admin */
+  background-color: #fffaf5; /* Sfondo leggermente diverso per admin */
+}
+#manageCommentsModal .comment-item-admin-styled.admin-reply-highlight .comment-meta strong::after {
+  content: " (Admin)";
+  font-size: 0.8em;
+  font-weight: normal;
+  color: var(--accent);
+  margin-left: 0.3em;
+  background-color: var(--light);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+}
+
+/* Stili per le risposte nidificate (se decidi di implementarle visivamente) */
+#manageCommentsModal .comment-replies-list-styled {
+  list-style: none;
+  padding-left: 0; /* Reset padding, l'indentazione è gestita dal margin del contenitore */
+  margin-top: 1rem;
+  margin-left: 25px; /* Indentazione per le risposte */
+  border-left: 2px dotted var(--gray-medium);
+  padding-left: 15px; /* Spazio dopo la linea di indentazione */
+}
 
 /* ----- FINE STILI SPECIFICI DASHBOARD ----- */
 
@@ -3714,3 +3844,35 @@ body.page-dashboard .modal-content {
   }
 }
 /* ----- FINE NUOVI STILI DASHBOARD ----- */
+
+/* ----- INIZIO STILI PER COMMENTI STAFF (EVENTO DETTAGLIO ACCESSO) ----- */
+
+/* Stile per evidenziare i commenti dello Staff/Admin */
+.comment.admin-comment-highlight {
+  border-left-color: var(--accent) !important; /* Usa un colore distintivo per il bordo sinistro */
+  background-color: #fffaf0 !important; /* Sfondo leggermente diverso, es. un crema/giallo pallido */
+  /* Puoi aggiungere un padding leggermente diverso se vuoi differenziarlo ulteriormente */
+  /* padding: 1.6rem; */
+}
+
+/* Aggiunge un'etichetta "(Staff)" o "(Admin)" dopo il nome dell'autore */
+.comment.admin-comment-highlight .comment-meta strong::after {
+  content: " (Staff)"; /* Puoi cambiarlo in " (Admin)" o " (Eremo)" */
+  font-size: 0.8em;     /* Rendi l'etichetta leggermente più piccola del nome */
+  font-weight: normal;  /* Non grassetto per l'etichetta */
+  color: var(--accent); /* Colore dell'etichetta */
+  margin-left: 0.5em;   /* Spazio tra il nome e l'etichetta */
+  background-color: rgba(209, 140, 96, 0.1); /* Sfondo leggero per l'etichetta, usando --accent con opacità */
+  padding: 0.15em 0.5em; /* Padding interno per l'etichetta */
+  border-radius: 4px;   /* Angoli arrotondati per l'etichetta */
+  border: 1px solid rgba(209, 140, 96, 0.3); /* Bordo leggero per l'etichetta */
+  text-transform: uppercase; /* Opzionale: rendi l'etichetta maiuscola */
+  letter-spacing: 0.5px;   /* Opzionale: leggera spaziatura tra le lettere */
+}
+
+/* Opzionale: se vuoi che l'avatar dell'admin sia leggermente diverso */
+.comment.admin-comment-highlight .comment-header .user-avatar {
+  border-color: var(--accent); /* Esempio: bordo avatar admin con colore accent */
+}
+
+/* ----- FINE STILI PER COMMENTI STAFF ----- */

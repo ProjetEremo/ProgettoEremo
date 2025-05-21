@@ -51,6 +51,19 @@
     .form-message { margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem; text-align: center; display: none; }
     .form-message.success { background-color: rgba(46, 204, 113, 0.15); border: 1px solid var(--success, green); color: var(--dark, black); }
     .form-message.error { background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--danger, red); color: var(--dark, black); }
+    .spinner-mini { /* Spinner per bottoni popup prenotazione */
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border: 2px solid rgba(255,255,255,0.3); /* Chiaro per contrasto su bottoni scuri */
+      border-radius: 50%;
+      border-top-color: #fff; /* Loader bianco */
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
   </style>
 </head>
 <body>
@@ -112,6 +125,8 @@
   </div>
 </main>
 
+<div class="volantino-morph-overlay" id="volantinoMorphOverlay"></div>
+
 <footer>
   <p>&copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
 </footer>
@@ -157,11 +172,16 @@
 
 <script>
   let currentUser = null;
-  const defaultUserIconPath = '/uploads/icons/default_user.png'; // Path ASSOLUTO dalla root del sito
+  const defaultUserIconPath = '/uploads/icons/default_user.png';
+
+  // Variabili per il morphing del volantino
+  let volantinoMorphOverlay = null; // Verrà inizializzato in DOMContentLoaded
+  let morphingCard = null;
+  let originalCardForMorph = null;
+
 
   // --- FUNZIONI NAVBAR E SESSIONE UTENTE (STANDARD) ---
   async function callApi(url, method = 'GET', data = null) {
-    // console.log(`[callApi eventiincorso] Chiamata ${method} a ${url}`, data || '');
     const headers = { 'Content-Type': 'application/json' };
     const options = { method, headers, credentials: 'same-origin' };
     if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
@@ -169,20 +189,17 @@
     }
     try {
       const response = await fetch(url, options);
-      // console.log(`[callApi eventiincorso] Risposta da ${url} - Stato: ${response.status}`);
       if (!response.ok) {
         let errorData = { message: `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
         try { errorData = await response.json(); } catch (e) { /* usa default */ }
         const finalErrorMessage = errorData.message || `Errore del server: ${response.status} per ${url}`;
-        console.error("[callApi eventiincorso] Errore:", finalErrorMessage);
+        console.error("[callApi] Errore:", finalErrorMessage);
         throw new Error(finalErrorMessage);
       }
-      if (response.status === 204) { /* console.log(`[callApi eventiincorso] Risposta 204 No Content da ${url}`); */ return {}; }
-      const responseData = await response.json();
-      // console.log(`[callApi eventiincorso] Dati JSON da ${url} ricevuti.`);
-      return responseData;
+      if (response.status === 204) return {};
+      return await response.json();
     } catch (error) {
-      console.error(`[callApi eventiincorso] Fallimento chiamata API (rete/parse) a ${url}:`, error.message, error);
+      console.error(`[callApi] Fallimento chiamata API (rete/parse) a ${url}:`, error.message, error);
       throw error;
     }
   }
@@ -203,7 +220,6 @@
       navbarAvatarImgEl.src = defaultUserIconPath;
       navbarAvatarImgEl.alt = 'Icona utente predefinita';
     }
-    // console.log("[updateNavbarUserUI eventiincorso] UI Navbar aggiornata.");
   }
 
   function handleLogout() {
@@ -214,7 +230,6 @@
   }
 
   function setupUserSessionAndNavbar() {
-    // console.log("[setupUserSessionAndNavbar eventiincorso] Inizio setup.");
     const userDataString = localStorage.getItem('userDataEFF');
     if (userDataString) {
       try {
@@ -237,19 +252,14 @@
     if (logoutLinkMobile) logoutLinkMobile.addEventListener('click', (e) => {
       e.preventDefault(); if(typeof closeMobileMenu === 'function') closeMobileMenu(); handleLogout();
     });
-    // console.log("[setupUserSessionAndNavbar eventiincorso] Fine setup.");
   }
 
   async function fetchAndUpdateUserDisplayData() {
-    // console.log("[fetchAndUpdateUserDisplayData eventiincorso] Inizio.");
     if (!currentUser || !currentUser.email) {
-      // console.log("[fetchAndUpdateUserDisplayData eventiincorso] currentUser non valido, skip fetch API profilo.");
       return;
     }
     try {
-      // console.log("[fetchAndUpdateUserDisplayData eventiincorso] Chiamata a api/api_get_user_profile.php");
-      const apiUserData = await callApi('api/api_get_user_profile.php'); // Script profilo è in /api/
-      // console.log("[fetchAndUpdateUserDisplayData eventiincorso] Dati profilo API ricevuti:", apiUserData);
+      const apiUserData = await callApi('api/api_get_user_profile.php');
       if (apiUserData && apiUserData.success && apiUserData.data) {
         const freshData = apiUserData.data;
         currentUser.nome = freshData.nome || currentUser.nome;
@@ -258,22 +268,17 @@
         currentUser.cognome = freshData.cognome || (currentUser.cognome || '');
 
         localStorage.setItem('userDataEFF', JSON.stringify(currentUser));
-        // console.log("[fetchAndUpdateUserDisplayData eventiincorso] localStorage aggiornato:", currentUser);
         updateNavbarUserUI();
-      } else {
-        //  console.warn("[fetchAndUpdateUserDisplayData eventiincorso] Dati profilo non validi o API success false.");
       }
     } catch (error) {
-      console.warn("[fetchAndUpdateUserDisplayData eventiincorso] Errore fetch profilo aggiornato per navbar:", error.message);
+      console.warn("[fetchAndUpdateUserDisplayData] Errore fetch profilo aggiornato per navbar:", error.message);
     }
-    // console.log("[fetchAndUpdateUserDisplayData eventiincorso] Fine.");
   }
   // --- FINE FUNZIONI NAVBAR E SESSIONE UTENTE ---
 
 
   // --- Logica Menu (Scroll, Dropdown, Hamburger) ---
-  // Questa logica è basata su quella che avevi nel tuo eventiincorsoaccesso.html originale
-  let lastScroll = 0; // Già definita sopra, ma non fa male ridefinirla nel contesto se si copia/incolla questa sezione
+  let lastScroll = 0;
   const navbarContainer = document.getElementById('navbarContainer');
   if (navbarContainer) {
     window.addEventListener('scroll', () => {
@@ -288,19 +293,21 @@
   const userDropdownButton = document.querySelector('#userDropdownContainer .user-btn');
   const userDropdownMenu = document.querySelector('#userDropdownContainer .dropdown-menu');
 
-  if (userDropdownButton && userDropdownMenu) { // Questo è il tuo modo di associare il listener
-    userDropdownButton.addEventListener('click', function(event) {
-      event.stopPropagation();
+  // La funzione toggleUserMenu(event) è chiamata dall'onclick nell'HTML
+  function toggleUserMenu(event) {
+    event.stopPropagation();
+    if (userDropdownMenu && userDropdownButton) {
       const isCurrentlyOpen = userDropdownMenu.style.display === 'block';
       userDropdownMenu.style.display = isCurrentlyOpen ? 'none' : 'block';
-      this.setAttribute('aria-expanded', String(!isCurrentlyOpen));
-    });
+      userDropdownButton.setAttribute('aria-expanded', String(!isCurrentlyOpen));
+    }
   }
+
 
   const mobileMenu = document.getElementById("mobileMenu");
   const hamburger = document.querySelector(".navbar .hamburger");
 
-  function toggleMobileMenu() { // Funzione per onclick="" nell'HTML del hamburger
+  function toggleMobileMenu() {
     if (mobileMenu && hamburger) {
       const isOpen = mobileMenu.classList.toggle("open");
       hamburger.classList.toggle("open");
@@ -308,7 +315,7 @@
       document.body.style.overflow = isOpen ? 'hidden' : '';
     }
   }
-  function closeMobileMenu() { // Funzione per onclick="" nei link del mobile menu
+  function closeMobileMenu() {
     if (mobileMenu && hamburger && mobileMenu.classList.contains("open")) {
       mobileMenu.classList.remove("open");
       if(hamburger.classList.contains("open")){
@@ -318,27 +325,192 @@
       document.body.style.overflow = '';
     }
   }
-  // Il tuo HTML per hamburger ha onclick="toggleMobileMenu()", quindi non serve addEventListener qui.
-  // Listener globale per chiudere i menu al click esterno (combinato)
+
   document.addEventListener('click', function(event) {
-    // Chiudi dropdown utente
     if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
       const userDropdownContainer = document.getElementById('userDropdownContainer');
-      if (userDropdownContainer && !userDropdownContainer.contains(event.target)) { // Controlla se il click è fuori dal container
+      if (userDropdownContainer && !userDropdownContainer.contains(event.target)) {
         userDropdownMenu.style.display = 'none';
         if (userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
       }
     }
-    // Chiudi mobile menu
     if (mobileMenu && mobileMenu.classList.contains('open')) {
-      if (mobileMenu.contains(event.target) && event.target.tagName === 'A' && event.target.closest('.mobile-menu')) {
-        closeMobileMenu();
-      } else if (hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) {
+      // Se il click è su un link del mobile menu, la funzione closeMobileMenu() è già chiamata dall'onclick del link.
+      // Quindi, chiudi solo se il click è fuori dal menu mobile E non è sull'hamburger.
+      if (hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) {
         closeMobileMenu();
       }
     }
   });
   // --- FINE LOGICA MENU ---
+
+  // --- FUNZIONI MORPHING VOLANTINO (DAL CODICE DI eventiincorso.html) ---
+  function showVolantinoWithMorph(originalCardElement, copertinaUrl, volantinoUrl) {
+    if (morphingCard || !volantinoMorphOverlay) return;
+
+    originalCardForMorph = originalCardElement;
+    const rect = originalCardForMorph.getBoundingClientRect();
+
+    morphingCard = document.createElement("article");
+    morphingCard.className = "card morph-active-card";
+
+    morphingCard.style.width = `${rect.width}px`;
+    morphingCard.style.height = `${rect.height}px`;
+    morphingCard.style.top = `${rect.top + window.scrollY}px`;
+    morphingCard.style.left = `${rect.left + window.scrollX}px`;
+
+    const morphContentWrapper = document.createElement("div");
+    morphContentWrapper.className = "morph-content-wrapper";
+
+    const copertinaContainer = document.createElement("div");
+    copertinaContainer.className = "card-image-container-morph";
+    const imgCopertina = document.createElement("img");
+    imgCopertina.src = copertinaUrl;
+    imgCopertina.alt = "Copertina Evento";
+    copertinaContainer.appendChild(imgCopertina);
+
+    const cardContentOriginal = originalCardForMorph.querySelector(".card-content");
+    let cardContentCloned = null;
+    if (cardContentOriginal) {
+      cardContentCloned = cardContentOriginal.cloneNode(true);
+      cardContentCloned.className = "card-content-morph";
+      // Gestisci i bottoni nel contenuto clonato, adattandoli se necessario
+      // per la pagina 'accesso' o disabilitandoli.
+      cardContentCloned.querySelectorAll("button, a").forEach((btn) => {
+        const newBtn = btn.cloneNode(true); // Clona per rimuovere listener originali
+        if (newBtn.classList.contains("btn-prenota")) { // Bottone Prenota/Coda dalla card 'accesso'
+          // Manteniamo i data attributes originali per coerenza
+          // L'event listener originale non verrà copiato, quindi questo bottone nel morph
+          // sarà probabilmente non interattivo a meno di non riattaccare un listener specifico qui.
+          // Per semplicità, lo lasciamo non interattivo nel morph.
+          newBtn.onclick = (e) => e.preventDefault(); // Previene azioni default se è un link
+          newBtn.disabled = true; // Opzione: disabilita
+        } else if (newBtn.classList.contains("btn-visualizza-volantino")) {
+          newBtn.disabled = true;
+        } else if (newBtn.tagName === 'A' && newBtn.href.includes('evento_dettaglio_accesso.html')) {
+          // Lascia il link ai dettagli, ma potrebbe essere non cliccabile se coperto dall'overlay
+        } else {
+          newBtn.disabled = true;
+        }
+        btn.parentNode.replaceChild(newBtn, btn);
+      });
+    }
+
+
+    const volantinoContainer = document.createElement("div");
+    volantinoContainer.className = "volantino-image-container-morph";
+
+    morphContentWrapper.appendChild(copertinaContainer);
+    if (cardContentCloned) morphContentWrapper.appendChild(cardContentCloned);
+    morphContentWrapper.appendChild(volantinoContainer);
+    morphingCard.appendChild(morphContentWrapper);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "close-morph-volantino-btn";
+    closeBtn.innerHTML = "&times;";
+    closeBtn.setAttribute("aria-label", "Chiudi");
+    closeBtn.onclick = hideVolantinoWithMorph;
+    morphingCard.appendChild(closeBtn);
+
+    volantinoMorphOverlay.innerHTML = ""; // Pulisce eventuali residui
+    volantinoMorphOverlay.appendChild(morphingCard);
+
+    volantinoMorphOverlay.style.transitionDelay = '0s, 0.1s, 0.1s, 0s, 0s';
+    volantinoMorphOverlay.classList.add("active");
+
+    document.body.classList.add("volantino-morph-active");
+    if (originalCardForMorph) originalCardForMorph.classList.add("original-morph-hidden");
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        morphingCard.classList.add("zoomed-in");
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const cardAspectRatio = 700 / 800;
+        let finalWidth, finalHeight;
+        if (viewportWidth / viewportHeight > cardAspectRatio) {
+          finalHeight = Math.min(viewportHeight * 0.9, 800);
+          finalWidth = finalHeight * cardAspectRatio;
+        } else {
+          finalWidth = Math.min(viewportWidth * 0.9, 700);
+          finalHeight = finalWidth / cardAspectRatio;
+        }
+        finalWidth = Math.max(finalWidth, rect.width);
+        finalHeight = Math.max(finalHeight, rect.height);
+
+        morphingCard.style.width = `${finalWidth}px`;
+        morphingCard.style.height = `${finalHeight}px`;
+        morphingCard.style.top = `${(viewportHeight - finalHeight) / 2 + window.scrollY}px`;
+        morphingCard.style.left = `${(viewportWidth - finalWidth) / 2 + window.scrollX}px`;
+
+        const zoomDuration = parseFloat(getComputedStyle(morphingCard).transitionDuration.split(",")[1] || getComputedStyle(morphingCard).transitionDuration || "0.55") * 1000;
+
+        setTimeout(() => {
+          if (!morphingCard) return;
+          morphingCard.classList.add("morphing");
+          volantinoContainer.innerHTML = "";
+          if (volantinoUrl && volantinoUrl.trim() !== "") {
+            if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+              const imgVol = document.createElement("img");
+              imgVol.src = volantinoUrl;
+              imgVol.alt = "Volantino Evento";
+              imgVol.onerror = () => {
+                volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Impossibile caricare il volantino.</p><a href="${volantinoUrl}" target="_blank" rel="noopener noreferrer">Apri link diretto</a></div>`;
+              };
+              volantinoContainer.appendChild(imgVol);
+            } else {
+              volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Il volantino è disponibile come file esterno.</p><a href="${volantinoUrl}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`;
+            }
+          } else {
+            volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Volantino non disponibile per questo evento.</p></div>`;
+          }
+          morphingCard.classList.add("volantino-visible");
+        }, zoomDuration);
+      });
+    });
+  }
+
+  function hideVolantinoWithMorph() {
+    if (!morphingCard || !volantinoMorphOverlay || !originalCardForMorph) return;
+    morphingCard.classList.remove("volantino-visible", "morphing");
+    const clonedContent = morphingCard.querySelector('.card-content-morph');
+    if (clonedContent) clonedContent.style.opacity = '1';
+    const morphCopertina = morphingCard.querySelector('.card-image-container-morph');
+    if (morphCopertina) morphCopertina.style.height = '280px';
+
+    const rect = originalCardForMorph.getBoundingClientRect();
+    morphingCard.style.width = `${rect.width}px`;
+    morphingCard.style.height = `${rect.height}px`;
+    morphingCard.style.top = `${rect.top + window.scrollY}px`;
+    morphingCard.style.left = `${rect.left + window.scrollX}px`;
+    morphingCard.classList.remove("zoomed-in");
+
+    const overlayTransitionDuration = parseFloat(getComputedStyle(volantinoMorphOverlay).transitionDuration.split(",")[0] || "0.3") * 1000;
+    const cardShrinkDuration = parseFloat(getComputedStyle(morphingCard).transitionDuration.split(",")[1] || getComputedStyle(morphingCard).transitionDuration || "0.55") * 1000;
+    const cleanupDelay = Math.max(overlayTransitionDuration, cardShrinkDuration);
+
+    volantinoMorphOverlay.style.transitionDelay = '0s, 0s, 0s, 0s, 0s';
+    volantinoMorphOverlay.classList.remove("active");
+
+    setTimeout(cleanUpMorphingCard, cleanupDelay + 50);
+  }
+
+  function cleanUpMorphingCard() {
+    if (morphingCard) {
+      morphingCard.remove();
+      morphingCard = null;
+    }
+    if (volantinoMorphOverlay && volantinoMorphOverlay.classList.contains("active")) {
+      volantinoMorphOverlay.classList.remove("active");
+    }
+    if (volantinoMorphOverlay) volantinoMorphOverlay.innerHTML = "";
+    document.body.classList.remove("volantino-morph-active");
+    if (originalCardForMorph) {
+      originalCardForMorph.classList.remove("original-morph-hidden");
+      originalCardForMorph = null;
+    }
+  }
+  // --- FINE FUNZIONI MORPHING VOLANTINO ---
 
 
   // --- LOGICA SPECIFICA DELLA PAGINA EVENTIINCORSACCESSO ---
@@ -351,15 +523,37 @@
       return;
     }
 
-    // Dopo il setup iniziale, e DOPO il controllo di reindirizzamento, chiama la funzione per ottenere i dati aggiornati per la navbar
-    await fetchAndUpdateUserDisplayData();
+    volantinoMorphOverlay = document.getElementById('volantinoMorphOverlay'); // Inizializza qui
+    if (volantinoMorphOverlay) { // Listener per chiudere overlay cliccandoci sopra
+      volantinoMorphOverlay.addEventListener("click", (e) => {
+        if (e.target === volantinoMorphOverlay && morphingCard && morphingCard.classList.contains('zoomed-in')) {
+          hideVolantinoWithMorph();
+        }
+      });
+    }
 
+
+    await fetchAndUpdateUserDisplayData();
     loadEvents();
     initializeBookingPopupHandlers();
     initializeWaitlistPopupHandlers();
 
     const currentYearEl = document.getElementById('currentYear');
     if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
+
+    document.addEventListener("keydown", (e) => { // Listener globale per Esc
+      if (e.key === "Escape") {
+        if (document.getElementById('bookingPopup')?.classList.contains('active')) {
+          document.getElementById('closeBookingPopupBtn')?.click();
+        }
+        if (document.getElementById('waitlistPopup')?.classList.contains('active')) {
+          document.getElementById('closeWaitlistPopupBtn')?.click();
+        }
+        if (volantinoMorphOverlay?.classList.contains('active')) {
+          hideVolantinoWithMorph();
+        }
+      }
+    });
   });
 
   function generateParticipantFields(count, containerElement, baseIdName, maxAllowed) {
@@ -368,7 +562,7 @@
     let validCount = parseInt(count);
 
     if (isNaN(validCount) || validCount < 1) validCount = 1;
-    if (isNaN(maxAllowed) || maxAllowed < 1) maxAllowed = 5; // Fallback se maxAllowed non è un numero valido
+    if (isNaN(maxAllowed) || maxAllowed < 1) maxAllowed = 5;
     if (validCount > maxAllowed) validCount = maxAllowed;
 
     const numInput = containerElement.closest('form').querySelector('input[type="number"]');
@@ -452,11 +646,7 @@
     if (bookingPopupOverlay) bookingPopupOverlay.addEventListener('click', (e) => {
       if (e.target === bookingPopupOverlay) closeBookingPopup();
     });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && bookingPopup && bookingPopup.classList.contains('active')) {
-        closeBookingPopup();
-      }
-    });
+    // Escape listener è globale ora in DOMContentLoaded
 
     if (numeroPostiInput && participantFieldsContainer) {
       numeroPostiInput.addEventListener('input', (e) => {
@@ -503,7 +693,6 @@
           submitBtn.disabled = false; submitBtn.textContent = originalBtnText; return;
         }
         try {
-          // PERCORSO CORRETTO: prenota_evento.php è nella root
           const response = await fetch('prenota_evento.php', { method: 'POST', body: formData });
           const responseText = await response.text();
           let result;
@@ -511,8 +700,9 @@
           catch (error) { throw new Error("Risposta server non valida: " + responseText.substring(0,100)); }
           if (result.success) {
             if(bookingResponseMessage) { bookingResponseMessage.textContent = result.message || 'Prenotazione confermata!'; bookingResponseMessage.className = 'form-message success';}
-            loadEvents();
-            // RIMOSSO: setTimeout(closeBookingPopup, 3000);
+            loadEvents(); // Ricarica gli eventi per aggiornare i posti e lo stato
+            // Non chiudere subito il popup, l'utente deve vedere il messaggio.
+            // Potrebbe essere utile un bottone "Chiudi" aggiuntivo o chiudere dopo un timeout.
           } else { throw new Error(result.message || 'Errore prenotazione.'); }
         } catch (error) {
           if(bookingResponseMessage) { bookingResponseMessage.textContent = `Errore: ${error.message}`; bookingResponseMessage.className = 'form-message error'; }
@@ -536,7 +726,7 @@
     const waitlistResponseMessage = document.getElementById('waitlistResponseMessage');
 
     window.openWaitlistPopup = function(eventId, eventTitle) {
-      if (!currentUser) { /* ... (controllo currentUser come in openBookingPopup) ... */ return; }
+      if (!currentUser) { alert("Sessione scaduta. Effettua il login."); window.location.href = 'index.html'; return; }
       if(waitlistEventIdInput) waitlistEventIdInput.value = eventId;
       if(waitlistPopupTitle) waitlistPopupTitle.textContent = `Entra in Lista d'Attesa`;
       if(waitlistEventInfo) waitlistEventInfo.textContent = `Evento: ${eventTitle}`;
@@ -554,12 +744,12 @@
     }
     if (closeWaitlistPopupBtn) closeWaitlistPopupBtn.addEventListener('click', closeWaitlistPopup);
     if (waitlistPopupOverlay) waitlistPopupOverlay.addEventListener('click', (e) => { if (e.target === waitlistPopupOverlay) closeWaitlistPopup(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && waitlistPopup && waitlistPopup.classList.contains('active')) { closeWaitlistPopup(); }});
+    // Escape listener è globale ora
 
     if (waitlistForm) {
       waitlistForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        if (!currentUser || !currentUser.email) { /* ... (controllo currentUser) ... */ return; }
+        if (!currentUser || !currentUser.email) { alert("Sessione utente non valida. Effettua il login."); window.location.href = 'index.html'; return; }
         const submitBtn = this.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.textContent;
         submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div> Elaborazione...';
@@ -569,13 +759,12 @@
         formData.append('numeroPosti', waitlistNumeroPostiInput.value);
         formData.append('contatto', currentUser.email);
         try {
-          // PERCORSO CORRETTO: gestisci_coda.php è nella root (o dove è prenota_evento.php)
           const response = await fetch('gestisci_coda.php', { method: 'POST', body: formData });
           const responseText = await response.text(); let result;
           try { result = JSON.parse(responseText); } catch (error) { throw new Error("Risposta server non valida: " + responseText.substring(0,100)); }
           if (result.success) {
             if(waitlistResponseMessage) { waitlistResponseMessage.textContent = result.message || "Richiesta coda inviata!"; waitlistResponseMessage.className = 'form-message success'; }
-            // RIMOSSO: setTimeout(closeWaitlistPopup, 3000);
+            // Non chiudere popup, lasciare messaggio visibile
           } else { throw new Error(result.message || "Errore invio richiesta coda.");}
         } catch (error) {
           if(waitlistResponseMessage) { waitlistResponseMessage.textContent = `Errore: ${error.message}`; waitlistResponseMessage.className = 'form-message error';}
@@ -590,16 +779,15 @@
   async function loadEvents() {
     const eventsGrid = document.getElementById('eventiGrid');
     const loadingIndicator = document.getElementById('loadingIndicator');
-    if (loadingIndicator) loadingIndicator.style.display = 'flex'; // Mostra spinner
+    if (loadingIndicator) loadingIndicator.style.display = 'flex';
     if (eventsGrid) eventsGrid.innerHTML = '';
 
-    if (!currentUser || !currentUser.email) { // Già controllato in DOMContentLoaded, ma per sicurezza
+    if (!currentUser || !currentUser.email) {
       if (eventsGrid) eventsGrid.innerHTML = '<p class="no-events error-message">Sessione utente non valida.</p>';
       if (loadingIndicator) loadingIndicator.style.display = 'none';
       return;
     }
     try {
-      // PERCORSO CORRETTO: get_events.php è nella root
       const response = await fetch(`get_events.php?user_email=${encodeURIComponent(currentUser.email)}`);
       if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
       const result = await response.json();
@@ -614,63 +802,93 @@
     } catch (error) {
       if (eventsGrid) eventsGrid.innerHTML = `<p class="no-events error-message" style="text-align:center; padding:20px;">Errore: ${error.message} <button onclick="loadEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>`;
     } finally {
-      if (loadingIndicator) loadingIndicator.style.display = 'none'; // Nascondi spinner
+      if (loadingIndicator) loadingIndicator.style.display = 'none';
     }
   }
 
   function createEventCard(event) {
     const card = document.createElement('article');
     card.className = 'card';
-    let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : '/images/default-event.jpg'; // Path assoluto per default
+    card.dataset.eventId = event.idevento; // Aggiunto per riferimento se necessario
+    let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : '/images/default-event.jpg';
 
     const postiDisponibiliOriginali = parseInt(event.posti_disponibili);
     const postiGiaPrenotatiUtente = parseInt(event.posti_gia_prenotati_utente) || 0;
-    const flagPrenotabileDB = event.flagprenotabile;
-    let buttonHTML = '';
+    const flagPrenotabileDB = event.flagprenotabile; // Assume 1 per true, 0 per false
+    let primaryButtonHTML = ''; // Bottone Prenota/Coda
     const maxPostiAncoraPrenotabiliUtente = 5 - postiGiaPrenotatiUtente;
 
-    if (!flagPrenotabileDB) {
-      buttonHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled>Non Prenotabile</button>`;
-    } else if (maxPostiAncoraPrenotabiliUtente <= 0) {
-      buttonHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Hai già prenotato il numero massimo di 5 posti per questo evento.">Max Posti Raggiunti</button>`;
-    } else if (postiDisponibiliOriginali > 0) {
-      buttonHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-disponibili-evento="${postiDisponibiliOriginali}" data-posti-gia-prenotati-utente="${postiGiaPrenotatiUtente}">Prenota</button>`;
-    } else {
-      buttonHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}">Entra in Coda</button>`;
+    if (parseInt(flagPrenotabileDB) === 0) { // Evento non prenotabile dal DB
+      primaryButtonHTML = `<a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Dettagli</a>`;
+    } else if (maxPostiAncoraPrenotabiliUtente <= 0) { // Utente ha raggiunto limite prenotazioni
+      primaryButtonHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Hai già prenotato il numero massimo di 5 posti per questo evento.">Max Posti Raggiunti</button>`;
+    } else if (postiDisponibiliOriginali > 0) { // Ci sono posti e l'utente può ancora prenotare
+      primaryButtonHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-disponibili-evento="${postiDisponibiliOriginali}" data-posti-gia-prenotati-utente="${postiGiaPrenotatiUtente}">Prenota</button>`;
+    } else { // Posti esauriti, l'utente può andare in coda (se non ha raggiunto limite)
+      primaryButtonHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}">Entra in Coda</button>`;
     }
 
+    // --- MODIFICA PER BOTTONE VOLANTINO ---
+    let volantinoBtnHtml = "";
+    if (event.volantino_url?.trim()) {
+      volantinoBtnHtml = `<button class="card-btn btn-visualizza-volantino card-btn-secondary"
+                                        data-volantino-url="${event.volantino_url}"
+                                        data-copertina-url="${imageSrc}">Volantino</button>`;
+    } else { // Se non c'è volantino, mettiamo il link ai dettagli per coerenza layout
+      volantinoBtnHtml = `<a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a>`;
+    }
+
+
     card.innerHTML = `
-            <div class="card-image-container"> <img src="${imageSrc}" alt="Copertina: ${event.titolo || 'Evento'}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='/images/default-event-error.jpg';"> </div>
-            <div class="card-content">
-                <h3>${event.titolo || 'Titolo non disponibile'}</h3>
-                <p class="card-info">
-                    <b>Data:</b> ${event.datainizio ? formatDate(event.datainizio) : 'Da definire'}
-                    ${event.durata ? `<br><b>Orario:</b> ${event.durata}` : ''}
-                </p>
-                <p class="card-info">
-                    <b>${event.prefisso_relatore || 'Relatore'}:</b> ${event.relatore || 'Non specificato'}
-                    ${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ''}
-                </p>
-                <p class="card-description">${event.descrizione || 'Nessuna descrizione breve.'}</p>
-                <p class="card-info">
-                    <b>Posti Disponibili:</b> <span class="posti-disponibili">${event.posti_disponibili !== null ? (parseInt(event.posti_disponibili) > 0 ? event.posti_disponibili : 'Esaurito') : 'N/D'}</span>
-                    ${postiGiaPrenotatiUtente > 0 ? `<br><b>Tuoi posti prenotati:</b> <span class="posti-disponibili">${postiGiaPrenotatiUtente}</span>` : ''}
-                    ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0 ? '<br><b>Costo:</b> Offerta libera' : '')) : ''}
-                </p>
-                <div class="card-actions">
-                    <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a>
-                    ${buttonHTML}
-                </div>
-            </div>`;
-    const actionBtn = card.querySelector('.btn-prenota');
+        <div class="card-image-container"> <img src="${imageSrc}" alt="Copertina: ${event.titolo || 'Evento'}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='/images/default-event-error.jpg';"> </div>
+        <div class="card-content">
+            <h3>${event.titolo || 'Titolo non disponibile'}</h3>
+            <p class="card-info">
+                <b>Data:</b> ${event.datainizio ? formatDate(event.datainizio) : 'Da definire'}
+                ${event.durata ? `<br><b>Orario:</b> ${event.durata}` : ''}
+            </p>
+            <p class="card-info">
+                <b>${event.prefisso_relatore || 'Relatore'}:</b> ${event.relatore || 'Non specificato'}
+                ${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ''}
+            </p>
+            <p class="card-description">${event.descrizione || 'Nessuna descrizione breve.'}</p>
+            <p class="card-info">
+                <b>Posti Disponibili:</b> <span class="posti-disponibili">${event.posti_disponibili !== null ? (parseInt(event.posti_disponibili) > 0 ? event.posti_disponibili : 'Esaurito') : 'N/D'}</span>
+                ${postiGiaPrenotatiUtente > 0 ? `<br><b>Tuoi posti prenotati:</b> <span class="posti-disponibili">${postiGiaPrenotatiUtente}</span>` : ''}
+                ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0 ? '<br><b>Costo:</b> Offerta libera' : '')) : ''}
+            </p>
+            <div class="card-actions ${!volantinoBtnHtml && !primaryButtonHTML.includes('data-action') ? 'single-action' : (volantinoBtnHtml && primaryButtonHTML.includes('data-action') ? '' : 'single-action-ish') }">
+                ${volantinoBtnHtml}
+                ${primaryButtonHTML}
+            </div>
+        </div>`;
+
+    const actionBtn = card.querySelector('.btn-prenota'); // Bottone Prenota/Coda
     if (actionBtn && !actionBtn.disabled) {
       actionBtn.addEventListener('click', function() {
-        const action = this.dataset.action; const eventId = this.dataset.eventId; const eventTitle = this.dataset.eventTitle;
+        const action = this.dataset.action;
+        const eventId = this.dataset.eventId;
+        const eventTitle = this.dataset.eventTitle;
         if (action === 'book') {
-          const postiDisp = parseInt(this.dataset.postiDisponibiliEvento); const postiGiaPren = parseInt(this.dataset.postiGiaPrenotatiUtente);
+          const postiDisp = parseInt(this.dataset.postiDisponibiliEvento);
+          const postiGiaPren = parseInt(this.dataset.postiGiaPrenotatiUtente);
           if(typeof window.openBookingPopup === 'function') { window.openBookingPopup(eventId, eventTitle, postiDisp, postiGiaPren); }
         } else if (action === 'waitlist') {
           if(typeof window.openWaitlistPopup === 'function') { window.openWaitlistPopup(eventId, eventTitle); }
+        }
+      });
+    }
+
+    // Listener per il pulsante volantino
+    const volantinoBtn = card.querySelector(".btn-visualizza-volantino");
+    if (volantinoBtn) {
+      volantinoBtn.addEventListener("click", function () {
+        if(typeof showVolantinoWithMorph === 'function') {
+          showVolantinoWithMorph(
+                  card, // Passa l'elemento card
+                  this.dataset.copertinaUrl,
+                  this.dataset.volantinoUrl
+          );
         }
       });
     }
@@ -680,10 +898,39 @@
   function formatDate(dateString) {
     if (!dateString) return 'Data non disponibile';
     try {
-      const date = new Date(dateString.replace(/-/g, '/'));
-      if (isNaN(date.getTime())) return dateString;
-      return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric'});
-    } catch (e) { return dateString; }
+      // Prova a normalizzare la data: sostituisci '-' con '/' per il costruttore Date in alcuni browser
+      // e assicurati che sia trattata come UTC se non ha informazioni di fuso orario.
+      const normalizedDateString = dateString.length === 10 ? dateString + "T00:00:00Z" : dateString.replace(" ", "T") + "Z";
+      const date = new Date(normalizedDateString);
+
+      if (isNaN(date.getTime())) { // Se il parsing fallisce
+        // Prova un parsing più semplice se la data è solo YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateString.substring(0,10))) {
+          const parts = dateString.substring(0,10).split('-');
+          const year = parseInt(parts[0]);
+          const month = parseInt(parts[1]) - 1; // Mese è 0-indexed
+          const day = parseInt(parts[2]);
+          const utcDate = new Date(Date.UTC(year, month, day));
+          if (isNaN(utcDate.getTime())) return dateString; // Fallback se ancora invalido
+          return utcDate.toLocaleDateString("it-IT", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: 'UTC' // Specifica che la data è UTC
+          });
+        }
+        return dateString; // Fallback alla stringa originale
+      }
+      return date.toLocaleDateString('it-IT', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC' // Visualizza come se fosse UTC per consistenza
+      });
+    } catch (e) {
+      console.warn("Errore formattazione data:", dateString, e);
+      return dateString;
+    }
   }
 </script>
 </body>
