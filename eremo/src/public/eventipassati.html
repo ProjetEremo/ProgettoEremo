@@ -1,625 +1,631 @@
 <!DOCTYPE html>
 <html lang="it">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="images/logo.png" type="image/x-icon" />
-    <title>Archivio Attività - Eremo Frate Francesco</title>
-    <link rel="stylesheet" href="style.css" />
-    <style>
-      /* Stili specifici per i filtri, se necessario */
-      .event-filters {
-        background-color: var(--white);
-        padding: 1.5rem;
-        border-radius: var(--border-radius-medium);
-        margin-bottom: 2rem;
-        box-shadow: var(--shadow-light);
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        align-items: flex-end; /* Allinea elementi in basso */
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="images/logo.png" type="image/x-icon" />
+  <title>Archivio Attività - Eremo Frate Francesco</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Stili specifici per i filtri, se necessario */
+    .event-filters {
+      background-color: var(--white);
+      padding: 1.5rem;
+      border-radius: var(--border-radius-medium);
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-light);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end; /* Allinea elementi in basso */
+    }
+    .event-filters .form-group {
+      flex: 1 1 200px; /* Flex per adattarsi */
+      margin-bottom: 0; /* Rimuove margine inferiore dal form-group */
+    }
+    .event-filters label {
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+      color: var(--primary);
+      display: block;
+    }
+    .event-filters input,
+    .event-filters select {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1px solid var(--gray-medium);
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+    .event-filters button {
+      padding: 0.7rem 1.5rem;
+      background-color: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition-medium);
+      height: fit-content; /* Adatta altezza */
+    }
+    .event-filters button:hover {
+      background-color: var(--primary);
+    }
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    .loading-overlay.visible {
+      visibility: visible;
+      opacity: 1;
+    }
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: var(--primary);
+      animation: spin 1s ease infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
       }
-      .event-filters .form-group {
-        flex: 1 1 200px; /* Flex per adattarsi */
-        margin-bottom: 0; /* Rimuove margine inferiore dal form-group */
-      }
-      .event-filters label {
-        font-size: 0.9rem;
-        margin-bottom: 0.3rem;
-        color: var(--primary);
-        display: block;
-      }
-      .event-filters input,
-      .event-filters select {
-        width: 100%;
-        padding: 0.7rem 1rem;
-        border: 1px solid var(--gray-medium);
-        border-radius: 8px;
-        font-size: 0.95rem;
-      }
-      .event-filters button {
-        padding: 0.7rem 1.5rem;
-        background-color: var(--secondary);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: var(--transition-medium);
-        height: fit-content; /* Adatta altezza */
-      }
-      .event-filters button:hover {
-        background-color: var(--primary);
-      }
-      .loading-overlay {
-        /* Stile per indicatore caricamento */
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(255, 255, 255, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10;
-        visibility: hidden;
-        opacity: 0;
-        transition: opacity 0.3s, visibility 0.3s;
-      }
-      .loading-overlay.visible {
-        visibility: visible;
-        opacity: 1;
-      }
-      .spinner {
-        /* Stile base per spinner */
-        border: 4px solid rgba(0, 0, 0, 0.1);
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border-left-color: var(--primary);
-        animation: spin 1s ease infinite;
-      }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-      .no-events {
-        text-align: center;
-        padding: 2rem;
-        color: var(--gray-dark);
-      }
-    </style>
-  </head>
-  <body>
-    <header class="navbar-container" id="navbarContainer">
-      <nav class="navbar">
-        <div class="logo">
-          <a href="index.html"
-            ><span class="emoji">🏔️</span>
-            <h2>Eremo Frate Francesco</h2></a
-          >
-        </div>
-        <div class="menu">
-          <a href="eventiincorso.html">Calendario attività</a>
-          <a href="eventipassati.html" class="active">Archivio attività</a
-          ><span class="separator">|</span>
-          <a href="incontrisullaparola.html">Incontri sulla parola</a
-          ><span class="separator">|</span>
-          <a href="dovesiamo.html">Dove siamo</a>
-          <a href="contatti.html">Contatti</a>
-        </div>
-        <div class="right-menu">
-          <button id="login-btn" class="login-btn">Accedi</button>
-          <button
-            class="hamburger"
-            onclick="toggleMobileMenu()"
-            aria-label="Toggle menu"
-          >
-            ☰
-          </button>
-        </div>
-      </nav>
-      <div class="mobile-menu" id="mobileMenu">
-        <a href="eventiincorso.html" onclick="closeMobileMenu()"
-          >Calendario attività</a
-        >
-        <a href="eventipassati.html" onclick="closeMobileMenu()"
-          >Archivio attività</a
-        >
-        <a href="incontrisullaparola.html" onclick="closeMobileMenu()"
-          >Incontri sulla parola</a
-        >
-        <a href="dovesiamo.html" onclick="closeMobileMenu()">Dove siamo</a>
-        <a href="contatti.html" onclick="closeMobileMenu()">Contatti</a>
-        <a
-          href="#"
-          id="login-btn-mobile"
-          onclick="openLoginPopup(); closeMobileMenu();"
-          >Accedi</a
-        >
-      </div>
-    </header>
-
-    <main>
-      <div class="container section-padding">
-        <h1>Archivio Attività</h1>
-
-        <div class="event-filters">
-          <div class="form-group">
-            <label for="searchTitle">Titolo Evento</label>
-            <input
-              type="text"
-              id="searchTitle"
-              placeholder="Cerca per titolo..."
-              class="form-control"
-            />
-          </div>
-          <div class="form-group">
-            <label for="searchDate">Mese/Anno (YYYY-MM)</label>
-            <input type="month" id="searchDate" class="form-control" />
-          </div>
-          <div class="form-group">
-            <label for="searchSpeaker">Relatore</label>
-            <input
-              type="text"
-              id="searchSpeaker"
-              class="form-control"
-              placeholder="Nome relatore..."
-            />
-          </div>
-        </div>
-
-        <div id="eventiGridContainer" style="position: relative">
-          <div id="loadingIndicator" class="loading-overlay">
-            <div class="spinner"></div>
-          </div>
-          <div class="card-grid" id="eventiPassatiGrid"></div>
-        </div>
-      </div>
-    </main>
-
-    <footer>
-      <p>
-        © <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti
-        riservati. Via della Spiritualità 123, Nembro (BG) - Italia
-      </p>
-    </footer>
-
-    <div class="login-popup-overlay" id="loginOverlay"></div>
-    <div class="login-popup" id="loginPopup">
-      <button class="close-popup" id="closePopup" aria-label="Chiudi popup">
-        &times;
+    }
+    .no-events {
+      text-align: center;
+      padding: 2rem;
+      color: var(--gray-dark);
+    }
+  </style>
+</head>
+<body>
+<header class="navbar-container" id="navbarContainer">
+  <nav class="navbar">
+    <div class="logo">
+      <a href="index.html"
+      ><span class="emoji">🏔️</span>
+        <h2>Eremo Frate Francesco</h2></a
+      >
+    </div>
+    <div class="menu">
+      <a href="eventiincorso.html">Calendario attività</a>
+      <a href="eventipassati.html" class="active">Archivio attività</a
+      ><span class="separator">|</span>
+      <a href="incontrisullaparola.html">Incontri sulla parola</a
+      ><span class="separator">|</span>
+      <a href="dovesiamo.html">Dove siamo</a>
+      <a href="contatti.html">Contatti</a>
+    </div>
+    <div class="right-menu">
+      <button id="login-btn" class="login-btn">Accedi</button>
+      <button
+              class="hamburger"
+              onclick="toggleMobileMenu()"
+              aria-label="Toggle menu"
+      >
+        ☰
       </button>
-      <div class="login-tabs">
-        <div class="login-tab active" data-tab="login">Accedi</div>
-        <div class="login-tab" data-tab="register">Registrati</div>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="eventiincorso.html" onclick="closeMobileMenu()"
+    >Calendario attività</a
+    >
+    <a href="eventipassati.html" onclick="closeMobileMenu()"
+    >Archivio attività</a
+    >
+    <a href="incontrisullaparola.html" onclick="closeMobileMenu()"
+    >Incontri sulla parola</a
+    >
+    <a href="dovesiamo.html" onclick="closeMobileMenu()">Dove siamo</a>
+    <a href="contatti.html" onclick="closeMobileMenu()">Contatti</a>
+    <a
+            href="#"
+            id="login-btn-mobile"
+            onclick="openLoginPopup(); closeMobileMenu();"
+    >Accedi</a
+    >
+  </div>
+</header>
+
+<main>
+  <div class="container section-padding">
+    <h1>Archivio Attività Passate</h1>
+
+    <div class="event-filters">
+      <div class="form-group">
+        <label for="searchTitle">Titolo Evento</label>
+        <input
+                type="text"
+                id="searchTitle"
+                placeholder="Cerca per titolo..."
+                class="form-control"
+        />
       </div>
-      <form class="login-form active" id="loginForm" method="POST">
-        <div class="form-group mb-3">
-          <label for="login-email">Email</label>
-          <input
-            type="email"
-            id="login-email"
-            name="login-email"
-            class="form-control"
-            required
-            autocomplete="email"
-          />
-        </div>
-        <div class="form-group mb-3">
-          <label for="login-password">Password</label>
-          <input
-            type="password"
-            id="login-password"
-            name="login-password"
-            class="form-control"
-            required
-            autocomplete="current-password"
-          />
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-popup">Accedi</button>
-        </div>
-      </form>
-      <form class="login-form" id="registerForm" method="POST">
-        <div class="form-group mb-3">
-          <label for="register-name">Nome</label>
-          <input
-            type="text"
-            id="register-name"
-            name="register-name"
-            class="form-control"
-            required
-            autocomplete="given-name"
-          />
-        </div>
-        <div class="form-group mb-3">
-          <label for="register-surname">Cognome</label>
-          <input
-            type="text"
-            id="register-surname"
-            name="register-surname"
-            class="form-control"
-            required
-            autocomplete="family-name"
-          />
-        </div>
-        <div class="form-group mb-3">
-          <label for="register-email">Email</label>
-          <input
-            type="email"
-            id="register-email"
-            name="register-email"
-            class="form-control"
-            required
-            autocomplete="email"
-          />
-        </div>
-        <div class="form-group mb-3">
-          <label for="register-password">Password</label>
-          <input
-            type="password"
-            id="register-password"
-            name="register-password"
-            class="form-control"
-            required
-            minlength="8"
-            autocomplete="new-password"
-          />
-          <small>Minimo 8 caratteri.</small>
-        </div>
-        <div class="terms-checkbox mb-3">
-          <input
-            type="checkbox"
-            id="register-terms"
-            name="register-terms"
-            required
-          />
-          <label for="register-terms"
-            >Accetto i
-            <a href="termini.html" target="_blank">termini e condizioni</a></label
-          >
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-popup">Registrati</button>
-        </div>
-      </form>
+      <div class="form-group">
+        <label for="searchDate">Mese/Anno (YYYY-MM)</label>
+        <input type="month" id="searchDate" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="searchSpeaker">Relatore</label>
+        <input
+                type="text"
+                id="searchSpeaker"
+                class="form-control"
+                placeholder="Nome relatore..."
+        />
+      </div>
     </div>
 
-    <script>
-      // --- Funzioni Utilità ---
-      function gebi(id) {
-        return document.getElementById(id);
-      }
+    <div id="eventiGridContainer" style="position: relative">
+      <div id="loadingIndicator" class="loading-overlay">
+        <div class="spinner"></div>
+      </div>
+      <div class="card-grid" id="eventiPassatiGrid"></div>
+    </div>
+  </div>
+</main>
 
-      // --- Navbar Scroll Logic ---
-      let lastScroll = 0;
-      const navbarContainer = gebi("navbarContainer");
-      if (navbarContainer) {
-        window.addEventListener(
-          "scroll",
-          function () {
-            const currentScroll =
-              window.pageYOffset || document.documentElement.scrollTop;
-            if (currentScroll <= 50) {
-              navbarContainer.classList.remove("hidden");
-              lastScroll = 0;
-              return;
-            }
-            if (
-              currentScroll > lastScroll &&
-              !navbarContainer.classList.contains("hidden")
-            ) {
-              navbarContainer.classList.add("hidden");
-            } else if (
-              currentScroll < lastScroll &&
-              navbarContainer.classList.contains("hidden")
-            ) {
-              navbarContainer.classList.remove("hidden");
-            }
-            lastScroll = currentScroll;
-          },
-          false
-        );
-      }
+<footer>
+  <p>
+    © <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti
+    riservati. Via della Spiritualità 123, Nembro (BG) - Italia
+  </p>
+</footer>
 
-      // --- Mobile Menu Logic ---
-      const mobileMenu = gebi("mobileMenu");
-      const hamburger = document.querySelector(".hamburger");
-      function toggleMobileMenu() {
-        if (mobileMenu && hamburger) {
-          const isOpen = mobileMenu.classList.toggle("open");
-          hamburger.setAttribute("aria-expanded", isOpen);
-          document.body.style.overflow = isOpen ? "hidden" : "";
-        }
+<div class="login-popup-overlay" id="loginOverlay"></div>
+<div class="login-popup" id="loginPopup">
+  <button class="close-popup" id="closePopupBtn" aria-label="Chiudi popup">
+    &times;
+  </button>
+  <div class="login-tabs">
+    <div class="login-tab active" data-tab="login">Accedi</div>
+    <div class="login-tab" data-tab="register">Registrati</div>
+  </div>
+  <form class="login-form active" id="loginFormPopup">
+    <div class="form-group">
+      <label for="login-email-popup">Email</label>
+      <input
+              type="email"
+              id="login-email-popup"
+              name="email"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="form-group">
+      <label for="login-password-popup">Password</label>
+      <input
+              type="password"
+              id="login-password-popup"
+              name="password"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn-popup">Accedi</button>
+    </div>
+  </form>
+  <form class="login-form" id="registerFormPopup">
+    <div class="form-group">
+      <label for="register-name-popup">Nome</label>
+      <input
+              type="text"
+              id="register-name-popup"
+              name="nome"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="form-group">
+      <label for="register-email-popup">Email</label>
+      <input
+              type="email"
+              id="register-email-popup"
+              name="email"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="form-group">
+      <label for="register-password-popup">Password</label>
+      <input
+              type="password"
+              id="register-password-popup"
+              name="password"
+              class="form-control"
+              required
+              minlength="8"
+      />
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn-popup">Registrati</button>
+    </div>
+  </form>
+</div>
+
+<div class="login-popup-overlay" id="loginRequiredOverlay"></div>
+<div class="login-popup" id="loginRequiredPopup">
+    <button class="close-popup" id="closeLoginRequiredPopupBtn" aria-label="Chiudi popup">&times;</button>
+    <h2 style="color: var(--primary); margin-top: 0; margin-bottom: 1.5rem; text-align: center; font-size: 1.8rem;">Accesso Richiesto</h2>
+    <p style="text-align: center; margin-bottom: 1.5rem; font-size: 1.2rem; color: var(--dark);">Per visualizzare i dettagli completi dell'evento e i commenti, è necessario effettuare l'accesso.</p>
+    <div class="form-actions" style="text-align: center;">
+        <button type="button" class="btn-popup" id="loginRequiredLoginBtn">Accedi / Registrati</button>
+    </div>
+</div>
+
+
+<script>
+  // --- Funzioni Utilità ---
+  function gebi(id) {
+    return document.getElementById(id);
+  }
+
+  // --- Navbar Scroll Logic (invariato) ---
+  let lastScroll = 0;
+  const navbarContainer = gebi("navbarContainer");
+  if (navbarContainer) {
+    window.addEventListener( "scroll", function () {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      if (currentScroll <= 50) {
+        navbarContainer.classList.remove("hidden");
+        lastScroll = 0;
+        return;
       }
-      function closeMobileMenu() {
-        if (mobileMenu && hamburger) {
-          mobileMenu.classList.remove("open");
-          hamburger.setAttribute("aria-expanded", "false");
-          document.body.style.overflow = "";
-        }
+      if ( currentScroll > lastScroll && !navbarContainer.classList.contains("hidden") ) {
+        navbarContainer.classList.add("hidden");
+      } else if ( currentScroll < lastScroll && navbarContainer.classList.contains("hidden") ) {
+        navbarContainer.classList.remove("hidden");
       }
-      document.addEventListener("click", function (event) {
-        if (
-          mobileMenu &&
-          mobileMenu.classList.contains("open") &&
-          !mobileMenu.contains(event.target) &&
-          hamburger &&
-          !hamburger.contains(event.target)
-        ) {
-          closeMobileMenu();
+      lastScroll = currentScroll;
+    }, false );
+  }
+
+  // --- Mobile Menu Logic (invariato) ---
+  const mobileMenu = gebi("mobileMenu");
+  const hamburger = document.querySelector(".hamburger");
+  function toggleMobileMenu() {
+    if (mobileMenu && hamburger) {
+      const isOpen = mobileMenu.classList.toggle("open");
+      hamburger.setAttribute("aria-expanded", isOpen);
+      document.body.style.overflow = isOpen ? "hidden" : "";
+    }
+  }
+  function closeMobileMenu() {
+    if (mobileMenu && hamburger) {
+      mobileMenu.classList.remove("open");
+      hamburger.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    }
+  }
+  document.addEventListener("click", function (event) {
+    if ( mobileMenu && mobileMenu.classList.contains("open") && !mobileMenu.contains(event.target) && hamburger && !hamburger.contains(event.target) ) {
+      closeMobileMenu();
+    }
+  });
+
+  // --- Login Popup Logic (invariato) ---
+  const loginBtn = gebi("login-btn");
+  const loginBtnMobile = gebi("login-btn-mobile");
+  const loginOverlay = gebi("loginOverlay");
+  const loginPopup = gebi("loginPopup");
+  const closePopupBtn = gebi("closePopupBtn");
+  const loginTabs = document.querySelectorAll(".login-tab");
+  const loginForms = document.querySelectorAll(".login-popup .login-form");
+
+  function openLoginPopup() {
+    if (loginOverlay) loginOverlay.classList.add("active");
+    if (loginPopup) loginPopup.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLoginPopup() {
+    if (loginOverlay) loginOverlay.classList.remove("active");
+    if (loginPopup) loginPopup.classList.remove("active");
+    document.body.style.overflow = "";
+  }
+
+  if (loginBtn) loginBtn.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); });
+  if (loginBtnMobile) {
+    loginBtnMobile.addEventListener("click", (e) => {
+      e.preventDefault();
+      closeMobileMenu();
+      openLoginPopup();
+    });
+  }
+  if (closePopupBtn) closePopupBtn.addEventListener("click", closeLoginPopup);
+  if (loginOverlay) loginOverlay.addEventListener("click", (e) => { if (e.target === loginOverlay) closeLoginPopup(); });
+
+  loginTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const tabId = tab.getAttribute("data-tab");
+      loginTabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      loginForms.forEach((form) => {
+        form.classList.remove("active");
+        if (form.id === `${tabId}FormPopup`) { // Aggiornato per ID univoci dei form nel popup
+          form.classList.add("active");
         }
       });
+    });
+  });
 
-      // --- Login Popup Logic (semplificato, assicurati sia completo se usi quello dei file forniti) ---
-      const loginBtn = gebi("login-btn");
-      const loginBtnMobile = gebi("login-btn-mobile");
-      const loginOverlay = gebi("loginOverlay");
-      const loginPopup = gebi("loginPopup");
-      const closePopupBtn = gebi("closePopupBtn"); // Era closePopup nel tuo HTML, ma spesso si usa closeLoginPopupBtn
-      const loginTabs = document.querySelectorAll(".login-tab");
-      const loginForms = document.querySelectorAll(".login-popup .login-form"); // Assicurati che il selettore sia corretto
+  gebi("loginFormPopup")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const loginButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = loginButton.innerHTML;
+    loginButton.disabled = true;
+    loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>';
 
-      function openLoginPopup() {
-        if (loginOverlay) loginOverlay.classList.add("active");
-        if (loginPopup) loginPopup.classList.add("active");
-        document.body.style.overflow = "hidden";
-      }
+    try {
+        const response = await fetch('login.php', {
+            method: 'POST',
+            body: new FormData(e.target)
+        });
+        if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
+        const result = await response.json();
 
-      function closeLoginPopup() {
-        if (loginOverlay) loginOverlay.classList.remove("active");
-        if (loginPopup) loginPopup.classList.remove("active");
+        if (result.success) {
+            const userDataToStore = {
+                nome: result.nome,
+                email: result.email,
+                iconPath: result.iconPath || '/uploads/icons/default_user.png',
+            };
+            localStorage.setItem('userDataEFF', JSON.stringify(userDataToStore));
+            closeLoginPopup();
+            window.location.href = result.is_admin ? 'indexadmin.html' : 'indexaccesso.html';
+        } else {
+            alert(result.message || "Credenziali non valide.");
+        }
+    } catch (error) {
+        alert("Errore di connessione o risposta non valida dal server.");
+        console.error("Errore login:", error);
+    } finally {
+        loginButton.disabled = false;
+        loginButton.innerHTML = originalButtonText;
+    }
+  });
+
+  gebi("registerFormPopup")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const registerButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = registerButton.innerHTML;
+    registerButton.disabled = true;
+    registerButton.innerHTML = 'Registrazione...';
+    try {
+        const response = await fetch('registrati.php', {
+            method: 'POST',
+            body: new FormData(e.target)
+        });
+        if (!response.ok) {
+            let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+            try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; }
+            catch(err) { /* Ignora */ }
+            throw new Error(errorMsg);
+        }
+        const result = await response.json();
+        if (result.success) {
+            alert(result.message || "Registrazione completata! Ora puoi effettuare il login.");
+            document.querySelector('.login-tab[data-tab="login"]').click();
+            const loginEmailPopup = gebi('login-email-popup');
+            const registerEmailPopup = gebi('register-email-popup');
+            if (loginEmailPopup && registerEmailPopup) {
+                loginEmailPopup.value = registerEmailPopup.value;
+            }
+            e.target.reset();
+        } else {
+            alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+        }
+    } catch (error) {
+        alert("Errore durante la registrazione: " + error.message);
+        console.error("Dettaglio errore registrazione:", error);
+    } finally {
+        registerButton.disabled = false;
+        registerButton.innerHTML = originalButtonText;
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && loginPopup && loginPopup.classList.contains("active") ) {
+      closeLoginPopup();
+    }
+  });
+
+  // --- Logica Popup "Accesso Richiesto" ---
+  const loginRequiredOverlay = gebi("loginRequiredOverlay");
+  const loginRequiredPopup = gebi("loginRequiredPopup");
+  const closeLoginRequiredPopupBtn = gebi("closeLoginRequiredPopupBtn");
+  const loginRequiredLoginBtn = gebi("loginRequiredLoginBtn");
+
+  function showLoginRequiredPopup(event) {
+    if (event) event.preventDefault();
+    if (loginRequiredOverlay) loginRequiredOverlay.classList.add("active");
+    if (loginRequiredPopup) loginRequiredPopup.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLoginRequiredPopup() {
+    if (loginRequiredOverlay) loginRequiredOverlay.classList.remove("active");
+    if (loginRequiredPopup) loginRequiredPopup.classList.remove("active");
+    if (!loginPopup || !loginPopup.classList.contains("active")) { // Solo se il popup di login principale non è attivo
         document.body.style.overflow = "";
-      }
+    }
+  }
 
-      if (loginBtn)
-        loginBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          openLoginPopup();
-        });
-      if (loginBtnMobile) {
-        loginBtnMobile.addEventListener("click", (e) => {
-          e.preventDefault();
-          closeMobileMenu();
-          openLoginPopup();
-        });
-      }
-      if (closePopupBtn)
-        closePopupBtn.addEventListener("click", closeLoginPopup);
-      if (loginOverlay)
-        loginOverlay.addEventListener("click", (e) => {
-          if (e.target === loginOverlay) closeLoginPopup();
-        });
+  if (closeLoginRequiredPopupBtn) {
+    closeLoginRequiredPopupBtn.addEventListener("click", closeLoginRequiredPopup);
+  }
+  if (loginRequiredOverlay) {
+    loginRequiredOverlay.addEventListener("click", (e) => {
+        if (e.target === loginRequiredOverlay) closeLoginRequiredPopup();
+    });
+  }
+  if (loginRequiredLoginBtn) {
+    loginRequiredLoginBtn.addEventListener("click", () => {
+        closeLoginRequiredPopup();
+        openLoginPopup(); // Apre il popup di login/registrazione principale
+    });
+  }
+   document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && loginRequiredPopup && loginRequiredPopup.classList.contains("active")) {
+      closeLoginRequiredPopup();
+    }
+  });
 
-      loginTabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          const tabId = tab.getAttribute("data-tab");
-          loginTabs.forEach((t) => t.classList.remove("active"));
-          tab.classList.add("active");
-          loginForms.forEach((form) => {
-            form.classList.remove("active");
-            // Assicurati che gli ID dei form corrispondano (es. loginFormPopup, registerFormPopup)
-            if (form.id === `${tabId}FormPopup` || form.id === `${tabId}Form`) {
-              form.classList.add("active");
-            }
-          });
-        });
+
+  // --- Logica Caricamento e Filtro Eventi Passati ---
+  const eventiPassatiGrid = gebi("eventiPassatiGrid");
+  const loadingIndicator = gebi("loadingIndicator");
+  let allPastEvents = [];
+
+  function formatDate(dateString) {
+    if (!dateString) return "Data non disponibile";
+    try {
+      const date = new Date( dateString.includes("T") ? dateString : dateString + "T00:00:00" );
+      if (isNaN(date.getTime())) return dateString;
+      return date.toLocaleDateString("it-IT", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
       });
+    } catch (e) {
+      console.warn("Errore formattazione data:", dateString, e);
+      return dateString;
+    }
+  }
 
-      // Gestione Login/Registrazione (DA COMPLETARE CON LA TUA LOGICA PHP)
-      gebi("loginFormPopup")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        // Logica di invio per il login...
-        alert("Login simulato. Implementare chiamata a login.php");
-        // Esempio: const formData = new FormData(e.target); fetch('login.php', {method: 'POST', body: formData})...
-        // closeLoginPopup();
-      });
+  function createPastEventCard(event) {
+    const card = document.createElement("article");
+    card.className = "card";
+    card.dataset.title = event.titolo?.toLowerCase() || "";
+    card.dataset.date = event.datainizio || "";
+    card.dataset.speaker = event.relatore?.toLowerCase() || "";
 
-      gebi("registerFormPopup")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        // Logica di invio per la registrazione...
-        alert("Registrazione simulata. Implementare chiamata a registrati.php");
-        // Esempio: const formData = new FormData(e.target); fetch('registrati.php', {method: 'POST', body: formData})...
-        // closeLoginPopup();
-      });
+    let imageSrc = event.immagine_url && event.immagine_url.trim() !== "" ? event.immagine_url : "images/default-event-past.jpg";
 
-      document.addEventListener("keydown", (event) => {
-        if (
-          event.key === "Escape" &&
-          loginPopup &&
-          loginPopup.classList.contains("active")
-        ) {
-          closeLoginPopup();
-        }
-      });
-
-      // --- Logica Caricamento e Filtro Eventi Passati ---
-      const eventiPassatiGrid = gebi("eventiPassatiGrid");
-      const loadingIndicator = gebi("loadingIndicator");
-      let allPastEvents = []; // Array per memorizzare tutti gli eventi caricati
-
-      function formatDate(dateString) {
-        if (!dateString) return "Data non disponibile";
-        try {
-          // Gestisce sia YYYY-MM-DD che timestamp completi
-          const date = new Date(
-            dateString.includes("T") ? dateString : dateString + "T00:00:00"
-          );
-          if (isNaN(date.getTime())) return dateString; // Restituisce la stringa originale se non valida
-          return date.toLocaleDateString("it-IT", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          });
-        } catch (e) {
-          console.warn("Errore formattazione data:", dateString, e);
-          return dateString; // Fallback alla stringa originale
-        }
-      }
-
-      function createPastEventCard(event) {
-        const card = document.createElement("article");
-        card.className = "card";
-        // Salva i dati grezzi sulla card per il filtraggio
-        card.dataset.title = event.titolo?.toLowerCase() || "";
-        card.dataset.date = event.datainizio || ""; // YYYY-MM-DD
-        card.dataset.speaker = event.relatore?.toLowerCase() || "";
-
-        let imageSrc =
-          event.immagine_url && event.immagine_url.trim() !== ""
-            ? event.immagine_url
-            : "images/default-event-past.jpg"; // Immagine default specifica per eventi passati
-
-        card.innerHTML = `
+    // MODIFICHE QUI:
+    card.innerHTML = `
             <div class="card-image-container">
-                <img src="${imageSrc}" alt="Copertina: ${
-          event.titolo || "Evento passato"
-        }" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
+                <img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento passato"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
             </div>
             <div class="card-content">
                 <h3>${event.titolo || "Titolo non disponibile"}</h3>
                 <p class="card-info">
                     <b>Data:</b> ${formatDate(event.datainizio)}
-                    ${
-                      event.durata
-                        ? `<br><b>Orario/Durata:</b> ${event.durata}`
-                        : ""
-                    }
+                    ${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ""}
                 </p>
                 <p class="card-info">
-                    <b>${event.prefisso_relatore || "Relatore"}:</b> ${
-          event.relatore || "N/D"
-        }
-                    ${
-                      event.associazione
-                        ? `<br><b>Associazione:</b> ${event.associazione}`
-                        : ""
-                    }
+                    <b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}
+                    ${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}`: ""}
                 </p>
-                <p>${
-                  event.descrizione || "Nessuna descrizione breve disponibile."
-                }</p>
-                <div class="card-actions single-action">
-                    <a href="evento.html?id=${
-                      event.idevento
-                    }" class="card-btn card-btn-secondary">Dettagli Evento</a>
+                <p>${event.descrizione || "Nessuna descrizione breve disponibile."}</p>
+                <div class="card-actions">
+                    <a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Dettagli</a>
+                    <a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Commenti</a>
                 </div>
             </div>
         `;
-        return card;
+    return card;
+  }
+
+  async function loadPastEvents() {
+    if (!eventiPassatiGrid || !loadingIndicator) return;
+    loadingIndicator.classList.add("visible");
+    eventiPassatiGrid.innerHTML = "";
+
+    try {
+      const response = await fetch("get_past_events.php");
+      if (!response.ok) {
+        throw new Error( `Errore HTTP: ${response.status} ${response.statusText}` );
       }
+      const result = await response.json();
 
-      async function loadPastEvents() {
-        if (!eventiPassatiGrid || !loadingIndicator) return;
-        loadingIndicator.classList.add("visible");
-        eventiPassatiGrid.innerHTML = ""; // Pulisci la griglia
-
-        try {
-          const response = await fetch("get_past_events.php");
-          if (!response.ok) {
-            throw new Error(
-              `Errore HTTP: ${response.status} ${response.statusText}`
-            );
-          }
-          const result = await response.json();
-
-          if (result.success && result.data) {
-            allPastEvents = result.data; // Salva i dati per il filtraggio
-            if (allPastEvents.length > 0) {
-              allPastEvents.forEach((event) => {
-                eventiPassatiGrid.appendChild(createPastEventCard(event));
-              });
-            } else {
-              eventiPassatiGrid.innerHTML =
-                '<p class="no-events">Nessun evento passato trovato.</p>';
-            }
-          } else {
-            throw new Error(
-              result.message || "Errore nel caricamento degli eventi passati."
-            );
-          }
-        } catch (error) {
-          console.error("Errore caricamento eventi passati:", error);
-          eventiPassatiGrid.innerHTML = `<p class="no-events error-message">Si è verificato un errore durante il caricamento degli eventi. (${error.message})</p>`;
-        } finally {
-          loadingIndicator.classList.remove("visible");
+      if (result.success && result.data) {
+        allPastEvents = result.data;
+        if (allPastEvents.length > 0) {
+          allPastEvents.forEach((event) => {
+            eventiPassatiGrid.appendChild(createPastEventCard(event));
+          });
+        } else {
+          eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
         }
+      } else {
+        throw new Error( result.message || "Errore nel caricamento degli eventi passati." );
       }
+    } catch (error) {
+      console.error("Errore caricamento eventi passati:", error);
+      eventiPassatiGrid.innerHTML = `<p class="no-events error-message">Si è verificato un errore durante il caricamento degli eventi. (${error.message})</p>`;
+    } finally {
+      loadingIndicator.classList.remove("visible");
+    }
+  }
 
-      function filterEvents() {
-        if (!eventiPassatiGrid) return;
+  function filterEvents() {
+    if (!eventiPassatiGrid) return;
 
-        const titleFilter = gebi("searchTitle").value.toLowerCase().trim();
-        const dateFilter = gebi("searchDate").value; // Formato YYYY-MM
-        const speakerFilter = gebi("searchSpeaker").value.toLowerCase().trim();
+    const titleFilter = gebi("searchTitle").value.toLowerCase().trim();
+    const dateFilter = gebi("searchDate").value;
+    const speakerFilter = gebi("searchSpeaker").value.toLowerCase().trim();
 
-        const cards = eventiPassatiGrid.querySelectorAll(".card");
-        let visibleCards = 0;
+    eventiPassatiGrid.innerHTML = ''; // Pulisci e ripopola con card filtrate
+    let visibleCards = 0;
 
-        cards.forEach((card) => {
-          const eventTitle = card.dataset.title || "";
-          const eventDate = card.dataset.date || ""; // YYYY-MM-DD
-          const eventSpeaker = card.dataset.speaker || "";
+    const filteredEvents = allPastEvents.filter(event => {
+        const eventTitle = event.titolo?.toLowerCase() || "";
+        const eventDate = event.datainizio || "";
+        const eventSpeaker = event.relatore?.toLowerCase() || "";
 
-          let titleMatch = true;
-          if (titleFilter) {
-            titleMatch = eventTitle.includes(titleFilter);
-          }
+        let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
+        let dateMatch = !dateFilter || (eventDate && eventDate.substring(0, 7) === dateFilter);
+        let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
+        return titleMatch && dateMatch && speakerMatch;
+    });
 
-          let dateMatch = true;
-          if (dateFilter) {
-            // dateFilter è YYYY-MM
-            // Estrai YYYY-MM da eventDate (YYYY-MM-DD)
-            const eventYearMonth = eventDate.substring(0, 7); // primi 7 caratteri: YYYY-MM
-            dateMatch = eventYearMonth === dateFilter;
-          }
-
-          let speakerMatch = true;
-          if (speakerFilter) {
-            speakerMatch = eventSpeaker.includes(speakerFilter);
-          }
-
-          if (titleMatch && dateMatch && speakerMatch) {
-            card.style.display = "flex"; // o 'block', a seconda del tuo CSS per .card
-            visibleCards++;
-          } else {
-            card.style.display = "none";
-          }
+    if (filteredEvents.length > 0) {
+        filteredEvents.forEach(event => {
+            eventiPassatiGrid.appendChild(createPastEventCard(event));
         });
+        visibleCards = filteredEvents.length;
+    }
 
-        // Opzionale: mostra un messaggio se nessun evento corrisponde ai filtri
-        const noResultsMessage = gebi("noResultsMessage");
-        if (
-          visibleCards === 0 &&
-          (titleFilter || dateFilter || speakerFilter)
-        ) {
-          if (!noResultsMessage) {
-            const p = document.createElement("p");
-            p.id = "noResultsMessage";
-            p.className = "no-events";
-            p.textContent =
-              "Nessun evento passato corrisponde ai criteri di ricerca.";
-            eventiPassatiGrid.appendChild(p);
-          } else {
-            noResultsMessage.style.display = "block";
-          }
-        } else if (noResultsMessage) {
-          noResultsMessage.style.display = "none";
-        }
-      }
+    const noResultsMessageEl = gebi("noResultsMessage");
+    if (noResultsMessageEl) noResultsMessageEl.remove(); 
 
-      // Inizializzazione al caricamento della pagina
-      document.addEventListener("DOMContentLoaded", () => {
-        gebi("currentYear").textContent = new Date().getFullYear();
-        loadPastEvents(); // Carica gli eventi passati
+    if (visibleCards === 0 && (titleFilter || dateFilter || speakerFilter) ) { // Mostra messaggio solo se ci sono filtri attivi E nessun risultato
+        const p = document.createElement("p");
+        p.id = "noResultsMessage";
+        p.className = "no-events";
+        p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
+        eventiPassatiGrid.appendChild(p);
+    } else if (visibleCards === 0 && allPastEvents.length === 0) { // Se non ci sono eventi in assoluto (nessun filtro)
+         const p = document.createElement("p");
+        p.id = "noResultsMessage";
+        p.className = "no-events";
+        p.textContent = "Nessun evento passato trovato.";
+        eventiPassatiGrid.appendChild(p);
+    }
+  }
 
-        // Aggiungi event listener per l'input dinamico sui filtri
-        gebi("searchTitle").addEventListener("input", filterEvents);
-        gebi("searchDate").addEventListener("change", filterEvents);
-        gebi("searchSpeaker").addEventListener("input", filterEvents);
-      });
-    </script>
-  </body>
+  document.addEventListener("DOMContentLoaded", () => {
+    gebi("currentYear").textContent = new Date().getFullYear();
+    loadPastEvents();
+
+    gebi("searchTitle").addEventListener("input", filterEvents);
+    gebi("searchDate").addEventListener("change", filterEvents);
+    gebi("searchSpeaker").addEventListener("input", filterEvents);
+  });
+</script>
+</body>
 </html>
