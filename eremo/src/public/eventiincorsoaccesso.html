@@ -100,7 +100,6 @@
       <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button> </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="chi-siamoaccesso.html" onclick="closeMobileMenu()">Chi siamo</a>
     <a href="eventiincorsoaccesso.html" onclick="closeMobileMenu()">Calendario attività</a>
     <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()">Archivio attività</a>
     <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
@@ -174,9 +173,11 @@
   let currentUser = null;
   const defaultUserIconPath = '/uploads/icons/default_user.png';
 
-  // Variabili per il morphing del volantino
-  let volantinoMorphOverlay = null; // Verrà inizializzato in DOMContentLoaded
+  // Variabili globali per il popup volantino
+  let volantinoMorphOverlay = null;
   let morphingCard = null;
+  // originalCardForMorph non è più strettamente necessario per l'animazione semplice
+  // ma lo manteniamo se altre logiche (ora rimosse dalla funzione morphing) lo usassero in futuro.
   let originalCardForMorph = null;
 
 
@@ -293,8 +294,7 @@
   const userDropdownButton = document.querySelector('#userDropdownContainer .user-btn');
   const userDropdownMenu = document.querySelector('#userDropdownContainer .dropdown-menu');
 
-  // La funzione toggleUserMenu(event) è chiamata dall'onclick nell'HTML
-  function toggleUserMenu(event) {
+  function toggleUserMenu(event) { // Chiamata dall'HTML onclick
     event.stopPropagation();
     if (userDropdownMenu && userDropdownButton) {
       const isCurrentlyOpen = userDropdownMenu.style.display === 'block';
@@ -302,7 +302,6 @@
       userDropdownButton.setAttribute('aria-expanded', String(!isCurrentlyOpen));
     }
   }
-
 
   const mobileMenu = document.getElementById("mobileMenu");
   const hamburger = document.querySelector(".navbar .hamburger");
@@ -335,8 +334,6 @@
       }
     }
     if (mobileMenu && mobileMenu.classList.contains('open')) {
-      // Se il click è su un link del mobile menu, la funzione closeMobileMenu() è già chiamata dall'onclick del link.
-      // Quindi, chiudi solo se il click è fuori dal menu mobile E non è sull'hamburger.
       if (hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) {
         closeMobileMenu();
       }
@@ -344,155 +341,56 @@
   });
   // --- FINE LOGICA MENU ---
 
-  // --- FUNZIONI MORPHING VOLANTINO (DAL CODICE DI eventiincorso.html) ---
-  function showVolantinoWithMorph(originalCardElement, copertinaUrl, volantinoUrl) {
+  // --- FUNZIONI VOLANTINO SEMPLIFICATE ---
+  function showVolantinoWithMorph(volantinoUrl) { // Rimosso copertinaUrl non più necessario per popup semplice
     if (morphingCard || !volantinoMorphOverlay) return;
 
-    originalCardForMorph = originalCardElement;
-    const rect = originalCardForMorph.getBoundingClientRect();
+    volantinoMorphOverlay.classList.add("active");
+    document.body.classList.add("volantino-morph-active");
 
     morphingCard = document.createElement("article");
-    morphingCard.className = "card morph-active-card";
+    morphingCard.className = "card morph-active-card"; // Il CSS si occuperà di centrarlo e animarlo
 
-    morphingCard.style.width = `${rect.width}px`;
-    morphingCard.style.height = `${rect.height}px`;
-    morphingCard.style.top = `${rect.top + window.scrollY}px`;
-    morphingCard.style.left = `${rect.left + window.scrollX}px`;
-
-    const morphContentWrapper = document.createElement("div");
-    morphContentWrapper.className = "morph-content-wrapper";
-
-    const copertinaContainer = document.createElement("div");
-    copertinaContainer.className = "card-image-container-morph";
-    const imgCopertina = document.createElement("img");
-    imgCopertina.src = copertinaUrl;
-    imgCopertina.alt = "Copertina Evento";
-    copertinaContainer.appendChild(imgCopertina);
-
-    const cardContentOriginal = originalCardForMorph.querySelector(".card-content");
-    let cardContentCloned = null;
-    if (cardContentOriginal) {
-      cardContentCloned = cardContentOriginal.cloneNode(true);
-      cardContentCloned.className = "card-content-morph";
-      // Gestisci i bottoni nel contenuto clonato, adattandoli se necessario
-      // per la pagina 'accesso' o disabilitandoli.
-      cardContentCloned.querySelectorAll("button, a").forEach((btn) => {
-        const newBtn = btn.cloneNode(true); // Clona per rimuovere listener originali
-        if (newBtn.classList.contains("btn-prenota")) { // Bottone Prenota/Coda dalla card 'accesso'
-          // Manteniamo i data attributes originali per coerenza
-          // L'event listener originale non verrà copiato, quindi questo bottone nel morph
-          // sarà probabilmente non interattivo a meno di non riattaccare un listener specifico qui.
-          // Per semplicità, lo lasciamo non interattivo nel morph.
-          newBtn.onclick = (e) => e.preventDefault(); // Previene azioni default se è un link
-          newBtn.disabled = true; // Opzione: disabilita
-        } else if (newBtn.classList.contains("btn-visualizza-volantino")) {
-          newBtn.disabled = true;
-        } else if (newBtn.tagName === 'A' && newBtn.href.includes('evento_dettaglio_accesso.html')) {
-          // Lascia il link ai dettagli, ma potrebbe essere non cliccabile se coperto dall'overlay
-        } else {
-          newBtn.disabled = true;
-        }
-        btn.parentNode.replaceChild(newBtn, btn);
-      });
+    let flyerContentHTML = '';
+    if (volantinoUrl && volantinoUrl.trim() !== "") {
+      if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+        flyerContentHTML = `<img src="${volantinoUrl}" alt="Volantino Evento">`;
+      } else {
+        flyerContentHTML = `<div class="volantino-message-display"><p>Il volantino è disponibile come file esterno.</p><a href="${volantinoUrl}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`;
+      }
+    } else {
+      flyerContentHTML = `<div class="volantino-message-display"><p>Volantino non disponibile per questo evento.</p></div>`;
     }
 
+    morphingCard.innerHTML = `
+        <div class="morph-content-wrapper">
+            <div class="volantino-image-container-morph">
+                ${flyerContentHTML}
+            </div>
+        </div>
+        <button class="close-morph-volantino-btn" aria-label="Chiudi">&times;</button>
+    `;
 
-    const volantinoContainer = document.createElement("div");
-    volantinoContainer.className = "volantino-image-container-morph";
-
-    morphContentWrapper.appendChild(copertinaContainer);
-    if (cardContentCloned) morphContentWrapper.appendChild(cardContentCloned);
-    morphContentWrapper.appendChild(volantinoContainer);
-    morphingCard.appendChild(morphContentWrapper);
-
-    const closeBtn = document.createElement("button");
-    closeBtn.className = "close-morph-volantino-btn";
-    closeBtn.innerHTML = "&times;";
-    closeBtn.setAttribute("aria-label", "Chiudi");
-    closeBtn.onclick = hideVolantinoWithMorph;
-    morphingCard.appendChild(closeBtn);
-
-    volantinoMorphOverlay.innerHTML = ""; // Pulisce eventuali residui
     volantinoMorphOverlay.appendChild(morphingCard);
-
-    volantinoMorphOverlay.style.transitionDelay = '0s, 0.1s, 0.1s, 0s, 0s';
-    volantinoMorphOverlay.classList.add("active");
-
-    document.body.classList.add("volantino-morph-active");
-    if (originalCardForMorph) originalCardForMorph.classList.add("original-morph-hidden");
+    morphingCard.querySelector('.close-morph-volantino-btn').onclick = hideVolantinoWithMorph;
 
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        morphingCard.classList.add("zoomed-in");
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        const cardAspectRatio = 700 / 800;
-        let finalWidth, finalHeight;
-        if (viewportWidth / viewportHeight > cardAspectRatio) {
-          finalHeight = Math.min(viewportHeight * 0.9, 800);
-          finalWidth = finalHeight * cardAspectRatio;
-        } else {
-          finalWidth = Math.min(viewportWidth * 0.9, 700);
-          finalHeight = finalWidth / cardAspectRatio;
-        }
-        finalWidth = Math.max(finalWidth, rect.width);
-        finalHeight = Math.max(finalHeight, rect.height);
-
-        morphingCard.style.width = `${finalWidth}px`;
-        morphingCard.style.height = `${finalHeight}px`;
-        morphingCard.style.top = `${(viewportHeight - finalHeight) / 2 + window.scrollY}px`;
-        morphingCard.style.left = `${(viewportWidth - finalWidth) / 2 + window.scrollX}px`;
-
-        const zoomDuration = parseFloat(getComputedStyle(morphingCard).transitionDuration.split(",")[1] || getComputedStyle(morphingCard).transitionDuration || "0.55") * 1000;
-
-        setTimeout(() => {
-          if (!morphingCard) return;
-          morphingCard.classList.add("morphing");
-          volantinoContainer.innerHTML = "";
-          if (volantinoUrl && volantinoUrl.trim() !== "") {
-            if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-              const imgVol = document.createElement("img");
-              imgVol.src = volantinoUrl;
-              imgVol.alt = "Volantino Evento";
-              imgVol.onerror = () => {
-                volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Impossibile caricare il volantino.</p><a href="${volantinoUrl}" target="_blank" rel="noopener noreferrer">Apri link diretto</a></div>`;
-              };
-              volantinoContainer.appendChild(imgVol);
-            } else {
-              volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Il volantino è disponibile come file esterno.</p><a href="${volantinoUrl}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`;
-            }
-          } else {
-            volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Volantino non disponibile per questo evento.</p></div>`;
-          }
-          morphingCard.classList.add("volantino-visible");
-        }, zoomDuration);
-      });
+      // Applica la classe che attiva la transizione CSS per la visibilità del popup
+      // Assicurati che il CSS per .card.morph-active-card.zoomed-in.volantino-visible sia quello per il popup semplice
+      morphingCard.classList.add("zoomed-in", "volantino-visible");
     });
   }
 
   function hideVolantinoWithMorph() {
-    if (!morphingCard || !volantinoMorphOverlay || !originalCardForMorph) return;
-    morphingCard.classList.remove("volantino-visible", "morphing");
-    const clonedContent = morphingCard.querySelector('.card-content-morph');
-    if (clonedContent) clonedContent.style.opacity = '1';
-    const morphCopertina = morphingCard.querySelector('.card-image-container-morph');
-    if (morphCopertina) morphCopertina.style.height = '280px';
+    if (morphingCard && volantinoMorphOverlay) {
+      // Rimuovi le classi che rendono visibile il popup, per attivare la transizione di chiusura
+      morphingCard.classList.remove("zoomed-in", "volantino-visible");
+      volantinoMorphOverlay.classList.remove("active");
+      document.body.classList.remove("volantino-morph-active");
 
-    const rect = originalCardForMorph.getBoundingClientRect();
-    morphingCard.style.width = `${rect.width}px`;
-    morphingCard.style.height = `${rect.height}px`;
-    morphingCard.style.top = `${rect.top + window.scrollY}px`;
-    morphingCard.style.left = `${rect.left + window.scrollX}px`;
-    morphingCard.classList.remove("zoomed-in");
-
-    const overlayTransitionDuration = parseFloat(getComputedStyle(volantinoMorphOverlay).transitionDuration.split(",")[0] || "0.3") * 1000;
-    const cardShrinkDuration = parseFloat(getComputedStyle(morphingCard).transitionDuration.split(",")[1] || getComputedStyle(morphingCard).transitionDuration || "0.55") * 1000;
-    const cleanupDelay = Math.max(overlayTransitionDuration, cardShrinkDuration);
-
-    volantinoMorphOverlay.style.transitionDelay = '0s, 0s, 0s, 0s, 0s';
-    volantinoMorphOverlay.classList.remove("active");
-
-    setTimeout(cleanUpMorphingCard, cleanupDelay + 50);
+      // La transizione CSS è di 0.25s (o quanto definito nel tuo style.css modificato)
+      setTimeout(cleanUpMorphingCard, 300); // Aggiunto un piccolo buffer
+    }
   }
 
   function cleanUpMorphingCard() {
@@ -500,17 +398,10 @@
       morphingCard.remove();
       morphingCard = null;
     }
-    if (volantinoMorphOverlay && volantinoMorphOverlay.classList.contains("active")) {
-      volantinoMorphOverlay.classList.remove("active");
-    }
-    if (volantinoMorphOverlay) volantinoMorphOverlay.innerHTML = "";
-    document.body.classList.remove("volantino-morph-active");
-    if (originalCardForMorph) {
-      originalCardForMorph.classList.remove("original-morph-hidden");
-      originalCardForMorph = null;
-    }
+    // originalCardForMorph e .original-morph-hidden non sono più necessari per l'animazione semplice
+    originalCardForMorph = null;
   }
-  // --- FINE FUNZIONI MORPHING VOLANTINO ---
+  // --- FINE FUNZIONI VOLANTINO SEMPLIFICATE ---
 
 
   // --- LOGICA SPECIFICA DELLA PAGINA EVENTIINCORSACCESSO ---
@@ -523,15 +414,14 @@
       return;
     }
 
-    volantinoMorphOverlay = document.getElementById('volantinoMorphOverlay'); // Inizializza qui
-    if (volantinoMorphOverlay) { // Listener per chiudere overlay cliccandoci sopra
+    volantinoMorphOverlay = document.getElementById('volantinoMorphOverlay');
+    if (volantinoMorphOverlay) {
       volantinoMorphOverlay.addEventListener("click", (e) => {
-        if (e.target === volantinoMorphOverlay && morphingCard && morphingCard.classList.contains('zoomed-in')) {
+        if (e.target === volantinoMorphOverlay && morphingCard ) {
           hideVolantinoWithMorph();
         }
       });
     }
-
 
     await fetchAndUpdateUserDisplayData();
     loadEvents();
@@ -541,7 +431,7 @@
     const currentYearEl = document.getElementById('currentYear');
     if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
-    document.addEventListener("keydown", (e) => { // Listener globale per Esc
+    document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         if (document.getElementById('bookingPopup')?.classList.contains('active')) {
           document.getElementById('closeBookingPopupBtn')?.click();
@@ -646,7 +536,6 @@
     if (bookingPopupOverlay) bookingPopupOverlay.addEventListener('click', (e) => {
       if (e.target === bookingPopupOverlay) closeBookingPopup();
     });
-    // Escape listener è globale ora in DOMContentLoaded
 
     if (numeroPostiInput && participantFieldsContainer) {
       numeroPostiInput.addEventListener('input', (e) => {
@@ -700,9 +589,7 @@
           catch (error) { throw new Error("Risposta server non valida: " + responseText.substring(0,100)); }
           if (result.success) {
             if(bookingResponseMessage) { bookingResponseMessage.textContent = result.message || 'Prenotazione confermata!'; bookingResponseMessage.className = 'form-message success';}
-            loadEvents(); // Ricarica gli eventi per aggiornare i posti e lo stato
-            // Non chiudere subito il popup, l'utente deve vedere il messaggio.
-            // Potrebbe essere utile un bottone "Chiudi" aggiuntivo o chiudere dopo un timeout.
+            loadEvents();
           } else { throw new Error(result.message || 'Errore prenotazione.'); }
         } catch (error) {
           if(bookingResponseMessage) { bookingResponseMessage.textContent = `Errore: ${error.message}`; bookingResponseMessage.className = 'form-message error'; }
@@ -744,7 +631,6 @@
     }
     if (closeWaitlistPopupBtn) closeWaitlistPopupBtn.addEventListener('click', closeWaitlistPopup);
     if (waitlistPopupOverlay) waitlistPopupOverlay.addEventListener('click', (e) => { if (e.target === waitlistPopupOverlay) closeWaitlistPopup(); });
-    // Escape listener è globale ora
 
     if (waitlistForm) {
       waitlistForm.addEventListener('submit', async function(e) {
@@ -764,7 +650,6 @@
           try { result = JSON.parse(responseText); } catch (error) { throw new Error("Risposta server non valida: " + responseText.substring(0,100)); }
           if (result.success) {
             if(waitlistResponseMessage) { waitlistResponseMessage.textContent = result.message || "Richiesta coda inviata!"; waitlistResponseMessage.className = 'form-message success'; }
-            // Non chiudere popup, lasciare messaggio visibile
           } else { throw new Error(result.message || "Errore invio richiesta coda.");}
         } catch (error) {
           if(waitlistResponseMessage) { waitlistResponseMessage.textContent = `Errore: ${error.message}`; waitlistResponseMessage.className = 'form-message error';}
@@ -809,32 +694,31 @@
   function createEventCard(event) {
     const card = document.createElement('article');
     card.className = 'card';
-    card.dataset.eventId = event.idevento; // Aggiunto per riferimento se necessario
+    card.dataset.eventId = event.idevento;
     let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : '/images/default-event.jpg';
 
     const postiDisponibiliOriginali = parseInt(event.posti_disponibili);
     const postiGiaPrenotatiUtente = parseInt(event.posti_gia_prenotati_utente) || 0;
-    const flagPrenotabileDB = event.flagprenotabile; // Assume 1 per true, 0 per false
-    let primaryButtonHTML = ''; // Bottone Prenota/Coda
+    const flagPrenotabileDB = event.flagprenotabile;
+    let primaryButtonHTML = '';
     const maxPostiAncoraPrenotabiliUtente = 5 - postiGiaPrenotatiUtente;
 
-    if (parseInt(flagPrenotabileDB) === 0) { // Evento non prenotabile dal DB
+    if (parseInt(flagPrenotabileDB) === 0) {
       primaryButtonHTML = `<a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Dettagli</a>`;
-    } else if (maxPostiAncoraPrenotabiliUtente <= 0) { // Utente ha raggiunto limite prenotazioni
+    } else if (maxPostiAncoraPrenotabiliUtente <= 0) {
       primaryButtonHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Hai già prenotato il numero massimo di 5 posti per questo evento.">Max Posti Raggiunti</button>`;
-    } else if (postiDisponibiliOriginali > 0) { // Ci sono posti e l'utente può ancora prenotare
+    } else if (postiDisponibiliOriginali > 0) {
       primaryButtonHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-disponibili-evento="${postiDisponibiliOriginali}" data-posti-gia-prenotati-utente="${postiGiaPrenotatiUtente}">Prenota</button>`;
-    } else { // Posti esauriti, l'utente può andare in coda (se non ha raggiunto limite)
+    } else {
       primaryButtonHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}">Entra in Coda</button>`;
     }
 
-    // --- MODIFICA PER BOTTONE VOLANTINO ---
     let volantinoBtnHtml = "";
     if (event.volantino_url?.trim()) {
       volantinoBtnHtml = `<button class="card-btn btn-visualizza-volantino card-btn-secondary"
                                         data-volantino-url="${event.volantino_url}"
                                         data-copertina-url="${imageSrc}">Volantino</button>`;
-    } else { // Se non c'è volantino, mettiamo il link ai dettagli per coerenza layout
+    } else {
       volantinoBtnHtml = `<a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a>`;
     }
 
@@ -857,13 +741,13 @@
                 ${postiGiaPrenotatiUtente > 0 ? `<br><b>Tuoi posti prenotati:</b> <span class="posti-disponibili">${postiGiaPrenotatiUtente}</span>` : ''}
                 ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0 ? '<br><b>Costo:</b> Offerta libera' : '')) : ''}
             </p>
-            <div class="card-actions ${!volantinoBtnHtml && !primaryButtonHTML.includes('data-action') ? 'single-action' : (volantinoBtnHtml && primaryButtonHTML.includes('data-action') ? '' : 'single-action-ish') }">
+            <div class="card-actions ${!volantinoBtnHtml.includes('btn-visualizza-volantino') && !primaryButtonHTML.includes('data-action') && !primaryButtonHTML.includes('evento_dettaglio_accesso.html') ? 'single-action' : (volantinoBtnHtml.includes('btn-visualizza-volantino') && (primaryButtonHTML.includes('data-action') || primaryButtonHTML.includes('evento_dettaglio_accesso.html')) ? '' : 'single-action-ish') }">
                 ${volantinoBtnHtml}
                 ${primaryButtonHTML}
             </div>
         </div>`;
 
-    const actionBtn = card.querySelector('.btn-prenota'); // Bottone Prenota/Coda
+    const actionBtn = card.querySelector('.btn-prenota');
     if (actionBtn && !actionBtn.disabled) {
       actionBtn.addEventListener('click', function() {
         const action = this.dataset.action;
@@ -879,16 +763,11 @@
       });
     }
 
-    // Listener per il pulsante volantino
     const volantinoBtn = card.querySelector(".btn-visualizza-volantino");
     if (volantinoBtn) {
       volantinoBtn.addEventListener("click", function () {
         if(typeof showVolantinoWithMorph === 'function') {
-          showVolantinoWithMorph(
-                  card, // Passa l'elemento card
-                  this.dataset.copertinaUrl,
-                  this.dataset.volantinoUrl
-          );
+          showVolantinoWithMorph(this.dataset.volantinoUrl, this.dataset.copertinaUrl); // Passa solo volantinoUrl e copertinaUrl
         }
       });
     }
@@ -898,39 +777,19 @@
   function formatDate(dateString) {
     if (!dateString) return 'Data non disponibile';
     try {
-      // Prova a normalizzare la data: sostituisci '-' con '/' per il costruttore Date in alcuni browser
-      // e assicurati che sia trattata come UTC se non ha informazioni di fuso orario.
       const normalizedDateString = dateString.length === 10 ? dateString + "T00:00:00Z" : dateString.replace(" ", "T") + "Z";
       const date = new Date(normalizedDateString);
-
-      if (isNaN(date.getTime())) { // Se il parsing fallisce
-        // Prova un parsing più semplice se la data è solo YYYY-MM-DD
+      if (isNaN(date.getTime())) {
         if (/^\d{4}-\d{2}-\d{2}$/.test(dateString.substring(0,10))) {
           const parts = dateString.substring(0,10).split('-');
-          const year = parseInt(parts[0]);
-          const month = parseInt(parts[1]) - 1; // Mese è 0-indexed
-          const day = parseInt(parts[2]);
-          const utcDate = new Date(Date.UTC(year, month, day));
-          if (isNaN(utcDate.getTime())) return dateString; // Fallback se ancora invalido
-          return utcDate.toLocaleDateString("it-IT", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-            timeZone: 'UTC' // Specifica che la data è UTC
-          });
+          const utcDate = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+          if (isNaN(utcDate.getTime())) return dateString;
+          return utcDate.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
         }
-        return dateString; // Fallback alla stringa originale
+        return dateString;
       }
-      return date.toLocaleDateString('it-IT', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'UTC' // Visualizza come se fosse UTC per consistenza
-      });
-    } catch (e) {
-      console.warn("Errore formattazione data:", dateString, e);
-      return dateString;
-    }
+      return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+    } catch (e) { console.warn("Errore formattazione data:", dateString, e); return dateString; }
   }
 </script>
 </body>
