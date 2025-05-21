@@ -1,395 +1,483 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="images/logo.png" type="image/x-icon">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="images/logo.png" type="image/x-icon" />
     <title>Archivio Attività (Accesso) - Eremo Frate Francesco</title>
-    <link rel="stylesheet" href="style.css"> {/* ASSICURATI CHE QUESTO PERCORSO SIA CORRETTO! */}
+    <link rel="stylesheet" href="style.css" />
+    {/* ASSICURATI CHE QUESTO PERCORSO SIA CORRETTO! */}
     <style>
-        /* Stili specifici per i filtri, identici a eventipassati.html */
-        .event-filters {
-            background-color: var(--white); padding: 1.5rem; border-radius: var(--border-radius-medium);
-            margin-bottom: 2rem; box-shadow: var(--shadow-light); display: flex;
-            flex-wrap: wrap; gap: 1rem; align-items: flex-end;
+      /* Stili specifici per i filtri, identici a eventipassati.html */
+      .event-filters {
+        background-color: var(--white);
+        padding: 1.5rem;
+        border-radius: var(--border-radius-medium);
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-light);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-end;
+      }
+      .event-filters .form-group {
+        flex: 1 1 200px;
+        margin-bottom: 0;
+      }
+      .event-filters label {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+        color: var(--primary);
+        display: block;
+      }
+      .event-filters input,
+      .event-filters select {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        border: 1px solid var(--gray-medium);
+        border-radius: 8px;
+        font-size: 0.95rem;
+      }
+      .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s, visibility 0.3s;
+      }
+      .loading-overlay.visible {
+        visibility: visible;
+        opacity: 1;
+      }
+      .loading-overlay .spinner {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .loading-overlay .spinner > div {
+        width: 14px;
+        height: 14px;
+        background-color: var(--primary);
+        border-radius: 100%;
+        display: inline-block;
+        animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+        margin: 0 4px;
+      }
+      .loading-overlay .spinner .bounce1 {
+        animation-delay: -0.32s;
+      }
+      .loading-overlay .spinner .bounce2 {
+        animation-delay: -0.16s;
+      }
+      @keyframes sk-bouncedelay {
+        0%,
+        80%,
+        100% {
+          transform: scale(0.3);
+          opacity: 0.5;
         }
-        .event-filters .form-group { flex: 1 1 200px; margin-bottom: 0; }
-        .event-filters label {
-            font-size: 0.9rem; margin-bottom: 0.3rem; color: var(--primary); display: block;
+        40% {
+          transform: scale(1);
+          opacity: 1;
         }
-        .event-filters input, .event-filters select {
-            width: 100%; padding: 0.7rem 1rem; border: 1px solid var(--gray-medium);
-            border-radius: 8px; font-size: 0.95rem;
-        }
-        .loading-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255,255,255,0.8); display: flex; flex-direction:column;
-            justify-content: center; align-items: center; z-index: 10;
-            visibility: hidden; opacity: 0; transition: opacity 0.3s, visibility 0.3s;
-        }
-        .loading-overlay.visible { visibility: visible; opacity: 1; }
-        .loading-overlay .spinner {
-            width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px;
-        }
-        .loading-overlay .spinner > div {
-            width: 14px; height: 14px; background-color: var(--primary);
-            border-radius: 100%; display: inline-block;
-            animation: sk-bouncedelay 1.4s infinite ease-in-out both; margin: 0 4px;
-        }
-        .loading-overlay .spinner .bounce1 { animation-delay: -0.32s; }
-        .loading-overlay .spinner .bounce2 { animation-delay: -0.16s; }
-        @keyframes sk-bouncedelay {
-            0%, 80%, 100% { transform: scale(0.3); opacity: 0.5; }
-            40% { transform: scale(1.0); opacity: 1; }
-        }
-        .loading-overlay p { font-weight: 500; color: var(--dark); }
-        .no-events { text-align: center; padding: 2rem; color: var(--gray-dark); }
+      }
+      .loading-overlay p {
+        font-weight: 500;
+        color: var(--dark);
+      }
+      .no-events {
+        text-align: center;
+        padding: 2rem;
+        color: var(--gray-dark);
+      }
     </style>
-</head>
-<body>
-
-<header class="navbar-container" id="navbarContainer">
-    <nav class="navbar">
+  </head>
+  <body>
+    <header class="navbar-container" id="navbarContainer">
+      <nav class="navbar">
         <div class="logo">
-            <a href="indexaccesso.html"><span class="emoji">🏔️</span><h2>Eremo Frate Francesco</h2></a>
+          <a href="indexaccesso.html"
+            ><span class="emoji">🏔️</span>
+            <h2>Eremo Frate Francesco</h2></a
+          >
         </div>
         <div class="menu">
-            <a href="eventiincorsoaccesso.html">Calendario attività</a>
-            <a href="eventipassatiaccesso.html" class="active">Archivio attività</a>
-            <span class="separator">|</span>
-            <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
-            <span class="separator">|</span>
-            <a href="dovesiamoaccesso.html">Dove siamo</a>
-            <a href="contattiaccesso.html">Contatti</a>
+          <a href="eventiincorsoaccesso.html">Calendario attività</a>
+          <a href="eventipassatiaccesso.html" class="active"
+            >Archivio attività</a
+          >
+          <span class="separator">|</span>
+          <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
+          <span class="separator">|</span>
+          <a href="dovesiamoaccesso.html">Dove siamo</a>
+          <a href="contattiaccesso.html">Contatti</a>
         </div>
         <div class="right-menu">
-            <div class="user-dropdown" id="userDropdownContainer">
-                <button class="user-btn" aria-haspopup="true" aria-expanded="false">
-                    <span class="user-avatar" id="navbar-avatar">👤</span>
-                    <span class="user-name" id="navbar-username">Utente</span>
-                    <span class="dropdown-arrow">▼</span>
-                </button>
-                <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
-                    <a href="areapersonale.html">Il mio profilo</a>
-                    <a href="gestisciprenotazioni.html">Le mie prenotazioni</a>
-                    <a href="#" id="logout-link-dropdown">Esci</a>
-                </div>
+          <div class="user-dropdown" id="userDropdownContainer">
+            <button class="user-btn" aria-haspopup="true" aria-expanded="false">
+              <span class="user-avatar" id="navbar-avatar">👤</span>
+              <span class="user-name" id="navbar-username">Utente</span>
+              <span class="dropdown-arrow">▼</span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
+              <a href="areapersonale.html">Il mio profilo</a>
+              <a href="gestisciprenotazioni.html">Le mie prenotazioni</a>
+              <a href="#" id="logout-link-dropdown">Esci</a>
             </div>
-            <button class="hamburger" aria-label="Toggle menu">☰</button>
+          </div>
+          <button class="hamburger" aria-label="Toggle menu">☰</button>
         </div>
-    </nav>
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="eventiincorsoaccesso.html" onclick="closeMobileMenu()">Calendario attività</a>
-        <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()">Archivio attività</a>
-        <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
-        <a href="dovesiamoaccesso.html" onclick="closeMobileMenu()">Dove siamo</a>
+      </nav>
+      <div class="mobile-menu" id="mobileMenu">
+        <a href="eventiincorsoaccesso.html" onclick="closeMobileMenu()"
+          >Calendario attività</a
+        >
+        <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()"
+          >Archivio attività</a
+        >
+        <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()"
+          >Incontri sulla parola</a
+        >
+        <a href="dovesiamoaccesso.html" onclick="closeMobileMenu()"
+          >Dove siamo</a
+        >
         <a href="contattiaccesso.html" onclick="closeMobileMenu()">Contatti</a>
-        <hr style="border-color: rgba(255,255,255,0.1);">
-        <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
-        <a href="gestisciprenotazioni.html" onclick="closeMobileMenu()">Le mie prenotazioni</a>
+        <hr style="border-color: rgba(255, 255, 255, 0.1)" />
+        <a href="areapersonale.html" onclick="closeMobileMenu()"
+          >Il mio profilo</a
+        >
+        <a href="gestisciprenotazioni.html" onclick="closeMobileMenu()"
+          >Le mie prenotazioni</a
+        >
         <a href="#" id="logout-link-mobile" onclick="closeMobileMenu()">Esci</a>
-    </div>
-</header>
+      </div>
+    </header>
 
-<main>
-    <div class="container section-padding">
-        <h1>Archivio Attività Passate</h1>
+    <main>
+      <div class="container section-padding">
+        <h1>Archivio Attività</h1>
 
         <div class="event-filters">
-            <div class="form-group">
-                <label for="searchTitle">Titolo Evento</label>
-                <input type="text" id="searchTitle" placeholder="Cerca per titolo..." class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="searchDate">Mese/Anno (YYYY-MM)</label>
-                <input type="month" id="searchDate" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="searchSpeaker">Relatore</label>
-                <input type="text" id="searchSpeaker" class="form-control" placeholder="Nome relatore...">
-            </div>
+          <div class="form-group">
+            <label for="searchTitle">Titolo Evento</label>
+            <input
+              type="text"
+              id="searchTitle"
+              placeholder="Cerca per titolo..."
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="searchDate">Mese/Anno (YYYY-MM)</label>
+            <input type="month" id="searchDate" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="searchSpeaker">Relatore</label>
+            <input
+              type="text"
+              id="searchSpeaker"
+              class="form-control"
+              placeholder="Nome relatore..."
+            />
+          </div>
         </div>
 
-        <div id="eventiGridContainer" style="position: relative;">
-            <div id="loadingIndicator" class="loading-overlay">
-                <div class="spinner">
-                    <div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>
-                </div>
-                <p>Caricamento eventi passati...</p>
+        <div id="eventiGridContainer" style="position: relative">
+          <div id="loadingIndicator" class="loading-overlay">
+            <div class="spinner">
+              <div class="bounce1"></div>
+              <div class="bounce2"></div>
+              <div class="bounce3"></div>
             </div>
-            <div class="card-grid" id="eventiPassatiGrid">
-                {/* Le card verranno popolate da JavaScript */}
-            </div>
+            <p>Caricamento eventi passati...</p>
+          </div>
+          <div class="card-grid" id="eventiPassatiGrid">
+            {/* Le card verranno popolate da JavaScript */}
+          </div>
         </div>
-    </div>
-</main>
+      </div>
+    </main>
 
-<footer>
-    <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia</p>
-</footer>
+    <footer>
+      <p>
+        © <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti
+        riservati. Via della Spiritualità 123, Nembro (BG) - Italia
+      </p>
+    </footer>
 
-<script>
-    // --- SCRIPT GLOBALI PER PAGINE ACCESSO ---
-    let currentUser = null;
+    <script>
+      // --- SCRIPT GLOBALI PER PAGINE ACCESSO ---
+      let currentUser = null;
 
-    function updateNavbarUserUI() {
-        const navbarUsernameEl = document.getElementById('navbar-username');
-        const navbarAvatarEl = document.getElementById('navbar-avatar');
-        if (!navbarUsernameEl || !navbarAvatarEl) {
-            // console.warn("Elementi navbar per utente (navbar-username, navbar-avatar) non trovati.");
-            return;
-        }
-        if (currentUser) {
-            let displayName = 'Utente';
-            if (currentUser.nome && currentUser.nome.trim() !== '') {
-                displayName = currentUser.nome;
-            } else if (currentUser.email) {
-                displayName = currentUser.email.split('@')[0];
-            }
-            navbarUsernameEl.textContent = displayName;
-            if (currentUser.avatar) navbarAvatarEl.textContent = currentUser.avatar;
-        } else {
-            navbarUsernameEl.textContent = 'Utente';
-            navbarAvatarEl.textContent = '👤';
-        }
-    }
+      function updateNavbarUserUI() {
+          const navbarUsernameEl = document.getElementById('navbar-username');
+          const navbarAvatarEl = document.getElementById('navbar-avatar');
+          if (!navbarUsernameEl || !navbarAvatarEl) {
+              // console.warn("Elementi navbar per utente (navbar-username, navbar-avatar) non trovati.");
+              return;
+          }
+          if (currentUser) {
+              let displayName = 'Utente';
+              if (currentUser.nome && currentUser.nome.trim() !== '') {
+                  displayName = currentUser.nome;
+              } else if (currentUser.email) {
+                  displayName = currentUser.email.split('@')[0];
+              }
+              navbarUsernameEl.textContent = displayName;
+              if (currentUser.avatar) navbarAvatarEl.textContent = currentUser.avatar;
+          } else {
+              navbarUsernameEl.textContent = 'Utente';
+              navbarAvatarEl.textContent = '👤';
+          }
+      }
 
-    function handleLogout() {
-        localStorage.removeItem('userDataEFF');
-        currentUser = null;
-        alert('Logout effettuato.');
-        window.location.href = 'index.html';
-    }
+      function handleLogout() {
+          localStorage.removeItem('userDataEFF');
+          currentUser = null;
+          alert('Logout effettuato.');
+          window.location.href = 'index.html';
+      }
 
-    function setupUserSessionAndNavbar() {
-        const userDataString = localStorage.getItem('userDataEFF');
-        if (userDataString) {
-            try {
-                currentUser = JSON.parse(userDataString);
-                if (!currentUser || !currentUser.email) {
-                    currentUser = null;
-                    localStorage.removeItem('userDataEFF');
-                }
-            } catch (e) {
-                currentUser = null;
-                localStorage.removeItem('userDataEFF');
-            }
-        } else {
-            currentUser = null;
-        }
-        updateNavbarUserUI();
+      function setupUserSessionAndNavbar() {
+          const userDataString = localStorage.getItem('userDataEFF');
+          if (userDataString) {
+              try {
+                  currentUser = JSON.parse(userDataString);
+                  if (!currentUser || !currentUser.email) {
+                      currentUser = null;
+                      localStorage.removeItem('userDataEFF');
+                  }
+              } catch (e) {
+                  currentUser = null;
+                  localStorage.removeItem('userDataEFF');
+              }
+          } else {
+              currentUser = null;
+          }
+          updateNavbarUserUI();
 
-        const logoutLinkDropdown = document.getElementById('logout-link-dropdown');
-        const logoutLinkMobile = document.getElementById('logout-link-mobile');
-        if (logoutLinkDropdown) logoutLinkDropdown.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
-        if (logoutLinkMobile) logoutLinkMobile.addEventListener('click', (e) => {
-            e.preventDefault();
-            if(typeof closeMobileMenu === 'function') closeMobileMenu();
-            handleLogout();
-        });
-    }
+          const logoutLinkDropdown = document.getElementById('logout-link-dropdown');
+          const logoutLinkMobile = document.getElementById('logout-link-mobile');
+          if (logoutLinkDropdown) logoutLinkDropdown.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+          if (logoutLinkMobile) logoutLinkMobile.addEventListener('click', (e) => {
+              e.preventDefault();
+              if(typeof closeMobileMenu === 'function') closeMobileMenu();
+              handleLogout();
+          });
+      }
 
-    let lastScroll = 0;
-    const navbarContainer = document.getElementById('navbarContainer');
-    if (navbarContainer) {
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            if (currentScroll <= 50) { navbarContainer.classList.remove('hidden'); lastScroll = 0; return; }
-            if (currentScroll > lastScroll && !navbarContainer.classList.contains('hidden')) {
-                navbarContainer.classList.add('hidden');
-            } else if (currentScroll < lastScroll && navbarContainer.classList.contains('hidden')) {
-                navbarContainer.classList.remove('hidden');
-            }
-            lastScroll = currentScroll;
-        });
-    }
+      let lastScroll = 0;
+      const navbarContainer = document.getElementById('navbarContainer');
+      if (navbarContainer) {
+          window.addEventListener('scroll', () => {
+              const currentScroll = window.pageYOffset;
+              if (currentScroll <= 50) { navbarContainer.classList.remove('hidden'); lastScroll = 0; return; }
+              if (currentScroll > lastScroll && !navbarContainer.classList.contains('hidden')) {
+                  navbarContainer.classList.add('hidden');
+              } else if (currentScroll < lastScroll && navbarContainer.classList.contains('hidden')) {
+                  navbarContainer.classList.remove('hidden');
+              }
+              lastScroll = currentScroll;
+          });
+      }
 
-    const userDropdownButton = document.querySelector('#userDropdownContainer .user-btn');
-    const userDropdownMenu = document.querySelector('#userDropdownContainer .dropdown-menu');
-    if (userDropdownButton && userDropdownMenu) {
-        userDropdownButton.addEventListener('click', function(event) {
-            event.stopPropagation();
-            const isCurrentlyOpen = userDropdownMenu.style.display === 'block';
-            userDropdownMenu.style.display = isCurrentlyOpen ? 'none' : 'block';
-            this.setAttribute('aria-expanded', String(!isCurrentlyOpen));
-        });
-    }
-    document.addEventListener('click', function(event) {
-        if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
-            if (userDropdownButton && !userDropdownButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
-                userDropdownMenu.style.display = 'none';
-                if (userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
-            }
-        }
-    });
+      const userDropdownButton = document.querySelector('#userDropdownContainer .user-btn');
+      const userDropdownMenu = document.querySelector('#userDropdownContainer .dropdown-menu');
+      if (userDropdownButton && userDropdownMenu) {
+          userDropdownButton.addEventListener('click', function(event) {
+              event.stopPropagation();
+              const isCurrentlyOpen = userDropdownMenu.style.display === 'block';
+              userDropdownMenu.style.display = isCurrentlyOpen ? 'none' : 'block';
+              this.setAttribute('aria-expanded', String(!isCurrentlyOpen));
+          });
+      }
+      document.addEventListener('click', function(event) {
+          if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
+              if (userDropdownButton && !userDropdownButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
+                  userDropdownMenu.style.display = 'none';
+                  if (userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
+              }
+          }
+      });
 
-    const mobileMenu = document.getElementById("mobileMenu");
-    const hamburger = document.querySelector(".navbar .hamburger");
-    if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
-    function toggleMobileMenu() {
-        if (mobileMenu && hamburger) {
-            const isOpen = mobileMenu.classList.toggle("open");
-            hamburger.classList.toggle("open");
-            hamburger.setAttribute("aria-expanded", isOpen.toString());
-            document.body.style.overflow = isOpen ? 'hidden' : '';
-        }
-    }
-    function closeMobileMenu() {
-        if (mobileMenu && hamburger) {
-            mobileMenu.classList.remove("open");
-            if (hamburger.classList.contains("open")) { hamburger.classList.remove("open"); hamburger.setAttribute("aria-expanded", "false");}
-            document.body.style.overflow = '';
-        }
-    }
-    document.addEventListener('click', function(event) {
-        if (mobileMenu && mobileMenu.classList.contains('open')) {
-            if (!mobileMenu.contains(event.target) && hamburger && !hamburger.contains(event.target)) {
-                closeMobileMenu();
-            }
-        }
-    });
-    // --- FINE SCRIPT GLOBALI ---
+      const mobileMenu = document.getElementById("mobileMenu");
+      const hamburger = document.querySelector(".navbar .hamburger");
+      if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
+      function toggleMobileMenu() {
+          if (mobileMenu && hamburger) {
+              const isOpen = mobileMenu.classList.toggle("open");
+              hamburger.classList.toggle("open");
+              hamburger.setAttribute("aria-expanded", isOpen.toString());
+              document.body.style.overflow = isOpen ? 'hidden' : '';
+          }
+      }
+      function closeMobileMenu() {
+          if (mobileMenu && hamburger) {
+              mobileMenu.classList.remove("open");
+              if (hamburger.classList.contains("open")) { hamburger.classList.remove("open"); hamburger.setAttribute("aria-expanded", "false");}
+              document.body.style.overflow = '';
+          }
+      }
+      document.addEventListener('click', function(event) {
+          if (mobileMenu && mobileMenu.classList.contains('open')) {
+              if (!mobileMenu.contains(event.target) && hamburger && !hamburger.contains(event.target)) {
+                  closeMobileMenu();
+              }
+          }
+      });
+      // --- FINE SCRIPT GLOBALI ---
 
-    // --- Logica Specifica per eventipassatiaccesso.html ---
-    const eventiPassatiGrid = document.getElementById('eventiPassatiGrid');
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    let allPastEventsData = [];
+      // --- Logica Specifica per eventipassatiaccesso.html ---
+      const eventiPassatiGrid = document.getElementById('eventiPassatiGrid');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      let allPastEventsData = [];
 
-    function formatDate(dateString) {
-        if (!dateString) return 'Data non disponibile';
-        try {
-            const date = new Date(dateString.replace(/-/g, '/'));
-            if (isNaN(date.getTime())) return dateString;
-            return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric'});
-        } catch (e) { return dateString; }
-    }
+      function formatDate(dateString) {
+          if (!dateString) return 'Data non disponibile';
+          try {
+              const date = new Date(dateString.replace(/-/g, '/'));
+              if (isNaN(date.getTime())) return dateString;
+              return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric'});
+          } catch (e) { return dateString; }
+      }
 
-    function createPastEventCard(event) {
-        const card = document.createElement('article');
-        card.className = 'card';
-        card.dataset.title = event.titolo?.toLowerCase() || '';
-        card.dataset.date = event.datainizio || '';
-        card.dataset.speaker = event.relatore?.toLowerCase() || '';
-        let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-past.jpg';
+      function createPastEventCard(event) {
+          const card = document.createElement('article');
+          card.className = 'card';
+          card.dataset.title = event.titolo?.toLowerCase() || '';
+          card.dataset.date = event.datainizio || '';
+          card.dataset.speaker = event.relatore?.toLowerCase() || '';
+          let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-past.jpg';
 
-        // CORREZIONE: Assicurarsi che i backtick (`) siano usati correttamente per i template literal
-        // e che le variabili siano interpolate con ${...}
-        card.innerHTML = \`
-            <div class="card-image-container">
-                <img src="\${imageSrc}" alt="Copertina: \${event.titolo || 'Evento passato'}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
-            </div>
-            <div class="card-content">
-                <h3>\${event.titolo || 'Titolo non disponibile'}</h3>
-                <p class="card-info">
-                    <b>Data:</b> \${formatDate(event.datainizio)}
-                    \${event.durata ? \`<br><b>Orario/Durata:</b> \${event.durata}\` : ''}
-                </p>
-                <p class="card-info">
-                    <b>\${event.prefisso_relatore || 'Relatore'}:</b> \${event.relatore || 'N/D'}
-                    \${event.associazione ? \`<br><b>Associazione:</b> \${event.associazione}\` : ''}
-                </p>
-                <p>\${event.descrizione || 'Nessuna descrizione breve disponibile.'}</p>
-                <div class="card-actions single-action">
-                    <a href="evento_dettaglio_accesso.html?id=\${event.idevento}" class="card-btn card-btn-secondary">Dettagli Evento</a>
-                </div>
-            </div>
-        \`;
-        return card;
-    }
+          // CORREZIONE: Assicurarsi che i backtick (`) siano usati correttamente per i template literal
+          // e che le variabili siano interpolate con ${...}
+          card.innerHTML = \`
+              <div class="card-image-container">
+                  <img src="\${imageSrc}" alt="Copertina: \${event.titolo || 'Evento passato'}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
+              </div>
+              <div class="card-content">
+                  <h3>\${event.titolo || 'Titolo non disponibile'}</h3>
+                  <p class="card-info">
+                      <b>Data:</b> \${formatDate(event.datainizio)}
+                      \${event.durata ? \`<br><b>Orario/Durata:</b> \${event.durata}\` : ''}
+                  </p>
+                  <p class="card-info">
+                      <b>\${event.prefisso_relatore || 'Relatore'}:</b> \${event.relatore || 'N/D'}
+                      \${event.associazione ? \`<br><b>Associazione:</b> \${event.associazione}\` : ''}
+                  </p>
+                  <p>\${event.descrizione || 'Nessuna descrizione breve disponibile.'}</p>
+                  <div class="card-actions single-action">
+                      <a href="evento_dettaglio_accesso.html?id=\${event.idevento}" class="card-btn card-btn-secondary">Dettagli Evento</a>
+                  </div>
+              </div>
+          \`;
+          return card;
+      }
 
-    async function loadPastEvents() {
-        if (!eventiPassatiGrid || !loadingIndicator) {
-            console.error("Elementi DOM per griglia eventi passati o indicatore non trovati.");
-            return;
-        }
-        loadingIndicator.classList.add('visible');
-        eventiPassatiGrid.innerHTML = '';
+      async function loadPastEvents() {
+          if (!eventiPassatiGrid || !loadingIndicator) {
+              console.error("Elementi DOM per griglia eventi passati o indicatore non trovati.");
+              return;
+          }
+          loadingIndicator.classList.add('visible');
+          eventiPassatiGrid.innerHTML = '';
 
-        try {
-            const response = await fetch('get_past_events.php');
-            if (!response.ok) {
-                throw new Error(\`Errore HTTP \${response.status}: \${response.statusText}\`);
-            }
-            const result = await response.json();
+          try {
+              const response = await fetch('get_past_events.php');
+              if (!response.ok) {
+                  throw new Error(\`Errore HTTP \${response.status}: \${response.statusText}\`);
+              }
+              const result = await response.json();
 
-            if (result.success && Array.isArray(result.data)) { // Verifica che result.data sia un array
-                allPastEventsData = result.data;
-                if (allPastEventsData.length > 0) {
-                    allPastEventsData.forEach(event => {
-                        eventiPassatiGrid.appendChild(createPastEventCard(event));
-                    });
-                } else {
-                    eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
-                }
-            } else {
-                throw new Error(result.message || 'Formato dati non valido o errore nel caricamento degli eventi passati.');
-            }
-        } catch (error) {
-            console.error('Errore dettagliato caricamento eventi passati:', error);
-            eventiPassatiGrid.innerHTML = \`<p class="no-events error-message" style="text-align:center; padding:20px;">Errore caricamento eventi: \${error.message}. <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>\`;
-        } finally {
-            loadingIndicator.classList.remove('visible');
-        }
-    }
+              if (result.success && Array.isArray(result.data)) { // Verifica che result.data sia un array
+                  allPastEventsData = result.data;
+                  if (allPastEventsData.length > 0) {
+                      allPastEventsData.forEach(event => {
+                          eventiPassatiGrid.appendChild(createPastEventCard(event));
+                      });
+                  } else {
+                      eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
+                  }
+              } else {
+                  throw new Error(result.message || 'Formato dati non valido o errore nel caricamento degli eventi passati.');
+              }
+          } catch (error) {
+              console.error('Errore dettagliato caricamento eventi passati:', error);
+              eventiPassatiGrid.innerHTML = \`<p class="no-events error-message" style="text-align:center; padding:20px;">Errore caricamento eventi: \${error.message}. <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>\`;
+          } finally {
+              loadingIndicator.classList.remove('visible');
+          }
+      }
 
-    function filterEvents() {
-        if (!eventiPassatiGrid || !Array.isArray(allPastEventsData)) return;
-        const titleFilter = document.getElementById('searchTitle').value.toLowerCase().trim();
-        const dateFilter = document.getElementById('searchDate').value;
-        const speakerFilter = document.getElementById('searchSpeaker').value.toLowerCase().trim();
+      function filterEvents() {
+          if (!eventiPassatiGrid || !Array.isArray(allPastEventsData)) return;
+          const titleFilter = document.getElementById('searchTitle').value.toLowerCase().trim();
+          const dateFilter = document.getElementById('searchDate').value;
+          const speakerFilter = document.getElementById('searchSpeaker').value.toLowerCase().trim();
 
-        eventiPassatiGrid.innerHTML = '';
-        let visibleCards = 0;
+          eventiPassatiGrid.innerHTML = '';
+          let visibleCards = 0;
 
-        const filteredEvents = allPastEventsData.filter(event => {
-            const eventTitle = event.titolo?.toLowerCase() || '';
-            const eventDate = event.datainizio || '';
-            const eventSpeaker = event.relatore?.toLowerCase() || '';
+          const filteredEvents = allPastEventsData.filter(event => {
+              const eventTitle = event.titolo?.toLowerCase() || '';
+              const eventDate = event.datainizio || '';
+              const eventSpeaker = event.relatore?.toLowerCase() || '';
 
-            let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
-            let dateMatch = !dateFilter || (eventDate && eventDate.substring(0, 7) === dateFilter);
-            let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
-            return titleMatch && dateMatch && speakerMatch;
-        });
+              let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
+              let dateMatch = !dateFilter || (eventDate && eventDate.substring(0, 7) === dateFilter);
+              let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
+              return titleMatch && dateMatch && speakerMatch;
+          });
 
-        if (filteredEvents.length > 0) {
-            filteredEvents.forEach(event => {
-                eventiPassatiGrid.appendChild(createPastEventCard(event));
-            });
-        } else {
-            if (titleFilter || dateFilter || speakerFilter) {
-                 eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato corrisponde ai criteri di ricerca.</p>';
-            } else if (allPastEventsData.length === 0) {
-                 eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
-            } else {
-                 allPastEventsData.forEach(event => eventiPassatiGrid.appendChild(createPastEventCard(event)));
-            }
-        }
-    }
+          if (filteredEvents.length > 0) {
+              filteredEvents.forEach(event => {
+                  eventiPassatiGrid.appendChild(createPastEventCard(event));
+              });
+          } else {
+              if (titleFilter || dateFilter || speakerFilter) {
+                   eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato corrisponde ai criteri di ricerca.</p>';
+              } else if (allPastEventsData.length === 0) {
+                   eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
+              } else {
+                   allPastEventsData.forEach(event => eventiPassatiGrid.appendChild(createPastEventCard(event)));
+              }
+          }
+      }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        setupUserSessionAndNavbar(); // Imposta currentUser e UI navbar PRIMA
+      document.addEventListener('DOMContentLoaded', () => {
+          setupUserSessionAndNavbar(); // Imposta currentUser e UI navbar PRIMA
 
-        if (!currentUser) {
-            console.log("Utente non loggato su eventipassatiaccesso.html. Reindirizzamento a index.html");
-            window.location.href = 'index.html';
-            return;
-        }
+          if (!currentUser) {
+              console.log("Utente non loggato su eventipassatiaccesso.html. Reindirizzamento a index.html");
+              window.location.href = 'index.html';
+              return;
+          }
 
-        const currentYearEl = document.getElementById('currentYear');
-        if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
+          const currentYearEl = document.getElementById('currentYear');
+          if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
-        loadPastEvents();
+          loadPastEvents();
 
-        const searchTitleEl = document.getElementById('searchTitle');
-        const searchDateEl = document.getElementById('searchDate');
-        const searchSpeakerEl = document.getElementById('searchSpeaker');
+          const searchTitleEl = document.getElementById('searchTitle');
+          const searchDateEl = document.getElementById('searchDate');
+          const searchSpeakerEl = document.getElementById('searchSpeaker');
 
-        if(searchTitleEl) searchTitleEl.addEventListener('input', filterEvents);
-        if(searchDateEl) searchDateEl.addEventListener('change', filterEvents);
-        if(searchSpeakerEl) searchSpeakerEl.addEventListener('input', filterEvents);
-    });
-
-</script>
-</body>
+          if(searchTitleEl) searchTitleEl.addEventListener('input', filterEvents);
+          if(searchDateEl) searchDateEl.addEventListener('change', filterEvents);
+          if(searchSpeakerEl) searchSpeakerEl.addEventListener('input', filterEvents);
+      });
+    </script>
+  </body>
 </html>
