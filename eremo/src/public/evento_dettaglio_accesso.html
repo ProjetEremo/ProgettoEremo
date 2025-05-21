@@ -61,7 +61,7 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
                     <a href="areapersonale.html">Il mio profilo</a>
-                    <a href="gestisciprenotazioni.html">Le mie prenotazioni</a>
+                    <a href="areapersonale.html#prenotazioni">Le mie prenotazioni</a>
                     <a href="#" id="logout-link-dropdown">Esci</a>
                 </div>
             </div>
@@ -485,6 +485,7 @@
         }
     }
 
+    // Modifica nella funzione displayComments per evitare l'ereditarietà dello stato admin
     function displayComments(comments, parentUlElement, depth = 0) {
         if (depth === 0) {
             parentUlElement.innerHTML = '';
@@ -506,12 +507,14 @@
 
         comments.forEach(commentData => {
             const commentItemLi = document.createElement('li');
+            // Ogni commento viene creato indipendentemente, usando le sue proprietà
             commentItemLi.appendChild(createCommentElement(commentData, depth > 0));
             listToAppendTo.appendChild(commentItemLi);
 
             if (commentData.replies && commentData.replies.length > 0) {
                 const repliesContainerDiv = commentItemLi.querySelector('.replies');
                 if (repliesContainerDiv) {
+                    // Ogni risposta deve utilizzare il proprio valore is_admin_comment
                     displayComments(commentData.replies, repliesContainerDiv, depth + 1);
                 }
             }
@@ -519,41 +522,53 @@
     }
 
     function createCommentElement(commentData, isReply = false) {
-        // LOG 1: DATI RICEVUTI (già verificato, mostra is_admin_comment: false per il tuo commento)
+        // LOG 1: DATI RICEVUTI (Verifica che is_admin_comment sia corretto)
         console.log('Dati per createCommentElement:', JSON.parse(JSON.stringify(commentData)));
 
         const commentDiv = document.createElement('div');
         commentDiv.className = isReply ? 'comment reply' : 'comment';
         commentDiv.id = 'comment-' + commentData.Progressivo;
 
-        const isAdminComment = commentData.is_admin_comment === true || commentData.is_admin_comment === 1;
+        // Determina se QUESTO commento è di un admin
+        const isAdminComment = commentData.is_admin_comment === true;
 
+        // Applica uno stile generale al contenitore del commento se è di un admin (opzionale)
         if (isAdminComment) {
-            commentDiv.classList.add('admin-comment-highlight');
+            commentDiv.classList.add('commento-admin-stile'); // Nuova classe per stile generale admin
         }
 
         // LOG 2: VERIFICA CLASSI E VALORE JS 'isAdminComment'
         console.log('[DEBUG] Commento ID:', commentData.Progressivo,
-            '| Valore JS isAdminComment:', isAdminComment,
-            '| Classi finali del DIV:', commentDiv.className);
+            '| Flag da PHP (is_admin_comment):', commentData.is_admin_comment,
+            '| Variabile JS (isAdminComment):', isAdminComment,
+            '| Classi applicate al DIV:', commentDiv.className);
 
         const avatarUrl = (commentData.CommenterIconPath && commentData.CommenterIconPath.trim() !== '') ? commentData.CommenterIconPath : defaultUserIconPath;
         const commenterDisplayName = sanitizeTextForHTML(commentData.CommenterNomeCompleto || 'Anonimo');
 
         // LOG 3: VERIFICA AVATAR E NOME USATI
         console.log('[DEBUG] Commento ID:', commentData.Progressivo,
-            '| URL Avatar usato:', avatarUrl,
-            '| Nome Display usato:', commenterDisplayName);
+            '| URL Avatar usato per HTML:', avatarUrl,
+            '| Nome Display usato per HTML:', commenterDisplayName);
 
         const commentDate = sanitizeTextForHTML(commentData.DataVisualizzata || 'Data non disponibile');
         const commentDescription = sanitizeTextForHTML(commentData.Descrizione);
         const likeCount = commentData.NumLike !== null ? parseInt(commentData.NumLike) : 0;
         const isLikedByCurrentUser = commentData.is_liked_by_current_user || false;
 
+        // NUOVA LOGICA PER IL BADGE STAFF:
+        let staffBadgeHTML = '';
+        if (isAdminComment) {
+            staffBadgeHTML = '<span class="badge-staff">(Staff)</span>';
+        }
+
         commentDiv.innerHTML = `
             <div class="comment-header">
                 <img src="${avatarUrl}" alt="Avatar di ${commenterDisplayName}" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';">
-                <div class="comment-meta"><strong>${commenterDisplayName}</strong> <small>${commentDate}</small></div>
+                <div class="comment-meta">
+                    <strong>${commenterDisplayName}</strong>
+                    ${staffBadgeHTML} <small>${commentDate}</small>
+                </div>
             </div>
             <p>${commentDescription}</p>
             <div class="comment-actions">
