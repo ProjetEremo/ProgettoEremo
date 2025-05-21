@@ -51,7 +51,6 @@
       background-color: var(--primary);
     }
     .loading-overlay {
-      /* Stile per indicatore caricamento */
       position: absolute;
       top: 0;
       left: 0;
@@ -71,7 +70,6 @@
       opacity: 1;
     }
     .spinner {
-      /* Stile base per spinner */
       border: 4px solid rgba(0, 0, 0, 0.1);
       width: 36px;
       height: 36px;
@@ -258,44 +256,44 @@
   </form>
 </div>
 
+<div class="login-popup-overlay" id="loginRequiredOverlay"></div>
+<div class="login-popup" id="loginRequiredPopup">
+  <button class="close-popup" id="closeLoginRequiredPopupBtn" aria-label="Chiudi popup">&times;</button>
+  <h2 style="color: var(--primary); margin-top: 0; margin-bottom: 1.5rem; text-align: center; font-size: 1.8rem;">Accesso Richiesto</h2>
+  <p style="text-align: center; margin-bottom: 1.5rem; font-size: 1.2rem; color: var(--dark);">Per visualizzare i dettagli completi dell'evento e i commenti, è necessario effettuare l'accesso.</p>
+  <div class="form-actions" style="text-align: center;">
+    <button type="button" class="btn-popup" id="loginRequiredLoginBtn">Accedi / Registrati</button>
+  </div>
+</div>
+
+
 <script>
   // --- Funzioni Utilità ---
   function gebi(id) {
     return document.getElementById(id);
   }
 
-  // --- Navbar Scroll Logic ---
+  // --- Navbar Scroll Logic (invariato) ---
   let lastScroll = 0;
   const navbarContainer = gebi("navbarContainer");
   if (navbarContainer) {
-    window.addEventListener(
-            "scroll",
-            function () {
-              const currentScroll =
-                      window.pageYOffset || document.documentElement.scrollTop;
-              if (currentScroll <= 50) {
-                navbarContainer.classList.remove("hidden");
-                lastScroll = 0;
-                return;
-              }
-              if (
-                      currentScroll > lastScroll &&
-                      !navbarContainer.classList.contains("hidden")
-              ) {
-                navbarContainer.classList.add("hidden");
-              } else if (
-                      currentScroll < lastScroll &&
-                      navbarContainer.classList.contains("hidden")
-              ) {
-                navbarContainer.classList.remove("hidden");
-              }
-              lastScroll = currentScroll;
-            },
-            false
-    );
+    window.addEventListener( "scroll", function () {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      if (currentScroll <= 50) {
+        navbarContainer.classList.remove("hidden");
+        lastScroll = 0;
+        return;
+      }
+      if ( currentScroll > lastScroll && !navbarContainer.classList.contains("hidden") ) {
+        navbarContainer.classList.add("hidden");
+      } else if ( currentScroll < lastScroll && navbarContainer.classList.contains("hidden") ) {
+        navbarContainer.classList.remove("hidden");
+      }
+      lastScroll = currentScroll;
+    }, false );
   }
 
-  // --- Mobile Menu Logic ---
+  // --- Mobile Menu Logic (invariato) ---
   const mobileMenu = gebi("mobileMenu");
   const hamburger = document.querySelector(".hamburger");
   function toggleMobileMenu() {
@@ -313,25 +311,19 @@
     }
   }
   document.addEventListener("click", function (event) {
-    if (
-            mobileMenu &&
-            mobileMenu.classList.contains("open") &&
-            !mobileMenu.contains(event.target) &&
-            hamburger &&
-            !hamburger.contains(event.target)
-    ) {
+    if ( mobileMenu && mobileMenu.classList.contains("open") && !mobileMenu.contains(event.target) && hamburger && !hamburger.contains(event.target) ) {
       closeMobileMenu();
     }
   });
 
-  // --- Login Popup Logic (semplificato, assicurati sia completo se usi quello dei file forniti) ---
+  // --- Login Popup Logic (invariato) ---
   const loginBtn = gebi("login-btn");
   const loginBtnMobile = gebi("login-btn-mobile");
   const loginOverlay = gebi("loginOverlay");
   const loginPopup = gebi("loginPopup");
-  const closePopupBtn = gebi("closePopupBtn"); // Era closePopup nel tuo HTML, ma spesso si usa closeLoginPopupBtn
+  const closePopupBtn = gebi("closePopupBtn");
   const loginTabs = document.querySelectorAll(".login-tab");
-  const loginForms = document.querySelectorAll(".login-popup .login-form"); // Assicurati che il selettore sia corretto
+  const loginForms = document.querySelectorAll(".login-popup .login-form");
 
   function openLoginPopup() {
     if (loginOverlay) loginOverlay.classList.add("active");
@@ -345,11 +337,7 @@
     document.body.style.overflow = "";
   }
 
-  if (loginBtn)
-    loginBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      openLoginPopup();
-    });
+  if (loginBtn) loginBtn.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); });
   if (loginBtnMobile) {
     loginBtnMobile.addEventListener("click", (e) => {
       e.preventDefault();
@@ -357,12 +345,8 @@
       openLoginPopup();
     });
   }
-  if (closePopupBtn)
-    closePopupBtn.addEventListener("click", closeLoginPopup);
-  if (loginOverlay)
-    loginOverlay.addEventListener("click", (e) => {
-      if (e.target === loginOverlay) closeLoginPopup();
-    });
+  if (closePopupBtn) closePopupBtn.addEventListener("click", closeLoginPopup);
+  if (loginOverlay) loginOverlay.addEventListener("click", (e) => { if (e.target === loginOverlay) closeLoginPopup(); });
 
   loginTabs.forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -371,54 +355,146 @@
       tab.classList.add("active");
       loginForms.forEach((form) => {
         form.classList.remove("active");
-        // Assicurati che gli ID dei form corrispondano (es. loginFormPopup, registerFormPopup)
-        if (form.id === `${tabId}FormPopup` || form.id === `${tabId}Form`) {
+        if (form.id === `${tabId}FormPopup`) { // Aggiornato per ID univoci dei form nel popup
           form.classList.add("active");
         }
       });
     });
   });
 
-  // Gestione Login/Registrazione (DA COMPLETARE CON LA TUA LOGICA PHP)
   gebi("loginFormPopup")?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    // Logica di invio per il login...
-    alert("Login simulato. Implementare chiamata a login.php");
-    // Esempio: const formData = new FormData(e.target); fetch('login.php', {method: 'POST', body: formData})...
-    // closeLoginPopup();
+    const loginButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = loginButton.innerHTML;
+    loginButton.disabled = true;
+    loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>';
+
+    try {
+      const response = await fetch('login.php', {
+        method: 'POST',
+        body: new FormData(e.target)
+      });
+      if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
+      const result = await response.json();
+
+      if (result.success) {
+        const userDataToStore = {
+          nome: result.nome,
+          email: result.email,
+          iconPath: result.iconPath || '/uploads/icons/default_user.png',
+        };
+        localStorage.setItem('userDataEFF', JSON.stringify(userDataToStore));
+        closeLoginPopup();
+        window.location.href = result.is_admin ? 'indexadmin.html' : 'indexaccesso.html';
+      } else {
+        alert(result.message || "Credenziali non valide.");
+      }
+    } catch (error) {
+      alert("Errore di connessione o risposta non valida dal server.");
+      console.error("Errore login:", error);
+    } finally {
+      loginButton.disabled = false;
+      loginButton.innerHTML = originalButtonText;
+    }
   });
 
   gebi("registerFormPopup")?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    // Logica di invio per la registrazione...
-    alert("Registrazione simulata. Implementare chiamata a registrati.php");
-    // Esempio: const formData = new FormData(e.target); fetch('registrati.php', {method: 'POST', body: formData})...
-    // closeLoginPopup();
+    const registerButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = registerButton.innerHTML;
+    registerButton.disabled = true;
+    registerButton.innerHTML = 'Registrazione...';
+    try {
+      const response = await fetch('registrati.php', {
+        method: 'POST',
+        body: new FormData(e.target)
+      });
+      if (!response.ok) {
+        let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
+        try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; }
+        catch(err) { /* Ignora */ }
+        throw new Error(errorMsg);
+      }
+      const result = await response.json();
+      if (result.success) {
+        alert(result.message || "Registrazione completata! Ora puoi effettuare il login.");
+        document.querySelector('.login-tab[data-tab="login"]').click();
+        const loginEmailPopup = gebi('login-email-popup');
+        const registerEmailPopup = gebi('register-email-popup');
+        if (loginEmailPopup && registerEmailPopup) {
+          loginEmailPopup.value = registerEmailPopup.value;
+        }
+        e.target.reset();
+      } else {
+        alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+      }
+    } catch (error) {
+      alert("Errore durante la registrazione: " + error.message);
+      console.error("Dettaglio errore registrazione:", error);
+    } finally {
+      registerButton.disabled = false;
+      registerButton.innerHTML = originalButtonText;
+    }
   });
 
   document.addEventListener("keydown", (event) => {
-    if (
-            event.key === "Escape" &&
-            loginPopup &&
-            loginPopup.classList.contains("active")
-    ) {
+    if (event.key === "Escape" && loginPopup && loginPopup.classList.contains("active") ) {
       closeLoginPopup();
     }
   });
 
+  // --- Logica Popup "Accesso Richiesto" ---
+  const loginRequiredOverlay = gebi("loginRequiredOverlay");
+  const loginRequiredPopup = gebi("loginRequiredPopup");
+  const closeLoginRequiredPopupBtn = gebi("closeLoginRequiredPopupBtn");
+  const loginRequiredLoginBtn = gebi("loginRequiredLoginBtn");
+
+  function showLoginRequiredPopup(event) {
+    if (event) event.preventDefault();
+    if (loginRequiredOverlay) loginRequiredOverlay.classList.add("active");
+    if (loginRequiredPopup) loginRequiredPopup.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLoginRequiredPopup() {
+    if (loginRequiredOverlay) loginRequiredOverlay.classList.remove("active");
+    if (loginRequiredPopup) loginRequiredPopup.classList.remove("active");
+    if (!loginPopup || !loginPopup.classList.contains("active")) { // Solo se il popup di login principale non è attivo
+      document.body.style.overflow = "";
+    }
+  }
+
+  if (closeLoginRequiredPopupBtn) {
+    closeLoginRequiredPopupBtn.addEventListener("click", closeLoginRequiredPopup);
+  }
+  if (loginRequiredOverlay) {
+    loginRequiredOverlay.addEventListener("click", (e) => {
+      if (e.target === loginRequiredOverlay) closeLoginRequiredPopup();
+    });
+  }
+  if (loginRequiredLoginBtn) {
+    loginRequiredLoginBtn.addEventListener("click", () => {
+      closeLoginRequiredPopup();
+      openLoginPopup(); // Apre il popup di login/registrazione principale
+    });
+  }
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && loginRequiredPopup && loginRequiredPopup.classList.contains("active")) {
+      closeLoginRequiredPopup();
+    }
+  });
+
+
   // --- Logica Caricamento e Filtro Eventi Passati ---
   const eventiPassatiGrid = gebi("eventiPassatiGrid");
   const loadingIndicator = gebi("loadingIndicator");
-  let allPastEvents = []; // Array per memorizzare tutti gli eventi caricati
+  let allPastEvents = [];
 
   function formatDate(dateString) {
     if (!dateString) return "Data non disponibile";
     try {
-      // Gestisce sia YYYY-MM-DD che timestamp completi
-      const date = new Date(
-              dateString.includes("T") ? dateString : dateString + "T00:00:00"
-      );
-      if (isNaN(date.getTime())) return dateString; // Restituisce la stringa originale se non valida
+      const date = new Date( dateString.includes("T") ? dateString : dateString + "T00:00:00" );
+      if (isNaN(date.getTime())) return dateString;
       return date.toLocaleDateString("it-IT", {
         day: "numeric",
         month: "long",
@@ -426,56 +502,38 @@
       });
     } catch (e) {
       console.warn("Errore formattazione data:", dateString, e);
-      return dateString; // Fallback alla stringa originale
+      return dateString;
     }
   }
 
   function createPastEventCard(event) {
     const card = document.createElement("article");
     card.className = "card";
-    // Salva i dati grezzi sulla card per il filtraggio
     card.dataset.title = event.titolo?.toLowerCase() || "";
-    card.dataset.date = event.datainizio || ""; // YYYY-MM-DD
+    card.dataset.date = event.datainizio || "";
     card.dataset.speaker = event.relatore?.toLowerCase() || "";
 
-    let imageSrc =
-            event.immagine_url && event.immagine_url.trim() !== ""
-                    ? event.immagine_url
-                    : "images/default-event-past.jpg"; // Immagine default specifica per eventi passati
+    let imageSrc = event.immagine_url && event.immagine_url.trim() !== "" ? event.immagine_url : "images/default-event-past.jpg";
 
+    // MODIFICHE QUI:
     card.innerHTML = `
             <div class="card-image-container">
-                <img src="${imageSrc}" alt="Copertina: ${
-            event.titolo || "Evento passato"
-    }" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
+                <img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento passato"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
             </div>
             <div class="card-content">
                 <h3>${event.titolo || "Titolo non disponibile"}</h3>
                 <p class="card-info">
                     <b>Data:</b> ${formatDate(event.datainizio)}
-                    ${
-            event.durata
-                    ? `<br><b>Orario/Durata:</b> ${event.durata}`
-                    : ""
-    }
+                    ${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ""}
                 </p>
                 <p class="card-info">
-                    <b>${event.prefisso_relatore || "Relatore"}:</b> ${
-            event.relatore || "N/D"
-    }
-                    ${
-            event.associazione
-                    ? `<br><b>Associazione:</b> ${event.associazione}`
-                    : ""
-    }
+                    <b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}
+                    ${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}`: ""}
                 </p>
-                <p>${
-            event.descrizione || "Nessuna descrizione breve disponibile."
-    }</p>
-                <div class="card-actions single-action">
-                    <a href="evento.html?id=${
-            event.idevento
-    }" class="card-btn card-btn-secondary">Dettagli Evento</a>
+                <p>${event.descrizione || "Nessuna descrizione breve disponibile."}</p>
+                <div class="card-actions">
+                    <a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Dettagli</a>
+                    <a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Commenti</a>
                 </div>
             </div>
         `;
@@ -485,31 +543,26 @@
   async function loadPastEvents() {
     if (!eventiPassatiGrid || !loadingIndicator) return;
     loadingIndicator.classList.add("visible");
-    eventiPassatiGrid.innerHTML = ""; // Pulisci la griglia
+    eventiPassatiGrid.innerHTML = "";
 
     try {
       const response = await fetch("get_past_events.php");
       if (!response.ok) {
-        throw new Error(
-                `Errore HTTP: ${response.status} ${response.statusText}`
-        );
+        throw new Error( `Errore HTTP: ${response.status} ${response.statusText}` );
       }
       const result = await response.json();
 
       if (result.success && result.data) {
-        allPastEvents = result.data; // Salva i dati per il filtraggio
+        allPastEvents = result.data;
         if (allPastEvents.length > 0) {
           allPastEvents.forEach((event) => {
             eventiPassatiGrid.appendChild(createPastEventCard(event));
           });
         } else {
-          eventiPassatiGrid.innerHTML =
-                  '<p class="no-events">Nessun evento passato trovato.</p>';
+          eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
         }
       } else {
-        throw new Error(
-                result.message || "Errore nel caricamento degli eventi passati."
-        );
+        throw new Error( result.message || "Errore nel caricamento degli eventi passati." );
       }
     } catch (error) {
       console.error("Errore caricamento eventi passati:", error);
@@ -523,70 +576,52 @@
     if (!eventiPassatiGrid) return;
 
     const titleFilter = gebi("searchTitle").value.toLowerCase().trim();
-    const dateFilter = gebi("searchDate").value; // Formato YYYY-MM
+    const dateFilter = gebi("searchDate").value;
     const speakerFilter = gebi("searchSpeaker").value.toLowerCase().trim();
 
-    const cards = eventiPassatiGrid.querySelectorAll(".card");
+    eventiPassatiGrid.innerHTML = ''; // Pulisci e ripopola con card filtrate
     let visibleCards = 0;
 
-    cards.forEach((card) => {
-      const eventTitle = card.dataset.title || "";
-      const eventDate = card.dataset.date || ""; // YYYY-MM-DD
-      const eventSpeaker = card.dataset.speaker || "";
+    const filteredEvents = allPastEvents.filter(event => {
+      const eventTitle = event.titolo?.toLowerCase() || "";
+      const eventDate = event.datainizio || "";
+      const eventSpeaker = event.relatore?.toLowerCase() || "";
 
-      let titleMatch = true;
-      if (titleFilter) {
-        titleMatch = eventTitle.includes(titleFilter);
-      }
-
-      let dateMatch = true;
-      if (dateFilter) {
-        // dateFilter è YYYY-MM
-        // Estrai YYYY-MM da eventDate (YYYY-MM-DD)
-        const eventYearMonth = eventDate.substring(0, 7); // primi 7 caratteri: YYYY-MM
-        dateMatch = eventYearMonth === dateFilter;
-      }
-
-      let speakerMatch = true;
-      if (speakerFilter) {
-        speakerMatch = eventSpeaker.includes(speakerFilter);
-      }
-
-      if (titleMatch && dateMatch && speakerMatch) {
-        card.style.display = "flex"; // o 'block', a seconda del tuo CSS per .card
-        visibleCards++;
-      } else {
-        card.style.display = "none";
-      }
+      let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
+      let dateMatch = !dateFilter || (eventDate && eventDate.substring(0, 7) === dateFilter);
+      let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
+      return titleMatch && dateMatch && speakerMatch;
     });
 
-    // Opzionale: mostra un messaggio se nessun evento corrisponde ai filtri
-    const noResultsMessage = gebi("noResultsMessage");
-    if (
-            visibleCards === 0 &&
-            (titleFilter || dateFilter || speakerFilter)
-    ) {
-      if (!noResultsMessage) {
-        const p = document.createElement("p");
-        p.id = "noResultsMessage";
-        p.className = "no-events";
-        p.textContent =
-                "Nessun evento passato corrisponde ai criteri di ricerca.";
-        eventiPassatiGrid.appendChild(p);
-      } else {
-        noResultsMessage.style.display = "block";
-      }
-    } else if (noResultsMessage) {
-      noResultsMessage.style.display = "none";
+    if (filteredEvents.length > 0) {
+      filteredEvents.forEach(event => {
+        eventiPassatiGrid.appendChild(createPastEventCard(event));
+      });
+      visibleCards = filteredEvents.length;
+    }
+
+    const noResultsMessageEl = gebi("noResultsMessage");
+    if (noResultsMessageEl) noResultsMessageEl.remove();
+
+    if (visibleCards === 0 && (titleFilter || dateFilter || speakerFilter) ) { // Mostra messaggio solo se ci sono filtri attivi E nessun risultato
+      const p = document.createElement("p");
+      p.id = "noResultsMessage";
+      p.className = "no-events";
+      p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
+      eventiPassatiGrid.appendChild(p);
+    } else if (visibleCards === 0 && allPastEvents.length === 0) { // Se non ci sono eventi in assoluto (nessun filtro)
+      const p = document.createElement("p");
+      p.id = "noResultsMessage";
+      p.className = "no-events";
+      p.textContent = "Nessun evento passato trovato.";
+      eventiPassatiGrid.appendChild(p);
     }
   }
 
-  // Inizializzazione al caricamento della pagina
   document.addEventListener("DOMContentLoaded", () => {
     gebi("currentYear").textContent = new Date().getFullYear();
-    loadPastEvents(); // Carica gli eventi passati
+    loadPastEvents();
 
-    // Aggiungi event listener per l'input dinamico sui filtri
     gebi("searchTitle").addEventListener("input", filterEvents);
     gebi("searchDate").addEventListener("change", filterEvents);
     gebi("searchSpeaker").addEventListener("input", filterEvents);

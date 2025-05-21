@@ -28,8 +28,12 @@
       width: 100%; padding: 0.7rem 1rem; border: 1px solid var(--gray-medium);
       border-radius: 8px; font-size: 0.95rem;
     }
-    .loading-overlay { /* ... (stili loading overlay invariati) ... */ }
-    .no-events { /* ... (stili no-events invariati) ... */ }
+    /* Stili per .loading-overlay e .spinner sono in style.css */
+    .no-events {
+      text-align: center;
+      padding: 2rem;
+      color: var(--gray-dark);
+    }
   </style>
 </head>
 <body>
@@ -115,9 +119,8 @@
 
 <script>
   let currentUser = null;
-  const defaultUserIconPath = '/uploads/icons/default_user.png'; // Path ASSOLUTO
+  const defaultUserIconPath = '/uploads/icons/default_user.png';
 
-  // --- FUNZIONI NAVBAR E SESSIONE UTENTE (STANDARD) ---
   async function callApi(url, method = 'GET', data = null) {
     const headers = { 'Content-Type': 'application/json' };
     const options = { method, headers, credentials: 'same-origin' };
@@ -182,7 +185,6 @@
     }
     updateNavbarUserUI();
 
-    // Usa gli ID generici per i link di logout, come nelle altre pagine corrette
     const logoutLinkDropdown = document.getElementById('logout-link-dropdown');
     const logoutLinkMobile = document.getElementById('logout-link-mobile');
 
@@ -195,7 +197,7 @@
   async function fetchAndUpdateUserDisplayData() {
     if (!currentUser || !currentUser.email) { return; }
     try {
-      const apiUserData = await callApi('api/api_get_user_profile.php'); // Script profilo UTENTE è in /api/
+      const apiUserData = await callApi('api/api_get_user_profile.php');
       if (apiUserData && apiUserData.success && apiUserData.data) {
         const freshData = apiUserData.data;
         currentUser.nome = freshData.nome || currentUser.nome;
@@ -206,13 +208,10 @@
         updateNavbarUserUI();
       }
     } catch (error) {
-      console.warn("EventiPassati: Errore fetch profilo aggiornato per navbar:", error.message);
+      console.warn("EventiPassatiAccesso: Errore fetch profilo aggiornato per navbar:", error.message);
     }
   }
-  // --- FINE FUNZIONI NAVBAR E SESSIONE UTENTE ---
 
-  // --- Logica Menu (Scroll, Dropdown, Hamburger) ---
-  // (Identica a quella di areapersonale.html e indexaccesso.html)
   let lastScroll = 0;
   const navbarContainer = document.getElementById('navbarContainer');
   if (navbarContainer) {
@@ -270,10 +269,7 @@
       }
     }
   });
-  // --- FINE LOGICA MENU ---
 
-
-  // --- Logica Specifica per eventipassatiaccesso.html (Tua logica esistente) ---
   const eventiPassatiGrid = document.getElementById('eventiPassatiGrid');
   const loadingIndicator = document.getElementById('loadingIndicator');
   let allPastEventsData = [];
@@ -290,15 +286,15 @@
   function createPastEventCard(event) {
     const card = document.createElement('article');
     card.className = 'card';
-    // I dataset per il filtro sono utili, li lascio
     card.dataset.title = event.titolo?.toLowerCase() || '';
     card.dataset.date = event.datainizio || '';
     card.dataset.speaker = event.relatore?.toLowerCase() || '';
 
-    let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : '/images/default-event-past.jpg'; // Path assoluto per default
+    let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : '/images/default-event-past.jpg';
 
-    let htmlContent =
-            `<div class="card-image-container">
+    // MODIFICHE QUI:
+    card.innerHTML = `
+            <div class="card-image-container">
                 <img src="${imageSrc}" alt="Copertina: ${event.titolo || 'Evento passato'}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='/images/default-event-error.jpg';">
             </div>
             <div class="card-content">
@@ -312,11 +308,11 @@
                     ${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ''}
                 </p>
                 <p>${event.descrizione || 'Nessuna descrizione breve disponibile.'}</p>
-                <div class="card-actions single-action">
-                    <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli Evento</a>
+                <div class="card-actions">
+                    <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Dettagli</a>
+                    <a href="evento_dettaglio_accesso.html?id=${event.idevento}#event-comments" class="card-btn card-btn-primary">Commenti</a>
                 </div>
             </div>`;
-    card.innerHTML = htmlContent;
     return card;
   }
 
@@ -326,7 +322,6 @@
     eventiPassatiGrid.innerHTML = '';
 
     try {
-      // Assicurati che get_past_events.php sia nella root se chiamato così, o modifica il percorso
       const response = await fetch('get_past_events.php');
       if (!response.ok) { throw new Error('Errore HTTP ' + response.status + ': ' + response.statusText); }
       const result = await response.json();
@@ -353,14 +348,15 @@
   function filterEvents() {
     if (!eventiPassatiGrid || !Array.isArray(allPastEventsData)) return;
     const titleFilter = document.getElementById('searchTitle').value.toLowerCase().trim();
-    const dateFilter = document.getElementById('searchDate').value; // Formato YYYY-MM
+    const dateFilter = document.getElementById('searchDate').value;
     const speakerFilter = document.getElementById('searchSpeaker').value.toLowerCase().trim();
 
     eventiPassatiGrid.innerHTML = '';
+    let visibleCards = 0;
 
     const filteredEvents = allPastEventsData.filter(event => {
       const eventTitle = event.titolo?.toLowerCase() || '';
-      const eventDate = event.datainizio || ''; // Formato YYYY-MM-DD
+      const eventDate = event.datainizio || '';
       const eventSpeaker = event.relatore?.toLowerCase() || '';
 
       let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
@@ -373,40 +369,48 @@
       filteredEvents.forEach(event => {
         eventiPassatiGrid.appendChild(createPastEventCard(event));
       });
-    } else {
-      if (titleFilter || dateFilter || speakerFilter) {
-        eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato corrisponde ai criteri di ricerca.</p>';
-      } else if (allPastEventsData.length === 0) { // Se non ci sono eventi in assoluto
-        eventiPassatiGrid.innerHTML = '<p class="no-events">Nessun evento passato trovato.</p>';
-      } else { // Nessun filtro attivo, ma filteredEvents è vuoto (non dovrebbe succedere se allPastEventsData ha elementi)
-        allPastEventsData.forEach(event => eventiPassatiGrid.appendChild(createPastEventCard(event)));
-      }
+      visibleCards = filteredEvents.length;
+    }
+
+    const noResultsMessageEl = document.getElementById("noResultsMessage");
+    if (noResultsMessageEl) noResultsMessageEl.remove();
+
+    if (visibleCards === 0 && (titleFilter || dateFilter || speakerFilter) ) {
+      const p = document.createElement("p");
+      p.id = "noResultsMessage";
+      p.className = "no-events";
+      p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
+      eventiPassatiGrid.appendChild(p);
+    } else if (visibleCards === 0 && allPastEventsData.length === 0) {
+      const p = document.createElement("p");
+      p.id = "noResultsMessage";
+      p.className = "no-events";
+      p.textContent = "Nessun evento passato trovato.";
+      eventiPassatiGrid.appendChild(p);
     }
   }
 
-  document.addEventListener('DOMContentLoaded', async () => { // Reso async
-    setupUserSessionAndNavbar(); // Setup iniziale da localStorage
+  document.addEventListener('DOMContentLoaded', async () => {
+    setupUserSessionAndNavbar();
 
-    if (!currentUser) { // Reindirizza se non loggato
-      // console.log("Utente non loggato su eventipassatiaccesso.html. Reindirizzamento.");
+    if (!currentUser) {
       window.location.href = 'index.html';
       return;
     }
 
-    // Dopo il setup iniziale, e DOPO il controllo di redirect, chiama per aggiornare la navbar
     await fetchAndUpdateUserDisplayData();
 
     const currentYearEl = document.getElementById('currentYear');
     if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
-    loadPastEvents(); // Carica gli eventi passati specifici di questa pagina
+    loadPastEvents();
 
     const searchTitleEl = document.getElementById('searchTitle');
     const searchDateEl = document.getElementById('searchDate');
     const searchSpeakerEl = document.getElementById('searchSpeaker');
 
     if(searchTitleEl) searchTitleEl.addEventListener('input', filterEvents);
-    if(searchDateEl) searchDateEl.addEventListener('change', filterEvents); // 'change' è meglio per input type month
+    if(searchDateEl) searchDateEl.addEventListener('change', filterEvents);
     if(searchSpeakerEl) searchSpeakerEl.addEventListener('input', filterEvents);
   });
 </script>
