@@ -8,6 +8,27 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Stile per l'avatar immagine nella navbar (se necessario) */
+        /* .user-avatar img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; } */
+
+        /* Stili specifici per avatar nei commenti del modal admin, se non coperti da style.css esterno */
+        /* Questi stili sono pensati per essere COPERTI dal CSS fornito, ma li lascio commentati come riferimento */
+        /*
+        #manageCommentsModal .comment-header .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            flex-shrink: 0;
+            border: 1px solid var(--gray-light);
+        }
+        #manageCommentsModal .reply-form-admin {
+            margin-left: 50px; // Corrisponde a larghezza avatar + gap
+        }
+        */
+    </style>
 </head>
 <body class="page-dashboard">
 
@@ -21,7 +42,7 @@
         <div class="right-menu">
             <div class="user-dropdown" id="userDropdownContainer">
                 <button class="user-btn" onclick="toggleUserMenu()" aria-haspopup="true" aria-expanded="false">
-                    <span class="user-avatar" id="navbar-avatar">👤</span>
+                    <span class="user-avatar" id="navbar-avatar"><img src="images/logo.png" alt="Admin Icon" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle;"></span>
                     <span class="user-name" id="navbar-username">Admin</span>
                     <span class="dropdown-arrow">▼</span>
                 </button>
@@ -108,10 +129,13 @@
     <div class="modal-content">
         <span class="close-modal-btn" onclick="closeModal('manageCommentsModal')">&times;</span>
         <h3>Gestisci Commenti: <span id="commentsEventTitle"></span></h3>
-        <div class="modal-content-scrollable"><div id="commentsListContainer"><p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p></div></div>
+        <div class="modal-content-scrollable" id="commentsListContainer">
+            <p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p>
+        </div>
         <div id="commentsManagementFeedback" style="margin-top:1rem;"></div>
     </div>
 </div>
+
 
 <div id="manageBookingsModal" class="modal">
     <div class="modal-content">
@@ -173,6 +197,10 @@
 
     let allUpcomingEventsData = [];
     let allPastEventsData = [];
+    const defaultUserIconPath = '/uploads/icons/default_user.png'; // Path per avatar utenti
+    const adminAvatarPath = 'images/logo.png'; // Path per avatar admin "Eremo Frate Francesco"
+    const adminName = "Eremo Frate Francesco";
+
 
     // --- Navbar & Mobile Menu Logic ---
     const SnavbarContainer = document.getElementById('navbarContainer');
@@ -233,9 +261,9 @@
         }
     });
     function logout() {
-        localStorage.removeItem('adminUserEFF');
+        localStorage.removeItem('adminUserEFF'); // Assumendo che l'utente admin sia salvato qui
         alert('Logout effettuato.');
-        window.location.href = 'login_admin.html';
+        window.location.href = 'login_admin.html'; // O la pagina di login admin appropriata
     }
     // --- Fine Navbar & Mobile Menu ---
 
@@ -248,7 +276,6 @@
     function closeModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) modal.classList.remove('active');
-        // Solo resetta overflow se nessun altro modal o popup è attivo
         if (!document.querySelector('.modal.active') && !document.querySelector('.event-popup.active')) {
             document.body.style.overflow = '';
         }
@@ -258,11 +285,11 @@
             document.getElementById('existingMediaContainer').innerHTML = '<p>Caricamento media...</p>';
         }
         if (modalId === 'manageCommentsModal') {
-            document.getElementById('commentsListContainer').innerHTML = '<p>Caricamento commenti...</p>';
+            document.getElementById('commentsListContainer').innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p>';
             document.getElementById('commentsManagementFeedback').innerHTML = '';
         }
         if (modalId === 'manageBookingsModal') {
-            document.getElementById('bookingsListContainerModal').innerHTML = '<p>Caricamento prenotazioni...</p>';
+            document.getElementById('bookingsListContainerModal').innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento prenotazioni...</p>';
             document.getElementById('bookingsManagementFeedbackModal').innerHTML = '';
         }
     }
@@ -284,8 +311,12 @@
     function sanitizeText(text) {
         if (text === null || typeof text === 'undefined') return '';
         const element = document.createElement('div');
-        element.innerText = String(text);
+        element.innerText = String(text); // Changed from textContent for stricter sanitization if needed, but innerText is fine here.
         return element.innerHTML;
+    }
+    function sanitizeTextForHTML(str) { // Da evento_dettaglio_accesso, utile per innerHTML
+        if (typeof str !== 'string') str = String(str || '');
+        const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');
     }
     function sanitizeForAttribute(str) {
         if (typeof str !== 'string') return '';
@@ -293,16 +324,20 @@
     }
     function formatDbDate(dateString) {
         if (!dateString) return 'N/D';
-        const date = new Date(dateString.replace(/-/g, '/'));
-        if (isNaN(date.getTime())) return dateString;
-        return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        try {
+            const date = new Date(dateString.replace(/-/g, '/'));
+            if (isNaN(date.getTime())) return dateString; // Ritorna la stringa originale se non valida
+            return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        } catch (e) { return dateString; }
     }
     function formatMonthYear(dateString) {
         if (!dateString) return 'Data sconosciuta';
-        const date = new Date(dateString.replace(/-/g, '/'));
-        if (isNaN(date.getTime())) return 'Data non valida';
-        const options = { month: 'long', year: 'numeric' };
-        return new Intl.DateTimeFormat('it-IT', options).format(date);
+        try {
+            const date = new Date(dateString.replace(/-/g, '/'));
+            if (isNaN(date.getTime())) return 'Data non valida';
+            const options = { month: 'long', year: 'numeric' };
+            return new Intl.DateTimeFormat('it-IT', options).format(date);
+        } catch (e) { return 'Data non valida'; }
     }
     function getMonthIndexFromString(monthName) {
         const months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
@@ -311,7 +346,6 @@
     // --- Fine Funzioni Utility ---
 
     // --- Logica Pop-up Aggiungi/Modifica Evento ---
-    const addEventBtnDashboard = document.getElementById('addEventBtnDashboard'); // Rimosso dalla logica qui, gestito dalla card
     const eventPopupOverlayDashboard = document.getElementById('eventPopupOverlayDashboard');
     const eventPopupDashboard = document.getElementById('eventPopupDashboard');
     const closeEventPopupBtnDashboard = document.getElementById('closeEventPopupBtnDashboard');
@@ -350,15 +384,13 @@
             const eventDate = eventData.Data ? new Date(eventData.Data.replace(/-/g, '/')) : null;
             document.getElementById('event-date-dashboard').value = (eventDate && !isNaN(eventDate)) ? eventDate.toISOString().split('T')[0] : '';
             document.getElementById('event-time-dashboard').value = eventData.Durata || '';
-            document.getElementById('event-short-desc-dashboard').value = eventData.descrizione || '';
-            document.getElementById('event-long-desc-dashboard').value = eventData.descrizione_estesa || '';
+            document.getElementById('event-short-desc-dashboard').value = eventData.descrizione || ''; // Assicurati che i nomi dei campi corrispondano
+            document.getElementById('event-long-desc-dashboard').value = eventData.descrizione_estesa || ''; // Assicurati che i nomi dei campi corrispondano
             document.getElementById('event-prefix-dashboard').value = eventData.prefisso_relatore || 'Relatore';
             document.getElementById('event-speaker-dashboard').value = eventData.relatore || '';
             document.getElementById('event-association-dashboard').value = eventData.associazione || '';
-            // Per 'event-seats', quando si modifica, si mostra PostiDisponibili (quelli rimanenti).
-            // Il backend (gestione_eventi.php) dovrà interpretare questo campo come il *nuovo valore* per PostiDisponibili.
-            document.getElementById('event-seats-dashboard').value = eventData.PostiDisponibili !== null ? eventData.PostiDisponibili : '0';
-            document.getElementById('event-booking-dashboard').checked = !!eventData.FlagPrenotabile;
+            document.getElementById('event-seats-dashboard').value = eventData.PostiDisponibili !== null ? eventData.PostiDisponibili : (eventData.posti_configurati_totali || '0'); // Usa PostiDisponibili se presente, altrimenti i totali
+            document.getElementById('event-booking-dashboard').checked = !!eventData.FlagPrenotabile; // Assicurati che i nomi dei campi corrispondano
             voluntaryCheckboxDashboard.checked = eventData.costo !== null && parseFloat(eventData.costo) === 0;
             updatePriceFieldVisibilityDashboard();
             if (!voluntaryCheckboxDashboard.checked && eventData.costo !== null && parseFloat(eventData.costo) > 0) {
@@ -374,9 +406,12 @@
         } else { // Modalità Aggiungi
             eventPopupTitleDashboard.textContent = 'Aggiungi Nuovo Evento';
             eventIdInputDashboard.value = '';
-            document.getElementById('event-booking-dashboard').checked = true;
-            voluntaryCheckboxDashboard.checked = false;
+            document.getElementById('event-booking-dashboard').checked = true; // Default per nuovi eventi
+            voluntaryCheckboxDashboard.checked = false; // Default non volontario
             updatePriceFieldVisibilityDashboard();
+            // Default per posti, o lascialo vuoto per input manuale
+            document.getElementById('event-seats-dashboard').value = '50';
+            document.getElementById('event-prefix-dashboard').value = 'Relatore';
         }
         eventPopupOverlayDashboard.classList.add('active');
         eventPopupDashboard.classList.add('active');
@@ -387,12 +422,11 @@
     function closeEventPopupDashboard() {
         eventPopupOverlayDashboard.classList.remove('active');
         eventPopupDashboard.classList.remove('active');
-        if (!document.querySelector('.modal.active')) { // Solo se nessun altro modal è aperto
+        if (!document.querySelector('.modal.active')) {
             document.body.style.overflow = '';
         }
     }
 
-    // addEventBtnDashboard non è più un bottone globale, ma una card. L'event listener sarà sulla card.
     if (closeEventPopupBtnDashboard) closeEventPopupBtnDashboard.addEventListener('click', closeEventPopupDashboard);
 
     document.addEventListener('keydown', function(event) {
@@ -411,22 +445,27 @@
         eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';
         try {
             const formData = new FormData(this);
+            // L'action 'add_event' o 'update_event' sarà determinata dalla presenza di event-id
             formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
             const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
             const responseText = await response.text();
             let result;
             try { result = JSON.parse(responseText); }
             catch (jsonError) { throw new Error(`Risposta non JSON: ${responseText.substring(0, 200)}`); }
+
             if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
+
             if (result.success) {
-                eventFormMessageDashboard.textContent = result.message || 'OK!';
+                eventFormMessageDashboard.textContent = result.message || (formData.get('event-id') ? 'Evento aggiornato con successo!' : 'Evento aggiunto con successo!');
+                eventFormMessageDashboard.classList.remove('error');
                 eventFormMessageDashboard.classList.add('success');
-                fetchDashboardData();
+                fetchDashboardData(); // Ricarica i dati della dashboard
                 setTimeout(closeEventPopupDashboard, 1500);
-            } else { throw new Error(result.message || 'Errore salvataggio.'); }
+            } else { throw new Error(result.message || 'Errore durante il salvataggio dell\'evento.'); }
         } catch (error) {
-            console.error('Errore form evento:', error);
+            console.error('Errore nel form evento:', error);
             eventFormMessageDashboard.textContent = `Errore: ${error.message}`;
+            eventFormMessageDashboard.classList.remove('success');
             eventFormMessageDashboard.classList.add('error');
         } finally {
             eventFormMessageDashboard.style.display = 'block';
@@ -457,10 +496,10 @@
         const upcomingGrid = document.getElementById('upcomingEventsGrid');
         const pastGrid = document.getElementById('pastEventsGrid');
         if (!upcomingGrid || !pastGrid) return;
-        upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
-        pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
+        upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>';
+        pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento archivio eventi...</p>';
         try {
-            const response = await fetch('get_dashboard_event_data.php');
+            const response = await fetch('get_dashboard_event_data.php'); // Script PHP che ritorna i dati
             if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
             const data = await response.json();
             if (data.success) {
@@ -468,27 +507,31 @@
                 allPastEventsData = data.past_events || [];
                 applyFiltersAndRender();
             } else {
-                [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore: ${data.message || 'Dati errati.'}</p></div>`);
+                [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore nel caricamento dei dati: ${sanitizeText(data.message || 'Formato dati non corretto.')}</p></div>`);
             }
         } catch (error) {
             console.error('Errore fetchDashboardData:', error);
-            [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare: ${error.message}</p></div>`);
+            [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare gli eventi: ${sanitizeText(error.message)}</p></div>`);
         }
     }
 
     function applyFiltersAndRender() {
         const titleFilter = document.getElementById('searchTitleDashboard').value.toLowerCase().trim();
-        const dateFilter = document.getElementById('searchDateDashboard').value;
+        const dateFilter = document.getElementById('searchDateDashboard').value; // Formato YYYY-MM
         const speakerFilter = document.getElementById('searchSpeakerDashboard').value.toLowerCase().trim();
+
         const filterEvent = (event) => {
             const eventTitle = event.Titolo?.toLowerCase() || '';
-            const eventDate = event.Data || '';
+            const eventDate = event.Data || ''; // Formato YYYY-MM-DD
             const eventSpeaker = event.Relatore?.toLowerCase() || '';
+
             let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
             let dateMatch = !dateFilter || (eventDate && eventDate.substring(0, 7) === dateFilter);
             let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
+
             return titleMatch && dateMatch && speakerMatch;
         };
+
         renderEventsSection(allUpcomingEventsData.filter(filterEvent), 'upcomingEventsGrid', true);
         renderEventsSection(allPastEventsData.filter(filterEvent), 'pastEventsGrid', false);
     }
@@ -496,43 +539,44 @@
     function renderEventsSection(events, gridContainerId, isUpcoming) {
         const gridContainer = document.getElementById(gridContainerId);
         if (!gridContainer) return;
-        gridContainer.innerHTML = ''; // Pulisce la griglia prima di ripopolarla
+        gridContainer.innerHTML = '';
 
-        // Dentro la funzione renderEventsSection, quando isUpcoming è true:
         if (isUpcoming) {
-            const addEventElement = document.createElement('div'); // o 'article'
-            addEventElement.className = 'add-event-bar'; // NUOVA CLASSE!
-            addEventElement.innerHTML = `
-                <i class="fas fa-plus-circle"></i>
-                <span>Nuovo Evento</span>
-            `;
+            const addEventElement = document.createElement('div');
+            addEventElement.className = 'add-event-bar';
+            addEventElement.innerHTML = `<i class="fas fa-plus-circle"></i><span>Nuovo Evento</span>`;
             addEventElement.addEventListener('click', () => openEventPopupDashboard(null));
             gridContainer.appendChild(addEventElement);
         }
 
         if (events.length === 0) {
-            if (!isUpcoming) { // Solo se è la sezione "passati" e non ci sono eventi, mostra il messaggio
+            // Se è la sezione "upcoming" e c'è solo la barra "Nuovo Evento", mostra un messaggio più specifico.
+            if (isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar')) {
+                const p = document.createElement('p');
+                p.className = 'no-events-dashboard';
+                p.innerHTML = 'Nessun evento futuro in programma. Clicca su <i class="fas fa-plus-circle"></i> "Nuovo Evento" per aggiungerne uno.';
+                gridContainer.appendChild(p);
+            } else if (!isUpcoming) { // Per eventi passati
                 gridContainer.innerHTML += '<p class="no-events-dashboard">Nessun evento passato trovato o corrispondente ai filtri.</p>';
-            } else if (gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-new-event-card')) {
-                // Se c'è solo la card "Nuovo Evento" e nessun altro evento futuro
-                gridContainer.innerHTML += '<p class="no-events-dashboard">Nessun evento futuro. Clicca "+" per aggiungerne uno.</p>';
             }
             return;
         }
 
+        // Raggruppa per mese/anno
         const groupedByMonth = events.reduce((acc, event) => {
-            const monthYear = formatMonthYear(event.Data);
+            const monthYear = formatMonthYear(event.Data); // e.g., "Maggio 2024"
             if (!acc[monthYear]) acc[monthYear] = [];
             acc[monthYear].push(event);
             return acc;
         }, {});
 
+        // Ordina i gruppi mese/anno
         const sortedMonthYears = Object.keys(groupedByMonth).sort((a, b) => {
             const [monthAStr, yearAStr] = a.split(" ");
             const [monthBStr, yearBStr] = b.split(" ");
             const dateA = new Date(parseInt(yearAStr), getMonthIndexFromString(monthAStr));
             const dateB = new Date(parseInt(yearBStr), getMonthIndexFromString(monthBStr));
-            return isUpcoming ? dateA - dateB : dateB - dateA;
+            return isUpcoming ? dateA - dateB : dateB - dateA; // Ascendente per futuri, Discendente per passati
         });
 
         for (const monthYear of sortedMonthYears) {
@@ -540,23 +584,33 @@
             monthYearHeader.className = 'month-year-header';
             monthYearHeader.textContent = monthYear;
             gridContainer.appendChild(monthYearHeader);
-            // La griglia admin-event-grid è ora il gridContainer stesso per ogni sezione
-            groupedByMonth[monthYear].forEach(event => gridContainer.appendChild(createAdminEventCard(event)));
+
+            // Crea le card per quel mese/anno
+            groupedByMonth[monthYear].forEach(event => {
+                gridContainer.appendChild(createAdminEventCard(event));
+            });
         }
     }
+
 
     function createAdminEventCard(event) {
         const eventCard = document.createElement('article');
         eventCard.className = 'admin-event-card';
         eventCard.id = `admin-event-${event.IDEvento}`;
+
         const numPrenotazioni = event.elenco_prenotazioni?.length || 0;
         const partecipanti = event.posti_occupati || 0;
-        const postiConfigurati = event.posti_configurati_totali || 0;
+        const postiConfigurati = event.posti_configurati_totali || 0; // Assicurati che questo campo esista
         const commentCount = event.comment_count || 0;
         const mediaCount = event.media_count || 0;
+
         let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-admin.jpg';
+
+
         eventCard.innerHTML = `
-            <div class="admin-event-card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.Titolo)}" class="admin-event-card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+            <div class="admin-event-card-image-container">
+                <img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.Titolo)}" class="admin-event-card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
+            </div>
             <div class="admin-event-card-content">
                 <div class="admin-event-card-header">
                     <h3 class="admin-event-title">${sanitizeText(event.Titolo)} (ID: ${event.IDEvento})</h3>
@@ -564,35 +618,51 @@
                 </div>
                 <div class="admin-event-card-quick-stats">
                     <div class="stat-item" title="Prenotazioni"><i class="fas fa-ticket-alt"></i> ${numPrenotazioni} Pren.</div>
-                    <div class="stat-item" title="Partecipanti / Posti"><i class="fas fa-users"></i> ${partecipanti}/${postiConfigurati} Part.</div>
-                    <div class="stat-item" title="Media"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div>
-                    <div class="stat-item" title="Commenti"><i class="fas fa-comments"></i> ${commentCount} Comm.</div>
+                    <div class="stat-item" title="Partecipanti / Posti Config."><i class="fas fa-users"></i> ${partecipanti}/${postiConfigurati} Part.</div>
+                    <div class="stat-item" title="Media Caricati"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div>
+                    <div class="stat-item" title="Commenti Ricevuti"><i class="fas fa-comments"></i> ${commentCount} Comm.</div>
                 </div>
                 <div class="admin-event-card-actions top-actions">
-                    <button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Media"><i class="fas fa-photo-video"></i> Media</button>
-                    <button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Commenti"><i class="fas fa-comments"></i> Commenti</button>
-                    <button class="btn-admin btn-bookings" data-event-id="${event.IDEvento}" title="Prenotazioni"><i class="fas fa-list-alt"></i> Prenotazioni</button>
+                    <button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Gestisci Media"><i class="fas fa-photo-video"></i> Media</button>
+                    <button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Gestisci Commenti"><i class="fas fa-comments"></i> Commenti</button>
+                    <button class="btn-admin btn-bookings" data-event-id="${event.IDEvento}" title="Gestisci Prenotazioni"><i class="fas fa-list-alt"></i> Prenotazioni</button>
                 </div>
                 <div class="admin-event-card-actions bottom-actions">
-                     <button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="PDF"><i class="fas fa-file-pdf"></i> PDF</button>
-                     <button class="btn-admin btn-edit" data-event-id="${event.IDEvento}" title="Modifica"><i class="fas fa-edit"></i> Modifica</button>
-                     <button class="btn-admin btn-admin-danger btn-delete" data-event-id="${event.IDEvento}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button>
+                     <button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="Genera PDF Info Evento"><i class="fas fa-file-pdf"></i> PDF Info</button>
+                     <button class="btn-admin btn-edit" data-event-id="${event.IDEvento}" title="Modifica Evento"><i class="fas fa-edit"></i> Modifica</button>
+                     <button class="btn-admin btn-admin-danger btn-delete" data-event-id="${event.IDEvento}" title="Elimina Evento"><i class="fas fa-trash-alt"></i> Elimina</button>
                 </div>
             </div>`;
+
+        // Aggiungi event listener per i bottoni specifici della card
         eventCard.querySelector('.btn-edit').addEventListener('click', function() {
-            const eventToEdit = [...allUpcomingEventsData, ...allPastEventsData].find(e => e.IDEvento == this.dataset.eventId);
-            if (eventToEdit) openEventPopupDashboard(eventToEdit); else alert("Dati non trovati.");
+            const eventId = this.dataset.eventId;
+            const eventToEdit = [...allUpcomingEventsData, ...allPastEventsData].find(e => e.IDEvento == eventId);
+            if (eventToEdit) {
+                openEventPopupDashboard(eventToEdit);
+            } else {
+                alert("Dati dell'evento non trovati per la modifica.");
+            }
         });
         eventCard.querySelector('.btn-delete').addEventListener('click', function() {
-            const eventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => e.IDEvento == this.dataset.eventId);
-            confirmDeleteEvent(this.dataset.eventId, eventData ? eventData.Titolo : "evento");
+            const eventId = this.dataset.eventId;
+            const eventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => e.IDEvento == eventId);
+            const eventTitle = eventData ? eventData.Titolo : "questo evento";
+            confirmDeleteEvent(eventId, eventTitle);
         });
         eventCard.querySelector('.btn-bookings').addEventListener('click', function() {
-            const eventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => e.IDEvento == this.dataset.eventId);
-            if (eventData) openManageBookingsModal(eventData); else alert("Dati non trovati.");
+            const eventId = this.dataset.eventId;
+            const eventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => e.IDEvento == eventId);
+            if (eventData) {
+                openManageBookingsModal(eventData);
+            } else {
+                alert("Dati dell'evento non trovati per le prenotazioni.");
+            }
         });
+
         return eventCard;
     }
+
 
     // Listener per i filtri e reset
     document.getElementById('searchTitleDashboard').addEventListener('input', applyFiltersAndRender);
@@ -610,49 +680,96 @@
         const modalTitleEl = document.getElementById('bookingsEventTitle');
         const bookingsContainerEl = document.getElementById('bookingsListContainerModal');
         const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
+
         if (modalTitleEl) modalTitleEl.textContent = sanitizeText(eventData.Titolo);
         if (feedbackEl) feedbackEl.innerHTML = '';
-        if (bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento);
+
+        if (bookingsContainerEl) {
+            bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento);
+        }
         openModal('manageBookingsModal');
     }
+
     function renderGroupedBookings(bookings, eventId) {
-        if (!bookings || bookings.length === 0) return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione.</p>';
+        if (!bookings || bookings.length === 0) {
+            return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione per questo evento.</p>';
+        }
         let html = '';
         bookings.forEach(booking => {
             const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim();
-            const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto);
-            html += `<div class="user-booking-group"><h5>Prenotazione di: ${displayNomeUtente} <small>(${sanitizeText(booking.Contatto)})</small></h5><div class="single-booking-details"><p><strong>ID: ${booking.idPrenotazione}</strong> - Posti: ${booking.NumeroPosti}</p><strong>Partecipanti:</strong>${booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0 ? `<ul class="participant-list-inline">${booking.partecipanti_della_prenotazione.map(p => `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`).join('')}</ul>` : '<p><small>Nessun dettaglio.</small></p>'}<button class="btn-admin btn-admin-danger btn-sm" onclick="confirmCancelBookingInModal(${booking.idPrenotazione}, ${eventId}, ${booking.NumeroPosti}, '${sanitizeForAttribute(displayNomeUtente)}')" title="Annulla prenotazione"><i class="fas fa-times-circle"></i> Annulla</button></div></div>`;
+            const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto) || 'Utente Sconosciuto';
+            const contattoEmail = sanitizeText(booking.Contatto) || 'N/D';
+
+            html += `
+                <div class="user-booking-group">
+                    <h5>Prenotazione di: ${displayNomeUtente} <small>(Email: ${contattoEmail})</small></h5>
+                    <div class="single-booking-details">
+                        <p><strong>ID Prenotazione: ${booking.idPrenotazione}</strong> - Posti prenotati: ${booking.NumeroPosti}</p>
+                        <strong>Partecipanti dichiarati:</strong>`;
+            if (booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0) {
+                html += `<ul class="participant-list-inline">`;
+                booking.partecipanti_della_prenotazione.forEach(p => {
+                    html += `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`;
+                });
+                html += `</ul>`;
+            } else {
+                html += '<p><small>Nessun dettaglio partecipante fornito.</small></p>';
+            }
+            html += `<button class="btn-admin btn-admin-danger btn-sm" onclick="confirmCancelBookingInModal(${booking.idPrenotazione}, ${eventId}, ${booking.NumeroPosti}, '${sanitizeForAttribute(displayNomeUtente)}')" title="Annulla questa prenotazione"><i class="fas fa-times-circle"></i> Annulla Prenotazione</button>
+                    </div>
+                </div>`;
         });
         return html;
     }
+
+
     function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) {
-        if (confirm(`Annullare prenotazione ID ${idPrenotazione} (${numPosti} posti) di ${nomeUtente}?`)) {
+        if (confirm(`Sei sicuro di voler annullare la prenotazione ID ${idPrenotazione} (${numPosti} posti) effettuata da ${nomeUtente}? L'azione è irreversibile.`)) {
             cancelBookingInModal(idPrenotazione, eventId);
         }
     }
+
     async function cancelBookingInModal(idPrenotazione, eventIdForModalReload) {
         const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
-        if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento...</p>`;
+        if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento prenotazione in corso...</p>`;
         try {
-            const formData = new FormData(); formData.append('id_prenotazione', idPrenotazione);
-            const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData });
+            const formData = new FormData();
+            formData.append('id_prenotazione', idPrenotazione);
+            // Se il tuo script PHP si aspetta un'action, aggiungila:
+            // formData.append('action', 'cancel_booking');
+
+            const response = await fetch('annulla_prenotazione_admin.php', { // Assicurati che lo script PHP sia corretto
+                method: 'POST',
+                body: formData
+            });
             const result = await response.json();
+
             if (feedbackEl) {
                 if (result.success) {
                     feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`;
-                    await fetchDashboardData(); // Attendi che i dati siano ricaricati
+                    // Ricarica i dati della dashboard per riflettere i posti aggiornati e le prenotazioni
+                    await fetchDashboardData();
+                    // Riapri il modal delle prenotazioni con i dati aggiornati
                     const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => e.IDEvento == eventIdForModalReload);
-                    if(updatedEventData) openManageBookingsModal(updatedEventData); else closeModal('manageBookingsModal');
+                    if(updatedEventData) {
+                        openManageBookingsModal(updatedEventData); // Riapre il modal
+                    } else {
+                        closeModal('manageBookingsModal'); // Chiude se l'evento non è più trovato
+                    }
                 } else {
-                    feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare.')}</p>`;
+                    feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare la prenotazione.')}</p>`;
                 }
-                setTimeout(() => { if (feedbackEl) feedbackEl.innerHTML = ''; }, 7000);
             }
         } catch (error) {
-            console.error("Errore AJAX annullamento modal:", error);
-            if (feedbackEl) { feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore connessione: ${sanitizeText(error.message)}</p>`; setTimeout(() => { if (feedbackEl) feedbackEl.innerHTML = ''; }, 7000); }
+            console.error("Errore AJAX durante l'annullamento della prenotazione nel modal:", error);
+            if (feedbackEl) {
+                feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore di connessione o risposta non valida: ${sanitizeText(error.message)}</p>`;
+            }
         }
+        // Non rimuovere subito il feedback per darti tempo di leggerlo se il modal non si ricarica
+        // setTimeout(() => { if (feedbackEl) feedbackEl.innerHTML = ''; }, 7000);
     }
+
     // --- Fine Gestione Prenotazioni (Modal) ---
 
     // --- Gestione Media ---
@@ -662,157 +779,440 @@
         const existingMediaContainer = document.getElementById('existingMediaContainer');
         const feedbackDiv = document.getElementById('uploadMediaFeedback');
         const uploadForm = document.getElementById('uploadMediaForm');
+
         if (eventIdInput) eventIdInput.value = eventId;
         if (eventTitleEl) eventTitleEl.textContent = sanitizeText(eventTitle);
         if (uploadForm) uploadForm.reset();
         if (feedbackDiv) feedbackDiv.innerHTML = '';
-        if (existingMediaContainer) existingMediaContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media...</p>';
+        if (existingMediaContainer) existingMediaContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media esistenti...</p>';
+
         openModal('uploadMediaModal');
+
         try {
             const response = await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`);
+            if (!response.ok) throw new Error(`Errore HTTP ${response.status} nel recuperare i media.`);
             const result = await response.json();
-            if (result.success && result.media) renderExistingMedia(result.media, eventId);
-            else if (existingMediaContainer) existingMediaContainer.innerHTML = `<p>Nessun media o errore: ${sanitizeText(result.message || 'Sconosciuto.')}</p>`;
+
+            if (result.success && result.media) {
+                renderExistingMedia(result.media, eventId);
+            } else if (existingMediaContainer) {
+                existingMediaContainer.innerHTML = `<p>${sanitizeText(result.message || 'Nessun media trovato o errore sconosciuto.')}</p>`;
+            }
         } catch (error) {
-            console.error('Errore recupero media:', error);
-            if (existingMediaContainer) existingMediaContainer.innerHTML = `<p>Errore connessione: ${sanitizeText(error.message)}</p>`;
+            console.error('Errore nel recupero dei media:', error);
+            if (existingMediaContainer) existingMediaContainer.innerHTML = `<p class="error-message">Errore di connessione: ${sanitizeText(error.message)}</p>`;
         }
     }
+
     function renderExistingMedia(mediaItems, eventId) {
         const container = document.getElementById('existingMediaContainer');
         if (!container) return;
-        if (mediaItems.length === 0) { container.innerHTML = '<p>Nessun media attualmente caricato.</p>'; return; }
+
+        if (mediaItems.length === 0) {
+            container.innerHTML = '<p>Nessun media attualmente caricato per questo evento.</p>';
+            return;
+        }
+
         let html = '<div class="existing-media-grid">';
         mediaItems.forEach(item => {
-            const filename = item.url_media ? item.url_media.split('/').pop() : 'File';
+            const filename = item.url_media ? item.url_media.split('/').pop() : 'File Sconosciuto';
+            const itemDesc = sanitizeText(item.Descrizione || 'Nessuna descrizione');
+            const itemUrl = sanitizeForAttribute(item.url_media || '#');
+
             html += `<div class="existing-media-item">`;
-            if (item.tipo_media === 'image') html += `<img src="${item.url_media}" alt="${sanitizeText(item.Descrizione) || filename}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="media-icon-placeholder" style="display:none;"><i class="fas fa-image"></i></div>`;
-            else if (item.tipo_media === 'video') html += `<div class="media-icon-placeholder" title="Video: ${sanitizeText(filename)}"><i class="fas fa-video"></i></div>`;
-            else html += `<a href="${item.url_media}" target="_blank" title="Apri ${sanitizeText(filename)}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`;
-            html += `<p class="media-filename" title="${item.url_media}">${sanitizeText(filename)}</p>`;
-            if (item.Descrizione) html += `<p class="media-description"><em>${sanitizeText(item.Descrizione)}</em></p>`;
-            html += `<button class="btn-admin btn-admin-danger btn-sm btn-delete-media" data-media-id="${item.id_media}" data-event-id="${eventId}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div>`;
+            if (item.tipo_media === 'image') {
+                html += `<a href="${itemUrl}" target="_blank" title="Visualizza immagine: ${sanitizeForAttribute(filename)} - ${itemDesc}"><img src="${itemUrl}" alt="${itemDesc}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;"><i class="fas fa-image"></i></div>`;
+            } else if (item.tipo_media === 'video') {
+                html += `<a href="${itemUrl}" target="_blank" title="Visualizza video: ${sanitizeForAttribute(filename)} - ${itemDesc}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`;
+            } else { // PDF o altro
+                html += `<a href="${itemUrl}" target="_blank" title="Apri file: ${sanitizeForAttribute(filename)} - ${itemDesc}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`;
+            }
+            html += `<p class="media-filename" title="${sanitizeForAttribute(item.url_media)}">${sanitizeText(filename)}</p>`;
+            if (item.Descrizione) {
+                html += `<p class="media-description" title="${itemDesc}">${itemDesc}</p>`;
+            }
+            html += `<button class="btn-admin btn-admin-danger btn-sm btn-delete-media" data-media-id="${item.id_media}" data-event-id="${eventId}" title="Elimina questo media"><i class="fas fa-trash-alt"></i> Elimina</button></div>`;
         });
-        html += '</div>'; container.innerHTML = html;
+        html += '</div>';
+        container.innerHTML = html;
+
+        // Aggiungi event listener ai nuovi bottoni delete
         container.querySelectorAll('.btn-delete-media').forEach(button => {
-            button.addEventListener('click', function() { if (confirm('Eliminare questo media?')) deleteMediaItem(this.dataset.mediaId, this.dataset.eventId); });
+            button.addEventListener('click', function() {
+                if (confirm('Sei sicuro di voler eliminare questo media? L\'azione è irreversibile.')) {
+                    deleteMediaItem(this.dataset.mediaId, this.dataset.eventId);
+                }
+            });
         });
     }
+
+
     async function deleteMediaItem(mediaId, eventId) {
         const feedbackDiv = document.getElementById('uploadMediaFeedback');
-        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
+        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione media in corso...</p>';
         try {
-            const formData = new FormData(); formData.append('action', 'delete_event_media'); formData.append('media_id', mediaId);
-            const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
+            const formData = new FormData();
+            formData.append('action', 'delete_event_media');
+            formData.append('media_id', mediaId);
+            // Potrebbe essere necessario inviare anche event_id se il backend lo richiede per validazione
+            // formData.append('event_id', eventId);
+
+
+            const response = await fetch('manage_event_media.php', {
+                method: 'POST',
+                body: formData
+            });
             const result = await response.json();
+
             if (result.success) {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento");
-                fetchDashboardData();
-            } else if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;
+                // Ricarica la lista dei media nel modal e aggiorna il conteggio nella card dell'evento
+                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); // Ricarica i media nel modal
+                fetchDashboardData(); // Aggiorna i dati della dashboard (incluso il conteggio media)
+            } else {
+                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore durante l'eliminazione: ${sanitizeText(result.message)}</p>`;
+            }
         } catch (error) {
-            console.error('Errore eliminazione media:', error);
-            if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore connessione: ${sanitizeText(error.message)}</p>`;
+            console.error('Errore AJAX durante l\'eliminazione del media:', error);
+            if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore di connessione: ${sanitizeText(error.message)}</p>`;
         }
         setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 4000);
     }
+
     const uploadMediaForm = document.getElementById('uploadMediaForm');
     if(uploadMediaForm) {
         uploadMediaForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const eventId = document.getElementById('uploadMediaEventId').value;
             const feedbackDiv = document.getElementById('uploadMediaFeedback');
-            if (document.getElementById('mediaFiles').files.length === 0) { feedbackDiv.innerHTML = '<p class="error-message">Seleziona almeno un file.</p>'; return; }
-            feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
-            const formData = new FormData(this); formData.set('action', 'upload_media'); formData.set('event_id', eventId);
+            const mediaFilesInput = document.getElementById('mediaFiles');
+
+            if (mediaFilesInput.files.length === 0) {
+                feedbackDiv.innerHTML = '<p class="error-message">Devi selezionare almeno un file da caricare.</p>';
+                return;
+            }
+            feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media in corso...</p>';
+
+            const formData = new FormData(this); // 'this' è il form
+            formData.set('action', 'upload_media'); // Assicurati che 'event_id' sia già nel form o aggiungilo
+            // formData.set('event_id', eventId); // Già presente come hidden input
+
             try {
-                const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
+                const response = await fetch('manage_event_media.php', {
+                    method: 'POST',
+                    body: formData
+                });
                 const result = await response.json();
+
                 if (result.success) {
                     feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                    openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento");
-                    fetchDashboardData(); this.reset();
-                } else feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;
-            } catch (error) { console.error('Errore uploadMedia:', error); feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`; }
+                    this.reset(); // Resetta il form dopo l'upload
+                    openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); // Ricarica media
+                    fetchDashboardData(); // Aggiorna conteggio nella dashboard
+                } else {
+                    feedbackDiv.innerHTML = `<p class="error-message">Errore durante l'upload: ${sanitizeText(result.message)}</p>`;
+                }
+            } catch (error) {
+                console.error('Errore AJAX durante l\'upload dei media:', error);
+                feedbackDiv.innerHTML = `<p class="error-message">Errore di connessione o risposta non valida: ${sanitizeText(error.message)}</p>`;
+            }
             setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 5000);
         });
     }
     // --- Fine Gestione Media ---
 
-    // --- Gestione Commenti ---
+    // --- Gestione Commenti (Nuova con Reply Admin) ---
+    let currentEventIdForComments = null; // Variabile globale per l'ID evento corrente nel modal commenti
+
     async function openManageCommentsModal(eventId, eventTitle) {
+        currentEventIdForComments = eventId; // Salva l'ID evento
         const titleEl = document.getElementById('commentsEventTitle');
-        const listEl = document.getElementById('commentsListContainer');
+        const listEl = document.getElementById('commentsListContainer'); // Questo sarà il contenitore UL
         const feedbackEl = document.getElementById('commentsManagementFeedback');
+
         if(titleEl) titleEl.textContent = sanitizeText(eventTitle);
-        if(listEl) listEl.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
-        if(feedbackEl) feedbackEl.innerHTML = '';
+        if(listEl) listEl.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p>'; // Messaggio di caricamento
+        if(feedbackEl) feedbackEl.innerHTML = ''; // Pulisce feedback precedenti
+
         openModal('manageCommentsModal');
+
         try {
             const response = await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`);
+            if (!response.ok) throw new Error(`Errore HTTP ${response.status}`);
             const result = await response.json();
-            if (result.success && result.comments) { if(listEl) renderCommentsForAdminThreaded(result.comments, eventId, listEl); }
-            else if(listEl) listEl.innerHTML = `<p>${sanitizeText(result.message || 'Nessun commento.')}</p>`;
-        } catch (error) { console.error('Errore fetchComments:', error); if(listEl) listEl.innerHTML = `<p>Impossibile caricare: ${sanitizeText(error.message)}</p>`; }
+
+            if (result.success && result.comments) {
+                if(listEl) renderCommentsForAdminThreaded(result.comments, eventId, listEl);
+            } else {
+                if(listEl) listEl.innerHTML = `<p>${sanitizeText(result.message || 'Nessun commento trovato per questo evento.')}</p>`;
+            }
+        } catch (error) {
+            console.error('Errore nel fetch dei commenti:', error);
+            if(listEl) listEl.innerHTML = `<p class="error-message">Impossibile caricare i commenti: ${sanitizeText(error.message)}</p>`;
+        }
     }
+
     function renderCommentsForAdminThreaded(comments, eventId, parentElement, depth = 0) {
-        if (depth === 0 && parentElement) parentElement.innerHTML = '';
-        if (!comments || comments.length === 0) { if (depth === 0 && parentElement) parentElement.innerHTML = '<p>Nessun commento.</p>'; return; }
-        const ul = document.createElement('ul');
-        ul.className = depth > 0 ? 'comment-replies-list' : 'comment-thread-list';
+        if (depth === 0) {
+            parentElement.innerHTML = ''; // Pulisce il contenitore
+            if (!comments || comments.length === 0) {
+                parentElement.innerHTML = '<p style="text-align:center; margin:1rem 0;">Nessun commento da visualizzare.</p>';
+                return;
+            }
+            const ul = document.createElement('ul');
+            ul.className = 'comments-list-admin-styled'; // Classe per la lista principale
+            parentElement.appendChild(ul);
+            parentElement = ul; // Ora il parentElement per i commenti di primo livello è l'UL
+        }
+
         comments.forEach(comment => {
-            const li = document.createElement('li'); li.className = 'comment-item-admin';
-            li.innerHTML = `<div class="comment-item-content"><p><strong>${sanitizeText(comment.utente_display_name)}</strong> <small>(${sanitizeText(comment.data_creazione_formattata)}) [ID: ${comment.Progressivo}${comment.CodRisposta ? `, Risp. a ${comment.CodRisposta}` : ''}]</small></p><p class="comment-text-admin"><em>"${sanitizeText(comment.Descrizione)}"</em></p></div><button class="btn-admin btn-admin-danger btn-sm" onclick="deleteAdminComment(${comment.Progressivo}, ${eventId})" title="Elimina"><i class="fas fa-trash-alt"></i></button>`;
-            (depth === 0 || (parentElement && parentElement.tagName === 'UL')) ? ul.appendChild(li) : parentElement?.appendChild(li);
-            if (comment.replies && comment.replies.length > 0) renderCommentsForAdminThreaded(comment.replies, eventId, li, depth + 1);
+            const commentItem = document.createElement('li'); // Ogni commento è un LI
+            commentItem.className = 'comment-item-admin-styled';
+            commentItem.id = `admin-comment-${comment.Progressivo}`;
+
+            // Verifica se è una risposta dell'admin
+            const isAdminReply = comment.utente_display_name === adminName || (comment.is_admin_reply === true || comment.is_admin_reply === 1); // Assumendo un flag dal backend
+            if (isAdminReply) {
+                commentItem.classList.add('admin-reply-highlight');
+            }
+
+            const commenterAvatar = isAdminReply ? adminAvatarPath : (comment.icon_path || defaultUserIconPath);
+            const commenterName = sanitizeText(comment.utente_display_name || 'Utente Anonimo');
+            const commentDate = sanitizeText(comment.data_creazione_formattata || 'Data non disponibile');
+            const commentText = sanitizeTextForHTML(comment.Descrizione); // Usa sanitizeTextForHTML per preservare <br>
+
+            commentItem.innerHTML = `
+                <div class="comment-header">
+                    <img src="${commenterAvatar}" alt="Avatar di ${commenterName}" class="user-avatar" onerror="this.onerror=null;this.src='${isAdminReply ? adminAvatarPath : defaultUserIconPath}';">
+                    <div class="comment-meta">
+                        <strong>${commenterName}</strong>
+                        <small>${commentDate}</small>
+                        <small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta ? ` | Risposta a: ${comment.CodRisposta}` : ''}</small>
+                    </div>
+                </div>
+                <div class="comment-text-admin">${commentText}</div>
+                <div class="comment-actions-admin">
+                    <button class="btn-admin btn-admin-reply" data-comment-id="${comment.Progressivo}" title="Rispondi a questo commento"><i class="fas fa-reply"></i> Rispondi</button>
+                    <button class="btn-admin btn-admin-danger btn-admin-delete-comment" data-comment-id="${comment.Progressivo}" title="Elimina questo commento"><i class="fas fa-trash-alt"></i> Elimina</button>
+                </div>
+                <div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}">
+                    <form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}">
+                        <textarea name="Descrizione" placeholder="Scrivi la tua risposta come ${adminName}..." rows="3" required aria-label="Testo della risposta admin"></textarea>
+                        <div class="form-actions-reply">
+                            <button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia Risposta</button>
+                        </div>
+                        <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em;"></div>
+                    </form>
+                </div>
+            `;
+
+            parentElement.appendChild(commentItem);
+
+            // Gestione risposte nidificate
+            if (comment.replies && comment.replies.length > 0) {
+                const repliesContainer = document.createElement('ul');
+                repliesContainer.className = 'comment-replies-list-styled'; // Classe per la lista delle risposte
+                commentItem.appendChild(repliesContainer);
+                renderCommentsForAdminThreaded(comment.replies, eventId, repliesContainer, depth + 1);
+            }
         });
-        if (depth === 0 && parentElement && ul.hasChildNodes()) parentElement.appendChild(ul);
-        else if (depth === 0 && parentElement && !parentElement.hasChildNodes()) parentElement.innerHTML = '<p>Nessun commento.</p>';
+        attachAdminCommentListeners(parentElement);
     }
-    async function deleteAdminComment(commentId, eventIdForReload) {
-        if (!confirm('Eliminare questo commento e risposte dirette?')) return;
-        const feedbackDiv = document.getElementById('commentsManagementFeedback');
-        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
+
+    function attachAdminCommentListeners(container) {
+        container.querySelectorAll('.btn-admin-reply').forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.dataset.commentId;
+                const replyFormDiv = document.getElementById(`reply-form-admin-${commentId}`);
+                if (replyFormDiv) {
+                    const isActive = replyFormDiv.classList.toggle('active');
+                    if(isActive) {
+                        const textarea = replyFormDiv.querySelector('textarea');
+                        if (textarea) textarea.focus();
+                    }
+                    const localMsg = replyFormDiv.querySelector('.form-message-local');
+                    if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }
+                }
+            });
+        });
+
+        container.querySelectorAll('.btn-admin-delete-comment').forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.dataset.commentId;
+                // currentEventIdForComments dovrebbe essere già impostato quando il modal è stato aperto
+                if (currentEventIdForComments) {
+                    deleteAdminComment(commentId, currentEventIdForComments);
+                } else {
+                    console.error("ID Evento non disponibile per eliminare il commento.");
+                    alert("Errore: ID evento mancante.");
+                }
+            });
+        });
+
+        container.querySelectorAll('.reply-form-admin form').forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const eventId = this.dataset.eventId; // ID Evento originale del thread
+                await handleAdminReplySubmit(this, eventId);
+            });
+        });
+    }
+
+    async function handleAdminReplySubmit(formElement, eventId) {
+        const parentCommentId = formElement.dataset.parentCommentId;
+        const replyText = formElement.querySelector('textarea[name="Descrizione"]').value.trim();
+        const feedbackEl = formElement.querySelector('.form-message-local');
+        const submitBtn = formElement.querySelector('button[type="submit"]');
+
+        if (!replyText) {
+            if(feedbackEl) { feedbackEl.textContent = 'La risposta non può essere vuota.'; feedbackEl.className = 'form-message-local error-message'; feedbackEl.style.display='block'; }
+            return;
+        }
+
+        const originalBtnHTML = submitBtn.innerHTML;
+        if(submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-mini"></span> Invio...'; }
+        if(feedbackEl) { feedbackEl.textContent = ''; feedbackEl.style.display = 'none';}
+
         try {
-            const formData = new FormData(); formData.append('action', 'delete_comment'); formData.append('comment_id', commentId);
-            const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
+            const formData = new FormData();
+            formData.append('action', 'submit_admin_reply');
+            formData.append('event_id', eventId);
+            formData.append('comment_id', parentCommentId); // ID del commento a cui si risponde
+            formData.append('reply_text', replyText);
+            formData.append('admin_name', adminName); // Invia il nome dell'admin
+
+            const response = await fetch('manage_comments_admin.php', {
+                method: 'POST',
+                body: formData
+            });
             const result = await response.json();
+
+            if (result.success) {
+                if(feedbackEl) {
+                    feedbackEl.textContent = 'Risposta inviata con successo!';
+                    feedbackEl.className = 'form-message-local success-message';
+                    feedbackEl.style.display = 'block';
+                    setTimeout(() => { if(feedbackEl) feedbackEl.style.display = 'none'; }, 3000);
+                }
+                formElement.reset();
+                formElement.closest('.reply-form-admin').classList.remove('active');
+                // Ricarica i commenti nel modal
+                await openManageCommentsModal(eventId, document.getElementById('commentsEventTitle')?.textContent || "Evento");
+                fetchDashboardData(); // Aggiorna anche il conteggio nella dashboard
+            } else {
+                throw new Error(result.message || 'Errore durante l\'invio della risposta.');
+            }
+        } catch (error) {
+            console.error("Errore invio risposta admin:", error);
+            if(feedbackEl) {
+                feedbackEl.textContent = `Errore: ${sanitizeText(error.message)}`;
+                feedbackEl.className = 'form-message-local error-message';
+                feedbackEl.style.display = 'block';
+            }
+        } finally {
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
+        }
+    }
+
+
+    async function deleteAdminComment(commentId, eventIdForReload) {
+        if (!confirm('Sei sicuro di voler eliminare questo commento e tutte le sue eventuali risposte? L\'azione è irreversibile.')) return;
+
+        const feedbackDiv = document.getElementById('commentsManagementFeedback');
+        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione commento in corso...</p>';
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'delete_comment');
+            formData.append('comment_id', commentId);
+            // formData.append('event_id', eventIdForReload); // Potrebbe servire al backend per validazione
+
+            const response = await fetch('manage_comments_admin.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
             if (result.success) {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                openManageCommentsModal(eventIdForReload, document.getElementById('commentsEventTitle')?.textContent || "Evento");
-                fetchDashboardData();
-            } else if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;
-        } catch (error) { console.error('Errore deleteComment:', error); if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`; }
+                // Ricarica i commenti nel modal dopo l'eliminazione
+                await openManageCommentsModal(eventIdForReload, document.getElementById('commentsEventTitle')?.textContent || "Evento");
+                fetchDashboardData(); // Aggiorna il conteggio nella dashboard
+            } else {
+                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore durante l'eliminazione: ${sanitizeText(result.message)}</p>`;
+            }
+        } catch (error) {
+            console.error('Errore AJAX durante l\'eliminazione del commento:', error);
+            if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore di connessione: ${sanitizeText(error.message)}</p>`;
+        }
         setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 5000);
     }
+
     // --- Fine Gestione Commenti ---
+
 
     // --- Gestione Eliminazione Evento ---
     async function confirmDeleteEvent(eventId, eventTitle) {
-        if (!confirm(`Eliminare evento "${eventTitle}" (ID: ${eventId}) e tutti i dati associati?`)) return;
+        if (!confirm(`ATTENZIONE: Sei sicuro di voler eliminare l'evento "${sanitizeText(eventTitle)}" (ID: ${eventId})? Questa azione eliminerà anche tutte le prenotazioni, i media e i commenti associati in modo permanente. L'operazione non è reversibile.`)) return;
+
         const cardEl = document.getElementById(`admin-event-${eventId}`);
-        if (cardEl) cardEl.style.opacity = '0.5';
+        if (cardEl) cardEl.style.opacity = '0.5'; // Feedback visivo durante l'operazione
+
         try {
-            const formData = new FormData(); formData.append('action', 'delete_event'); formData.append('event_id', eventId);
-            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+            const formData = new FormData();
+            formData.append('action', 'delete_event');
+            formData.append('event_id', eventId);
+
+            const response = await fetch('gestione_eventi.php', { // Assicurati che lo script sia corretto
+                method: 'POST',
+                body: formData
+            });
             const result = await response.json();
-            alert(sanitizeText(result.message));
-            if (result.success) fetchDashboardData(); else if (cardEl) cardEl.style.opacity = '1';
+
+            alert(sanitizeText(result.message)); // Mostra il messaggio del server
+
+            if (result.success) {
+                fetchDashboardData(); // Ricarica la lista degli eventi
+            } else {
+                if (cardEl) cardEl.style.opacity = '1'; // Ripristina l'opacità se l'eliminazione fallisce
+            }
         } catch (error) {
-            console.error('Errore deleteEvent:', error); alert(`Errore: ${sanitizeText(error.message)}`);
-            if (cardEl) cardEl.style.opacity = '1';
+            console.error('Errore durante l\'eliminazione dell\'evento:', error);
+            alert(`Errore: ${sanitizeText(error.message)}`);
+            if (cardEl) cardEl.style.opacity = '1'; // Ripristina l'opacità in caso di errore
         }
     }
     // --- Fine Gestione Eliminazione Evento ---
 
     // Inizializzazione Pagina
     document.addEventListener('DOMContentLoaded', () => {
-        updatePriceFieldVisibilityDashboard();
-        if (addEventBtnDashboard) { // Nascondi inizialmente se il tab di default non è "upcoming"
-            const initialActiveTab = document.querySelector('.event-tab-button.active');
-            addEventBtnDashboard.style.display = (initialActiveTab && initialActiveTab.dataset.tab === 'upcoming') ? 'flex' : 'none';
+        const adminUserString = localStorage.getItem('adminUserEFF');
+        if (!adminUserString) {
+            // alert('Accesso non autorizzato. Verrai reindirizzato al login.');
+            // window.location.href = 'login_admin.html'; // O altra pagina di login
+            // return; // Interrompi l'esecuzione se non loggato
+        } else {
+            try {
+                const adminUser = JSON.parse(adminUserString);
+                const navbarUsername = document.getElementById('navbar-username');
+                if (navbarUsername && adminUser.nome) { // Assumendo che l'oggetto utente admin abbia una proprietà 'nome'
+                    navbarUsername.textContent = adminUser.nome;
+                }
+                // Potresti voler aggiornare anche l'avatar della navbar se presente
+                const navbarAvatarImg = document.querySelector('#navbar-avatar img');
+                if (navbarAvatarImg && adminUser.iconPath) { // Assumendo iconPath per l'admin
+                    navbarAvatarImg.src = adminUser.iconPath;
+                } else if (navbarAvatarImg) {
+                    navbarAvatarImg.src = 'images/logo.png'; // Fallback icon
+                }
+
+
+            } catch(e) { console.error("Errore parsing dati admin:", e); }
         }
-        fetchDashboardData();
+
+
+        updatePriceFieldVisibilityDashboard();
+        fetchDashboardData(); // Carica i dati iniziali della dashboard
     });
     // === FINE BLOCCO SCRIPT COMPLETO ===
 </script>
