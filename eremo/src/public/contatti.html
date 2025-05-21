@@ -1,86 +1,238 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta
-          name="description"
-          content="Contatta i volontari dell'Eremo Frate Francesco tramite telefono o email"
-  />
-  <link rel="icon" href="images/logo.png" type="image/x-icon" />
-  <title>Contatti - Eremo Frate Francesco</title>
-  <link rel="stylesheet" href="style.css" />
-  <link
-          href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-  />
-  <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-  />
-  <style>
-    /* Stili aggiuntivi per coerenza e messaggi di errore */
-    .login-popup input.form-control.error-border {
-      border-color: var(--danger, red) !important;
-    }
-    .login-popup input:-webkit-autofill,
-    .login-popup input:-webkit-autofill:hover,
-    .login-popup input:-webkit-autofill:focus {
-      -webkit-box-shadow: 0 0 0px 1000px var(--white, white) inset !important;
-      -webkit-text-fill-color: var(--dark, #333) !important;
-    }
-    .form-message.error {
-      color: var(--danger, red);
-      background-color: rgba(var(--danger-rgb, 231, 76, 60), 0.1);
-      border: 1px solid rgba(var(--danger-rgb, 231, 76, 60), 0.3);
-      padding: 0.75rem;
-      border-radius: 8px;
-      font-size: 0.9em;
-      margin-top: 0.5em;
-      text-align: left;
-    }
-    .spinner-mini-light { /* Spinner per bottoni */
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      border: 2px solid rgba(0,0,0,0.2); /* Colore base spinner */
-      border-radius: 50%;
-      border-top-color: #000; /* Colore del loader che gira */
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-left: 5px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    /* Assicurati che .terms-checkbox sia stilizzato se non lo è già globalmente in style.css */
-    .terms-checkbox {
-      text-align: left;
-      font-size: 0.9em;
-      margin-top: 0.5rem;
-      margin-bottom: 1rem; /* Default da style.css è .mb-3 */
-      color: var(--gray-dark);
-    }
-    .terms-checkbox input[type="checkbox"] {
-      margin-right: 0.5rem;
-      vertical-align: middle;
-    }
-    .terms-checkbox label {
-      font-weight: normal;
-      color: var(--gray-dark);
-    }
-    .terms-checkbox a {
-      color: var(--primary);
-      text-decoration: underline;
-    }
-  </style>
-</head>
-<body>
-<header class="navbar-container" id="navbarContainer">
-  <nav class="navbar">
-    <div class="logo">
-      <a href="index.html">
-        <span class="emoji">🏔️</span>
-        <h2>Eremo Frate Francesco</h2>
-      </a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Contatta i volontari dell'Eremo Frate Francesco tramite telefono o email"
+    />
+    <link rel="icon" href="images/logo.png" type="image/x-icon" />
+    <title>Contatti - Eremo Frate Francesco</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="navbar-container" id="navbarContainer">
+      <nav class="navbar">
+        <div class="logo">
+          <a href="index.html">
+            <span class="emoji">🏔️</span>
+            <h2>Eremo Frate Francesco</h2>
+          </a>
+        </div>
+        <div class="menu">
+          <a href="eventiincorso.html">Calendario attività</a>
+          <a href="eventipassati.html">Archivio attività</a>
+          <span class="separator">|</span>
+          <a href="incontrisullaparola.html">Incontri sulla parola</a>
+          <span class="separator">|</span>
+          <a href="dovesiamo.html">Dove siamo</a>
+          <a href="contatti.html" class="active">Contatti</a>
+        </div>
+        <div class="right-menu">
+          <button id="login-btn" class="login-btn">Accedi</button>
+          <button
+            class="hamburger"
+            onclick="toggleMobileMenu()"
+            aria-label="Toggle menu"
+          >
+            ☰
+          </button>
+        </div>
+      </nav>
+      <div class="mobile-menu" id="mobileMenu">
+        <a href="eventiincorso.html" onclick="closeMobileMenu()"
+          >Calendario attività</a
+        >
+        <a href="eventipassati.html" onclick="closeMobileMenu()"
+          >Archivio attività</a
+        >
+        <a href="incontrisullaparola.html" onclick="closeMobileMenu()"
+          >Incontri sulla parola</a
+        >
+        <a href="dovesiamo.html" onclick="closeMobileMenu()">Dove siamo</a>
+        <a href="contatti.html" onclick="closeMobileMenu()">Contatti</a>
+        <a
+          href="#"
+          id="login-btn-mobile"
+          onclick="openLoginPopup(); closeMobileMenu();"
+          >Accedi</a
+        >
+      </div>
+    </header>
+
+    <main>
+      <div class="container section-padding">
+        <h1 class="text-center mb-4">Contattaci</h1>
+        <p
+          class="text-center mb-4"
+          style="max-width: 700px; margin-left: auto; margin-right: auto"
+        >
+          Siamo a disposizione per informazioni sulle nostre attività,
+          sull'ospitalità o per qualsiasi altra domanda. Non esitare a
+          contattarci!
+        </p>
+
+        <div class="contatti-grid">
+          <div class="contatto-card">
+            <div class="contatto-icon">
+              <i
+                class="fas fa-mobile-alt fa-2x"
+                style="color: var(--secondary)"
+              ></i>
+            </div>
+            <h3>Referente Ospitalità</h3>
+            <p>Per informazioni specifiche sui ritiri e l'accoglienza.</p>
+            <p style="font-weight: bold; font-size: 1.1rem">+39 098 765432</p>
+            <button
+              class="btn-contatto"
+              onclick="copyPhoneNumber('0987654321', this)"
+            >
+              <i class="fas fa-copy" style="margin-right: 5px"></i> Copia Numero
+            </button>
+          </div>
+
+          <div class="contatto-card">
+            <div class="contatto-icon">
+              <i
+                class="fas fa-envelope fa-2x"
+                style="color: var(--secondary)"
+              ></i>
+            </div>
+            <h3>Indirizzo Email</h3>
+            <p>Per richieste scritte e invio documentazione.</p>
+            <p style="font-weight: bold; font-size: 1.1rem">
+              info.eremofrancesco@email.it
+            </p>
+            <a href="mailto:info.eremofrancesco@email.it" class="btn-contatto">
+              <i class="fas fa-paper-plane" style="margin-right: 5px"></i>
+              Scrivici
+            </a>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <h2 class="mb-3">Dove Trovarci</h2>
+          <p>Via San Vito, 24027 Nembro BG</p>
+          <a
+            href="dovesiamo.html"
+            class="btn-contatto"
+            style="background-color: var(--accent)"
+          >
+            <i class="fas fa-map-marked-alt" style="margin-right: 5px"></i> Vedi
+            Mappa e Indicazioni
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <div class="login-popup-overlay" id="loginOverlay"></div>
+    <div class="login-popup" id="loginPopup">
+      <button class="close-popup" id="closePopup" aria-label="Chiudi popup">
+        &times;
+      </button>
+      <div class="login-tabs">
+        <div class="login-tab active" data-tab="login">Accedi</div>
+        <div class="login-tab" data-tab="register">Registrati</div>
+      </div>
+      <form class="login-form active" id="loginForm" method="POST">
+        <div class="form-group mb-3">
+          <label for="login-email">Email</label>
+          <input
+            type="email"
+            id="login-email"
+            name="login-email"
+            class="form-control"
+            required
+            autocomplete="email"
+          />
+        </div>
+        <div class="form-group mb-3">
+          <label for="login-password">Password</label>
+          <input
+            type="password"
+            id="login-password"
+            name="login-password"
+            class="form-control"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-popup">Accedi</button>
+        </div>
+      </form>
+      <form class="login-form" id="registerForm" method="POST">
+        <div class="form-group mb-3">
+          <label for="register-name">Nome</label>
+          <input
+            type="text"
+            id="register-name"
+            name="register-name"
+            class="form-control"
+            required
+            autocomplete="given-name"
+          />
+        </div>
+        <div class="form-group mb-3">
+          <label for="register-surname">Cognome</label>
+          <input
+            type="text"
+            id="register-surname"
+            name="register-surname"
+            class="form-control"
+            required
+            autocomplete="family-name"
+          />
+        </div>
+        <div class="form-group mb-3">
+          <label for="register-email">Email</label>
+          <input
+            type="email"
+            id="register-email"
+            name="register-email"
+            class="form-control"
+            required
+            autocomplete="email"
+          />
+        </div>
+        <div class="form-group mb-3">
+          <label for="register-password">Password</label>
+          <input
+            type="password"
+            id="register-password"
+            name="register-password"
+            class="form-control"
+            required
+            minlength="8"
+            autocomplete="new-password"
+          />
+          <small>Minimo 8 caratteri.</small>
+        </div>
+        <div class="terms-checkbox mb-3">
+          <input
+            type="checkbox"
+            id="register-terms"
+            name="register-terms"
+            required
+          />
+          <label for="register-terms"
+            >Accetto i
+            <a href="termini.html" target="_blank">termini e condizioni</a></label
+          >
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-popup">Registrati</button>
+        </div>
+      </form>
     </div>
     <div class="menu">
       <a href="eventiincorso.html">Calendario attività</a>
