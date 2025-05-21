@@ -149,7 +149,7 @@
         </div>
         <div id="waitlistResponseMessage" class="form-message" style="display:none;"></div>
         <div class="form-actions">
-            <button type="submit" class="btn-popup">Entra in lista</button>
+            <button type="submit" class="btn-popup">Conferma Richiesta Coda</button>
         </div>
     </form>
 </div>
@@ -511,7 +511,8 @@
                     catch (error) { throw new Error("Risposta server non valida: " + responseText.substring(0,100)); }
                     if (result.success) {
                         if(bookingResponseMessage) { bookingResponseMessage.textContent = result.message || 'Prenotazione confermata!'; bookingResponseMessage.className = 'form-message success';}
-                        loadEvents(); setTimeout(closeBookingPopup, 3000);
+                        loadEvents();
+                        // RIMOSSO: setTimeout(closeBookingPopup, 3000);
                     } else { throw new Error(result.message || 'Errore prenotazione.'); }
                 } catch (error) {
                     if(bookingResponseMessage) { bookingResponseMessage.textContent = `Errore: ${error.message}`; bookingResponseMessage.className = 'form-message error'; }
@@ -574,7 +575,7 @@
                     try { result = JSON.parse(responseText); } catch (error) { throw new Error("Risposta server non valida: " + responseText.substring(0,100)); }
                     if (result.success) {
                         if(waitlistResponseMessage) { waitlistResponseMessage.textContent = result.message || "Richiesta coda inviata!"; waitlistResponseMessage.className = 'form-message success'; }
-                        setTimeout(closeWaitlistPopup, 3000);
+                        // RIMOSSO: setTimeout(closeWaitlistPopup, 3000);
                     } else { throw new Error(result.message || "Errore invio richiesta coda.");}
                 } catch (error) {
                     if(waitlistResponseMessage) { waitlistResponseMessage.textContent = `Errore: ${error.message}`; waitlistResponseMessage.className = 'form-message error';}

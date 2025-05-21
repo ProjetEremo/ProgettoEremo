@@ -1,722 +1,722 @@
 <!DOCTYPE html>
 <html lang="it">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="images/logo.png" type="image/x-icon" />
-    <title>Calendario Attività - Eremo Frate Francesco</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <header class="navbar-container" id="navbarContainer">
-      <nav class="navbar">
-        <div class="logo">
-          <a href="index.html">
-            <span class="emoji">🏔️</span>
-            <h2>Eremo Frate Francesco</h2>
-          </a>
-        </div>
-        <div class="menu">
-          <a href="eventiincorso.html" class="active">Calendario attività</a>
-          <a href="eventipassati.html">Archivio attività</a
-          ><span class="separator">|</span>
-          <a href="incontrisullaparola.html">Incontri sulla parola</a
-          ><span class="separator">|</span>
-          <a href="dovesiamo.html">Dove siamo</a>
-          <a href="contatti.html">Contatti</a>
-        </div>
-        <div class="right-menu">
-          <button id="login-btn-header" class="login-btn">Accedi</button>
-          <div
-            class="user-dropdown"
-            id="userDropdownContainer"
-            style="display: none"
-          >
-            <button class="user-btn" aria-haspopup="true" aria-expanded="false">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="images/logo.png" type="image/x-icon" />
+  <title>Calendario Attività - Eremo Frate Francesco</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="navbar-container" id="navbarContainer">
+  <nav class="navbar">
+    <div class="logo">
+      <a href="index.html">
+        <span class="emoji">🏔️</span>
+        <h2>Eremo Frate Francesco</h2>
+      </a>
+    </div>
+    <div class="menu">
+      <a href="eventiincorso.html" class="active">Calendario attività</a>
+      <a href="eventipassati.html">Archivio attività</a
+      ><span class="separator">|</span>
+      <a href="incontrisullaparola.html">Incontri sulla parola</a
+      ><span class="separator">|</span>
+      <a href="dovesiamo.html">Dove siamo</a>
+      <a href="contatti.html">Contatti</a>
+    </div>
+    <div class="right-menu">
+      <button id="login-btn-header" class="login-btn">Accedi</button>
+      <div
+              class="user-dropdown"
+              id="userDropdownContainer"
+              style="display: none"
+      >
+        <button class="user-btn" aria-haspopup="true" aria-expanded="false">
               <span class="user-avatar" id="navbar-avatar">👤</span
               ><span class="user-name" id="navbar-username">Utente</span
-              ><span class="dropdown-arrow">▼</span>
-            </button>
-            <div class="dropdown-menu">
-              <a href="areapersonale.html">Profilo</a>
-              <a href="areapersonale.html#prenotazioni">Prenotazioni</a>
-              <a href="#" id="logout-btn-dropdown">Esci</a>
-            </div>
-          </div>
-          <button class="hamburger" aria-label="Toggle menu">☰</button>
-        </div>
-      </nav>
-      <div class="mobile-menu" id="mobileMenu">
-        <a href="eventiincorso.html">Calendario attività</a>
-        <a href="eventipassati.html">Archivio attività</a>
-        <a href="incontrisullaparola.html">Incontri sulla parola</a>
-        <a href="dovesiamo.html">Dove siamo</a>
-        <a href="contatti.html">Contatti</a>
-        <a href="#" id="login-btn-mobile">Accedi</a>
-      </div>
-    </header>
-
-    <main>
-      <div class="container section-padding">
-        <h1>Calendario Attività</h1>
-        <div id="eventiGridContainer">
-          <div id="loadingIndicator" class="loading-overlay">
-            <div class="spinner">
-              <div class="bounce1"></div>
-              <div class="bounce2"></div>
-              <div class="bounce3"></div>
-            </div>
-            <p>Sto caricando gli eventi...</p>
-          </div>
-          <div class="card-grid" id="eventiGrid"></div>
+        ><span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="dropdown-menu">
+          <a href="areapersonale.html">Profilo</a>
+          <a href="areapersonale.html#prenotazioni">Prenotazioni</a>
+          <a href="#" id="logout-btn-dropdown">Esci</a>
         </div>
       </div>
-    </main>
-
-    <div class="volantino-morph-overlay" id="volantinoMorphOverlay"></div>
-
-    <div class="login-popup-overlay" id="loginOverlay"></div>
-    <div class="login-popup" id="loginPopup">
-      <button
-        class="close-popup"
-        id="closeLoginPopupBtn"
-        aria-label="Chiudi popup"
-      >
-        &times;
-      </button>
-      <div class="login-tabs">
-        <div class="login-tab active" data-tab="login">Accedi</div>
-        <div class="login-tab" data-tab="register">Registrati</div>
-      </div>
-      <form class="login-form active" id="loginFormPopup">
-        <div class="form-group">
-          <label for="login-email-popup">Email</label>
-          <input
-            type="email"
-            id="login-email-popup"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="login-password-popup">Password</label>
-          <input
-            type="password"
-            id="login-password-popup"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-popup">Accedi</button>
-        </div>
-      </form>
-      <form class="login-form" id="registerFormPopup">
-        <div class="form-group">
-          <label for="register-name-popup">Nome</label>
-          <input
-            type="text"
-            id="register-name-popup"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="register-email-popup">Email</label>
-          <input
-            type="email"
-            id="register-email-popup"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="register-password-popup">Password</label>
-          <input
-            type="password"
-            id="register-password-popup"
-            class="form-control"
-            required
-            minlength="8"
-          />
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-popup">Registrati</button>
-        </div>
-      </form>
+      <button class="hamburger" aria-label="Toggle menu">☰</button>
     </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="eventiincorso.html">Calendario attività</a>
+    <a href="eventipassati.html">Archivio attività</a>
+    <a href="incontrisullaparola.html">Incontri sulla parola</a>
+    <a href="dovesiamo.html">Dove siamo</a>
+    <a href="contatti.html">Contatti</a>
+    <a href="#" id="login-btn-mobile">Accedi</a>
+  </div>
+</header>
 
-    <footer>
-      <p>
-        &copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i
-        diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia
-      </p>
-    </footer>
+<main>
+  <div class="container section-padding">
+    <h1>Calendario Attività</h1>
+    <div id="eventiGridContainer">
+      <div id="loadingIndicator" class="loading-overlay">
+        <div class="spinner">
+          <div class="bounce1"></div>
+          <div class="bounce2"></div>
+          <div class="bounce3"></div>
+        </div>
+        <p>Sto caricando gli eventi...</p>
+      </div>
+      <div class="card-grid" id="eventiGrid"></div>
+    </div>
+  </div>
+</main>
 
-    <script>
-      function gebi(id) {
-        return document.getElementById(id);
-      }
+<div class="volantino-morph-overlay" id="volantinoMorphOverlay"></div>
 
-      // --- Navbar & Mobile Menu (Codice Completo) ---
-      const navbarContainerEl = gebi("navbarContainer");
-      const mobileMenuEl = gebi("mobileMenu");
-      const hamburgerEl = document.querySelector(".hamburger");
-      let lastScrollNav = 0;
-      if (navbarContainerEl) {
-        window.addEventListener("scroll", function () {
-          const currentScroll = window.pageYOffset;
-          if (currentScroll <= 50) {
-            navbarContainerEl.classList.remove("hidden");
-            return;
-          }
-          if (
-            currentScroll > lastScrollNav &&
-            currentScroll > navbarContainerEl.offsetHeight
-          ) {
-            navbarContainerEl.classList.add("hidden");
-          } else {
-            navbarContainerEl.classList.remove("hidden");
-          }
-          lastScrollNav = currentScroll <= 0 ? 0 : currentScroll;
-        });
+<div class="login-popup-overlay" id="loginOverlay"></div>
+<div class="login-popup" id="loginPopup">
+  <button
+          class="close-popup"
+          id="closeLoginPopupBtn"
+          aria-label="Chiudi popup"
+  >
+    &times;
+  </button>
+  <div class="login-tabs">
+    <div class="login-tab active" data-tab="login">Accedi</div>
+    <div class="login-tab" data-tab="register">Registrati</div>
+  </div>
+  <form class="login-form active" id="loginFormPopup">
+    <div class="form-group">
+      <label for="login-email-popup">Email</label>
+      <input
+              type="email"
+              id="login-email-popup"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="form-group">
+      <label for="login-password-popup">Password</label>
+      <input
+              type="password"
+              id="login-password-popup"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn-popup">Accedi</button>
+    </div>
+  </form>
+  <form class="login-form" id="registerFormPopup">
+    <div class="form-group">
+      <label for="register-name-popup">Nome</label>
+      <input
+              type="text"
+              id="register-name-popup"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="form-group">
+      <label for="register-email-popup">Email</label>
+      <input
+              type="email"
+              id="register-email-popup"
+              class="form-control"
+              required
+      />
+    </div>
+    <div class="form-group">
+      <label for="register-password-popup">Password</label>
+      <input
+              type="password"
+              id="register-password-popup"
+              class="form-control"
+              required
+              minlength="8"
+      />
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn-popup">Registrati</button>
+    </div>
+  </form>
+</div>
+
+<footer>
+  <p>
+    &copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i
+    diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia
+  </p>
+</footer>
+
+<script>
+  function gebi(id) {
+    return document.getElementById(id);
+  }
+
+  // --- Navbar & Mobile Menu (Codice Completo) ---
+  const navbarContainerEl = gebi("navbarContainer");
+  const mobileMenuEl = gebi("mobileMenu");
+  const hamburgerEl = document.querySelector(".hamburger");
+  let lastScrollNav = 0;
+  if (navbarContainerEl) {
+    window.addEventListener("scroll", function () {
+      const currentScroll = window.pageYOffset;
+      if (currentScroll <= 50) {
+        navbarContainerEl.classList.remove("hidden");
+        return;
       }
-      function toggleMobileMenu() {
-        if (mobileMenuEl && hamburgerEl) {
-          mobileMenuEl.classList.toggle("open");
-          document.body.style.overflow = mobileMenuEl.classList.contains("open")
-            ? "hidden"
-            : "";
-        }
+      if (
+              currentScroll > lastScrollNav &&
+              currentScroll > navbarContainerEl.offsetHeight
+      ) {
+        navbarContainerEl.classList.add("hidden");
+      } else {
+        navbarContainerEl.classList.remove("hidden");
       }
-      function closeMobileMenuOnLinkClick() {
-        if (mobileMenuEl && mobileMenuEl.classList.contains("open"))
-          toggleMobileMenu();
+      lastScrollNav = currentScroll <= 0 ? 0 : currentScroll;
+    });
+  }
+  function toggleMobileMenu() {
+    if (mobileMenuEl && hamburgerEl) {
+      mobileMenuEl.classList.toggle("open");
+      document.body.style.overflow = mobileMenuEl.classList.contains("open")
+              ? "hidden"
+              : "";
+    }
+  }
+  function closeMobileMenuOnLinkClick() {
+    if (mobileMenuEl && mobileMenuEl.classList.contains("open"))
+      toggleMobileMenu();
+  }
+  if (hamburgerEl) hamburgerEl.addEventListener("click", toggleMobileMenu);
+  document
+          .querySelectorAll("#mobileMenu a")
+          .forEach((link) =>
+                  link.addEventListener("click", closeMobileMenuOnLinkClick)
+          );
+
+  // --- Login Popup (Codice Completo) ---
+  const loginOverlay = gebi("loginOverlay"),
+          loginPopup = gebi("loginPopup"),
+          closeLoginPopupBtn = gebi("closeLoginPopupBtn");
+  const loginTabs = document.querySelectorAll(".login-tab"),
+          loginForms = document.querySelectorAll(".login-popup .login-form");
+  const loginBtnHeader = gebi("login-btn-header"),
+          loginBtnMobile = gebi("login-btn-mobile");
+  function openLoginPopup() {
+    if (loginOverlay && loginPopup) {
+      loginOverlay.classList.add("active");
+      loginPopup.classList.add("active");
+      document.body.style.overflow = "hidden";
+      const activeForm = loginPopup.querySelector(".login-form.active");
+      if (activeForm)
+        activeForm.querySelector('input:not([type="hidden"])')?.focus();
+    }
+  }
+  function closeLoginPopup() {
+    if (loginOverlay && loginPopup) {
+      loginOverlay.classList.remove("active");
+      loginPopup.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  }
+  if (loginBtnHeader)
+    loginBtnHeader.addEventListener("click", openLoginPopup);
+  if (loginBtnMobile)
+    loginBtnMobile.addEventListener("click", (e) => {
+      e.preventDefault();
+      openLoginPopup();
+      if (mobileMenuEl.classList.contains("open")) toggleMobileMenu();
+    });
+  if (closeLoginPopupBtn)
+    closeLoginPopupBtn.addEventListener("click", closeLoginPopup);
+  if (loginOverlay) loginOverlay.addEventListener("click", closeLoginPopup);
+  loginTabs.forEach((tab) => {
+    tab.addEventListener("click", function () {
+      loginTabs.forEach((t) => t.classList.remove("active"));
+      loginForms.forEach((f) => f.classList.remove("active"));
+      this.classList.add("active");
+      const targetForm = gebi(
+              this.getAttribute("data-tab") === "login"
+                      ? "loginFormPopup"
+                      : "registerFormPopup"
+      );
+      if (targetForm) {
+        targetForm.classList.add("active");
+        targetForm.querySelector('input:not([type="hidden"])')?.focus();
       }
-      if (hamburgerEl) hamburgerEl.addEventListener("click", toggleMobileMenu);
-      document
-        .querySelectorAll("#mobileMenu a")
-        .forEach((link) =>
-          link.addEventListener("click", closeMobileMenuOnLinkClick)
+    });
+  });
+
+  // --- User Dropdown & Logic (Codice Completo) ---
+  const userDropdownContainerEl = gebi("userDropdownContainer"),
+          userBtnEl = userDropdownContainerEl?.querySelector(".user-btn");
+  let currentUser = null;
+  const logoutBtnDropdown = gebi("logout-btn-dropdown");
+  if (userBtnEl)
+    userBtnEl.addEventListener("click", (e) => {
+      e.stopPropagation();
+      userDropdownContainerEl.classList.toggle("show");
+      userBtnEl.setAttribute(
+              "aria-expanded",
+              userDropdownContainerEl.classList.contains("show").toString()
+      );
+    });
+  document.addEventListener("click", (e) => {
+    if (
+            userDropdownContainerEl?.classList.contains("show") &&
+            !userDropdownContainerEl.contains(e.target)
+    ) {
+      userDropdownContainerEl.classList.remove("show");
+      userBtnEl?.setAttribute("aria-expanded", "false");
+    }
+  });
+  function updateNavbarUserUI() {
+    const navbarAvatarEl = gebi("navbar-avatar"),
+            navbarUsernameEl = gebi("navbar-username");
+    if (currentUser) {
+      if (navbarAvatarEl)
+        navbarAvatarEl.textContent = currentUser.avatar || "👤";
+      if (navbarUsernameEl)
+        navbarUsernameEl.textContent = currentUser.nome || "Utente";
+      if (userDropdownContainerEl)
+        userDropdownContainerEl.style.display = "inline-block";
+      if (loginBtnHeader) loginBtnHeader.style.display = "none";
+      if (loginBtnMobile) loginBtnMobile.style.display = "none";
+    } else {
+      if (userDropdownContainerEl)
+        userDropdownContainerEl.style.display = "none";
+      if (loginBtnHeader) loginBtnHeader.style.display = "inline-block";
+      if (loginBtnMobile) {
+        loginBtnMobile.style.display = "block";
+        loginBtnMobile.textContent = "Accedi";
+      }
+    }
+  }
+  gebi("loginFormPopup")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = gebi("login-email-popup").value;
+    currentUser = {
+      nome: email.split("@")[0] || "Utente Loggato",
+      avatar: "🧘",
+    };
+    localStorage.setItem("userDataEFF", JSON.stringify(currentUser));
+    updateNavbarUserUI();
+    closeLoginPopup();
+    const p = localStorage.getItem("pending_booking_event_id_eff");
+    if (
+            p &&
+            confirm(`Login OK. Completare prenotazione per evento ${p}?`)
+    ) {
+    }
+    localStorage.removeItem("pending_booking_event_id_eff");
+  });
+  gebi("registerFormPopup")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    currentUser = {
+      nome: gebi("register-name-popup").value || "Nuovo Utente",
+      avatar: "👤",
+    };
+    localStorage.setItem("userDataEFF", JSON.stringify(currentUser));
+    updateNavbarUserUI();
+    closeLoginPopup();
+  });
+  function logout() {
+    currentUser = null;
+    localStorage.removeItem("userDataEFF");
+    updateNavbarUserUI();
+  }
+  function checkLoginStatusOnLoad() {
+    const d = localStorage.getItem("userDataEFF");
+    currentUser = d ? JSON.parse(d) : null;
+    updateNavbarUserUI();
+  }
+  if (logoutBtnDropdown)
+    logoutBtnDropdown.addEventListener("click", logout);
+
+  // --- Logica Caricamento Eventi & Morphing Volantino ---
+  const volantinoMorphOverlay = gebi("volantinoMorphOverlay");
+  let morphingCard = null;
+  let originalCardForMorph = null;
+
+  async function loadEvents() {
+    const eventsGrid = gebi("eventiGrid");
+    const loadingIndicator = gebi("loadingIndicator");
+    if (loadingIndicator) loadingIndicator.classList.add("visible");
+    if (eventsGrid) eventsGrid.innerHTML = "";
+    try {
+      const response = await fetch("get_events.php");
+      const responseText = await response.text();
+      if (!response.ok)
+        throw new Error(
+                `Errore HTTP ${response.status}: ${
+                        response.statusText || "Net err"
+                }`
         );
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        console.error("JSON Parse err:", responseText.substring(0, 500));
+        throw new Error("Server err.");
+      }
+      if (!result.success) throw new Error(result.message || "Load err.");
+      if (!eventsGrid) return;
+      if (result.data.length === 0) {
+        eventsGrid.innerHTML =
+                '<p class="no-events">Nessun evento in programma.</p>';
+      } else {
+        result.data.forEach((event) =>
+                eventsGrid.appendChild(createEventCard(event))
+        );
+      }
+    } catch (error) {
+      console.error("loadEvents err:", error);
+      if (eventsGrid)
+        eventsGrid.innerHTML = `<div class="error-message" style="width:100%;"><p><strong>Errore:</strong> ${error.message}</p><button onclick="loadEvents()" class="btn-popup">Riprova</button></div>`;
+    } finally {
+      if (loadingIndicator) loadingIndicator.classList.remove("visible");
+    }
+  }
 
-      // --- Login Popup (Codice Completo) ---
-      const loginOverlay = gebi("loginOverlay"),
-        loginPopup = gebi("loginPopup"),
-        closeLoginPopupBtn = gebi("closeLoginPopupBtn");
-      const loginTabs = document.querySelectorAll(".login-tab"),
-        loginForms = document.querySelectorAll(".login-popup .login-form");
-      const loginBtnHeader = gebi("login-btn-header"),
-        loginBtnMobile = gebi("login-btn-mobile");
-      function openLoginPopup() {
-        if (loginOverlay && loginPopup) {
-          loginOverlay.classList.add("active");
-          loginPopup.classList.add("active");
-          document.body.style.overflow = "hidden";
-          const activeForm = loginPopup.querySelector(".login-form.active");
-          if (activeForm)
-            activeForm.querySelector('input:not([type="hidden"])')?.focus();
-        }
-      }
-      function closeLoginPopup() {
-        if (loginOverlay && loginPopup) {
-          loginOverlay.classList.remove("active");
-          loginPopup.classList.remove("active");
-          document.body.style.overflow = "";
-        }
-      }
-      if (loginBtnHeader)
-        loginBtnHeader.addEventListener("click", openLoginPopup);
-      if (loginBtnMobile)
-        loginBtnMobile.addEventListener("click", (e) => {
-          e.preventDefault();
-          openLoginPopup();
-          if (mobileMenuEl.classList.contains("open")) toggleMobileMenu();
-        });
-      if (closeLoginPopupBtn)
-        closeLoginPopupBtn.addEventListener("click", closeLoginPopup);
-      if (loginOverlay) loginOverlay.addEventListener("click", closeLoginPopup);
-      loginTabs.forEach((tab) => {
-        tab.addEventListener("click", function () {
-          loginTabs.forEach((t) => t.classList.remove("active"));
-          loginForms.forEach((f) => f.classList.remove("active"));
-          this.classList.add("active");
-          const targetForm = gebi(
-            this.getAttribute("data-tab") === "login"
-              ? "loginFormPopup"
-              : "registerFormPopup"
-          );
-          if (targetForm) {
-            targetForm.classList.add("active");
-            targetForm.querySelector('input:not([type="hidden"])')?.focus();
-          }
-        });
-      });
-
-      // --- User Dropdown & Logic (Codice Completo) ---
-      const userDropdownContainerEl = gebi("userDropdownContainer"),
-        userBtnEl = userDropdownContainerEl?.querySelector(".user-btn");
-      let currentUser = null;
-      const logoutBtnDropdown = gebi("logout-btn-dropdown");
-      if (userBtnEl)
-        userBtnEl.addEventListener("click", (e) => {
-          e.stopPropagation();
-          userDropdownContainerEl.classList.toggle("show");
-          userBtnEl.setAttribute(
-            "aria-expanded",
-            userDropdownContainerEl.classList.contains("show").toString()
-          );
-        });
-      document.addEventListener("click", (e) => {
-        if (
-          userDropdownContainerEl?.classList.contains("show") &&
-          !userDropdownContainerEl.contains(e.target)
-        ) {
-          userDropdownContainerEl.classList.remove("show");
-          userBtnEl?.setAttribute("aria-expanded", "false");
-        }
-      });
-      function updateNavbarUserUI() {
-        const navbarAvatarEl = gebi("navbar-avatar"),
-          navbarUsernameEl = gebi("navbar-username");
-        if (currentUser) {
-          if (navbarAvatarEl)
-            navbarAvatarEl.textContent = currentUser.avatar || "👤";
-          if (navbarUsernameEl)
-            navbarUsernameEl.textContent = currentUser.nome || "Utente";
-          if (userDropdownContainerEl)
-            userDropdownContainerEl.style.display = "inline-block";
-          if (loginBtnHeader) loginBtnHeader.style.display = "none";
-          if (loginBtnMobile) loginBtnMobile.style.display = "none";
-        } else {
-          if (userDropdownContainerEl)
-            userDropdownContainerEl.style.display = "none";
-          if (loginBtnHeader) loginBtnHeader.style.display = "inline-block";
-          if (loginBtnMobile) {
-            loginBtnMobile.style.display = "block";
-            loginBtnMobile.textContent = "Accedi";
-          }
-        }
-      }
-      gebi("loginFormPopup")?.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const email = gebi("login-email-popup").value;
-        currentUser = {
-          nome: email.split("@")[0] || "Utente Loggato",
-          avatar: "🧘",
-        };
-        localStorage.setItem("userDataEFF", JSON.stringify(currentUser));
-        updateNavbarUserUI();
-        closeLoginPopup();
-        const p = localStorage.getItem("pending_booking_event_id_eff");
-        if (
-          p &&
-          confirm(`Login OK. Completare prenotazione per evento ${p}?`)
-        ) {
-        }
-        localStorage.removeItem("pending_booking_event_id_eff");
-      });
-      gebi("registerFormPopup")?.addEventListener("submit", (e) => {
-        e.preventDefault();
-        currentUser = {
-          nome: gebi("register-name-popup").value || "Nuovo Utente",
-          avatar: "👤",
-        };
-        localStorage.setItem("userDataEFF", JSON.stringify(currentUser));
-        updateNavbarUserUI();
-        closeLoginPopup();
-      });
-      function logout() {
-        currentUser = null;
-        localStorage.removeItem("userDataEFF");
-        updateNavbarUserUI();
-      }
-      function checkLoginStatusOnLoad() {
-        const d = localStorage.getItem("userDataEFF");
-        currentUser = d ? JSON.parse(d) : null;
-        updateNavbarUserUI();
-      }
-      if (logoutBtnDropdown)
-        logoutBtnDropdown.addEventListener("click", logout);
-
-      // --- Logica Caricamento Eventi & Morphing Volantino ---
-      const volantinoMorphOverlay = gebi("volantinoMorphOverlay");
-      let morphingCard = null;
-      let originalCardForMorph = null;
-
-      async function loadEvents() {
-        const eventsGrid = gebi("eventiGrid");
-        const loadingIndicator = gebi("loadingIndicator");
-        if (loadingIndicator) loadingIndicator.classList.add("visible");
-        if (eventsGrid) eventsGrid.innerHTML = "";
-        try {
-          const response = await fetch("get_events.php");
-          const responseText = await response.text();
-          if (!response.ok)
-            throw new Error(
-              `Errore HTTP ${response.status}: ${
-                response.statusText || "Net err"
-              }`
-            );
-          let result;
-          try {
-            result = JSON.parse(responseText);
-          } catch (e) {
-            console.error("JSON Parse err:", responseText.substring(0, 500));
-            throw new Error("Server err.");
-          }
-          if (!result.success) throw new Error(result.message || "Load err.");
-          if (!eventsGrid) return;
-          if (result.data.length === 0) {
-            eventsGrid.innerHTML =
-              '<p class="no-events">Nessun evento in programma.</p>';
-          } else {
-            result.data.forEach((event) =>
-              eventsGrid.appendChild(createEventCard(event))
-            );
-          }
-        } catch (error) {
-          console.error("loadEvents err:", error);
-          if (eventsGrid)
-            eventsGrid.innerHTML = `<div class="error-message" style="width:100%;"><p><strong>Errore:</strong> ${error.message}</p><button onclick="loadEvents()" class="btn-popup">Riprova</button></div>`;
-        } finally {
-          if (loadingIndicator) loadingIndicator.classList.remove("visible");
-        }
-      }
-
-      function createEventCard(event) {
-        const cardOriginal = document.createElement("article");
-        cardOriginal.className = "card";
-        cardOriginal.dataset.eventId = event.idevento;
-        let imageSrc = event.immagine_url?.trim()
-          ? event.immagine_url
-          : "images/default-event.jpg";
-        let volantinoBtnHtml = "";
-        if (event.volantino_url?.trim()) {
-          volantinoBtnHtml = `<button class="card-btn btn-visualizza-volantino"
+  function createEventCard(event) {
+    const cardOriginal = document.createElement("article");
+    cardOriginal.className = "card";
+    cardOriginal.dataset.eventId = event.idevento;
+    let imageSrc = event.immagine_url?.trim()
+            ? event.immagine_url
+            : "images/default-event.jpg";
+    let volantinoBtnHtml = "";
+    if (event.volantino_url?.trim()) {
+      volantinoBtnHtml = `<button class="card-btn btn-visualizza-volantino"
                                         data-volantino-url="${event.volantino_url}"
-                                        data-copertina-url="${imageSrc}">Volantino</button>`;
-        }
-        cardOriginal.innerHTML = `
+                                        data-copertina-url="${imageSrc}">Visualizza Volantino</button>`;
+    }
+    cardOriginal.innerHTML = `
             <div class="card-image-container">
                 <img src="${imageSrc}" alt="Copertina: ${
-          event.titolo || "Evento"
-        }" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
+            event.titolo || "Evento"
+    }" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
             </div>
             <div class="card-content">
                 <h3>${event.titolo || "Titolo non disponibile"}</h3>
                 <p class="card-info"><b>Data:</b> ${formatDate(
-                  event.datainizio
-                )}${
-          event.durata ? `<br><b>Orario:</b> ${event.durata}` : ""
-        }</p>
+            event.datainizio
+    )}${
+            event.durata ? `<br><b>Orario:</b> ${event.durata}` : ""
+    }</p>
                 <p class="card-info"><b>${
-                  event.prefisso_relatore || "Relatore"
-                }:</b> ${event.relatore || "N/D"}${
-          event.associazione
-            ? `<br><b>Associazione:</b> ${event.associazione}`
-            : ""
-        }</p>
+            event.prefisso_relatore || "Relatore"
+    }:</b> ${event.relatore || "N/D"}${
+            event.associazione
+                    ? `<br><b>Associazione:</b> ${event.associazione}`
+                    : ""
+    }</p>
                 <p class="card-description">${
-                  event.descrizione || "Nessuna descrizione breve."
-                }</p>
+            event.descrizione || "Nessuna descrizione breve."
+    }</p>
                 <p class="card-info"><b>Posti:</b> <span class="posti-disponibili">${
-                  event.posti_disponibili ?? "N/D"
-                }</span>${
-          event.costo !== null
-            ? parseFloat(event.costo) > 0
-              ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €`
-              : parseFloat(event.costo) === 0
-              ? "<br><b>Costo:</b> Offerta libera"
-              : ""
-            : ""
-        }</p>
+            event.posti_disponibili ?? "N/D"
+    }</span>${
+            event.costo !== null
+                    ? parseFloat(event.costo) > 0
+                            ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €`
+                            : parseFloat(event.costo) === 0
+                                    ? "<br><b>Costo:</b> Offerta libera"
+                                    : ""
+                    : ""
+    }</p>
                 <div class="card-actions">
                     ${volantinoBtnHtml}
                     <button class="card-btn card-btn-primary btn-prenota-rapido" data-event-id="${
-                      event.idevento
-                    }" ${
-          parseInt(event.posti_disponibili) === 0 || !event.flagprenotabile
-            ? "disabled"
-            : ""
-        }>
+            event.idevento
+    }" ${
+            parseInt(event.posti_disponibili) === 0 || !event.flagprenotabile
+                    ? "disabled"
+                    : ""
+    }>
                         ${
-                          !event.flagprenotabile
-                            ? "Info Dettagli"
-                            : parseInt(event.posti_disponibili) === 0
+            !event.flagprenotabile
+                    ? "Info Dettagli"
+                    : parseInt(event.posti_disponibili) === 0
                             ? "Esaurito"
                             : "Prenota"
-                        }
+    }
                     </button>
                 </div>
             </div>`;
-        cardOriginal
-          .querySelector(".btn-prenota-rapido")
-          ?.addEventListener("click", function () {
-            handleRapidBooking(this, event.idevento);
-          });
-        cardOriginal
-          .querySelector(".btn-visualizza-volantino")
-          ?.addEventListener("click", function () {
-            showVolantinoWithMorph(
-              cardOriginal,
-              this.dataset.copertinaUrl,
-              this.dataset.volantinoUrl
+    cardOriginal
+            .querySelector(".btn-prenota-rapido")
+            ?.addEventListener("click", function () {
+              handleRapidBooking(this, event.idevento);
+            });
+    cardOriginal
+            .querySelector(".btn-visualizza-volantino")
+            ?.addEventListener("click", function () {
+              showVolantinoWithMorph(
+                      cardOriginal,
+                      this.dataset.copertinaUrl,
+                      this.dataset.volantinoUrl
+              );
+            });
+    return cardOriginal;
+  }
+
+  function showVolantinoWithMorph(
+          originalCardElement,
+          copertinaUrl,
+          volantinoUrl
+  ) {
+    if (morphingCard || !volantinoMorphOverlay) return;
+
+    originalCardForMorph = originalCardElement;
+    const rect = originalCardForMorph.getBoundingClientRect();
+
+    morphingCard = document.createElement("article");
+    morphingCard.className = "card morph-active-card preparing-morph";
+
+    morphingCard.style.width = `${rect.width}px`;
+    morphingCard.style.height = `${rect.height}px`;
+    morphingCard.style.top = `${rect.top}px`;
+    morphingCard.style.left = `${rect.left}px`;
+
+    const morphContentWrapper = document.createElement("div");
+    morphContentWrapper.className = "morph-content-wrapper";
+
+    // Immagine di copertina (per il morph iniziale)
+    const copertinaContainer = document.createElement("div");
+    copertinaContainer.className = "card-image-container-morph";
+    const imgCopertina = document.createElement("img");
+    imgCopertina.src = copertinaUrl;
+    imgCopertina.alt = "Copertina Evento";
+    copertinaContainer.appendChild(imgCopertina);
+
+    // Contenuto testuale originale (per la visualizzazione iniziale durante lo zoom)
+    const cardContentOriginal =
+            originalCardForMorph.querySelector(".card-content");
+    let cardContentCloned = null;
+    if (cardContentOriginal) {
+      cardContentCloned = cardContentOriginal.cloneNode(true);
+      cardContentCloned.className = "card-content-morph"; // Applica classe per controllo transizione
+      // Rimuovi/disabilita bottoni nel contenuto clonato
+      cardContentCloned.querySelectorAll("button").forEach((btn) => {
+        const newBtn = btn.cloneNode(true); // Rimuove listener
+        if (newBtn.classList.contains("btn-prenota-rapido")) {
+          newBtn.addEventListener("click", () =>
+                  handleRapidBooking(newBtn, originalCardForMorph.dataset.eventId)
+          );
+        } else {
+          newBtn.disabled = true;
+        }
+        btn.parentNode.replaceChild(newBtn, btn);
+      });
+    }
+
+    // Contenitore per l'immagine del volantino o messaggio
+    const volantinoContainer = document.createElement("div");
+    volantinoContainer.className = "volantino-image-container-morph";
+    // Il contenuto del volantino (img o messaggio) verrà aggiunto dopo
+
+    morphContentWrapper.appendChild(copertinaContainer);
+    if (cardContentCloned)
+      morphContentWrapper.appendChild(cardContentCloned);
+    morphContentWrapper.appendChild(volantinoContainer); // Aggiunto vuoto, verrà popolato
+    morphingCard.appendChild(morphContentWrapper);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "close-morph-volantino-btn";
+    closeBtn.innerHTML = "&times;";
+    closeBtn.setAttribute("aria-label", "Chiudi");
+    closeBtn.onclick = hideVolantinoWithMorph;
+    morphingCard.appendChild(closeBtn);
+
+    volantinoMorphOverlay.innerHTML = "";
+    volantinoMorphOverlay.appendChild(morphingCard);
+    volantinoMorphOverlay.classList.add("active");
+    document.body.classList.add("volantino-morph-active");
+    if (originalCardForMorph)
+      originalCardForMorph.classList.add("original-morph-hidden");
+
+    void morphingCard.offsetWidth; // Forza reflow
+
+    morphingCard.classList.remove("preparing-morph");
+    morphingCard.classList.add("zoomed-in");
+    const finalWidth = Math.min(window.innerWidth * 0.9, 700);
+    const finalHeight = Math.min(window.innerHeight * 0.85, 800);
+    morphingCard.style.width = `${finalWidth}px`;
+    morphingCard.style.height = `${finalHeight}px`;
+    morphingCard.style.top = `${(window.innerHeight - finalHeight) / 2}px`;
+    morphingCard.style.left = `${(window.innerWidth - finalWidth) / 2}px`;
+
+    console.log("Volantino URL per il morph:", volantinoUrl);
+
+    // Popola e attiva il volantino dopo l'animazione di zoom
+    // La durata dello zoom è 0.6s nel CSS
+    setTimeout(() => {
+      if (!morphingCard) return;
+      morphingCard.classList.add("morphing"); // Attiva le transizioni per copertina e contenuto
+
+      volantinoContainer.innerHTML = ""; // Pulisci prima di aggiungere nuovo contenuto
+      if (volantinoUrl && volantinoUrl.trim() !== "") {
+        if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+          const imgVol = document.createElement("img");
+          imgVol.src = volantinoUrl;
+          imgVol.alt = "Volantino Evento";
+          // Non serve classe specifica se .volantino-image-container-morph img è già stilizzato
+          imgVol.onerror = () => {
+            console.error(
+                    "Errore caricamento immagine volantino:",
+                    volantinoUrl
             );
-          });
-        return cardOriginal;
+            volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Impossibile caricare volantino.</p><a href="${volantinoUrl}" target="_blank">Apri link</a></div>`;
+          };
+          volantinoContainer.appendChild(imgVol);
+        } else {
+          volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Volantino PDF/Link.</p><a href="${volantinoUrl}" target="_blank">Apri</a></div>`;
+        }
+      } else {
+        volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Volantino non disponibile.</p></div>`;
+      }
+      // Attiva la visibilità del volantino (che triggera l'opacità)
+      morphingCard.classList.add("volantino-visible");
+    }, parseFloat(getComputedStyle(morphingCard).transitionDuration.split(",")[0] || "0.6") * 1000); // Basato sulla durata della transizione di zoom
+  }
+
+  function hideVolantinoWithMorph() {
+    if (morphingCard && volantinoMorphOverlay) {
+      morphingCard.classList.remove("volantino-visible"); // Inizia a nascondere il volantino
+      morphingCard.classList.remove("morphing"); // Ferma l'espansione dell'img di copertina e fa riapparire il contenuto
+
+      // Fai riapparire il contenuto testuale originale (se era stato nascosto)
+      const clonedCardContent = morphingCard.querySelector(
+              ".card-content-morph"
+      );
+      if (clonedCardContent) {
+        clonedCardContent.style.display = ""; // O il suo display originale
+        setTimeout(() => {
+          // Permetti al display di applicarsi prima dell'opacità
+          if (clonedCardContent) clonedCardContent.style.opacity = "1";
+        }, 0);
+      }
+      const originalCopertinaContainer = morphingCard.querySelector(
+              ".card-image-container-morph"
+      );
+      if (originalCopertinaContainer) {
+        originalCopertinaContainer.style.height = "200px"; // Torna all'altezza originale
+        originalCopertinaContainer.style.borderRadius =
+                "var(--border-radius-medium) var(--border-radius-medium) 0 0";
       }
 
-      function showVolantinoWithMorph(
-        originalCardElement,
-        copertinaUrl,
-        volantinoUrl
-      ) {
-        if (morphingCard || !volantinoMorphOverlay) return;
-
-        originalCardForMorph = originalCardElement;
+      if (originalCardForMorph) {
         const rect = originalCardForMorph.getBoundingClientRect();
-
-        morphingCard = document.createElement("article");
-        morphingCard.className = "card morph-active-card preparing-morph";
-
         morphingCard.style.width = `${rect.width}px`;
         morphingCard.style.height = `${rect.height}px`;
         morphingCard.style.top = `${rect.top}px`;
         morphingCard.style.left = `${rect.left}px`;
-
-        const morphContentWrapper = document.createElement("div");
-        morphContentWrapper.className = "morph-content-wrapper";
-
-        // Immagine di copertina (per il morph iniziale)
-        const copertinaContainer = document.createElement("div");
-        copertinaContainer.className = "card-image-container-morph";
-        const imgCopertina = document.createElement("img");
-        imgCopertina.src = copertinaUrl;
-        imgCopertina.alt = "Copertina Evento";
-        copertinaContainer.appendChild(imgCopertina);
-
-        // Contenuto testuale originale (per la visualizzazione iniziale durante lo zoom)
-        const cardContentOriginal =
-          originalCardForMorph.querySelector(".card-content");
-        let cardContentCloned = null;
-        if (cardContentOriginal) {
-          cardContentCloned = cardContentOriginal.cloneNode(true);
-          cardContentCloned.className = "card-content-morph"; // Applica classe per controllo transizione
-          // Rimuovi/disabilita bottoni nel contenuto clonato
-          cardContentCloned.querySelectorAll("button").forEach((btn) => {
-            const newBtn = btn.cloneNode(true); // Rimuove listener
-            if (newBtn.classList.contains("btn-prenota-rapido")) {
-              newBtn.addEventListener("click", () =>
-                handleRapidBooking(newBtn, originalCardForMorph.dataset.eventId)
-              );
-            } else {
-              newBtn.disabled = true;
-            }
-            btn.parentNode.replaceChild(newBtn, btn);
-          });
-        }
-
-        // Contenitore per l'immagine del volantino o messaggio
-        const volantinoContainer = document.createElement("div");
-        volantinoContainer.className = "volantino-image-container-morph";
-        // Il contenuto del volantino (img o messaggio) verrà aggiunto dopo
-
-        morphContentWrapper.appendChild(copertinaContainer);
-        if (cardContentCloned)
-          morphContentWrapper.appendChild(cardContentCloned);
-        morphContentWrapper.appendChild(volantinoContainer); // Aggiunto vuoto, verrà popolato
-        morphingCard.appendChild(morphContentWrapper);
-
-        const closeBtn = document.createElement("button");
-        closeBtn.className = "close-morph-volantino-btn";
-        closeBtn.innerHTML = "&times;";
-        closeBtn.setAttribute("aria-label", "Chiudi");
-        closeBtn.onclick = hideVolantinoWithMorph;
-        morphingCard.appendChild(closeBtn);
-
-        volantinoMorphOverlay.innerHTML = "";
-        volantinoMorphOverlay.appendChild(morphingCard);
-        volantinoMorphOverlay.classList.add("active");
-        document.body.classList.add("volantino-morph-active");
-        if (originalCardForMorph)
-          originalCardForMorph.classList.add("original-morph-hidden");
-
-        void morphingCard.offsetWidth; // Forza reflow
-
-        morphingCard.classList.remove("preparing-morph");
-        morphingCard.classList.add("zoomed-in");
-        const finalWidth = Math.min(window.innerWidth * 0.9, 700);
-        const finalHeight = Math.min(window.innerHeight * 0.85, 800);
-        morphingCard.style.width = `${finalWidth}px`;
-        morphingCard.style.height = `${finalHeight}px`;
-        morphingCard.style.top = `${(window.innerHeight - finalHeight) / 2}px`;
-        morphingCard.style.left = `${(window.innerWidth - finalWidth) / 2}px`;
-
-        console.log("Volantino URL per il morph:", volantinoUrl);
-
-        // Popola e attiva il volantino dopo l'animazione di zoom
-        // La durata dello zoom è 0.6s nel CSS
-        setTimeout(() => {
-          if (!morphingCard) return;
-          morphingCard.classList.add("morphing"); // Attiva le transizioni per copertina e contenuto
-
-          volantinoContainer.innerHTML = ""; // Pulisci prima di aggiungere nuovo contenuto
-          if (volantinoUrl && volantinoUrl.trim() !== "") {
-            if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-              const imgVol = document.createElement("img");
-              imgVol.src = volantinoUrl;
-              imgVol.alt = "Volantino Evento";
-              // Non serve classe specifica se .volantino-image-container-morph img è già stilizzato
-              imgVol.onerror = () => {
-                console.error(
-                  "Errore caricamento immagine volantino:",
-                  volantinoUrl
-                );
-                volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Impossibile caricare volantino.</p><a href="${volantinoUrl}" target="_blank">Apri link</a></div>`;
-              };
-              volantinoContainer.appendChild(imgVol);
-            } else {
-              volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Volantino PDF/Link.</p><a href="${volantinoUrl}" target="_blank">Apri</a></div>`;
-            }
-          } else {
-            volantinoContainer.innerHTML = `<div class="volantino-message-display"><p>Volantino non disponibile.</p></div>`;
-          }
-          // Attiva la visibilità del volantino (che triggera l'opacità)
-          morphingCard.classList.add("volantino-visible");
-        }, parseFloat(getComputedStyle(morphingCard).transitionDuration.split(",")[0] || "0.6") * 1000); // Basato sulla durata della transizione di zoom
       }
+      morphingCard.classList.remove("zoomed-in");
 
-      function hideVolantinoWithMorph() {
-        if (morphingCard && volantinoMorphOverlay) {
-          morphingCard.classList.remove("volantino-visible"); // Inizia a nascondere il volantino
-          morphingCard.classList.remove("morphing"); // Ferma l'espansione dell'img di copertina e fa riapparire il contenuto
+      const transitionDuration =
+              parseFloat(
+                      getComputedStyle(morphingCard).transitionDuration.split(",")[0] ||
+                      "0.6"
+              ) * 1000;
+      let transitionEnded = false;
 
-          // Fai riapparire il contenuto testuale originale (se era stato nascosto)
-          const clonedCardContent = morphingCard.querySelector(
-            ".card-content-morph"
-          );
-          if (clonedCardContent) {
-            clonedCardContent.style.display = ""; // O il suo display originale
-            setTimeout(() => {
-              // Permetti al display di applicarsi prima dell'opacità
-              if (clonedCardContent) clonedCardContent.style.opacity = "1";
-            }, 0);
-          }
-          const originalCopertinaContainer = morphingCard.querySelector(
-            ".card-image-container-morph"
-          );
-          if (originalCopertinaContainer) {
-            originalCopertinaContainer.style.height = "200px"; // Torna all'altezza originale
-            originalCopertinaContainer.style.borderRadius =
-              "var(--border-radius-medium) var(--border-radius-medium) 0 0";
-          }
-
-          if (originalCardForMorph) {
-            const rect = originalCardForMorph.getBoundingClientRect();
-            morphingCard.style.width = `${rect.width}px`;
-            morphingCard.style.height = `${rect.height}px`;
-            morphingCard.style.top = `${rect.top}px`;
-            morphingCard.style.left = `${rect.left}px`;
-          }
-          morphingCard.classList.remove("zoomed-in");
-
-          const transitionDuration =
-            parseFloat(
-              getComputedStyle(morphingCard).transitionDuration.split(",")[0] ||
-                "0.6"
-            ) * 1000;
-          let transitionEnded = false;
-
-          function onTransitionEnd(e) {
-            if (
-              e.target === morphingCard &&
-              e.propertyName.includes("transform") &&
-              !transitionEnded
-            ) {
-              transitionEnded = true;
-              cleanUpMorphingCard();
-              if (morphingCard)
-                morphingCard.removeEventListener(
-                  "transitionend",
-                  onTransitionEnd
-                );
-            }
-          }
-          morphingCard.addEventListener("transitionend", onTransitionEnd);
-
-          setTimeout(() => {
-            if (
-              !transitionEnded &&
-              volantinoMorphOverlay.contains(morphingCard)
-            ) {
-              cleanUpMorphingCard();
-            }
-          }, transitionDuration + 100);
+      function onTransitionEnd(e) {
+        if (
+                e.target === morphingCard &&
+                e.propertyName.includes("transform") &&
+                !transitionEnded
+        ) {
+          transitionEnded = true;
+          cleanUpMorphingCard();
+          if (morphingCard)
+            morphingCard.removeEventListener(
+                    "transitionend",
+                    onTransitionEnd
+            );
         }
       }
+      morphingCard.addEventListener("transitionend", onTransitionEnd);
 
-      function cleanUpMorphingCard() {
-        if (volantinoMorphOverlay.classList.contains("active")) {
-          volantinoMorphOverlay.classList.remove("active");
-          volantinoMorphOverlay.innerHTML = "";
-          document.body.classList.remove("volantino-morph-active");
-          if (originalCardForMorph)
-            originalCardForMorph.classList.remove("original-morph-hidden");
-          morphingCard = null;
-          originalCardForMorph = null;
+      setTimeout(() => {
+        if (
+                !transitionEnded &&
+                volantinoMorphOverlay.contains(morphingCard)
+        ) {
+          cleanUpMorphingCard();
         }
-      }
+      }, transitionDuration + 100);
+    }
+  }
 
-      if (volantinoMorphOverlay)
-        volantinoMorphOverlay.addEventListener("click", (e) => {
-          if (e.target === volantinoMorphOverlay) hideVolantinoWithMorph();
-        });
+  function cleanUpMorphingCard() {
+    if (volantinoMorphOverlay.classList.contains("active")) {
+      volantinoMorphOverlay.classList.remove("active");
+      volantinoMorphOverlay.innerHTML = "";
+      document.body.classList.remove("volantino-morph-active");
+      if (originalCardForMorph)
+        originalCardForMorph.classList.remove("original-morph-hidden");
+      morphingCard = null;
+      originalCardForMorph = null;
+    }
+  }
 
-      function handleRapidBooking(buttonElement, eventId) {
-        if (currentUser) {
-          alert(
-            `Prenotazione evento ${eventId} per ${currentUser.nome}. (Simulato)`
-          );
-        } else {
-          openLoginPopup();
-          localStorage.setItem("pending_booking_event_id_eff", eventId);
-        }
-      }
-      function formatDate(dateString) {
-        if (!dateString) return "N/D";
-        try {
-          let date;
-          if (/^\d{4}-\d{2}-\d{2}/.test(dateString)) {
-            const p = dateString.substring(0, 10).split("-");
-            date = new Date(Date.UTC(p[0], parseInt(p[1]) - 1, p[2]));
-          } else {
-            date = new Date(dateString);
-          }
-          if (isNaN(date.getTime())) return dateString;
-          return date.toLocaleDateString("it-IT", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-            timeZone: "UTC",
-          });
-        } catch (e) {
-          return dateString;
-        }
-      }
+  if (volantinoMorphOverlay)
+    volantinoMorphOverlay.addEventListener("click", (e) => {
+      if (e.target === volantinoMorphOverlay) hideVolantinoWithMorph();
+    });
 
-      document.addEventListener("DOMContentLoaded", () => {
-        gebi("currentYear").textContent = new Date().getFullYear();
-        checkLoginStatusOnLoad();
-        loadEvents();
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") {
-            if (loginPopup?.classList.contains("active")) closeLoginPopup();
-            if (volantinoMorphOverlay?.classList.contains("active"))
-              hideVolantinoWithMorph();
-          }
-        });
+  function handleRapidBooking(buttonElement, eventId) {
+    if (currentUser) {
+      alert(
+              `Prenotazione evento ${eventId} per ${currentUser.nome}. (Simulato)`
+      );
+    } else {
+      openLoginPopup();
+      localStorage.setItem("pending_booking_event_id_eff", eventId);
+    }
+  }
+  function formatDate(dateString) {
+    if (!dateString) return "N/D";
+    try {
+      let date;
+      if (/^\d{4}-\d{2}-\d{2}/.test(dateString)) {
+        const p = dateString.substring(0, 10).split("-");
+        date = new Date(Date.UTC(p[0], parseInt(p[1]) - 1, p[2]));
+      } else {
+        date = new Date(dateString);
+      }
+      if (isNaN(date.getTime())) return dateString;
+      return date.toLocaleDateString("it-IT", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
       });
-    </script>
-  </body>
+    } catch (e) {
+      return dateString;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    gebi("currentYear").textContent = new Date().getFullYear();
+    checkLoginStatusOnLoad();
+    loadEvents();
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (loginPopup?.classList.contains("active")) closeLoginPopup();
+        if (volantinoMorphOverlay?.classList.contains("active"))
+          hideVolantinoWithMorph();
+      }
+    });
+  });
+</script>
+</body>
 </html>
