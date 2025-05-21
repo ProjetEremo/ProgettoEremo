@@ -761,34 +761,66 @@
     async function openManageCommentsModal(eventId, eventTitle) {
         currentEventIdForComments = eventId;
         const titleEl = document.getElementById('commentsEventTitle');
-        const listContainerEl = document.getElementById('commentsListContainer'); // Questo è l'UL
+        let listContainerEl = document.getElementById('commentsListContainer'); // Prende l'elemento UL esistente
         const feedbackEl = document.getElementById('commentsManagementFeedback');
 
-        if(titleEl) titleEl.textContent = sanitizeText(eventTitle);
-        if(listContainerEl) listContainerEl.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p></li>';
-        if(feedbackEl) feedbackEl.innerHTML = '';
+        if(titleEl) {
+            titleEl.textContent = sanitizeText(eventTitle);
+        }
 
-        openModal('manageCommentsModal');
+        // --- INIZIO MODIFICA CRUCIALE ---
+        // Assicuriamoci di lavorare sempre con un contenitore "pulito" per i commenti
+        // per evitare l'accumulo di event listener.
+        if (listContainerEl && listContainerEl.parentNode) {
+            const newClonedListContainer = listContainerEl.cloneNode(false); // Clona solo l'elemento UL, non i suoi figli (li)
+            listContainerEl.parentNode.replaceChild(newClonedListContainer, listContainerEl);
+            listContainerEl = newClonedListContainer; // Ora listContainerEl si riferisce al nuovo nodo clonato e pulito
+        } else {
+            // Questo non dovrebbe accadere se l'HTML ha <ul id="commentsListContainer">
+            console.error("Elemento commentsListContainer non trovato o senza genitore.");
+            // Potresti voler mostrare un errore all'utente o gestire diversamente
+            if(feedbackEl) feedbackEl.innerHTML = '<p class="error-message">Errore interno nella visualizzazione dei commenti.</p>';
+            openModal('manageCommentsModal'); // Apre comunque il modal, ma potrebbe essere vuoto o con errore
+            return;
+        }
+        // --- FINE MODIFICA CRUCIALE ---
+
+        if(listContainerEl) { // Ora listContainerEl è sicuramente il nodo clonato e pulito
+            listContainerEl.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p></li>';
+        }
+        if(feedbackEl) {
+            feedbackEl.innerHTML = '';
+        }
+
+        openModal('manageCommentsModal'); // Questa funzione mostra solo il modal, non lo ricrea.
 
         try {
             const response = await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`);
-            if (!response.ok) throw new Error(`Errore HTTP ${response.status}`);
+            if (!response.ok) {
+                let errorText = `Errore HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorText = errorData.message || errorText;
+                } catch (e) { /* Non fa nulla se la risposta non è JSON */ }
+                throw new Error(errorText);
+            }
             const result = await response.json();
 
             if (result.success && result.comments) {
+                // listContainerEl è il nodo clonato, pronto per essere popolato e per avere i listener attaccati (una sola volta)
                 renderCommentsForAdminThreaded(result.comments, eventId, listContainerEl);
             } else {
-                if(listContainerEl) listContainerEl.innerHTML = `<li><p>${sanitizeText(result.message || 'Nessun commento per questo evento.')}</p></li>`;
+                if(listContainerEl) listContainerEl.innerHTML = `<li><p>${sanitizeText(result.message || 'Nessun commento per questo evento o errore nel caricamento.')}</p></li>`;
             }
         } catch (error) {
-            console.error('Errore fetchComments:', error);
+            console.error('Errore nel caricare i commenti (fetchComments):', error);
             if(listContainerEl) listContainerEl.innerHTML = `<li><p class="error-message">Impossibile caricare i commenti: ${sanitizeText(error.message)}</p></li>`;
         }
     }
 
     function renderCommentsForAdminThreaded(comments, eventId, parentUlElement, depth = 0) {
         if (depth === 0) {
-            parentUlElement.innerHTML = ''; // Pulisce l'UL principale
+            parentUlElement.innerHTML = '';
             if (!comments || comments.length === 0) {
                 parentUlElement.innerHTML = '<li style="list-style-type:none; text-align:center; margin:1rem 0;"><p>Nessun commento da visualizzare.</p></li>';
                 return;
@@ -797,54 +829,69 @@
 
         comments.forEach(comment => {
             const commentItemLi = document.createElement('li');
-            commentItemLi.className = 'comment-item-admin-styled';
+            commentItemLi.className = 'comment-item-admin-styled'; // Classe base per lo stile del LI
             commentItemLi.id = `admin-comment-${comment.Progressivo}`;
 
-            const isAdminReply = comment.is_admin_reply === true || comment.is_admin_reply === 1;
-            if (isAdminReply) {
-                commentItemLi.classList.add('admin-reply-highlight');
+            // comment.is_admin_reply è il flag booleano inviato dal PHP manage_comments_admin.php
+            // che indica se l'autore di QUESTO commento è un admin.
+            const isThisCommentByAdmin = comment.is_admin_reply === true;
+
+            // Opzionale: aggiungi una classe generale per lo stile del box admin
+            if (isThisCommentByAdmin) {
+                commentItemLi.classList.add('commento-admin-generale'); // Nuova classe per stile generale
             }
 
-            const commenterAvatar = comment.commenter_icon_path || (isAdminReply ? adminAvatarPath : defaultUserIconPath);
+            // Usa i dati forniti dal PHP per nome e icona.
+            // Il PHP manage_comments_admin.php dovrebbe già impostare:
+            // comment.utente_display_name al nome dell'admin (o utente)
+            // comment.commenter_icon_path al percorso icona dell'admin (o utente)
+            const commenterAvatar = comment.commenter_icon_path || defaultUserIconPath; // Fallback se PHP non lo fornisce
             const commenterName = sanitizeText(comment.utente_display_name || 'Anonimo');
+
             const commentDate = sanitizeText(comment.data_creazione_formattata || 'Data non disponibile');
             const commentText = sanitizeTextForHTML(comment.Descrizione);
 
+            // NUOVA LOGICA PER IL BADGE ADMIN (diverso da "(Staff)", qui usiamo "(Admin)" come nel tuo CSS)
+            let adminBadgeHTML = '';
+            if (isThisCommentByAdmin) {
+                adminBadgeHTML = '<span class="badge-admin-dashboard">(Admin)</span>'; // Nuova classe per il badge specifico della dashboard
+            }
+
             commentItemLi.innerHTML = `
-                <div class="comment-header">
-                    <img src="${commenterAvatar}" alt="Avatar di ${commenterName}" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';">
-                    <div class="comment-meta">
-                        <strong>${commenterName}</strong>
-                        <small>${commentDate}</small>
-                        <small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta ? ` | Risposta a: ${comment.CodRisposta}` : ''}</small>
+            <div class="comment-header">
+                <img src="${commenterAvatar}" alt="Avatar di ${commenterName}" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';">
+                <div class="comment-meta">
+                    <strong>${commenterName}</strong>
+                    ${adminBadgeHTML} <small>${commentDate}</small>
+                    <small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta ? ` | Risposta a: ${comment.CodRisposta}` : ''}</small>
+                </div>
+            </div>
+            <div class="comment-text-admin">${commentText}</div>
+            <div class="comment-actions-admin">
+                <button class="btn-admin btn-admin-reply" data-comment-id="${comment.Progressivo}" title="Rispondi"><i class="fas fa-reply"></i> Rispondi</button>
+                <button class="btn-admin btn-admin-danger btn-admin-delete-comment" data-comment-id="${comment.Progressivo}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button>
+            </div>
+            <div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}" style="display:none;">
+                <form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}">
+                    <textarea name="Descrizione" placeholder="Rispondi come ${adminNameGlobalJS}..." rows="3" required aria-label="Testo della risposta admin"></textarea>
+                    <div class="form-actions-reply">
+                        <button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia</button>
                     </div>
-                </div>
-                <div class="comment-text-admin">${commentText}</div>
-                <div class="comment-actions-admin">
-                    <button class="btn-admin btn-admin-reply" data-comment-id="${comment.Progressivo}" title="Rispondi"><i class="fas fa-reply"></i> Rispondi</button>
-                    <button class="btn-admin btn-admin-danger btn-admin-delete-comment" data-comment-id="${comment.Progressivo}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button>
-                </div>
-                <div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}" style="display:none;">
-                    <form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}">
-                        <textarea name="Descrizione" placeholder="Rispondi come ${adminNameGlobalJS}..." rows="3" required aria-label="Testo della risposta admin"></textarea>
-                        <div class="form-actions-reply">
-                            <button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia</button>
-                        </div>
-                        <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em;"></div>
-                    </form>
-                </div>
-            `;
+                    <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em;"></div>
+                </form>
+            </div>
+        `;
             parentUlElement.appendChild(commentItemLi);
 
             if (comment.replies && comment.replies.length > 0) {
                 const repliesUl = document.createElement('ul');
                 repliesUl.className = 'comment-replies-list-styled';
-                commentItemLi.appendChild(repliesUl); // Appendi la lista delle risposte al LI del commento padre
+                commentItemLi.appendChild(repliesUl);
                 renderCommentsForAdminThreaded(comment.replies, eventId, repliesUl, depth + 1);
             }
         });
-        // Event listeners sono ora delegati dall'UL principale in openManageCommentsModal o una funzione di setup
-        if (depth === 0) { // Solo per la prima chiamata, attacca i listener delegati
+
+        if (depth === 0) {
             attachAdminCommentListeners(parentUlElement);
         }
     }
