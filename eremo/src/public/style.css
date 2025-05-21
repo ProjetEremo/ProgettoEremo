@@ -2412,6 +2412,225 @@ body.page-dashboard .modal-content {
 
 /* ----- FINE STILI SPECIFICI DASHBOARD ----- */
 
+/* ----- INIZIO NUOVI STILI DASHBOARD PER CARD EVENTI ----- */
+
+/* Contenitore per le card admin, simile a .card-grid */
+.admin-event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); /* Adatta minmax se necessario */
+  gap: 2rem; /* Spazio tra le card */
+  margin-top: 1.5rem;
+}
+
+.admin-event-grid .loading-message-dashboard,
+.admin-event-grid .error-message-dashboard,
+.admin-event-grid .no-events-dashboard {
+  grid-column: 1 / -1; /* Occupa tutta la larghezza */
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: var(--gray-dark);
+  background-color: var(--white);
+  border-radius: var(--border-radius-medium);
+  box-shadow: var(--shadow-light);
+}
+.admin-event-grid .loading-message-dashboard i {
+  margin-right: 0.5em;
+}
+
+.admin-event-card {
+  background: var(--white);
+  border-radius: var(--border-radius-medium);
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--gray-light);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Per angoli arrotondati sull'immagine */
+  transition: var(--transition-medium);
+}
+.admin-event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-medium);
+}
+
+.admin-event-card-image-container {
+  height: 180px; /* Altezza fissa per l'immagine della card admin */
+  background-color: var(--gray-light); /* Sfondo per immagini non caricate */
+  overflow: hidden;
+}
+.admin-event-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Immagine copre il contenitore */
+  transition: transform 0.3s ease-out;
+}
+.admin-event-card:hover .admin-event-card-image {
+  transform: scale(1.05);
+}
+
+.admin-event-card-content {
+  padding: 1rem 1.2rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-event-card-header {
+  margin-bottom: 0.8rem;
+}
+.admin-event-card-header .admin-event-title {
+  font-size: 1.3rem;
+  color: var(--primary);
+  margin: 0 0 0.3rem 0;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.admin-event-card-header .admin-event-date {
+  font-size: 0.85rem;
+  color: var(--gray-dark);
+}
+
+.admin-event-card-quick-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Due colonne per le stats */
+  gap: 0.5rem 0.8rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--gray-light);
+}
+.admin-event-card-quick-stats .stat-item {
+  font-size: 0.85rem;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  background-color: var(--light);
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+}
+.admin-event-card-quick-stats .stat-item i {
+  margin-right: 0.5em;
+  color: var(--secondary);
+  font-size: 0.9em;
+  width: 16px; /* Allinea le icone */
+  text-align: center;
+}
+
+.admin-event-card-actions {
+  display: grid; /* Usa grid per allineare i bottoni */
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.admin-event-card-actions .btn-admin {
+  width: 100%; /* I bottoni occupano tutta la larghezza della cella grid */
+  font-size: 0.8rem; /* Riduci leggermente il font per più bottoni */
+  padding: 0.5rem 0.6rem;
+}
+.admin-event-card-actions .btn-admin i {
+  font-size: 0.9em;
+}
+
+
+.admin-event-card-expand-toggle {
+  background-color: var(--light);
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary);
+  transition: background-color var(--transition-fast);
+  border: 1px solid var(--gray-light);
+  margin-top: auto; /* Spinge il toggle in fondo alla card-content se lo spazio lo permette */
+}
+.admin-event-card-expand-toggle:hover {
+  background-color: #e8f0e7; /* Leggero hover come event-header-admin */
+}
+.admin-event-card-expand-toggle i {
+  transition: transform 0.25s ease;
+}
+.admin-event-card-expand-toggle i.fa-chevron-up {
+  transform: rotate(180deg);
+}
+
+.admin-event-card-details {
+  padding: 0 1.2rem 1.2rem 1.2rem; /* Padding per i dettagli espansi */
+  background-color: #fcfcfc; /* Leggero sfondo per distinguere */
+  border-top: 1px solid var(--gray-light);
+  display: none; /* Nascosto di default */
+}
+.admin-event-card-details.active {
+  display: block;
+  animation: fadeIn 0.4s ease-out;
+}
+.admin-event-card-details h4 {
+  color: var(--primary);
+  margin-top: 1rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.05rem;
+  text-align: left;
+  font-weight: 500;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dotted var(--gray-medium);
+}
+.admin-event-card-details .user-bookings-list {
+  margin-top: 0.5rem;
+}
+.admin-event-card-details .user-booking-group h5 small { /* Per rendere il contatto meno prominente */
+  font-weight: normal;
+  font-size: 0.9em;
+  color: var(--gray-dark);
+}
+
+/* Stili per messaggi di feedback nell'annullamento prenotazione (se non già globali) */
+.success-message {
+  padding: 0.8rem; margin: 0.5rem 0;
+  background-color: rgba(var(--success-rgb), 0.15);
+  border: 1px solid var(--success);
+  color: var(--dark);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.error-message {
+  padding: 0.8rem; margin: 0.5rem 0;
+  background-color: rgba(var(--danger-rgb), 0.15);
+  border: 1px solid var(--danger);
+  color: var(--dark);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.cancel-feedback-placeholder { /* Stile per il placeholder del feedback, se necessario */
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+/* Stili per i commenti nel modal (assicurati che siano coerenti) */
+#manageCommentsModal .comment-replies-list {
+  margin-left: 15px; /* Già presente, conferma coerenza */
+  padding-left: 10px; /* Già presente */
+  border-left: 2px dotted var(--gray-medium); /* Già presente */
+}
+
+/* Modifiche Responsive per Admin Cards */
+@media (max-width: 767px) {
+  .admin-event-grid {
+    grid-template-columns: 1fr; /* Una colonna su mobile */
+  }
+  .admin-event-card-quick-stats {
+    grid-template-columns: 1fr; /* Stats in una colonna su mobile se troppo strette */
+  }
+  .admin-event-card-actions {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Bottoni più piccoli o 2 per riga */
+  }
+}
+
+/* ----- FINE NUOVI STILI DASHBOARD ----- */
+
 /* ----- REGOLE FONDAMENTALI PER I MODAL (Devono essere in style.css) ----- */
 .modal {
   display: none; /* Stato iniziale: il modal è nascosto */

@@ -67,8 +67,8 @@
     </section>
 
     <section class="dashboard-section" id="eventManagementSection">
-        <h2><i class="fas fa-calendar-check"></i> Gestione Eventi, Prenotazioni e Partecipanti</h2>
-        <div class="event-list-admin" id="adminEventList">
+        <h2><i class="fas fa-calendar-check"></i> Gestione Eventi</h2>
+        <div class="admin-event-grid" id="adminEventList">
             <p><i class="fas fa-spinner fa-spin"></i> Caricamento eventi...</p>
         </div>
     </section>
@@ -124,7 +124,7 @@
 <script>
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-    // --- Navbar & Mobile Menu Logic ---
+    // --- Navbar & Mobile Menu Logic (invariato) ---
     const SnavbarContainer = document.getElementById('navbarContainer');
     let SlastScroll = 0;
     if (SnavbarContainer) {
@@ -246,27 +246,27 @@
     }
     function formatDbDate(dateString) {
         if (!dateString) return 'N/D';
-        const date = new Date(dateString.replace(/-/g, '/'));
-        if (isNaN(date.getTime())) return dateString;
+        const date = new Date(dateString.replace(/-/g, '/')); // Assicura compatibilità cross-browser per il parsing
+        if (isNaN(date.getTime())) return dateString; // Se non è una data valida, ritorna la stringa originale
         return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
 
     async function fetchDashboardData() {
         if (!adminEventList) { console.error("Elemento adminEventList non trovato."); return; }
-        adminEventList.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento dati dashboard...</p>';
+        adminEventList.innerHTML = '<div class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento dati dashboard...</div>';
         try {
-            const response = await fetch('get_dashboard_event_data.php');
+            const response = await fetch('get_dashboard_event_data.php'); // Questo script PHP deve fornire anche media_count per evento
             if (!response.ok) throw new Error(`Errore HTTP: ${response.status} ${response.statusText}`);
             const data = await response.json();
             if (data.success && data.events) {
                 renderAdminEventsWithGroupedBookings(data.events);
                 updateQuickStats(data.stats || {});
             } else {
-                adminEventList.innerHTML = `<p>Errore nel caricamento dati: ${data.message || 'Nessun evento trovato o formato dati non corretto.'}</p>`;
+                adminEventList.innerHTML = `<div class="error-message-dashboard"><p>Errore nel caricamento dati: ${data.message || 'Nessun evento trovato o formato dati non corretto.'}</p></div>`;
             }
         } catch (error) {
             console.error('Errore fetchDashboardData:', error);
-            adminEventList.innerHTML = `<p>Impossibile caricare i dati: ${error.message}</p>`;
+            adminEventList.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare i dati: ${error.message}</p></div>`;
         }
     }
 
@@ -275,86 +275,105 @@
         const elTotalBookings = document.getElementById('total-bookings');
         const elTotalParticipants = document.getElementById('total-participants');
         const elTotalComments = document.getElementById('total-comments');
+
         if(elTotalEvents) elTotalEvents.textContent = stats.totalEvents || 0;
         if(elTotalBookings) elTotalBookings.textContent = stats.totalBookings || 0;
         if(elTotalParticipants) elTotalParticipants.textContent = stats.totalParticipants || 0;
         if(elTotalComments) elTotalComments.textContent = stats.totalComments || 0;
     }
 
+    // NUOVA FUNZIONE PER TOGGLE DETTAGLI CARD
+    function toggleAdminEventDetails(toggleButton, eventId) {
+        const detailsDiv = document.getElementById(`details-event-${eventId}`);
+        const icon = toggleButton.querySelector('i');
+        if (detailsDiv && icon) {
+            detailsDiv.classList.toggle('active');
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+            toggleButton.setAttribute('aria-expanded', detailsDiv.classList.contains('active'));
+        }
+    }
+
+    // --- MODIFIED: renderAdminEventsWithGroupedBookings ---
     function renderAdminEventsWithGroupedBookings(events) {
         if (!adminEventList) return;
         if (events.length === 0) {
-            adminEventList.innerHTML = '<p>Nessun evento da gestire al momento.</p>';
+            adminEventList.innerHTML = '<div class="no-events-dashboard"><p>Nessun evento da gestire al momento.</p></div>';
             return;
         }
-        adminEventList.innerHTML = '';
+        adminEventList.innerHTML = ''; // Pulisce la lista
 
         events.forEach(event => {
-            const eventItem = document.createElement('div');
-            eventItem.className = 'event-item-admin';
+            const eventCard = document.createElement('article');
+            eventCard.className = 'admin-event-card';
+            eventCard.id = `admin-event-${event.IDEvento}`;
+
             const postiOccupati = event.posti_occupati || 0;
             const postiConfigurati = event.posti_configurati_totali !== undefined ? event.posti_configurati_totali : (postiOccupati + (parseInt(event.PostiDisponibili, 10) || 0));
-            const postiDisponibiliAttuali = event.PostiDisponibili !== undefined ? event.PostiDisponibili : (postiConfigurati - postiOccupati);
+            // Assumiamo che lo script PHP `get_dashboard_event_data.php` possa fornire `media_count` e `comment_count`
+            // Se `comment_count` è già presente nel tuo `event` object, usalo.
+            const commentCount = event.comment_count || 0;
+            // `media_count` è un placeholder, dovrai aggiungerlo al tuo script PHP
+            const mediaCount = event.media_count || 0; // Assicurati che 'get_dashboard_event_data.php' fornisca questo.
 
-            eventItem.innerHTML = `
-                <div class="event-header-admin">
-                    <div>
-                        <h3>${sanitizeText(event.Titolo)} (ID: ${event.IDEvento})</h3>
-                        <span class="event-date-admin">Data: ${formatDbDate(event.Data)} ${sanitizeText(event.Durata) || ''}</span>
-                        <span class="event-date-admin">Posti: ${postiOccupati} / ${postiConfigurati} (Disponibili: ${postiDisponibiliAttuali})</span>
-                    </div>
-                    <i class="fas fa-chevron-down"></i>
+            let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-admin.jpg'; // Immagine di default specifica per admin card se vuoi
+
+            eventCard.innerHTML = `
+                <div class="admin-event-card-image-container">
+                    <img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.Titolo)}" class="admin-event-card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
                 </div>
-                <div class="event-details-admin">
-                    <h4>Prenotazioni Effettuate:</h4>
+                <div class="admin-event-card-content">
+                    <div class="admin-event-card-header">
+                        <h3 class="admin-event-title">${sanitizeText(event.Titolo)} (ID: ${event.IDEvento})</h3>
+                        <span class="admin-event-date">Data: ${formatDbDate(event.Data)} ${sanitizeText(event.Durata) || ''}</span>
+                    </div>
+                    <div class="admin-event-card-quick-stats">
+                        <div class="stat-item" title="Posti Occupati / Posti Configurati"><i class="fas fa-chair"></i> ${postiOccupati} / ${postiConfigurati}</div>
+                        <div class="stat-item" title="Totale Prenotazioni Individuali"><i class="fas fa-users"></i> ${event.elenco_prenotazioni?.length || 0} Pren.</div>
+                        <div class="stat-item" title="Numero Media Caricati"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div>
+                        <div class="stat-item" title="Numero Commenti"><i class="fas fa-comments"></i> ${commentCount} Commenti</div>
+                    </div>
+                    <div class="admin-event-card-actions">
+                        <button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="Scarica PDF Lista Partecipanti">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Gestisci media evento">
+                            <i class="fas fa-photo-video"></i> Media
+                        </button>
+                        <button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Gestisci commenti evento">
+                            <i class="fas fa-comments"></i> Commenti
+                        </button>
+                        <button class="btn-admin btn-admin-danger" onclick="confirmDeleteEvent(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Elimina questo evento">
+                            <i class="fas fa-trash-alt"></i> Elimina
+                        </button>
+                    </div>
+                    <div class="admin-event-card-expand-toggle" onclick="toggleAdminEventDetails(this, ${event.IDEvento})" role="button" aria-expanded="false" aria-controls="details-event-${event.IDEvento}">
+                        <span>Gestisci Prenotazioni</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="admin-event-card-details" id="details-event-${event.IDEvento}">
+                    <h4>Prenotazioni Effettuate (${event.elenco_prenotazioni?.length || 0}):</h4>
                     <div class="user-bookings-list" id="bookingsForEvent-${event.IDEvento}">
                         ${renderGroupedBookings(event.elenco_prenotazioni || [], event.IDEvento)}
                     </div>
-                    <hr style="margin: 1.5rem 0;">
-                    <h4>Azioni Generali Evento</h4>
-                    <div class="actions-container">
-                        <button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="Scarica PDF Lista Partecipanti">
-                            <i class="fas fa-file-pdf"></i> PDF Partecipanti
-                        </button>
-                        <button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Gestisci media evento">
-                            <i class="fas fa-photo-video"></i> Gestisci Media
-                        </button>
-                        <button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Gestisci commenti evento">
-                            <i class="fas fa-comments"></i> Commenti (${event.comment_count || 0})
-                        </button>
-                        <button class="btn-admin btn-admin-danger" onclick="confirmDeleteEvent(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Elimina questo evento">
-                            <i class="fas fa-trash-alt"></i> Elimina Evento
-                        </button>
-                    </div>
                 </div>
             `;
-            adminEventList.appendChild(eventItem);
-
-            const header = eventItem.querySelector('.event-header-admin');
-            const details = eventItem.querySelector('.event-details-admin');
-            if (header && details) {
-                header.addEventListener('click', () => {
-                    details.classList.toggle('active');
-                    const icon = header.querySelector('i');
-                    if (icon) {
-                        icon.classList.toggle('fa-chevron-down');
-                        icon.classList.toggle('fa-chevron-up');
-                    }
-                });
-            }
+            adminEventList.appendChild(eventCard);
         });
     }
 
+
     function renderGroupedBookings(bookings, eventId) {
         if (!bookings || bookings.length === 0) {
-            return '<p>Nessuna prenotazione per questo evento.</p>';
+            return '<p style="text-align:center; margin:1rem 0; font-size:0.9rem; color: var(--gray-dark);">Nessuna prenotazione per questo evento.</p>';
         }
         let html = '';
         bookings.forEach(booking => {
             const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim();
-            const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto);
+            const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto); // Fallback a Contatto se nome/cognome non ci sono
             html += `<div class="user-booking-group">
-                        <h5>Prenotazione di: ${displayNomeUtente} (${sanitizeText(booking.Contatto)})</h5>
+                        <h5>Prenotazione di: ${displayNomeUtente} <small>(${sanitizeText(booking.Contatto)})</small></h5>
                         <div class="single-booking-details">
                             <p><strong>ID Prenotazione: ${booking.idPrenotazione}</strong> - Posti Prenotati: ${booking.NumeroPosti}</p>
                             <strong>Partecipanti:</strong>
@@ -382,11 +401,24 @@
     }
 
     async function cancelBooking(idPrenotazione) {
-        const feedbackPlaceholder = document.createElement('p');
-        feedbackPlaceholder.id = `cancel-feedback-${idPrenotazione}`;
-        feedbackPlaceholder.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Annullamento prenotazione ID ${idPrenotazione}...`;
-        const eventDetailsDiv = document.querySelector(`#bookingsForEvent-${idPrenotazione}`)?.closest('.event-details-admin') || adminEventList;
-        eventDetailsDiv.insertAdjacentElement('afterbegin', feedbackPlaceholder);
+        // Trova il feedback placeholder relativo alla card specifica
+        const bookingGroupElement = document.querySelector(`button[onclick*="confirmCancelBooking(${idPrenotazione},"]`)?.closest('.user-booking-group');
+        let feedbackPlaceholder = bookingGroupElement?.querySelector('.cancel-feedback-placeholder');
+
+        if (!feedbackPlaceholder && bookingGroupElement) {
+            feedbackPlaceholder = document.createElement('p');
+            feedbackPlaceholder.className = 'cancel-feedback-placeholder'; // Aggiungi una classe per stilizzarlo se necessario
+            bookingGroupElement.insertAdjacentElement('afterend', feedbackPlaceholder);
+        } else if (!bookingGroupElement) { // Fallback se non troviamo il booking group (improbabile)
+            feedbackPlaceholder = document.getElementById(`admin-event-list`) || adminEventList; // Usa un contenitore generico
+            const tempP = document.createElement('p');
+            tempP.id = `cancel-feedback-${idPrenotazione}`;
+            feedbackPlaceholder.prepend(tempP);
+            feedbackPlaceholder = tempP;
+        }
+
+        if(feedbackPlaceholder) feedbackPlaceholder.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Annullamento prenotazione ID ${idPrenotazione}...`;
+
 
         try {
             const formData = new FormData();
@@ -394,20 +426,24 @@
             const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData });
             const result = await response.json();
 
-            if (result.success) {
-                feedbackPlaceholder.className = 'success-message';
-                feedbackPlaceholder.innerHTML = `<i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}`;
-                fetchDashboardData();
-            } else {
-                feedbackPlaceholder.className = 'error-message';
-                feedbackPlaceholder.innerHTML = `<i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare.')}`;
+            if (feedbackPlaceholder) {
+                if (result.success) {
+                    feedbackPlaceholder.className = 'success-message';
+                    feedbackPlaceholder.innerHTML = `<i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}`;
+                    fetchDashboardData(); // Ricarica tutti i dati per aggiornare la card e le stats globali
+                } else {
+                    feedbackPlaceholder.className = 'error-message';
+                    feedbackPlaceholder.innerHTML = `<i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare.')}`;
+                }
+                setTimeout(() => { feedbackPlaceholder.remove(); }, 7000);
             }
-            setTimeout(() => { feedbackPlaceholder.remove(); }, 7000);
         } catch (error) {
             console.error("Errore AJAX annullamento:", error);
-            feedbackPlaceholder.className = 'error-message';
-            feedbackPlaceholder.innerHTML = `<i class="fas fa-exclamation-circle"></i> Errore connessione: ${sanitizeText(error.message)}`;
-            setTimeout(() => { feedbackPlaceholder.remove(); }, 7000);
+            if (feedbackPlaceholder) {
+                feedbackPlaceholder.className = 'error-message';
+                feedbackPlaceholder.innerHTML = `<i class="fas fa-exclamation-circle"></i> Errore connessione: ${sanitizeText(error.message)}`;
+                setTimeout(() => { feedbackPlaceholder.remove(); }, 7000);
+            }
         }
     }
 
@@ -417,12 +453,15 @@
         const existingMediaContainer = document.getElementById('existingMediaContainer');
         const feedbackDiv = document.getElementById('uploadMediaFeedback');
         const uploadForm = document.getElementById('uploadMediaForm');
+
         if (eventIdInput) eventIdInput.value = eventId;
         if (eventTitleEl) eventTitleEl.textContent = sanitizeText(eventTitle);
         if (uploadForm) uploadForm.reset();
         if (feedbackDiv) feedbackDiv.innerHTML = '';
         if (existingMediaContainer) existingMediaContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media...</p>';
+
         openModal('uploadMediaModal');
+
         try {
             const response = await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`);
             const result = await response.json();
@@ -436,6 +475,7 @@
             if (existingMediaContainer) existingMediaContainer.innerHTML = `<p>Errore connessione: ${sanitizeText(error.message)}</p>`;
         }
     }
+
     function renderExistingMedia(mediaItems, eventId) {
         const container = document.getElementById('existingMediaContainer');
         if (!container) return;
@@ -450,8 +490,10 @@
                 html += `<img src="${item.url_media}" alt="${sanitizeText(item.Descrizione) || filename}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                          <div class="media-icon-placeholder" style="display:none;"><i class="fas fa-image"></i></div>`;
             } else if (item.tipo_media === 'video') {
-                html += `<video src="${item.url_media}" controls preload="metadata" style="background-color: #000;"></video>`;
-            } else { // Potrebbe essere un PDF o altro
+                // Per i video, potrebbe essere meglio un placeholder se il caricamento è pesante
+                html += `<div class="media-icon-placeholder" title="Video: ${sanitizeText(filename)}"><i class="fas fa-video"></i></div>`;
+                // Potresti aggiungere un link per aprirlo o un piccolo player se strettamente necessario nel modal
+            } else { // PDF o altro
                 html += `<a href="${item.url_media}" target="_blank" title="Apri ${sanitizeText(filename)}">
                             <div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div>
                          </a>`;
@@ -465,6 +507,7 @@
         });
         html += '</div>';
         container.innerHTML = html;
+
         container.querySelectorAll('.btn-delete-media').forEach(button => {
             button.addEventListener('click', function() {
                 if (confirm('Sei sicuro di voler eliminare questo media? L\'azione è irreversibile.')) {
@@ -473,6 +516,7 @@
             });
         });
     }
+
     async function deleteMediaItem(mediaId, eventId) {
         const feedbackDiv = document.getElementById('uploadMediaFeedback');
         if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
@@ -480,12 +524,16 @@
             const formData = new FormData();
             formData.append('action', 'delete_event_media');
             formData.append('media_id', mediaId);
+
             const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
             const result = await response.json();
+
             if (result.success) {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
                 const titleEl = document.getElementById('uploadMediaEventTitle');
+                // Ricarica i media nel modal e aggiorna il conteggio nella card principale
                 openManageMediaModal(eventId, titleEl ? titleEl.textContent : "Evento");
+                fetchDashboardData(); // Per aggiornare il conteggio media sulla card
             } else {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;
             }
@@ -495,6 +543,8 @@
         }
         setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 4000);
     }
+
+
     const uploadMediaForm = document.getElementById('uploadMediaForm');
     if(uploadMediaForm) {
         uploadMediaForm.addEventListener('submit', async function(e) {
@@ -503,23 +553,33 @@
             const files = document.getElementById('mediaFiles').files;
             const description = document.getElementById('mediaDescription').value;
             const feedbackDiv = document.getElementById('uploadMediaFeedback');
+
             if (!feedbackDiv) { console.error("Feedback div mancante"); return; }
+
             if (files.length === 0) {
                 feedbackDiv.innerHTML = '<p class="error-message">Seleziona almeno un file.</p>'; return;
             }
             feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
+
             const formData = new FormData();
             formData.append('action', 'upload_media');
             formData.append('event_id', eventId);
             formData.append('description', description);
-            for (let i = 0; i < files.length; i++) formData.append('mediaFiles[]', files[i]);
+            for (let i = 0; i < files.length; i++) {
+                formData.append('mediaFiles[]', files[i]);
+            }
+
             try {
-                const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
+                const response = await fetch('manage_event_media.php', {
+                    method: 'POST',
+                    body: formData
+                });
                 const result = await response.json();
                 if (result.success) {
                     feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
                     const titleEl = document.getElementById('uploadMediaEventTitle');
-                    openManageMediaModal(eventId, titleEl ? titleEl.textContent : "Evento");
+                    openManageMediaModal(eventId, titleEl ? titleEl.textContent : "Evento"); // Ricarica i media nel modal
+                    fetchDashboardData(); // Per aggiornare il conteggio media sulla card principale
                     this.reset();
                 } else {
                     feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;
@@ -536,13 +596,17 @@
         const commentsEventTitleEl = document.getElementById('commentsEventTitle');
         const commentsListContainerEl = document.getElementById('commentsListContainer');
         const feedbackDiv = document.getElementById('commentsManagementFeedback');
+
         if(commentsEventTitleEl) commentsEventTitleEl.textContent = sanitizeText(eventTitle);
         if(commentsListContainerEl) commentsListContainerEl.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p>';
         if(feedbackDiv) feedbackDiv.innerHTML = '';
+
         openModal('manageCommentsModal');
+
         try {
             const response = await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`);
             const result = await response.json();
+
             if (result.success && result.comments) {
                 if(commentsListContainerEl) renderCommentsForAdminThreaded(result.comments, eventId, commentsListContainerEl);
             } else {
@@ -553,15 +617,20 @@
             if(commentsListContainerEl) commentsListContainerEl.innerHTML = `<p>Impossibile caricare: ${sanitizeText(error.message)}</p>`;
         }
     }
+
     function renderCommentsForAdminThreaded(comments, eventId, parentElement, depth = 0) {
-        if (depth === 0 && parentElement) parentElement.innerHTML = '';
+        if (depth === 0 && parentElement) parentElement.innerHTML = ''; // Pulisci il contenitore solo al primo livello
+
         if (!comments || comments.length === 0) {
             if (depth === 0 && parentElement) parentElement.innerHTML = '<p>Nessun commento per questo evento.</p>';
             return;
         }
+
         const ul = document.createElement('ul');
         ul.className = depth > 0 ? 'comment-replies-list' : 'comment-thread-list';
-        if (depth > 0) ul.style.paddingLeft = `15px`; // Solo padding, non margin
+        // Lo stile per l'indentazione è meglio gestirlo via CSS (`.comment-replies-list { margin-left: ... }`)
+        // Ma se vuoi forzarlo via JS: if (depth > 0) ul.style.marginLeft = `${depth * 15}px`;
+
         comments.forEach(comment => {
             const li = document.createElement('li');
             li.className = 'comment-item-admin';
@@ -578,42 +647,58 @@
                     <i class="fas fa-trash-alt"></i> Elimina
                 </button>
             `;
-            if (parentElement) parentElement.appendChild(li);
+            // Se non è una risposta (depth 0) oppure se è una risposta e il genitore è un UL (per risposte dirette), appendi a ul.
+            // Se è una risposta e il genitore è un LI (per risposte nidificate), appendi a li.
+            if (depth === 0 || (parentElement && parentElement.tagName === 'UL')) {
+                ul.appendChild(li);
+            } else if (parentElement && parentElement.tagName === 'LI') {
+                parentElement.appendChild(li); // Aggiungi direttamente all'LI del commento padre per la nidificazione
+            }
+
+
             if (comment.replies && comment.replies.length > 0) {
-                // Le risposte vengono aggiunte direttamente sotto l'li del genitore,
-                // ma la funzione renderCommentsForAdminThreaded aggiungerà un nuovo ul per loro
+                // Per le risposte, il nuovo `ul` verrà creato e appeso DENTRO l' `li` del commento padre.
                 renderCommentsForAdminThreaded(comment.replies, eventId, li, depth + 1);
             }
         });
-        // Se stiamo aggiungendo un <ul> figlio a un <li>, non è necessario ri-appendere `ul` a `parentElement`
-        // a meno che non sia la prima chiamata (depth 0).
-        if (depth === 0 && parentElement) {
-            // Se ul ha figli, lo aggiungiamo. Altrimenti, il messaggio "Nessun commento" rimane.
-            if (ul.hasChildNodes()) {
-                parentElement.appendChild(ul);
-            } else if (!parentElement.hasChildNodes()) { // Doppio controllo se la lista era vuota e rimane vuota
-                parentElement.innerHTML = '<p>Nessun commento per questo evento.</p>';
-            }
-        } else if (depth > 0 && parentElement.tagName === 'LI') { // Aggiungiamo ul delle risposte al li genitore
-            if (ul.hasChildNodes()) {
-                parentElement.appendChild(ul); // L'ul delle risposte va dentro l'li del commento padre
-            }
+
+        // Aggiungi l'ul principale al parentElement solo se siamo al livello 0 e l'ul ha figli.
+        if (depth === 0 && parentElement && ul.hasChildNodes()) {
+            parentElement.appendChild(ul);
+        } else if (depth === 0 && parentElement && !ul.hasChildNodes() && !parentElement.hasChildNodes()) {
+            // Se l'ul è vuoto e il parentElement non ha altri figli (es. messaggio "Nessun commento"),
+            // non fare nulla per evitare di sovrascrivere il messaggio.
+            // Il messaggio "Nessun commento" viene già gestito all'inizio della funzione.
         }
+        // Se stiamo processando risposte (depth > 0), l' `ul` delle risposte è già stato appeso all' `li` del commento padre
+        // oppure all' `ul` del livello precedente se la struttura è piatta.
+        // Non è necessario ri-appendere `ul` a `parentElement` qui.
     }
+
+
     async function deleteAdminComment(commentId, eventIdForReload) {
         if (!confirm('Sei sicuro di voler eliminare questo commento e tutte le sue risposte dirette?')) return;
+
         const feedbackDiv = document.getElementById('commentsManagementFeedback');
         if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
+
         try {
             const formData = new FormData();
             formData.append('action', 'delete_comment');
             formData.append('comment_id', commentId);
-            const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
+
+            const response = await fetch('manage_comments_admin.php', {
+                method: 'POST',
+                body: formData
+            });
             const result = await response.json();
+
             if (result.success) {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
                 const titleEl = document.getElementById('commentsEventTitle');
+                // Ricarica i commenti nel modal e aggiorna il conteggio nella card principale
                 openManageCommentsModal(eventIdForReload, titleEl ? titleEl.textContent : "Evento");
+                fetchDashboardData(); // Per aggiornare il conteggio commenti sulla card
             } else {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;
             }
@@ -624,20 +709,37 @@
         setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 5000);
     }
 
+
     async function confirmDeleteEvent(eventId, eventTitle) {
         if (!confirm(`Sei sicuro di voler eliminare l'evento "${eventTitle}" (ID: ${eventId})? Questa azione è irreversibile e cancellerà anche tutte le prenotazioni, i media e i commenti associati.`)) return;
+
+        // Puoi aggiungere un feedback visivo qui se vuoi, es. sull'intera card
+        const eventCardElement = document.getElementById(`admin-event-${eventId}`);
+        if (eventCardElement) {
+            eventCardElement.style.opacity = '0.5';
+            // Aggiungi uno spinner sopra la card o un messaggio
+        }
+
         try {
             const formData = new FormData();
             formData.append('action', 'delete_event');
             formData.append('event_id', eventId);
-            // Assicurati che 'gestione_eventi.php' esista e gestisca questa action
-            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+
+            const response = await fetch('gestione_eventi.php', { // Assicurati che questo script esista e gestisca l'azione
+                method: 'POST',
+                body: formData
+            });
             const result = await response.json();
             alert(sanitizeText(result.message));
-            if (result.success) fetchDashboardData();
+            if (result.success) {
+                fetchDashboardData(); // Ricarica la lista degli eventi
+            } else {
+                if (eventCardElement) eventCardElement.style.opacity = '1'; // Ripristina l'opacità in caso di errore
+            }
         } catch (error) {
             console.error('Errore deleteEvent:', error);
             alert(`Errore eliminazione evento: ${sanitizeText(error.message)}`);
+            if (eventCardElement) eventCardElement.style.opacity = '1';
         }
     }
 
