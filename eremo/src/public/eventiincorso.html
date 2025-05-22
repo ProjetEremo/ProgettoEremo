@@ -192,7 +192,7 @@
     </div>
     <div class="terms-checkbox mb-3">
       <input type="checkbox" id="register-terms-popup" name="register-terms" required>
-      <label for="register-terms-popup">Accetto i <a href="/termini" target="_blank">termini e condizioni</a></label>
+      <label for="register-terms-popup">Accetto i <a href="termini.html" target="_blank">termini e condizioni</a></label>
     </div>
     <div id="register-error-message-popup" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
     <div class="form-actions">
@@ -215,25 +215,23 @@
 
   const defaultUserIconPath = 'uploads/icons/default_user.png';
 
-  // Variabili globali per il popup volantino
+  // Variabili globali per il popup volantino e menu
+  const navbarContainerEl = gebi("navbarContainer");
+  const mobileMenuEl = gebi("mobileMenu");
+  const hamburgerEl = document.querySelector(".navbar .hamburger"); // Definito qui per essere usato da tutte le funzioni menu
   let volantinoMorphOverlay = null;
   let morphingCard = null;
-  // originalCardForMorph non è più strettamente necessario per l'animazione semplice, ma lo lasciamo se altre logiche lo usano.
   let originalCardForMorph = null;
 
 
   // --- Navbar & Mobile Menu ---
-  const navbarContainerEl = gebi("navbarContainer");
-  const mobileMenuEl = gebi("mobileMenu");
-  const hamburgerEl = document.querySelector(".navbar .hamburger");
-  let lastScrollNav = 0;
-
+  let lastScrollNav = 0; // Rimuovi 'const' se già dichiarata globalmente
   if (navbarContainerEl) {
     window.addEventListener("scroll", function () {
       const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
       if (currentScroll <= 50) {
         navbarContainerEl.classList.remove("hidden");
-        lastScrollNav = 0;
+        lastScrollNav = 0; // Resetta lastScrollNav quando la navbar è visibile all'inizio
         return;
       }
       if (currentScroll > lastScrollNav && !navbarContainerEl.classList.contains("hidden")) {
@@ -241,20 +239,30 @@
       } else if (currentScroll < lastScrollNav && navbarContainerEl.classList.contains("hidden")) {
         navbarContainerEl.classList.remove("hidden");
       }
-      lastScrollNav = currentScroll;
+      lastScrollNav = currentScroll; // Aggiorna sempre lastScrollNav
     });
   }
 
   function toggleMobileMenu() {
     if (mobileMenuEl && hamburgerEl) {
       const isOpen = mobileMenuEl.classList.toggle("open");
-      hamburgerEl.classList.toggle("open");
+      hamburgerEl.classList.toggle("open"); // Aggiungi/rimuovi classe 'open' anche all'hamburger
       hamburgerEl.setAttribute("aria-expanded", String(isOpen));
       document.body.style.overflow = isOpen ? "hidden" : "";
     }
   }
 
-  function closeMobileMenuOnLinkClick() { // Rinominata per chiarezza
+  function closeMobileMenuOnLinkClick() { // MODIFICATA per chiudere correttamente
+    if (mobileMenuEl && hamburgerEl && mobileMenuEl.classList.contains("open")) {
+      mobileMenuEl.classList.remove("open");
+      hamburgerEl.classList.remove("open"); // Assicura che anche l'icona hamburger si resetti
+      hamburgerEl.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    }
+  }
+
+  // La funzione closeMobileMenu è per il click generico fuori dal menu
+  function closeMobileMenu() {
     if (mobileMenuEl && hamburgerEl && mobileMenuEl.classList.contains("open")) {
       mobileMenuEl.classList.remove("open");
       hamburgerEl.classList.remove("open");
@@ -263,30 +271,46 @@
     }
   }
 
-  if (hamburgerEl) hamburgerEl.addEventListener("click", toggleMobileMenu);
+
+  // L'event listener per hamburgerEl può rimanere se vuoi ridondanza,
+  // ma l'onclick nell'HTML è spesso sufficiente e più diretto.
+  // if (hamburgerEl) hamburgerEl.addEventListener("click", toggleMobileMenu); // Questo è già gestito dall'onclick
 
   document.querySelectorAll("#mobileMenu a").forEach((link) => {
     if (link.id !== 'login-btn-mobile') {
-      link.addEventListener("click", closeMobileMenuOnLinkClick); // Usa la funzione rinominata
+      link.addEventListener("click", closeMobileMenuOnLinkClick);
     }
+    // Per login-btn-mobile l'onclick nell'HTML gestisce già openLoginPopup() e closeMobileMenuOnLinkClick()
   });
+
   document.addEventListener('click', function(event) {
     if (mobileMenuEl && mobileMenuEl.classList.contains('open') &&
             hamburgerEl && !mobileMenuEl.contains(event.target) &&
             !hamburgerEl.contains(event.target)) {
-      closeMobileMenuOnLinkClick(); // Usa la funzione rinominata
+      closeMobileMenu(); // Usa la funzione corretta
+    }
+    // Logica per chiudere dropdown utente (se presente e aperta)
+    const userDropdownMenu = gebi("userDropdownContainer")?.querySelector(".dropdown-menu");
+    const userDropdownButton = gebi("userDropdownContainer")?.querySelector(".user-btn");
+    if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
+      const userDropdownContainer = gebi('userDropdownContainer');
+      if (userDropdownContainer && !userDropdownContainer.contains(event.target)) {
+        userDropdownMenu.style.display = 'none';
+        if(userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
+      }
     }
   });
 
 
   // --- Login Popup ---
+  // (Le variabili sono già definite globalmente sopra)
   const loginOverlay = gebi("loginOverlay"),
           loginPopup = gebi("loginPopup"),
           closeLoginPopupBtn = gebi("closeLoginPopupBtn");
   const loginTabs = document.querySelectorAll(".login-tab"),
           loginForms = document.querySelectorAll(".login-popup .login-form");
   const loginBtnHeader = gebi("login-btn-header"),
-          loginBtnMobile = gebi("login-btn-mobile");
+          loginBtnMobile = gebi("login-btn-mobile"); // Già definito
   const loginErrorMessagePopup = gebi('login-error-message-popup');
   const registerErrorMessagePopup = gebi('register-error-message-popup');
 
@@ -318,9 +342,8 @@
     if (registerErrorMessagePopup) registerErrorMessagePopup.style.display = 'none';
   }
 
-
   if (loginBtnHeader) loginBtnHeader.addEventListener("click", openLoginPopup);
-  // loginBtnMobile ha onclick nell'HTML
+  // loginBtnMobile ha l'onclick nell'HTML che chiama: openLoginPopup(); closeMobileMenuOnLinkClick();
 
   if (closeLoginPopupBtn) closeLoginPopupBtn.addEventListener("click", closeLoginPopup);
   if (loginOverlay) loginOverlay.addEventListener("click", (e) => {
@@ -351,44 +374,35 @@
   let currentUser = null;
   const logoutBtnDropdown = gebi("logout-btn-dropdown");
 
-  if (userBtnEl) {
+  if (userBtnEl) { // Gestione click sul pulsante utente per aprire/chiudere dropdown
     userBtnEl.addEventListener("click", (e) => {
-      e.stopPropagation();
-      userDropdownContainerEl.classList.toggle("show");
-      userBtnEl.setAttribute(
-              "aria-expanded",
-              userDropdownContainerEl.classList.contains("show").toString()
-      );
+      e.stopPropagation(); // Previene che il click si propaghi al document chiudendo subito il menu
+      const userMenu = userDropdownContainerEl.querySelector(".dropdown-menu");
+      const isCurrentlyOpen = userMenu.style.display === 'block';
+      userMenu.style.display = isCurrentlyOpen ? 'none' : 'block';
+      userBtnEl.setAttribute("aria-expanded", String(!isCurrentlyOpen));
     });
   }
-  document.addEventListener("click", (e) => { // Listener globale per chiudere dropdown utente
-    if (
-            userDropdownContainerEl?.classList.contains("show") &&
-            !userDropdownContainerEl.contains(e.target) &&
-            userBtnEl && !userBtnEl.contains(e.target) // Aggiunto controllo per non chiudere se si clicca sul bottone stesso
-    ) {
-      userDropdownContainerEl.classList.remove("show");
-      userBtnEl?.setAttribute("aria-expanded", "false");
-    }
-  });
 
   function updateNavbarUserUI() {
     const navbarAvatarEl = gebi("navbar-avatar");
     const navbarUsernameEl = gebi("navbar-username");
+    const userDropdownMenuEl = userDropdownContainerEl?.querySelector(".dropdown-menu");
+
 
     if (currentUser && currentUser.nome) {
       if (navbarAvatarEl) {
-        const imgAvatar = navbarAvatarEl.querySelector('img');
-        if (imgAvatar && currentUser.iconPath) {
-          imgAvatar.src = currentUser.iconPath;
-          imgAvatar.alt = `Icona di ${currentUser.nome}`;
-          imgAvatar.style.display = '';
-          const textNode = Array.from(navbarAvatarEl.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+        // Se c'è un elemento <img> dentro navbarAvatarEl, usa quello. Altrimenti, testo.
+        const imgEl = navbarAvatarEl.querySelector('img');
+        if (imgEl) {
+          imgEl.src = currentUser.iconPath || defaultUserIconPath;
+          imgEl.alt = `Icona di ${currentUser.nome}`;
+          imgEl.style.display = 'inline'; // Assicurati che sia visibile
+          // Nascondi il testo di fallback 👤 se l'immagine è presente
+          const textNode = Array.from(navbarAvatarEl.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '👤');
           if (textNode) textNode.textContent = '';
-        } else if (imgAvatar) { // Se c'è img ma non iconPath, usa default
-          imgAvatar.src = defaultUserIconPath;
-          imgAvatar.alt = `Icona utente`;
-        } else { // Fallback a testo se non c'è elemento img
+
+        } else { // Se non c'è <img>, usa il testo (come da tuo HTML originale)
           navbarAvatarEl.textContent = currentUser.avatar || (currentUser.nome ? currentUser.nome.charAt(0).toUpperCase() : "👤");
         }
       }
@@ -397,24 +411,66 @@
       if (userDropdownContainerEl) userDropdownContainerEl.style.display = "inline-block";
       if (loginBtnHeader) loginBtnHeader.style.display = "none";
       const mobileLoginLink = gebi('login-btn-mobile');
-      if(mobileLoginLink) mobileLoginLink.style.display = "none";
+      if(mobileLoginLink) mobileLoginLink.style.display = "none"; // Nascondi "Accedi" nel menu mobile
 
-    } else {
+      // Aggiungi link specifici utente al menu mobile se non già presenti
+      const mobileMenuElement = gebi('mobileMenu');
+      if (mobileMenuElement && !mobileMenuElement.querySelector('#logout-link-mobile-dynamic')) {
+        const hr = document.createElement('hr');
+        hr.style.borderColor = 'rgba(255,255,255,0.1)';
+        mobileMenuElement.appendChild(hr);
+
+        const profileLink = document.createElement('a');
+        profileLink.href = 'areapersonale.html';
+        profileLink.textContent = 'Il Mio Profilo';
+        profileLink.onclick = closeMobileMenuOnLinkClick;
+        mobileMenuElement.appendChild(profileLink);
+
+        const bookingsLink = document.createElement('a');
+        bookingsLink.href = 'areapersonale.html#prenotazioni'; // o gestisciprenotazioni.html
+        bookingsLink.textContent = 'Le Mie Prenotazioni';
+        bookingsLink.onclick = closeMobileMenuOnLinkClick;
+        mobileMenuElement.appendChild(bookingsLink);
+
+        const logoutLink = document.createElement('a');
+        logoutLink.href = '#';
+        logoutLink.id = 'logout-link-mobile-dynamic';
+        logoutLink.textContent = 'Esci';
+        logoutLink.onclick = (e) => { e.preventDefault(); logout(); closeMobileMenuOnLinkClick(); };
+        mobileMenuElement.appendChild(logoutLink);
+      }
+
+
+    } else { // Utente non loggato
       if (navbarAvatarEl) {
-        const imgAvatar = navbarAvatarEl.querySelector('img');
-        if (imgAvatar) {
-          imgAvatar.src = defaultUserIconPath;
-          imgAvatar.alt = 'User Icon';
-        } else {
+        const imgEl = navbarAvatarEl.querySelector('img');
+        if(imgEl) { // Se c'è un tag immagine, mettilo di default
+          imgEl.src = defaultUserIconPath; // o un placeholder
+          imgEl.alt = 'User Icon';
+        } else { // Altrimenti usa l'emoji di default per lo span
           navbarAvatarEl.textContent = "👤";
         }
       }
       if (navbarUsernameEl) navbarUsernameEl.textContent = "Utente";
       if (userDropdownContainerEl) userDropdownContainerEl.style.display = "none";
       if (loginBtnHeader) loginBtnHeader.style.display = "inline-block";
+
       const mobileLoginLink = gebi('login-btn-mobile');
       if(mobileLoginLink) {
         mobileLoginLink.style.display = "block";
+      }
+      // Rimuovi link specifici utente dal menu mobile
+      const mobileMenuElement = gebi('mobileMenu');
+      const dynamicLinks = ['logout-link-mobile-dynamic', 'Il Mio Profilo', 'Le Mie Prenotazioni'];
+      if (mobileMenuElement) {
+        Array.from(mobileMenuElement.children).forEach(child => {
+          if (dynamicLinks.includes(child.id) || dynamicLinks.includes(child.textContent)) {
+            child.remove();
+          }
+        });
+        // Rimuovi eventuali <hr> aggiuntive
+        const hrs = mobileMenuElement.querySelectorAll('hr');
+        if (hrs.length > 1) hrs[hrs.length -1].remove(); // Rimuovi l'ultima hr se ce n'è più di una (quella per i link utente)
       }
     }
   }
@@ -547,10 +603,9 @@
     currentUser = null;
     localStorage.removeItem("userDataEFF");
     updateNavbarUserUI();
-    // Reindirizza alla versione pubblica della pagina se necessario
     if (window.location.pathname.includes('accesso.html')) {
       window.location.href = window.location.pathname.replace('accesso.html', '.html');
-    } else { // Fallback alla homepage se non è una pagina "accesso"
+    } else {
       window.location.href = 'index.html';
     }
   }
@@ -560,7 +615,7 @@
     if (userDataString) {
       try {
         currentUser = JSON.parse(userDataString);
-        if (!currentUser.nome || !currentUser.email) { // Controllo più robusto
+        if (!currentUser.nome || !currentUser.email) {
           currentUser = null; localStorage.removeItem("userDataEFF");
         }
       } catch (e) {
@@ -584,13 +639,13 @@
     document.body.classList.add("volantino-morph-active");
 
     morphingCard = document.createElement("article");
-    morphingCard.className = "card morph-active-card"; // CSS applicherà stili per popup centrato
+    morphingCard.className = "card morph-active-card";
 
     let flyerContentHTML = '';
     if (volantinoUrl && volantinoUrl.trim() !== "") {
       if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
         flyerContentHTML = `<img src="${volantinoUrl}" alt="Volantino Evento">`;
-      } else { // Assume PDF o altro link
+      } else {
         flyerContentHTML = `<div class="volantino-message-display"><p>Il volantino è disponibile come file esterno.</p><a href="${volantinoUrl}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`;
       }
     } else {
@@ -610,21 +665,16 @@
     morphingCard.querySelector('.close-morph-volantino-btn').onclick = hideVolantinoWithMorph;
 
     requestAnimationFrame(() => {
-      // La classe .active-flyer-popup non è più necessaria se usiamo .zoomed-in.volantino-visible
-      // Assicuriamoci che il CSS per .card.morph-active-card.zoomed-in.volantino-visible sia corretto per l'effetto popup semplice
       morphingCard.classList.add("zoomed-in", "volantino-visible");
     });
   }
 
   function hideVolantinoWithMorph() {
     if (morphingCard && volantinoMorphOverlay) {
-      morphingCard.classList.remove("zoomed-in", "volantino-visible"); // Classi per attivare la transizione di chiusura del CSS
+      morphingCard.classList.remove("zoomed-in", "volantino-visible");
       volantinoMorphOverlay.classList.remove("active");
       document.body.classList.remove("volantino-morph-active");
-
-      // Attendi la fine della transizione CSS prima di rimuovere gli elementi
-      // La transizione è di 0.25s per opacity/transform sul popup
-      setTimeout(cleanUpMorphingCard, 250 + 50); // 250ms per transizione + 50ms buffer
+      setTimeout(cleanUpMorphingCard, 300);
     }
   }
 
@@ -633,11 +683,8 @@
       morphingCard.remove();
       morphingCard = null;
     }
-    // Non è necessario svuotare volantinoMorphOverlay.innerHTML se morphingCard è l'unico figlio e viene rimosso.
-    // originalCardForMorph e la classe .original-morph-hidden non sono più usati in questa versione semplificata.
   }
   // --- FINE FUNZIONI MORPHING VOLANTINO ---
-
 
   // --- Logica Caricamento Eventi ---
   async function loadEvents() {
@@ -679,7 +726,6 @@
 
     let volantinoBtnHtml = "";
     if (event.volantino_url?.trim()) {
-      // CORREZIONE: Aggiunta classe card-btn-secondary e testo "Volantino" posizionato correttamente
       volantinoBtnHtml = `<button class="card-btn btn-visualizza-volantino card-btn-secondary"
                                   data-volantino-url="${event.volantino_url}"
                                   data-copertina-url="${imageSrc}">Volantino</button>`;
@@ -691,7 +737,7 @@
     } else if (parseInt(event.posti_disponibili) === 0) {
       primaryButtonHtml = `<button class="card-btn card-btn-primary" disabled>Esaurito</button>`;
     } else {
-      primaryButtonHtml = `<button class="card-btn card-btn-primary btn-prenota-rapido" data-event-id="${event.idevento}">Prenota</button>`;
+      primaryButtonHtml = `<button class="card-btn card-btn-primary btn-prenota-rapido" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}">Prenota</button>`; // Aggiunto data-event-title
     }
 
     cardOriginal.innerHTML = `
@@ -704,7 +750,7 @@
                 <p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ""}</p>
                 <p class="card-description">${event.descrizione || "Nessuna descrizione breve."}</p>
                 <p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">${event.posti_disponibili !== null ? (parseInt(event.posti_disponibili) > 0 ? event.posti_disponibili : 'Esaurito') : 'N/D'}</span>${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}</p>
-                <div class="card-actions ${!volantinoBtnHtml ? 'single-action' : ''}">
+                <div class="card-actions ${!volantinoBtnHtml && !primaryButtonHtml.includes('data-event-id') && !primaryButtonHtml.includes('evento_dettaglio.html') ? 'single-action' : (volantinoBtnHtml && (primaryButtonHtml.includes('data-event-id') || primaryButtonHtml.includes('evento_dettaglio.html')) ? '' : 'single-action-ish')}">
                     ${volantinoBtnHtml}
                     ${primaryButtonHtml}
                 </div>
@@ -713,22 +759,19 @@
     const prenotaBtn = cardOriginal.querySelector(".btn-prenota-rapido");
     if (prenotaBtn && !prenotaBtn.disabled) {
       prenotaBtn.addEventListener("click", function () {
-        handleRapidBooking(this, event.idevento, event.titolo);
+        handleRapidBooking(this, event.idevento, event.titolo); // Passa anche event.titolo
       });
     }
 
     cardOriginal.querySelector(".btn-visualizza-volantino")?.addEventListener("click", function () {
-      // Ora showVolantinoWithMorph necessita solo dell'URL del volantino per la versione semplificata
-      // copertinaUrl non è più usato dalla JS semplificata ma lo passiamo per compatibilità se la funzione avesse ancora quel parametro
       showVolantinoWithMorph(this.dataset.volantinoUrl, this.dataset.copertinaUrl);
     });
     return cardOriginal;
   }
 
-  function handleRapidBooking(buttonElement, eventId, eventTitle) { // eventTitle aggiunto per alert
+  function handleRapidBooking(buttonElement, eventId, eventTitle) {
     if (currentUser) {
       alert(`Per prenotare l'evento "${eventTitle || 'selezionato'}", vai alla sezione calendario attività dell'area riservata dopo aver effettuato il login.`);
-      // Per coerenza, apriamo il popup di login anche se l'utente è "loggato" ma la prenotazione vera è su pagina accesso
       openLoginPopup();
       localStorage.setItem("pending_booking_event_id_eff", eventId);
     } else {
@@ -758,10 +801,10 @@
     const currentYearEl = gebi("currentYear");
     if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
-    volantinoMorphOverlay = gebi('volantinoMorphOverlay'); // Inizializza qui
+    volantinoMorphOverlay = gebi('volantinoMorphOverlay');
     if (volantinoMorphOverlay) {
       volantinoMorphOverlay.addEventListener("click", (e) => {
-        if (e.target === volantinoMorphOverlay && morphingCard) { // Controlla se morphingCard esiste
+        if (e.target === volantinoMorphOverlay && morphingCard) {
           hideVolantinoWithMorph();
         }
       });
