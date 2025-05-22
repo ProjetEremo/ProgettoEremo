@@ -1931,19 +1931,6 @@ body.volantino-morph-active {
   transform: scale(1.1) rotate(90deg);
 }
 
-/* RIMUOVERE O COMMENTARE QUESTI STILI RELATIVI ALLA VECCHIA ANIMAZIONE MORPHING */
-/*
-.card.original-morph-hidden { ... } -> La logica di opacità è ancora usata dal JS per la card originale, quindi mantenerla se serve.
-.card.morph-active-card { ... le vecchie transizioni per width, height, top, left ... }
-.morph-content-wrapper .card-image-container-morph { ... vecchie transizioni e posizionamenti assoluti per l'animazione ... }
-.morph-content-wrapper .card-content-morph { ... vecchi stili per animazione del testo ... }
-.card.morph-active-card.zoomed-in.morphing .card-image-container-morph { ... }
-.card.morph-active-card.zoomed-in.morphing .card-content-morph { ... }
-.card.morph-active-card.zoomed-in.volantino-visible .card-image-container-morph { ... } // Ora gestito sopra
-.card.morph-active-card.zoomed-in.volantino-visible .card-content-morph { opacity: 0; pointer-events: none; } // Mantenere per nascondere il testo clonato
-.card.morph-active-card:not(.volantino-visible):not(.morphing) .card-content-morph { ... }
-*/
-
 /* MANTENERE questo per nascondere il contenuto clonato della card quando il volantino è visibile */
 .card.morph-active-card.zoomed-in.volantino-visible .card-content-morph {
   opacity: 0;
@@ -2694,52 +2681,44 @@ body.page-dashboard .modal-content {
 
 /* ----- FINE NUOVI STILI DASHBOARD ----- */
 
-/* ----- REGOLE FONDAMENTALI PER I MODAL (Devono essere in style.css) ----- */
+/* ----- REGOLE FONDAMENTALI PER I MODAL GENERICI (dal tuo file, se diverse da .modal-eff) ----- */
+/* Se .modal e .modal-eff sono concettualmente la stessa cosa, potresti voler unificare gli stili.
+   Per ora, mantengo entrambe le definizioni come nel tuo file originale,
+   ma la logica JS che ti ho dato usa #conversationModal che ha la classe .modal-eff */
 .modal {
-  display: none; /* Stato iniziale: il modal è nascosto */
+  display: none;
   position: fixed;
-  z-index: 1050;
+  z-index: 1050; /* Assicurati che questo z-index sia appropriato rispetto a .modal-eff se coesistono */
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  overflow: auto; /* Permette lo scroll del modal stesso se il contenuto è troppo grande */
-  background-color: rgba(var(--dark-rgb), 0.84); /* Usa le tue variabili globali */
+  overflow: auto;
+  background-color: rgba(var(--dark-rgb), 0.84);
   backdrop-filter: blur(5px);
   transition: opacity 0.2s ease-out;
-  /* Proprietà Flexbox per centrare .modal-content quando .modal diventa .active */
   align-items: center;
   justify-content: center;
 }
-
 .modal.active {
-  display: flex; /* STATO ATTIVO: Rende il modal visibile E USA FLEXBOX PER CENTRARE */
+  display: flex;
   opacity: 1;
 }
-
-.modal-content { /* Stile base per il box bianco del popup */
+.modal-content { /* Stile base per il box bianco del popup generico */
   background-color: var(--white);
   padding: 2.4rem 3rem;
   border: none;
   width: 90%;
-  max-width: 660px; /* Larghezza massima di default per i modal generici */
+  max-width: 660px;
   border-radius: var(--border-radius-medium);
   position: relative;
   box-shadow: 0 11px 38px rgba(0,0,0,0.15);
-  animation: fadeInModal 0.25s ease-out;
-  max-height: 90vh; /* Previene che il modal sia più alto dello schermo */
-  /* Per la dashboard, useremo display:flex e flex-direction:column qui sotto
-     per gestire lo scroll interno con .modal-content-scrollable */
+  /* animation: fadeInModal 0.25s ease-out;  Potrebbe essere ridondante se .modal-eff ha già un'animazione */
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
 }
-
-@keyframes fadeInModal {
-  from { opacity: 0; transform: translateY(-22px) scale(0.94); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.close-modal-btn {
+.close-modal-btn { /* Bottone di chiusura per .modal generico */
   color: var(--gray-medium);
   position: absolute;
   top: 1.1rem;
@@ -2750,11 +2729,26 @@ body.page-dashboard .modal-content {
   line-height: 1;
   padding: 0.32rem;
   transition: var(--transition-fast);
-  z-index: 10; /* Assicura sia sopra il contenuto scrollabile */
+  z-index: 10;
 }
 .close-modal-btn:hover, .close-modal-btn:focus {
   color: var(--dark);
   transform: rotate(90deg) scale(1.12);
+}
+/* ... (Potrebbero esserci altri stili per .modal-content specifico della dashboard qui sotto, se erano separati) ... */
+/* Modal Dashboard (generalmente erediterà da .modal, .modal-content globali) */
+/* Puoi aggiungere qui sovrascritture specifiche se necessario */
+/* .modal-content { ... (se c'erano stili specifici per la dashboard qui, sono stati uniti sopra o sono ereditati) ... } */
+.modal-content-scrollable {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding: 0.5rem;
+  min-height: 150px;
+}
+.modal-content h3 {
+  color: var(--primary);
+  font-size: 1.7rem;
+  margin-bottom: 1.5rem;
 }
 /* ----- FINE REGOLE FONDAMENTALI PER I MODAL ----- */
 
@@ -3054,170 +3048,53 @@ body.page-dashboard .modal-content {
 
 
 
-/* Sezione Commenti */
-
-.comments-section {
-  margin-top: 4rem;
-  border-top: 1px solid var(--gray-light);
-  padding-top: 3rem;
-}
-.comments-section > h2, .comments-section > h3 {
-  text-align: center;
-  margin-bottom: 3rem;
-  color: var(--secondary);
-}
-
-.comment-form {
-  background: var(--light);
-  border-radius: var(--border-radius-medium);
-  padding: 2.2rem;
-  margin-bottom: 3rem;
-  box-shadow: inset 0 1.8px 4px rgba(0,0,0,0.07);
-}
-.comment-form h4 {
-  margin-bottom: 1.4rem;
-  font-size: 1.65rem;
-  color: var(--primary);
-  text-align: left;
-}
-.comment-form-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.4rem;
-  align-items: flex-start;
-}
-.comment-form textarea {
-  flex-grow: 1;
-  min-height: 110px;
-  resize: vertical;
-  width: 100%;
-  font-size: 1.2rem;
-}
-@media (min-width: 768px) {
-  .comment-form-container textarea {
-    width: auto;
-  }
-}
-
-.btn-comment {
-  background: var(--secondary);
-  color: white;
-  border: none;
-  padding: 1rem 2.2rem;
-  border-radius: 50px;
-  font-size: 1.2rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition-medium);
-  height: fit-content;
-  margin-left: auto;
-  display: inline-flex; align-items: center; gap: 0.65em;
-}
-.btn-comment:hover {
-  background: var(--primary);
-  text-decoration: none;
-}
-.btn-comment.btn-small {
-  padding: 0.8rem 1.4rem;
-  font-size: 1.15rem;
-}
-
-
-.comments-list {
-}
-.comment {
-  background: var(--white);
-  border-radius: var(--border-radius-medium);
-  padding: 2.2rem;
-  margin-bottom: 2.2rem;
-  box-shadow: var(--shadow-light);
-  border-left: 5.5px solid var(--secondary);
-}
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 1.4rem;
-  margin-bottom: 1.1rem;
-}
-.comment .user-avatar {
-  width: 50px; height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3.5px solid var(--light);
-}
-.comment-meta strong {
-  font-size: 1.3rem;
-  color: var(--dark);
-}
-.comment-meta small {
-  font-size: 1.05rem;
-  color: var(--gray-dark);
-  margin-left: 0.7rem;
-}
-.comment p {
-  margin-bottom: 1.4rem;
-  color: var(--dark);
-  font-size: 1.25rem;
-  word-wrap: break-word;
-  text-align: left;
-}
-.comment-actions {
-  display: flex;
-  gap: 1.4rem;
-  align-items: center;
-  font-size: 1.2rem;
-  margin-top: 0.8rem;
-}
-.like-btn, .btn-reply {
-  background: none; border: none;
-  color: var(--gray-dark);
-  cursor: pointer;
-  display: flex; align-items: center; gap: 0.55rem;
-  padding: 0.45rem 0.8rem;
-  border-radius: 6.5px;
-  transition: var(--transition-fast);
-}
-.like-btn i, .btn-reply i {
-  width: 19px;
-  text-align: center;
-}
-
-.like-btn:hover, .btn-reply:hover {
-  background-color: var(--gray-light);
-  color: var(--primary);
-  text-decoration: none;
-}
-.like-btn.active {
-  color: var(--danger);
-}
-
-
-.reply-form {
-  display: none;
-  margin-top: 1.4rem;
-  margin-left: 4.2rem;
-  padding-left: 1.4rem;
-  border-left: 3.5px solid var(--gray-light);
-  animation: fadeIn 0.3s ease-out;
-}
+/* ----- SEZIONE COMMENTI RESTYLING (Come da tue ultime indicazioni e mie precedenti risposte) ----- */
+.comments-section { margin-top: 4rem; border-top: 1px solid var(--gray-light); padding-top: 3rem; background-color: #f9f9f9; border-radius: var(--border-radius-large); padding: 2rem clamp(1rem, 5vw, 3rem); box-shadow: 0 8px 25px rgba(0,0,0,0.07); }
+.comments-section > h2, .comments-section > h3 { text-align: center; margin-bottom: 2.5rem; color: var(--primary); font-weight: 600; }
+.comments-section > h2 { font-size: clamp(2rem, 4.5vw, 2.6rem); }
+.comments-section > h3 { font-size: clamp(1.6rem, 3.8vw, 2.2rem); margin-top: 3rem; color: var(--secondary); }
+.comment-form { background: var(--white); border-radius: var(--border-radius-medium); padding: clamp(1.5rem, 3vw, 2rem); margin-bottom: 3rem; box-shadow: var(--shadow-light); border: 1px solid var(--gray-light); }
+.comment-form h4 { margin-bottom: 1.5rem; font-size: clamp(1.3rem, 2.5vw, 1.5rem); color: var(--primary); text-align: left; font-weight: 600; }
+.comment-form-container { display: flex; flex-direction: column; gap: 1rem; }
+.comment-form textarea { flex-grow: 1; min-height: 120px; resize: vertical; width: 100%; font-size: 1.1rem; padding: 0.8rem 1rem; border: 1px solid var(--gray-medium); border-radius: 9px; transition: var(--transition-fast); }
+.comment-form textarea:focus { border-color: var(--secondary); box-shadow: 0 0 0 3.5px rgba(var(--secondary-rgb, 141, 177, 135), 0.35); outline: none; } /* Aggiunto --secondary-rgb fallback */
+.btn-comment { background: var(--secondary); color: white; border: none; padding: 0.9rem 1.8rem; border-radius: 9px; font-size: 1.1rem; font-weight: 500; cursor: pointer; transition: var(--transition-medium); align-self: flex-end; display: inline-flex; align-items: center; gap: 0.6em; }
+.btn-comment:hover { background: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-light); }
+.btn-comment.btn-small { padding: 0.7rem 1.2rem; font-size: 1rem; }
+.comments-list { margin-top: 2rem; }
+.comment { background: var(--white); border-radius: var(--border-radius-medium); padding: clamp(1.5rem, 3vw, 2rem); margin-bottom: 1.8rem; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid var(--gray-light); position: relative; overflow-wrap: break-word; width: 100%; box-sizing: border-box; }
+.comment:not(.reply)::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background-color: var(--secondary); border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium); }
+.comment.admin-comment-highlight:not(.reply)::before { background-color: var(--accent); }
+.comment:not(.reply) { padding-left: clamp(2rem, 4vw, 2.8rem); }
+.comment-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+.comment .user-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--light); flex-shrink: 0; }
+.comment-meta { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; }
+.comment-meta .author-line { display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 0.2rem; }
+.comment-meta strong { font-size: 1.1rem; color: var(--primary); font-weight: 600; margin-right: 0.5rem; word-break: break-word; }
+.comment-meta small { font-size: 0.85rem; color: var(--gray-dark); word-break: break-word; }
+/* .badge-staff è definito all'inizio, assicurati sia quello corretto */
+.comment p { margin-bottom: 1.2rem; color: #4a4a4a; font-size: 1.05rem; line-height: 1.7; word-wrap: break-word; text-align: left; overflow-wrap: break-word; min-width: 0; }
+.comment-actions { display: flex; gap: 1rem; align-items: center; font-size: 0.9rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-light); }
+.like-btn, .btn-reply { background: none; border: 1px solid transparent; color: var(--gray-dark); cursor: pointer; display: inline-flex; align-items: center; gap: 0.5em; padding: 0.4rem 0.8rem; border-radius: 6px; transition: all 0.2s ease-in-out; font-weight: 500; }
+.like-btn i, .btn-reply i { font-size: 0.95em; }
+.like-btn:hover, .btn-reply:hover { background-color: var(--gray-light); color: var(--primary); border-color: var(--gray-medium); text-decoration: none; }
+.like-btn.active { color: var(--danger); }
+.like-btn.active:hover { color: var(--danger); background-color: rgba(var(--danger-rgb), 0.15); }
+.replies { margin-top: 1.5rem; padding-left: clamp(1.2rem, 3.5vw, 1.8rem); position: relative; box-sizing: border-box; }
+.replies::before { content: ""; position: absolute; left: calc(clamp(1.2rem, 3.5vw, 1.8rem) / 2 - 1px); top: -0.5rem; bottom: 0.5rem; width: 2px; background-color: #e0e0e0; border-radius: 2px; }
+.comment.reply { background-color: #fdfdfd; box-shadow: 0 3px 10px rgba(0,0,0,0.06); border: 1px solid #eef0f1; padding: clamp(1.2rem, 2.5vw, 1.8rem); margin-bottom: 1.5rem; }
+.comment.reply:not(.reply)::before { display: none; }
+.reply-form { display: none; margin-top: 1.2rem; padding: clamp(1rem, 2vw, 1.2rem); background-color: var(--white); border-radius: var(--border-radius-medium); border: 1px solid var(--gray-light); box-shadow: var(--shadow-light); animation: fadeIn 0.3s ease-out; }
 .reply-form.active { display: block; }
-.reply-form textarea {
-  width: 100%; font-size: 1.2rem; min-height: 80px;
-  margin-bottom: 0.7rem;
-}
-
-.replies {
-  margin-left: 4.2rem;
-  padding-left: 1.4rem;
-  border-left: 3.5px solid var(--gray-light);
-  margin-top: 1.4rem;
-}
-.comment.reply {
-  background-color: var(--light);
-  box-shadow: inset 0 1.8px 3px rgba(0,0,0,0.07);
-  border-left-color: var(--accent);
-  padding: 1.4rem;
-}
+.reply-form form { display: flex; flex-direction: column; gap: 0.8rem; }
+.reply-form textarea { width: 100%; font-size: 1rem; min-height: 70px; padding: 0.6rem 0.8rem; }
+.reply-form .btn-comment.btn-small { align-self: flex-end; }
+.form-message-local { font-size: 0.85rem; text-align: left; }
+.form-message-local.error { color: var(--danger); }
+.form-message-local.success { color: var(--success); }
+.no-content-message { text-align: center; padding: 2rem; font-size: 1.1rem; color: var(--gray-dark); background-color: var(--white); border-radius: var(--border-radius-medium); border: 1px dashed var(--gray-medium); margin: 2rem auto; max-width: 600px; }
+#login-to-comment-message a { color: var(--secondary); font-weight: 500; text-decoration: underline; }
+#login-to-comment-message a:hover { color: var(--primary); }
 
 /* === GALLERIA EVENTO === */
 
@@ -3590,10 +3467,16 @@ body.page-dashboard .modal-content {
   border-color: var(--dark);
 }
 
-/* Contenitore Unico per Tabs e Contenuto Eventi */
+/* Contenitore principale per il contenuto delle tab (griglie eventi) */
 .tabbed-content-area.dashboard-section {
-  padding: 0; background-color: transparent; box-shadow: none; border: none;
-  margin-bottom: 2rem;
+  background-color: var(--white);
+  padding: 0; /* Il padding sarà gestito da #eventManagementContent all'interno */
+  border: 1px solid var(--gray-medium);       /* APPLICA BORDO SU TUTTI I LATI */
+  border-radius: var(--border-radius-medium); /* APPLICA STONDATURA SU TUTTI GLI ANGOLI */
+  box-shadow: var(--shadow-light);
+  margin-top: 1.5rem; /* Aggiunge spazio sopra, separandolo da .event-view-controls */
+  /* Se .event-view-controls ha già margin-bottom, potresti voler regolare questo */
+  overflow: hidden; /* IMPORTANTE: per assicurare che i figli rispettino la stondatura */
 }
 .event-tabs-container { display: flex; position: relative; z-index: 1; }
 .event-tab-button {
@@ -3614,9 +3497,10 @@ body.page-dashboard .modal-content {
 .event-tab-button:hover i { color: var(--primary); }
 
 #eventManagementContent {
-  background-color: var(--white); padding: 1.5rem; border: 1px solid var(--gray-medium);
-  border-top: none; border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
-  box-shadow: var(--shadow-light); margin-top: -1px; position: relative;
+  padding: 1.5rem; /* Padding per il contenuto interno (griglie, barra "Nuovo Evento") */
+  /* Rimuovi eventuali background-color, border, border-radius, box-shadow specifici per questo ID,
+     poiché ora sono gestiti dal genitore .tabbed-content-area.dashboard-section */
+  background-color: transparent; /* O ometti se il genitore ha già var(--white) */
 }
 #eventManagementContent .event-tab-content { display: none; }
 #eventManagementContent .event-tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
@@ -3721,7 +3605,7 @@ body.page-dashboard .modal-content {
   .event-tab-button:last-child { border-bottom: none; border-radius: 0 0 10px 10px; }
   .event-tab-button.active { border-color: var(--gray-medium); border-left: 3px solid var(--accent); border-right: 3px solid var(--accent); border-bottom: 1px solid var(--gray-medium);}
 
-  #eventManagementContent.dashboard-section { border-radius: var(--border-radius-medium); border-top: 1px solid var(--gray-light); margin-top: 1rem; }
+  #eventManagementContent.dashboard-section { border-top: 1px solid var(--gray-light); margin-top: 1rem; }
 
   .admin-event-grid { grid-template-columns: 1fr; }
   .admin-event-card { max-width: none; min-height: auto; }
@@ -3860,3 +3744,440 @@ body.page-dashboard .modal-content {
   }
 }
 /* ----- FINE STILI CONTROLLI ORDINAMENTO DASHBOARD ----- */
+
+/* ----- INIZIO STILI NUOVA BARRA FILTRI/TAB E CONTROLLI VISTA ----- */
+
+/* Contenitore principale per la riga con bottone Filtri e Tab Eventi */
+.event-tabs-and-filter-container {
+  display: flex;
+  align-items: flex-start; /* Allinea gli elementi all'inizio se hanno altezze diverse */
+  position: relative;
+  background-color: var(--light); /* Sfondo per la barra base */
+  /* Rimuoviamo bordi e radius da qui, gestiti dai bottoni e dal contenuto sotto */
+  margin-bottom: 0; /* Si attaccherà a event-view-controls o eventManagementContent */
+}
+
+.filter-trigger-container {
+  position: relative; /* Per il posizionamento assoluto del pannello filtri */
+  z-index: 10; /* Per stare sopra altri elementi della riga */
+}
+
+/* Bottone Filtri */
+#filterToggleButton.event-tab-button.filter-tab-button {
+  border-radius: 10px 0 0 0;
+  margin-right: -1px; /* Sovrappone il bordo per un look unito */
+  border: 1px solid var(--gray-medium);
+  border-bottom: none; /* Il bordo inferiore è gestito dal contenuto sotto o dal pannello */
+  background-color: var(--gray-light); /* Colore di default come gli altri tab non attivi */
+}
+#filterToggleButton.event-tab-button.filter-tab-button.active {
+  background-color: var(--white); /* Sfondo bianco quando il pannello filtri è aperto */
+  border-bottom-color: var(--white); /* Nasconde il bordo inferiore del bottone per unirlo al pannello */
+  position: relative; /* Per z-index se necessario */
+  z-index: 11; /* Per stare sopra la linea del contenitore sottostante */
+}
+
+.dropdown-arrow-filter {
+  margin-left: 0.5em;
+  font-size: 0.8em;
+  transition: transform 0.2s ease-in-out;
+}
+#filterToggleButton.active .dropdown-arrow-filter {
+  transform: rotate(180deg);
+}
+
+/* Pannello Filtri Dropdown */
+.filter-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% - 1px); /* Si sovrappone al bordo inferiore del bottone per continuità */
+  left: 0;
+  z-index: 100; /* Sopra il contenuto della pagina */
+  background-color: var(--white);
+  border: 1px solid var(--gray-medium);
+  /* border-top: none; Se il bottone.active gestisce bene la connessione */
+  box-shadow: var(--shadow-medium);
+  padding: 1.5rem;
+  width: 320px; /* Larghezza fissa o min-width/max-width */
+  border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+}
+.filter-panel.active {
+  display: block;
+  animation: fadeInDropdown 0.2s ease-out;
+}
+.filter-panel h4 {
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  font-size: 1.1rem;
+  color: var(--primary);
+  border-bottom: 1px solid var(--gray-light);
+  padding-bottom: 0.6rem;
+  text-align: left;
+}
+.filter-panel .form-group {
+  margin-bottom: 1rem;
+}
+.filter-panel .form-group label { text-align: left; }
+.filter-panel .filter-panel-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-between; /* O flex-end se vuoi i bottoni a destra */
+  gap: 0.5rem;
+}
+.filter-panel .filter-panel-actions .btn-admin {
+  flex-grow: 1; /* Fa sì che i bottoni si espandano se c'è spazio */
+  /* flex-basis: calc(50% - 0.5rem); Se vuoi due bottoni di uguale larghezza */
+}
+
+
+/* Contenitore per i tab "Eventi Futuri", "Archivio Eventi" */
+.event-tabs-container {
+  display: flex;
+  flex-grow: 1; /* Occupa lo spazio rimanente nella riga */
+  /* Stile già definito per .event-tab-button dovrebbe andare bene */
+}
+/* Assicurati che il primo tab evento non abbia un angolo arrotondato a sinistra se segue il bottone Filtri */
+.event-tabs-container .event-tab-button:first-child {
+  border-top-left-radius: 0;
+}
+.event-tabs-container .event-tab-button:last-child {
+  border-top-right-radius: 10px; /* Arrotonda l'ultimo tab a destra */
+}
+
+
+/* Controlli di Vista (Ordina per, Raggruppa per) */
+.event-view-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding: 1rem 1.5rem;
+  background-color: #f8f9fa; /* Sfondo leggermente diverso per distinguerlo */
+  border-left: 1px solid var(--gray-medium);
+  border-right: 1px solid var(--gray-medium);
+  border-bottom: 1px solid var(--gray-medium);
+  /* Non c'è bordo superiore perché si attacca alla barra dei tab/filtri */
+  margin-bottom: 1.5rem; /* Spazio prima della griglia eventi */
+  border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+  /* box-shadow: var(--shadow-light); Ombra leggera */
+}
+.event-view-controls .form-group {
+  flex-grow: 1;
+  flex-basis: 180px; /* Base per ogni controllo, permettendo flessibilità */
+  min-width: 160px; /* Minima larghezza per controllo */
+}
+.event-view-controls label {
+  font-size: 0.85rem; /* Leggermente più piccolo */
+  margin-bottom: 0.3rem;
+  color: var(--primary);
+  display: block;
+  font-weight: 500;
+  text-align: left;
+}
+.event-view-controls select.form-control {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--gray-medium);
+  border-radius: 6px; /* Raggio più piccolo */
+  font-size: 0.9rem;
+  background-color: var(--white);
+  line-height: 1.4;
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23365e51%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 0.6em auto;
+  padding-right: 2rem; /* Spazio per la freccina */
+  cursor: pointer;
+}
+.event-view-controls select.form-control:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(141, 177, 135, 0.25);
+  outline: none;
+}
+
+/* Stile per il contenitore principale del contenuto delle tab (griglie eventi) */
+/* Questo è .tabbed-content-area > #eventManagementContent */
+#eventManagementContent {
+  background-color: var(--white);
+  padding: 1.5rem;
+  border: 1px solid var(--gray-medium);
+  border-top: none; /* Si collega a .event-view-controls */
+  box-shadow: var(--shadow-light);
+  /* Rimuovi margin-top se .event-view-controls è direttamente sopra */
+  margin-top: 0;
+}
+
+/* Adattamenti responsive */
+@media (max-width: 991px) { /* Tablet */
+  .event-view-controls {
+    /* Potrebbero andare due controlli per riga invece di tre */
+    /* flex-basis e min-width aiutano già, ma potresti voler forzare */
+  }
+}
+
+@media (max-width: 767px) { /* Mobile */
+  .event-tabs-and-filter-container {
+    flex-direction: column;
+    /* Non serve più il border-radius qui, sarà sui singoli elementi */
+    background-color: transparent; /* Sfondo neutro */
+    border: none; /* Nessun bordo generale */
+  }
+  .filter-trigger-container {
+    width: 100%;
+    margin-bottom: -1px; /* Sovrapponi al primo tab evento */
+  }
+  #filterToggleButton.event-tab-button.filter-tab-button {
+    border-radius: 10px 10px 0 0;
+    width: 100%;
+    justify-content: center;
+    border-right: 1px solid var(--gray-medium); /* Ripristina bordo destro */
+    border-left: 1px solid var(--gray-medium);
+    border-bottom: 1px solid var(--gray-medium); /* Bordo inferiore se il pannello è chiuso */
+  }
+  #filterToggleButton.event-tab-button.filter-tab-button.active {
+    border-bottom-color: var(--white); /* Si collega al pannello */
+  }
+
+  .filter-panel {
+    width: calc(100% - 2px); /* Sottrai i bordi laterali del contenitore */
+    position: static; /* Flusso normale sotto il bottone */
+    border-radius: 0 0 10px 10px; /* Arrotonda se è l'ultimo */
+    box-shadow: var(--shadow-light); /* Ripristina ombra */
+    border-left: 1px solid var(--gray-medium);
+    border-right: 1px solid var(--gray-medium);
+    border-bottom: 1px solid var(--gray-medium);
+    margin-bottom: 1rem; /* Spazio prima dei tab eventi */
+  }
+
+  .event-tabs-container {
+    width: 100%;
+    flex-direction: column;
+  }
+  .event-tabs-container .event-tab-button {
+    border-radius: 0;
+    margin-right: 0;
+    border-left: 1px solid var(--gray-medium);
+    border-right: 1px solid var(--gray-medium);
+  }
+  .event-tabs-container .event-tab-button:first-child {
+    border-radius: 10px 10px 0 0; /* Primo tab arrotondato sopra */
+  }
+  .event-tabs-container .event-tab-button:last-child {
+    border-radius: 0 0 10px 10px; /* Ultimo tab arrotondato sotto */
+    border-bottom: 1px solid var(--gray-medium);
+  }
+
+  .event-view-controls {
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: var(--border-radius-medium);
+    margin-top: 1rem;
+    border: 1px solid var(--gray-medium); /* Bordo completo se blocco separato */
+  }
+  #eventManagementContent {
+    border-radius: var(--border-radius-medium);
+    margin-top: 1rem;
+    border: 1px solid var(--gray-medium); /* Bordo completo */
+  }
+}
+/* ----- FINE STILI NUOVA BARRA FILTRI/TAB E CONTROLLI VISTA ----- */
+
+/* ----- ULTIMI FIX COMMENTI ----- */
+/* ----- Stili per visibilità commenti e bottoni ----- */
+.comments-list-wrapper.collapsed #commentsList > ul > li:nth-child(n+4) { /* Nasconde dal 4° commento in poi (se MAX_INITIAL_TOP_LEVEL_COMMENTS = 3) */
+  display: none;
+}
+
+#comments-visibility-controls { /* Contenitore per i bottoni "Mostra/Nascondi" */
+  /* text-align: center; margin-top: 1.5rem; sono già inline */
+}
+
+.btn-secondary-style { /* Stile per un bottone secondario, es. "Mostra meno" */
+  background-color: var(--gray-light);
+  color: var(--dark);
+  border: 1px solid var(--gray-medium);
+  padding: 0.9rem 1.8rem; /* Stesso padding del .btn-comment per coerenza */
+  border-radius: 9px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-medium);
+}
+.btn-secondary-style:hover {
+  background-color: var(--gray-medium);
+  color: var(--dark); /* Mantiene il colore del testo scuro */
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-light);
+}
+
+/* ----- Affinamenti Stili Commenti (dal restyling precedente + correzioni bug visivo) ----- */
+
+.comment {
+  /* ... stili esistenti dal restyling ... */
+  box-sizing: border-box; /* Assicura che padding e border non aggiungano alla larghezza */
+  width: 100%; /* Occupa tutta la larghezza del suo parent <li> */
+  overflow-wrap: break-word; /* Per prevenire overflow da parole lunghe */
+}
+
+.comment p {
+  /* ... stili esistenti dal restyling ... */
+  overflow-wrap: break-word; /* Alternativa più moderna a word-wrap */
+  word-wrap: break-word; /* Mantenuto per compatibilità */
+  min-width: 0; /* Aiuta gli elementi flex a restringersi e fare wrap correttamente */
+}
+
+.comment-meta strong,
+.comment-meta small {
+  word-break: break-word; /* Se nomi o date molto lunghe causano problemi */
+}
+
+.replies {
+  margin-top: 1.5rem;
+  /* Leggermente ridotta l'indentazione massima e resa più consistente */
+  padding-left: clamp(1.2rem, 3.5vw, 1.8rem);
+  position: relative;
+  box-sizing: border-box;
+}
+
+.replies::before {
+  content: "";
+  position: absolute;
+  /* Adattato per il nuovo padding-left e una linea più sottile */
+  left: calc(clamp(1.2rem, 3.5vw, 1.8rem) / 2 - 1px);
+  top: -0.5rem; /* Inizia leggermente sopra il primo commento di risposta */
+  bottom: 0.5rem; /* Termina leggermente prima della fine dell'ultimo commento di risposta */
+  width: 2px; /* Larghezza della linea di connessione */
+  background-color: #e0e0e0; /* Colore più chiaro per la linea */
+  border-radius: 2px; /* Angoli arrotondati per la linea */
+}
+
+/* Assicurati che il badge staff sia come definito nel restyling precedente se ti piaceva */
+.badge-staff {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--white);
+  background-color: var(--accent);
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  line-height: 1.3;
+  vertical-align: middle;
+  margin-left: 0.5rem; /* Spazio dal nome autore */
+}
+
+.comment-meta .author-line { /* Contenitore per nome autore e badge */
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.2rem;
+}
+
+/* ----- Stile per Bottone "Espandi l'intera conversazione" ----- */
+.btn-expand-conversation {
+  background-color: rgba(var(--primary-rgb), 0.05);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  color: var(--primary);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 0.8rem;
+  display: inline-block;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  text-align: center;
+}
+.btn-expand-conversation:hover {
+  background-color: rgba(var(--primary-rgb), 0.1);
+  border-color: var(--primary);
+  color: var(--accent);
+  text-decoration: none;
+}
+.btn-expand-conversation i {
+  margin-left: 0.6em;
+  font-size: 0.85em;
+}
+
+/* ----- Stili per il Modale della Conversazione (con logica .active) ----- */
+.modal-eff {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  position: fixed;
+  z-index: 1050;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(var(--dark-rgb), 0.88);
+  backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  transition: opacity 0.25s ease-out, visibility 0s linear 0.25s;
+}
+.modal-eff.active {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.modal-eff-content {
+  background-color: var(--white);
+  padding: 25px 30px;
+  border-radius: var(--border-radius-large);
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 750px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+.modal-eff.active .modal-eff-content {
+  animation: fadeInModal 0.25s ease-out;
+}
+.modal-eff-content.large { max-width: 850px; }
+.modal-eff-close-btn {
+  color: var(--gray-dark); position: absolute; top: 12px; right: 18px;
+  font-size: 2.2rem; font-weight: bold; cursor: pointer; line-height: 1;
+  padding: 0.2rem; transition: var(--transition-fast); z-index: 10;
+}
+.modal-eff-close-btn:hover { color: var(--danger); transform: rotate(90deg) scale(1.1); }
+#modalConversationTitle {
+  color: var(--primary); font-size: 1.6rem; margin-top: 0; margin-bottom: 1.8rem;
+  padding-bottom: 1rem; border-bottom: 1px solid var(--gray-light); text-align: left;
+}
+#modalConversationTitle strong { color: var(--accent); }
+#modalConversationBody { overflow-y: auto; flex-grow: 1; padding-right: 15px; margin-right: -15px; }
+#modalConversationBody .comment { margin-bottom: 1.2rem; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+#modalConversationBody .comment:not(.reply)::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+  background-color: var(--secondary);
+  border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);
+}
+#modalConversationBody .comment:not(.reply) { padding-left: clamp(2rem, 4vw, 2.8rem); }
+#modalConversationBody .comment.admin-comment-highlight:not(.reply)::before { background-color: var(--accent); }
+#modalConversationBody .comment.reply { background-color: #fdfdfd; }
+#modalConversationBody > ul { padding-left: 0; }
+#modalConversationBody .replies { padding-left: clamp(1.2rem, 3.5vw, 1.8rem); }
+#modalConversationBody .replies::before { left: calc(clamp(1.2rem, 3.5vw, 1.8rem) / 2 - 1px); background-color: #e8e8e8; }
+
+@keyframes fadeInModal {
+  from { opacity: 0; transform: translateY(-25px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Responsive per commenti */
+@media (max-width: 767px) {
+  .comments-section { padding: 1.5rem clamp(0.8rem, 3vw, 1.5rem); }
+  .comment, .comment.reply { padding: 1.2rem; }
+  .comment:not(.reply) { padding-left: 1.8rem; }
+  .comment-actions { flex-wrap: wrap; justify-content: flex-start; }
+  .replies { padding-left: 1.2rem; }
+  .replies::before { left: calc(1.2rem / 2 - 1px); }
+}
