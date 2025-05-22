@@ -46,65 +46,81 @@
 <main class="dashboard-main">
     <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
 
-    <div class="event-filters">
-        <div class="form-group">
-            <label for="searchTitleDashboard">Titolo Evento</label>
-            <input type="text" id="searchTitleDashboard" placeholder="Cerca per titolo..." class="form-control">
+    <div class="event-tabs-and-filter-container">
+        <div class="filter-trigger-container">
+            <button id="filterToggleButton" class="event-tab-button filter-tab-button" aria-expanded="false" aria-controls="filterPanelDropdown">
+                <i class="fas fa-filter"></i> Filtri <span class="dropdown-arrow-filter">▼</span>
+            </button>
+            <div id="filterPanelDropdown" class="filter-panel" role="region">
+                <h4>Applica Filtri</h4>
+                <div class="form-group">
+                    <label for="searchTitleDashboard">Titolo Evento</label>
+                    <input type="text" id="searchTitleDashboard" placeholder="Cerca per titolo..." class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="searchDateDashboard">Mese/Anno (YYYY-MM)</label>
+                    <input type="month" id="searchDateDashboard" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="searchSpeakerDashboard">Relatore</label>
+                    <input type="text" id="searchSpeakerDashboard" class="form-control" placeholder="Nome relatore...">
+                </div>
+                <div class="filter-panel-actions">
+                    <button type="button" class="btn-admin btn-admin-secondary" id="applyFiltersFromPanelBtn">Applica</button>
+                    <button type="button" class="btn-admin" id="resetFiltersBtnPanel" title="Resetta filtri">
+                        <i class="fas fa-times"></i> Reset
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="searchDateDashboard">Mese/Anno (YYYY-MM)</label>
-            <input type="month" id="searchDateDashboard" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="searchSpeakerDashboard">Relatore</label>
-            <input type="text" id="searchSpeakerDashboard" class="form-control" placeholder="Nome relatore...">
-        </div>
-        <div class="form-group filter-button-group"> <button type="button" class="btn-admin" id="resetFiltersBtn" title="Resetta filtri">
-            <i class="fas fa-times"></i> Reset
-        </button>
+
+        <div class="event-tabs-container"> <button class="event-tab-button active" data-tab="upcoming"><i class="fas fa-calendar-day"></i> Eventi Futuri</button>
+            <button class="event-tab-button" data-tab="past"><i class="fas fa-history"></i> Archivio Eventi</button>
         </div>
     </div>
 
-    <div class="event-sorting-controls">
-        <div class="form-group">
+    <div class="event-view-controls">
+        <div class="form-group sorting-group">
             <label for="sortCriteria">Ordina per:</label>
             <select id="sortCriteria" class="form-control">
                 <option value="mese" selected>Data Evento</option>
                 <option value="titolo">Titolo Evento</option>
                 <option value="relatore">Relatore</option>
-                <option value="prenotazioni">Numero Prenotazioni</option>
+                <option value="prenotazioni">N. Prenotazioni</option>
                 <option value="post_occupati">Posti Occupati</option>
-                <option value="post_tot">Posti Totali Config.</option>
+                <option value="post_tot">Posti Totali</option>
             </select>
         </div>
-        <div class="form-group">
+        <div class="form-group sorting-group">
             <label for="sortDirection">Direzione:</label>
             <select id="sortDirection" class="form-control">
                 <option value="desc">Decrescente</option>
-                <option value="asc">Crescente</option>
+                <option value="asc" selected>Crescente</option> </select>
+        </div>
+        <div class="form-group grouping-group">
+            <label for="groupCriteria">Raggruppa per:</label>
+            <select id="groupCriteria" class="form-control">
+                <option value="mese" selected>Mese e Anno</option>
+                <option value="giorno">Giorno</option>
+                <option value="settimana">Settimana</option>
+                <option value="anno">Anno</option>
+                <option value="relatore">Relatore</option>
+                <option value="nessuno">Nessun raggruppamento</option>
             </select>
         </div>
     </div>
 
-
-    <div class="tabbed-content-area dashboard-section">
-        <div class="event-tabs-container">
-            <button class="event-tab-button active" data-tab="upcoming"><i class="fas fa-calendar-day"></i> Eventi Futuri</button>
-            <button class="event-tab-button" data-tab="past"><i class="fas fa-history"></i> Archivio Eventi</button>
+    <div id="eventManagementContent" class="dashboard-section"> <div class="event-tab-content active" id="upcomingEventsContainer">
+        <div id="upcomingEventsGrid" class="admin-event-grid">
+            <p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>
         </div>
-
-        <div id="eventManagementContent">
-            <div class="event-tab-content active" id="upcomingEventsContainer">
-                <div id="upcomingEventsGrid" class="admin-event-grid"> <p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>
-                </div>
-            </div>
-            <div class="event-tab-content" id="pastEventsContainer" style="display: none;">
-                <div id="pastEventsGrid" class="admin-event-grid"> <p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento archivio eventi...</p>
-                </div>
+    </div>
+        <div class="event-tab-content" id="pastEventsContainer" style="display: none;">
+            <div id="pastEventsGrid" class="admin-event-grid">
+                <p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento archivio eventi...</p>
             </div>
         </div>
     </div>
-
 </main>
 
 <div id="uploadMediaModal" class="modal">
@@ -137,7 +153,6 @@
         <div id="commentsManagementFeedback" style="margin-top:1rem;"></div>
     </div>
 </div>
-
 
 <div id="manageBookingsModal" class="modal">
     <div class="modal-content">
@@ -199,9 +214,9 @@
 
     let allUpcomingEventsData = [];
     let allPastEventsData = [];
-    const defaultUserIconPath = '/uploads/icons/default_user.png'; // Assicurati che questo percorso sia corretto
-    const adminAvatarPath = 'images/logo.png'; // Avatar di default per l'admin se non specificato
-    const adminNameGlobalJS = "Eremo Frate Francesco"; // Nome usato per le risposte admin nei commenti
+    const defaultUserIconPath = '/uploads/icons/default_user.png';
+    const adminAvatarPath = 'images/logo.png';
+    const adminNameGlobalJS = "Eremo Frate Francesco";
 
     // --- Navbar & Mobile Menu Logic ---
     const SnavbarContainer = document.getElementById('navbarContainer');
@@ -264,7 +279,7 @@
     function logout() {
         localStorage.removeItem('adminUserEFF');
         alert('Logout effettuato.');
-        window.location.href = 'login_admin.html'; // O la tua pagina di login admin
+        window.location.href = 'login_admin.html';
     }
     // --- Fine Navbar & Mobile Menu ---
 
@@ -281,54 +296,37 @@
         if (!anyModalActive) {
             document.body.style.overflow = '';
         }
-
         if (modalId === 'uploadMediaModal') {
             document.getElementById('uploadMediaForm')?.reset();
-            const uploadFeedback = document.getElementById('uploadMediaFeedback');
-            if (uploadFeedback) uploadFeedback.innerHTML = '';
-            const existingMedia = document.getElementById('existingMediaContainer');
-            if (existingMedia) existingMedia.innerHTML = '<p>Caricamento media...</p>';
+            const uploadFeedback = document.getElementById('uploadMediaFeedback'); if (uploadFeedback) uploadFeedback.innerHTML = '';
+            const existingMedia = document.getElementById('existingMediaContainer'); if (existingMedia) existingMedia.innerHTML = '<p>Caricamento media...</p>';
         }
         if (modalId === 'manageCommentsModal') {
             let commentsListContainer = document.getElementById('commentsListContainer');
             if (commentsListContainer) {
                 const newClonedListContainer = commentsListContainer.cloneNode(false);
                 newClonedListContainer.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p></li>';
-                if(commentsListContainer.parentNode) {
-                    commentsListContainer.parentNode.replaceChild(newClonedListContainer, commentsListContainer);
-                }
+                if(commentsListContainer.parentNode) commentsListContainer.parentNode.replaceChild(newClonedListContainer, commentsListContainer);
             }
-            const commentsFeedback = document.getElementById('commentsManagementFeedback');
-            if (commentsFeedback) commentsFeedback.innerHTML = '';
+            const commentsFeedback = document.getElementById('commentsManagementFeedback'); if (commentsFeedback) commentsFeedback.innerHTML = '';
         }
         if (modalId === 'manageBookingsModal') {
-            const bookingsContainer = document.getElementById('bookingsListContainerModal');
-            if (bookingsContainer) bookingsContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento prenotazioni...</p>';
-            const bookingsFeedback = document.getElementById('bookingsManagementFeedbackModal');
-            if (bookingsFeedback) bookingsFeedback.innerHTML = '';
+            const bookingsContainer = document.getElementById('bookingsListContainerModal'); if (bookingsContainer) bookingsContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento prenotazioni...</p>';
+            const bookingsFeedback = document.getElementById('bookingsManagementFeedbackModal'); if (bookingsFeedback) bookingsFeedback.innerHTML = '';
         }
     }
-
     window.onclick = function(event) {
         const genericModals = document.querySelectorAll('.modal');
-        genericModals.forEach(modal => {
-            if (event.target === modal && modal.classList.contains('active')) {
-                closeModal(modal.id);
-            }
-        });
+        genericModals.forEach(modal => { if (event.target === modal && modal.classList.contains('active')) closeModal(modal.id); });
         const eventPopupOverlay = document.getElementById('eventPopupOverlayDashboard');
-        if (eventPopupOverlay && event.target === eventPopupOverlay && eventPopupOverlay.classList.contains('active')) {
-            closeEventPopupDashboard();
-        }
+        if (eventPopupOverlay && event.target === eventPopupOverlay && eventPopupOverlay.classList.contains('active')) closeEventPopupDashboard();
     };
     // --- Fine Logica Modali Generici ---
 
     // --- Funzioni Utility ---
     function sanitizeText(text) {
         if (text === null || typeof text === 'undefined') return '';
-        const element = document.createElement('div');
-        element.innerText = String(text);
-        return element.innerHTML;
+        const element = document.createElement('div'); element.innerText = String(text); return element.innerHTML;
     }
     function sanitizeTextForHTML(str) {
         if (typeof str !== 'string') str = String(str || '');
@@ -340,20 +338,13 @@
     }
     function formatDbDate(dateString) {
         if (!dateString) return 'N/D';
-        try {
-            const date = new Date(dateString.replace(/-/g, '/'));
-            if (isNaN(date.getTime())) return dateString;
-            return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        } catch (e) { return dateString; }
+        try { const date = new Date(dateString.replace(/-/g, '/')); if (isNaN(date.getTime())) return dateString; return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });}
+        catch (e) { return dateString; }
     }
     function formatMonthYear(dateString) {
         if (!dateString) return 'Data sconosciuta';
-        try {
-            const date = new Date(dateString.replace(/-/g, '/'));
-            if (isNaN(date.getTime())) return 'Data non valida';
-            const options = { month: 'long', year: 'numeric' };
-            return new Intl.DateTimeFormat('it-IT', options).format(date);
-        } catch (e) { return 'Data non valida'; }
+        try { const date = new Date(dateString.replace(/-/g, '/')); if (isNaN(date.getTime())) return 'Data non valida'; const options = { month: 'long', year: 'numeric' }; return new Intl.DateTimeFormat('it-IT', options).format(date); }
+        catch (e) { return 'Data non valida'; }
     }
     function getMonthIndexFromString(monthName) {
         const months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
@@ -379,25 +370,18 @@
         if (voluntaryCheckboxDashboard && priceContainerDashboard && eventPriceInputDashboard) {
             const isVoluntary = voluntaryCheckboxDashboard.checked;
             priceContainerDashboard.style.display = isVoluntary ? 'none' : 'block';
-            eventPriceInputDashboard.required = !isVoluntary;
-            if (isVoluntary) eventPriceInputDashboard.value = '';
+            eventPriceInputDashboard.required = !isVoluntary; if (isVoluntary) eventPriceInputDashboard.value = '';
         }
     }
     if (voluntaryCheckboxDashboard) voluntaryCheckboxDashboard.addEventListener('change', updatePriceFieldVisibilityDashboard);
 
     function openEventPopupDashboard(eventData = null) {
-        if (!eventFormDashboard || !eventPopupTitleDashboard || !eventIdInputDashboard || !currentImagePreviewDashboard || !currentFlyerPreviewDashboard || !eventFormMessageDashboard) {
-            console.error("Elementi del popup evento mancanti nel DOM."); return;
-        }
-        eventFormDashboard.reset();
-        updatePriceFieldVisibilityDashboard();
+        if (!eventFormDashboard || !eventPopupTitleDashboard || !eventIdInputDashboard || !currentImagePreviewDashboard || !currentFlyerPreviewDashboard || !eventFormMessageDashboard) { console.error("Elementi popup evento mancanti."); return; }
+        eventFormDashboard.reset(); updatePriceFieldVisibilityDashboard();
         eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';
-        currentImagePreviewDashboard.style.display = 'none'; currentImagePreviewDashboard.src = '#';
-        currentFlyerPreviewDashboard.innerHTML = '';
-
+        currentImagePreviewDashboard.style.display = 'none'; currentImagePreviewDashboard.src = '#'; currentFlyerPreviewDashboard.innerHTML = '';
         if (eventData) {
-            eventPopupTitleDashboard.textContent = 'Modifica Evento';
-            eventIdInputDashboard.value = eventData.IDEvento;
+            eventPopupTitleDashboard.textContent = 'Modifica Evento'; eventIdInputDashboard.value = eventData.IDEvento;
             document.getElementById('event-title-dashboard').value = eventData.Titolo || '';
             const eventDate = eventData.Data ? new Date(eventData.Data.replace(/-/g, '/')) : null;
             document.getElementById('event-date-dashboard').value = (eventDate && !isNaN(eventDate)) ? eventDate.toISOString().split('T')[0] : '';
@@ -407,96 +391,51 @@
             document.getElementById('event-prefix-dashboard').value = eventData.prefisso_relatore || 'Relatore';
             document.getElementById('event-speaker-dashboard').value = eventData.relatore || '';
             document.getElementById('event-association-dashboard').value = eventData.associazione || '';
-            // Popola "Posti Disponibili Iniziali" con posti_configurati_totali, che rappresenta il totale originale.
             document.getElementById('event-seats-dashboard').value = eventData.posti_configurati_totali !== null ? eventData.posti_configurati_totali : '0';
-
-            document.getElementById('event-booking-dashboard').checked = !!eventData.FlagPrenotabile; // Converte 0/1 in false/true
-            voluntaryCheckboxDashboard.checked = eventData.costo !== null && parseFloat(eventData.costo) === 0;
-            updatePriceFieldVisibilityDashboard();
-            if (!voluntaryCheckboxDashboard.checked && eventData.costo !== null && parseFloat(eventData.costo) > 0) {
-                eventPriceInputDashboard.value = parseFloat(eventData.costo).toFixed(2);
-            } else {
-                eventPriceInputDashboard.value = '';
-            }
+            document.getElementById('event-booking-dashboard').checked = !!eventData.FlagPrenotabile;
+            voluntaryCheckboxDashboard.checked = eventData.costo !== null && parseFloat(eventData.costo) === 0; updatePriceFieldVisibilityDashboard();
+            if (!voluntaryCheckboxDashboard.checked && eventData.costo !== null && parseFloat(eventData.costo) > 0) eventPriceInputDashboard.value = parseFloat(eventData.costo).toFixed(2); else eventPriceInputDashboard.value = '';
             if (eventData.immagine_url) { currentImagePreviewDashboard.src = eventData.immagine_url; currentImagePreviewDashboard.style.display = 'block'; }
-            if (eventData.volantino_url) {
-                const fileName = eventData.volantino_url.split('/').pop();
-                currentFlyerPreviewDashboard.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank">Vedi volantino attuale (${sanitizeText(fileName)})</a>`;
-            }
+            if (eventData.volantino_url) { const fileName = eventData.volantino_url.split('/').pop(); currentFlyerPreviewDashboard.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank">Vedi volantino (${sanitizeText(fileName)})</a>`; }
         } else {
-            eventPopupTitleDashboard.textContent = 'Aggiungi Nuovo Evento';
-            eventIdInputDashboard.value = '';
-            document.getElementById('event-booking-dashboard').checked = true;
-            voluntaryCheckboxDashboard.checked = false; updatePriceFieldVisibilityDashboard();
-            document.getElementById('event-seats-dashboard').value = '50';
-            document.getElementById('event-prefix-dashboard').value = 'Relatore';
+            eventPopupTitleDashboard.textContent = 'Aggiungi Nuovo Evento'; eventIdInputDashboard.value = '';
+            document.getElementById('event-booking-dashboard').checked = true; voluntaryCheckboxDashboard.checked = false; updatePriceFieldVisibilityDashboard();
+            document.getElementById('event-seats-dashboard').value = '50'; document.getElementById('event-prefix-dashboard').value = 'Relatore';
         }
-        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.add('active');
-        if(eventPopupDashboard) eventPopupDashboard.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        const titleInput = document.getElementById('event-title-dashboard');
-        if(titleInput) titleInput.focus();
+        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.add('active'); if(eventPopupDashboard) eventPopupDashboard.classList.add('active');
+        document.body.style.overflow = 'hidden'; const titleInput = document.getElementById('event-title-dashboard'); if(titleInput) titleInput.focus();
     }
-
     function closeEventPopupDashboard() {
-        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.remove('active');
-        if(eventPopupDashboard) eventPopupDashboard.classList.remove('active');
-        const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active');
-        if (!anyModalActive) {
-            document.body.style.overflow = '';
-        }
+        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.remove('active'); if(eventPopupDashboard) eventPopupDashboard.classList.remove('active');
+        const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active'); if (!anyModalActive) document.body.style.overflow = '';
     }
-
     if (closeEventPopupBtnDashboard) closeEventPopupBtnDashboard.addEventListener('click', closeEventPopupDashboard);
-
     document.addEventListener('keydown', function(event) {
-        if (event.key === "Escape") {
-            if (eventPopupDashboard && eventPopupDashboard.classList.contains('active')) closeEventPopupDashboard();
-            const activeModal = document.querySelector('.modal.active');
-            if (activeModal) closeModal(activeModal.id);
-        }
+        if (event.key === "Escape") { if (eventPopupDashboard && eventPopupDashboard.classList.contains('active')) closeEventPopupDashboard(); const activeModal = document.querySelector('.modal.active'); if (activeModal) closeModal(activeModal.id); }
     });
-
-    if(eventFormDashboard) {
-        eventFormDashboard.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
-            if(eventFormMessageDashboard) { eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';}
-            try {
-                const formData = new FormData(this);
-                formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
-                if (formData.get('event-voluntary') === 'on') { formData.set('event-price', '0.00'); }
-
-                const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
-                const responseText = await response.text();
-                let result;
-                try { result = JSON.parse(responseText); }
-                catch (jsonError) { console.error("Risposta non JSON:", responseText); throw new Error(`Risposta server non valida.`); }
-                if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
-                if (result.success) {
-                    if(eventFormMessageDashboard) { eventFormMessageDashboard.textContent = result.message || 'Operazione completata!'; eventFormMessageDashboard.classList.remove('error'); eventFormMessageDashboard.classList.add('success'); }
-                    await fetchDashboardData(); setTimeout(closeEventPopupDashboard, 1500);
-                } else { throw new Error(result.message || 'Errore salvataggio.'); }
-            } catch (error) {
-                console.error('Errore form evento:', error);
-                if(eventFormMessageDashboard) { eventFormMessageDashboard.textContent = `Errore: ${error.message}`; eventFormMessageDashboard.classList.remove('success'); eventFormMessageDashboard.classList.add('error'); }
-            } finally {
-                if(eventFormMessageDashboard) eventFormMessageDashboard.style.display = 'block';
-                submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText;
-            }
-        });
-    }
+    if(eventFormDashboard) eventFormDashboard.addEventListener('submit', async function(e) {
+        e.preventDefault(); const submitBtn = this.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
+        if(eventFormMessageDashboard) { eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';}
+        try {
+            const formData = new FormData(this); formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
+            if (formData.get('event-voluntary') === 'on') formData.set('event-price', '0.00');
+            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData }); const responseText = await response.text();
+            let result; try { result = JSON.parse(responseText); } catch (jsonError) { console.error("Risposta non JSON:", responseText); throw new Error(`Risposta server non valida.`); }
+            if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
+            if (result.success) { if(eventFormMessageDashboard) { eventFormMessageDashboard.textContent = result.message || 'Operazione completata!'; eventFormMessageDashboard.classList.remove('error'); eventFormMessageDashboard.classList.add('success'); } await fetchDashboardData(); setTimeout(closeEventPopupDashboard, 1500); }
+            else throw new Error(result.message || 'Errore salvataggio.');
+        } catch (error) { console.error('Errore form evento:', error); if(eventFormMessageDashboard) { eventFormMessageDashboard.textContent = `Errore: ${error.message}`; eventFormMessageDashboard.classList.remove('success'); eventFormMessageDashboard.classList.add('error'); }}
+        finally { if(eventFormMessageDashboard) eventFormMessageDashboard.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; }
+    });
     // --- Fine Logica Pop-up Evento ---
 
     // --- Logica Tabs Eventi ---
-    const tabButtons = document.querySelectorAll('.event-tab-button');
-    const tabContents = document.querySelectorAll('.event-tab-content');
+    const tabButtons = document.querySelectorAll('.event-tabs-container .event-tab-button'); // Selettore più specifico
+    const tabContents = document.querySelectorAll('#eventManagementContent .event-tab-content'); // Selettore più specifico
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
+            tabButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active');
             const targetTab = button.dataset.tab;
             tabContents.forEach(content => {
                 const isActiveTab = content.id === `${targetTab}EventsContainer`;
@@ -507,30 +446,49 @@
     });
     // --- Fine Logica Tabs Eventi ---
 
-    // --- Logica Caricamento Dati Dashboard, Filtri e Rendering ---
+    // --- Logica Filtro Dropdown ---
+    const filterToggleButton = document.getElementById('filterToggleButton');
+    const filterPanelDropdown = document.getElementById('filterPanelDropdown');
+    const applyFiltersFromPanelBtn = document.getElementById('applyFiltersFromPanelBtn');
+    const resetFiltersBtnPanel = document.getElementById('resetFiltersBtnPanel');
+
+    if (filterToggleButton && filterPanelDropdown) {
+        filterToggleButton.addEventListener('click', function(event) {
+            event.stopPropagation(); const isActive = filterPanelDropdown.classList.toggle('active');
+            filterToggleButton.classList.toggle('active', isActive); filterToggleButton.setAttribute('aria-expanded', isActive.toString());
+        });
+        document.addEventListener('click', function(event) { // Chiudi cliccando fuori
+            if (filterPanelDropdown.classList.contains('active') && !filterPanelDropdown.contains(event.target) && !filterToggleButton.contains(event.target)) {
+                filterPanelDropdown.classList.remove('active'); filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+    if (applyFiltersFromPanelBtn) applyFiltersFromPanelBtn.addEventListener('click', () => {
+        applyFiltersAndRender(); if (filterPanelDropdown) filterPanelDropdown.classList.remove('active');
+        if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}
+    });
+    if (resetFiltersBtnPanel) resetFiltersBtnPanel.addEventListener('click', () => {
+        const searchTitleInput = document.getElementById('searchTitleDashboard'); if(searchTitleInput) searchTitleInput.value = '';
+        const searchDateInput = document.getElementById('searchDateDashboard'); if(searchDateInput) searchDateInput.value = '';
+        const searchSpeakerInput = document.getElementById('searchSpeakerDashboard'); if(searchSpeakerInput) searchSpeakerInput.value = '';
+        // Non applica subito, l'utente premerà "Applica"
+    });
+    // --- Fine Logica Filtro Dropdown ---
+
+
+    // --- Logica Caricamento Dati Dashboard, Filtri, Ordinamento e Raggruppamento ---
     async function fetchDashboardData() {
-        const upcomingGrid = document.getElementById('upcomingEventsGrid');
-        const pastGrid = document.getElementById('pastEventsGrid');
+        const upcomingGrid = document.getElementById('upcomingEventsGrid'); const pastGrid = document.getElementById('pastEventsGrid');
         if (!upcomingGrid || !pastGrid) { console.error("Elementi griglia eventi mancanti."); return; }
-        upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>';
-        pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento archivio eventi...</p>';
+        upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
+        pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
         try {
             const response = await fetch('get_dashboard_event_data.php');
             if (!response.ok) throw new Error(`Errore HTTP: ${response.status} ${response.statusText}`);
             const data = await response.json();
-            if (data.success) {
-                allUpcomingEventsData = data.upcoming_events || [];
-                allPastEventsData = data.past_events || [];
-                applyFiltersAndRender();
-            } else {
-                const errorMsg = sanitizeText(data.message || 'Formato dati non corretto.');
-                [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore caricamento: ${errorMsg}</p></div>`);
-            }
-        } catch (error) {
-            console.error('Errore fetchDashboardData:', error);
-            const errorMsg = sanitizeText(error.message);
-            [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare: ${errorMsg}</p></div>`);
-        }
+            if (data.success) { allUpcomingEventsData = data.upcoming_events || []; allPastEventsData = data.past_events || []; applyFiltersAndRender(); }
+            else { const errorMsg = sanitizeText(data.message || 'Formato dati non corretto.'); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore: ${errorMsg}</p></div>`);}
+        } catch (error) { console.error('Errore fetchDashboardData:', error); const errorMsg = sanitizeText(error.message); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare: ${errorMsg}</p></div>`);}
     }
 
     function applyFiltersAndRender() {
@@ -539,19 +497,16 @@
         const speakerFilter = document.getElementById('searchSpeakerDashboard').value.toLowerCase().trim();
         const sortBy = document.getElementById('sortCriteria').value;
         const sortDirection = document.getElementById('sortDirection').value;
+        const groupBy = document.getElementById('groupCriteria').value;
 
         const filterEvent = (event) => {
-            const eventTitle = event.Titolo?.toLowerCase() || '';
-            const eventDateStr = event.Data || '';
-            const eventSpeaker = event.relatore?.toLowerCase() || ''; // Usa event.relatore
+            const eventTitle = event.Titolo?.toLowerCase() || ''; const eventDateStr = event.Data || ''; const eventSpeaker = event.relatore?.toLowerCase() || '';
             let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
             let dateMatch = !dateFilter || (eventDateStr && eventDateStr.substring(0, 7) === dateFilter);
             let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
             return titleMatch && dateMatch && speakerMatch;
         };
-
-        let filteredUpcoming = allUpcomingEventsData.filter(filterEvent);
-        let filteredPast = allPastEventsData.filter(filterEvent);
+        let filteredUpcoming = allUpcomingEventsData.filter(filterEvent); let filteredPast = allPastEventsData.filter(filterEvent);
 
         const compareFunction = (a, b) => {
             let valA, valB;
@@ -564,363 +519,143 @@
                 case 'post_tot': valA = a.posti_configurati_totali || 0; valB = b.posti_configurati_totali || 0; break;
                 default: valA = new Date(a.Data); valB = new Date(b.Data);
             }
-
-            if (typeof valA === 'string' && typeof valB === 'string') {
-                const comparison = valA.localeCompare(valB, 'it', { sensitivity: 'base' });
-                if (comparison !== 0) return sortDirection === 'asc' ? comparison : -comparison;
-            } else {
-                if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-                if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-            }
-            // Fallback
-            let dateA = new Date(a.Data); let dateB = new Date(b.Data);
-            let dateComparisonFactor = (sortDirection === 'asc') ? 1 : -1;
-            if (dateA < dateB) return dateComparisonFactor * -1;
-            if (dateA > dateB) return dateComparisonFactor * 1;
-            return (a.IDEvento < b.IDEvento) ? -1 : 1;
+            if (typeof valA === 'string' && typeof valB === 'string') { const comp = valA.localeCompare(valB,'it',{sensitivity:'base'}); if(comp!==0) return sortDirection==='asc'?comp:-comp;}
+            else { if (valA < valB) return sortDirection === 'asc' ? -1 : 1; if (valA > valB) return sortDirection === 'asc' ? 1 : -1;}
+            let dA = new Date(a.Data); let dB = new Date(b.Data); let dFactor = (sortDirection==='asc')?1:-1;
+            if (dA < dB) return dFactor * -1; if (dA > dB) return dFactor * 1; return (a.IDEvento < b.IDEvento)?-1:1;
         };
-
-        filteredUpcoming.sort(compareFunction);
-        filteredPast.sort(compareFunction);
-        renderEventsSection(filteredUpcoming, 'upcomingEventsGrid', true, sortBy, sortDirection);
-        renderEventsSection(filteredPast, 'pastEventsGrid', false, sortBy, sortDirection);
+        filteredUpcoming.sort(compareFunction); filteredPast.sort(compareFunction);
+        renderEventsSection(filteredUpcoming, 'upcomingEventsGrid', true, groupBy, sortDirection);
+        renderEventsSection(filteredPast, 'pastEventsGrid', false, groupBy, sortDirection);
     }
 
-    function renderEventsSection(events, gridContainerId, isUpcoming, sortBy, sortDirection) {
-        const gridContainer = document.getElementById(gridContainerId);
-        if (!gridContainer) return;
-        gridContainer.innerHTML = '';
-        if (isUpcoming) {
-            const addEventElement = document.createElement('div');
-            addEventElement.className = 'add-event-bar';
-            addEventElement.innerHTML = `<i class="fas fa-plus-circle"></i><span>Nuovo Evento</span>`;
-            addEventElement.addEventListener('click', () => openEventPopupDashboard(null));
-            gridContainer.appendChild(addEventElement);
-        }
-        if (events.length === 0) {
-            if (!(isUpcoming && gridContainer.children.length === 1)) { // Non mostrare se c'è solo "Nuovo Evento"
-                gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'} trovato.</p>`;
-            }
-            return;
-        }
-        const groupedByMonth = events.reduce((acc, event) => {
-            const monthYear = formatMonthYear(event.Data);
-            if (!acc[monthYear]) acc[monthYear] = [];
-            acc[monthYear].push(event); return acc;
+    function getWeekStartDate(dInput) {
+        const d = new Date(dInput.replace(/-/g, '/')); const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1); return new Date(d.setDate(diff));
+    }
+    function getWeekRangeString(dateStr) {
+        if (!dateStr) return 'Data non valida'; try { const date = new Date(dateStr.replace(/-/g, '/')); if (isNaN(date.getTime())) return 'Data non valida';
+            const weekStart = getWeekStartDate(dateStr); const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6);
+            const options = { day: '2-digit', month: 'short' }; const year = weekStart.getFullYear();
+            return `Sett. ${weekStart.toLocaleDateString('it-IT', options)} - ${weekEnd.toLocaleDateString('it-IT', options)} ${year}`;
+        } catch (e) { return 'Data non valida'; }
+    }
+
+    function renderEventsSection(events, gridContainerId, isUpcoming, groupBy, sortDirection) {
+        const gridContainer = document.getElementById(gridContainerId); if (!gridContainer) return; gridContainer.innerHTML = '';
+        if (isUpcoming) { const addEl = document.createElement('div'); addEl.className='add-event-bar'; addEl.innerHTML=`<i class="fas fa-plus-circle"></i><span>Nuovo Evento</span>`; addEl.addEventListener('click',()=>openEventPopupDashboard(null)); gridContainer.appendChild(addEl);}
+        if (events.length === 0) { if (!(isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar'))) { gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'}.</p>`;} return;}
+        if (groupBy === "nessuno") { events.forEach(event => gridContainer.appendChild(createAdminEventCard(event))); return;}
+        const groupedEvents = events.reduce((acc, event) => {
+            let groupKey = 'Non specificato'; try { switch (groupBy) {
+                case 'giorno': groupKey = event.Data ? formatDbDate(event.Data) : 'Data scon.'; break;
+                case 'settimana': groupKey = event.Data ? getWeekRangeString(event.Data) : 'Data scon.'; break;
+                case 'mese': groupKey = event.Data ? formatMonthYear(event.Data) : 'Data scon.'; break;
+                case 'anno': groupKey = event.Data ? new Date(event.Data.replace(/-/g,'/')).getFullYear().toString() : 'Anno scon.'; break;
+                case 'relatore': groupKey = sanitizeText(event.relatore || 'Senza Relatore'); break;
+                default: groupKey = event.Data ? formatMonthYear(event.Data) : 'Data scon.';}} catch(e){console.warn("Errore groupKey:", event,e);}
+            if (!acc[groupKey]) acc[groupKey] = []; acc[groupKey].push(event); return acc;
         }, {});
-        let sortedMonthYears;
-        if (sortBy === 'mese') {
-            sortedMonthYears = Object.keys(groupedByMonth).sort((a, b) => {
-                const dateA = new Date(parseInt(a.split(" ")[1]), getMonthIndexFromString(a.split(" ")[0]));
-                const dateB = new Date(parseInt(b.split(" ")[1]), getMonthIndexFromString(b.split(" ")[0]));
-                return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
-            });
-        } else {
-            sortedMonthYears = Object.keys(groupedByMonth).sort((a, b) => {
-                const dateA = new Date(parseInt(a.split(" ")[1]), getMonthIndexFromString(a.split(" ")[0]));
-                const dateB = new Date(parseInt(b.split(" ")[1]), getMonthIndexFromString(b.split(" ")[0]));
-                return isUpcoming ? dateA - dateB : dateB - dateA;
-            });
-        }
-        for (const monthYear of sortedMonthYears) {
-            const monthYearHeader = document.createElement('h3');
-            monthYearHeader.className = 'month-year-header'; monthYearHeader.textContent = monthYear;
-            gridContainer.appendChild(monthYearHeader);
-            groupedByMonth[monthYear].forEach(event => gridContainer.appendChild(createAdminEventCard(event)));
-        }
+        let sortedGroupKeys = Object.keys(groupedEvents);
+        if (groupBy === 'giorno' || groupBy === 'settimana' || groupBy === 'mese' || groupBy === 'anno') {
+            sortedGroupKeys.sort((a, b) => { let dateA, dateB; try {
+                if (groupBy === 'giorno') { const pA=a.split('/'); dateA=new Date(pA[2],pA[1]-1,pA[0]); const pB=b.split('/'); dateB=new Date(pB[2],pB[1]-1,pB[0]);}
+                else if (groupBy === 'settimana') { const yA=parseInt(a.substring(a.lastIndexOf(' ')+1)); const mdA=a.split(' ')[1].split('/'); dateA=new Date(yA,getMonthIndexFromString(a.split(' ')[2].replace('.','')),parseInt(mdA[0])); const yB=parseInt(b.substring(b.lastIndexOf(' ')+1)); const mdB=b.split(' ')[1].split('/'); dateB=new Date(yB,getMonthIndexFromString(b.split(' ')[2].replace('.','')),parseInt(mdB[0]));}
+                else if (groupBy === 'mese') { const pA=a.split(' '); dateA=new Date(pA[1],getMonthIndexFromString(pA[0])); const pB=b.split(' '); dateB=new Date(pB[1],getMonthIndexFromString(pB[0]));}
+                else if (groupBy === 'anno') { dateA=new Date(a,0,1); dateB=new Date(b,0,1);}} catch(e){return sortDirection==='asc'?String(a).localeCompare(String(b)):String(b).localeCompare(String(a));}
+                if(dateA&&dateB&&!isNaN(dateA)&&!isNaN(dateB))return sortDirection==='asc'?dateA-dateB:dateB-dateA; return sortDirection==='asc'?String(a).localeCompare(String(b)):String(b).localeCompare(String(a));});
+        } else if (groupBy === 'relatore') sortedGroupKeys.sort((a,b)=>sortDirection==='asc'?a.localeCompare(b,'it',{sensitivity:'base'}):b.localeCompare(a,'it',{sensitivity:'base'}));
+        for (const groupKey of sortedGroupKeys) { const h=document.createElement('h3'); h.className='month-year-header'; h.textContent=groupKey; gridContainer.appendChild(h); groupedEvents[groupKey].forEach(ev=>gridContainer.appendChild(createAdminEventCard(ev)));}
     }
 
-    function createAdminEventCard(event) {
-        const eventCard = document.createElement('article');
-        eventCard.className = 'admin-event-card'; eventCard.id = `admin-event-${event.IDEvento}`;
-        const numPrenotazioni = event.elenco_prenotazioni?.length || 0;
-        const partecipanti = event.posti_occupati || 0;
-        const postiConfigurati = event.posti_configurati_totali || 0;
-        const commentCount = event.comment_count || 0;
-        const mediaCount = event.media_count || 0;
+    function createAdminEventCard(event) { // Funzione esistente (leggermente aggiornata per relatore in card)
+        const eventCard = document.createElement('article'); eventCard.className = 'admin-event-card'; eventCard.id = `admin-event-${event.IDEvento}`;
+        const numPrenotazioni = event.elenco_prenotazioni?.length || 0; const partecipanti = event.posti_occupati || 0;
+        const postiConfigurati = event.posti_configurati_totali || 0; const commentCount = event.comment_count || 0; const mediaCount = event.media_count || 0;
         let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-admin.jpg';
         const relatoreDisplay = event.relatore ? `<span class="admin-event-date" style="display:block; margin-top:2px;">${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>` : '';
-
         eventCard.innerHTML = `
             <div class="admin-event-card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.Titolo)}" class="admin-event-card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
             <div class="admin-event-card-content">
-                <div class="admin-event-card-header">
-                    <h3 class="admin-event-title">${sanitizeText(event.Titolo)} (ID: ${event.IDEvento})</h3>
-                    <span class="admin-event-date">Data: ${formatDbDate(event.Data)} ${sanitizeText(event.Durata) || ''}</span>
-                    ${relatoreDisplay}
-                </div>
-                <div class="admin-event-card-quick-stats">
-                    <div class="stat-item" title="Prenotazioni"><i class="fas fa-ticket-alt"></i> ${numPrenotazioni} Pren.</div>
-                    <div class="stat-item" title="Partecipanti / Posti Config."><i class="fas fa-users"></i> ${partecipanti}/${postiConfigurati}</div>
-                    <div class="stat-item" title="Media Caricati"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div>
-                    <div class="stat-item" title="Commenti Ricevuti"><i class="fas fa-comments"></i> ${commentCount} Comm.</div>
-                </div>
-                <div class="admin-event-card-actions top-actions">
-                    <button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Gestisci Media"><i class="fas fa-photo-video"></i> Media</button>
-                    <button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Gestisci Commenti"><i class="fas fa-comments"></i> Commenti</button>
-                    <button class="btn-admin btn-bookings" data-event-id="${event.IDEvento}" title="Gestisci Prenotazioni"><i class="fas fa-list-alt"></i> Prenotazioni</button>
-                </div>
-                <div class="admin-event-card-actions bottom-actions">
-                     <button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="Genera PDF Riepilogo"><i class="fas fa-file-pdf"></i> PDF</button>
-                     <button class="btn-admin btn-edit" data-event-id="${event.IDEvento}" title="Modifica Evento"><i class="fas fa-edit"></i> Modifica</button>
-                     <button class="btn-admin btn-admin-danger btn-delete" data-event-id="${event.IDEvento}" title="Elimina Evento"><i class="fas fa-trash-alt"></i> Elimina</button>
-                </div>
+                <div class="admin-event-card-header"><h3 class="admin-event-title">${sanitizeText(event.Titolo)} (ID: ${event.IDEvento})</h3><span class="admin-event-date">Data: ${formatDbDate(event.Data)} ${sanitizeText(event.Durata) || ''}</span>${relatoreDisplay}</div>
+                <div class="admin-event-card-quick-stats"><div class="stat-item" title="Prenotazioni"><i class="fas fa-ticket-alt"></i> ${numPrenotazioni} Pren.</div><div class="stat-item" title="Partecipanti / Posti Config."><i class="fas fa-users"></i> ${partecipanti}/${postiConfigurati}</div><div class="stat-item" title="Media"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div><div class="stat-item" title="Commenti"><i class="fas fa-comments"></i> ${commentCount} Comm.</div></div>
+                <div class="admin-event-card-actions top-actions"><button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Media"><i class="fas fa-photo-video"></i> Media</button><button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Commenti"><i class="fas fa-comments"></i> Commenti</button><button class="btn-admin btn-bookings" data-event-id="${event.IDEvento}" title="Prenotazioni"><i class="fas fa-list-alt"></i> Prenotazioni</button></div>
+                <div class="admin-event-card-actions bottom-actions"><button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="PDF"><i class="fas fa-file-pdf"></i> PDF</button><button class="btn-admin btn-edit" data-event-id="${event.IDEvento}" title="Modifica"><i class="fas fa-edit"></i> Modifica</button><button class="btn-admin btn-admin-danger btn-delete" data-event-id="${event.IDEvento}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div>
             </div>`;
-        const editButton = eventCard.querySelector('.btn-edit');
-        if(editButton) editButton.addEventListener('click', function() {
-            const eventToEdit = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId);
-            if (eventToEdit) openEventPopupDashboard(eventToEdit); else alert("Dati evento non trovati.");
-        });
-        const deleteButton = eventCard.querySelector('.btn-delete');
-        if(deleteButton) deleteButton.addEventListener('click', function() {
-            const eventToDelete = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId);
-            confirmDeleteEvent(this.dataset.eventId, eventToDelete ? eventToDelete.Titolo : "evento");
-        });
-        const bookingsButton = eventCard.querySelector('.btn-bookings');
-        if(bookingsButton) bookingsButton.addEventListener('click', function() {
-            const eventForBookings = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId);
-            if (eventForBookings) openManageBookingsModal(eventForBookings); else alert("Dati evento non trovati.");
-        });
+        const editButton = eventCard.querySelector('.btn-edit'); if(editButton) editButton.addEventListener('click', function() { const eventToEdit = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); if (eventToEdit) openEventPopupDashboard(eventToEdit); else alert("Dati evento non trovati.");});
+        const deleteButton = eventCard.querySelector('.btn-delete'); if(deleteButton) deleteButton.addEventListener('click', function() { const eventToDelete = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); confirmDeleteEvent(this.dataset.eventId, eventToDelete ? eventToDelete.Titolo : "evento");});
+        const bookingsButton = eventCard.querySelector('.btn-bookings'); if(bookingsButton) bookingsButton.addEventListener('click', function() { const eventForBookings = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); if (eventForBookings) openManageBookingsModal(eventForBookings); else alert("Dati evento non trovati.");});
         return eventCard;
     }
 
-    const searchTitleInput = document.getElementById('searchTitleDashboard');
-    const searchDateInput = document.getElementById('searchDateDashboard');
-    const searchSpeakerInput = document.getElementById('searchSpeakerDashboard');
-    const resetFiltersButton = document.getElementById('resetFiltersBtn');
-    if(searchTitleInput) searchTitleInput.addEventListener('input', applyFiltersAndRender);
-    if(searchDateInput) searchDateInput.addEventListener('input', applyFiltersAndRender);
-    if(searchSpeakerInput) searchSpeakerInput.addEventListener('input', applyFiltersAndRender);
-    if(resetFiltersButton) resetFiltersButton.addEventListener('click', () => {
-        if(searchTitleInput) searchTitleInput.value = ''; if(searchDateInput) searchDateInput.value = ''; if(searchSpeakerInput) searchSpeakerInput.value = '';
-        const sortCriteriaSelect = document.getElementById('sortCriteria'); const sortDirectionSelect = document.getElementById('sortDirection');
-        if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese'; if(sortDirectionSelect) sortDirectionSelect.value = 'desc';
-        applyFiltersAndRender();
-    });
-    const sortCriteriaSelect = document.getElementById('sortCriteria'); const sortDirectionSelect = document.getElementById('sortDirection');
-    if(sortCriteriaSelect) sortCriteriaSelect.addEventListener('change', applyFiltersAndRender);
-    if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender);
-
-    // --- Funzioni Gestione Prenotazioni (per Modal) ---
+    // --- Funzioni Gestione Prenotazioni, Media, Commenti, Eliminazione Evento (invariate rispetto alla versione precedente) ---
+    // ... (copia qui le funzioni: openManageBookingsModal, renderGroupedBookings, confirmCancelBookingInModal, cancelBookingInModal)
+    // ... (copia qui le funzioni: openManageMediaModal, renderExistingMedia, deleteMediaItem, e l'event listener per uploadMediaForm)
+    // ... (copia qui le funzioni: openManageCommentsModal, renderCommentsForAdminThreaded, attachAdminCommentListeners, handleAdminReplySubmit, deleteAdminComment)
+    // ... (copia qui la funzione: confirmDeleteEvent)
+    // --- COPIA TUTTE LE FUNZIONI HELPER PER I MODAL QUI ---
+    // COPIATE DALLA RISPOSTA PRECEDENTE PER COMPLETEZZA:
     function openManageBookingsModal(eventData) {
-        const modalTitleEl = document.getElementById('bookingsEventTitle');
-        const bookingsContainerEl = document.getElementById('bookingsListContainerModal');
-        const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
-        if (modalTitleEl) modalTitleEl.textContent = sanitizeText(eventData.Titolo);
-        if (feedbackEl) feedbackEl.innerHTML = '';
-        if (bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento);
-        openModal('manageBookingsModal');
+        const modalTitleEl = document.getElementById('bookingsEventTitle'); const bookingsContainerEl = document.getElementById('bookingsListContainerModal'); const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
+        if (modalTitleEl) modalTitleEl.textContent = sanitizeText(eventData.Titolo); if (feedbackEl) feedbackEl.innerHTML = '';
+        if (bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento); openModal('manageBookingsModal');
     }
     function renderGroupedBookings(bookings, eventId) {
-        if (!bookings || bookings.length === 0) return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione.</p>';
-        let html = '';
-        bookings.forEach(booking => {
-            const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim();
-            const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto);
-            html += `<div class="user-booking-group" id="booking-group-${booking.idPrenotazione}"><h5>Prenotazione di: ${displayNomeUtente} <small>(${sanitizeText(booking.Contatto)})</small></h5><div class="single-booking-details"><p><strong>ID: ${booking.idPrenotazione}</strong> - Posti: ${booking.NumeroPosti}</p><strong>Partecipanti:</strong>${booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0 ? `<ul class="participant-list-inline">${booking.partecipanti_della_prenotazione.map(p => `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`).join('')}</ul>` : '<p><small>Nessun dettaglio.</small></p>'}<button class="btn-admin btn-admin-danger btn-sm" onclick="confirmCancelBookingInModal(${booking.idPrenotazione}, ${eventId}, ${booking.NumeroPosti}, '${sanitizeForAttribute(displayNomeUtente)}')" title="Annulla"><i class="fas fa-times-circle"></i> Annulla</button></div></div>`;
-        });
+        if (!bookings || bookings.length === 0) return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione.</p>'; let html = '';
+        bookings.forEach(booking => { const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim(); const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto);
+            html += `<div class="user-booking-group" id="booking-group-${booking.idPrenotazione}"><h5>Prenotazione di: ${displayNomeUtente} <small>(${sanitizeText(booking.Contatto)})</small></h5><div class="single-booking-details"><p><strong>ID: ${booking.idPrenotazione}</strong> - Posti: ${booking.NumeroPosti}</p><strong>Partecipanti:</strong>${booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0 ? `<ul class="participant-list-inline">${booking.partecipanti_della_prenotazione.map(p => `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`).join('')}</ul>` : '<p><small>Nessun dettaglio.</small></p>'}<button class="btn-admin btn-admin-danger btn-sm" onclick="confirmCancelBookingInModal(${booking.idPrenotazione}, ${eventId}, ${booking.NumeroPosti}, '${sanitizeForAttribute(displayNomeUtente)}')" title="Annulla"><i class="fas fa-times-circle"></i> Annulla</button></div></div>`;});
         return html;
     }
-    function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) {
-        if (confirm(`Annullare prenotazione ID ${idPrenotazione} (${numPosti} posti) di ${nomeUtente}?`)) cancelBookingInModal(idPrenotazione, eventId);
-    }
+    function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) { if (confirm(`Annullare prenotazione ID ${idPrenotazione} (${numPosti} posti) di ${nomeUtente}?`)) cancelBookingInModal(idPrenotazione, eventId);}
     async function cancelBookingInModal(idPrenotazione, eventIdForModalReload) {
-        const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
-        if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento...</p>`;
-        try {
-            const formData = new FormData(); formData.append('id_prenotazione', idPrenotazione);
-            const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData });
-            const result = await response.json();
-            if (feedbackEl) {
-                if (result.success) {
-                    feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`;
-                    await fetchDashboardData();
-                    const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === String(eventIdForModalReload));
-                    if(updatedEventData) {
-                        const bookingsContainerEl = document.getElementById('bookingsListContainerModal');
-                        if(bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(updatedEventData.elenco_prenotazioni || [], updatedEventData.IDEvento);
-                    } else closeModal('manageBookingsModal');
-                } else feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare.')}</p>`;
-            }
-        } catch (error) {
-            console.error("Errore AJAX annullamento modal:", error);
-            if (feedbackEl) feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore connessione: ${sanitizeText(error.message)}</p>`;
-        }
+        const feedbackEl = document.getElementById('bookingsManagementFeedbackModal'); if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento...</p>`;
+        try { const formData = new FormData(); formData.append('id_prenotazione', idPrenotazione); const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData }); const result = await response.json();
+            if (feedbackEl) { if (result.success) { feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`; await fetchDashboardData(); const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === String(eventIdForModalReload)); if(updatedEventData) { const bookingsContainerEl = document.getElementById('bookingsListContainerModal'); if(bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(updatedEventData.elenco_prenotazioni || [], updatedEventData.IDEvento);} else closeModal('manageBookingsModal');} else feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare.')}</p>`;}}
+        catch (error) { console.error("Errore AJAX annullamento modal:", error); if (feedbackEl) feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore connessione: ${sanitizeText(error.message)}</p>`;}
     }
-    // --- Fine Gestione Prenotazioni (Modal) ---
-
-    // --- Gestione Media ---
     async function openManageMediaModal(eventId, eventTitle) {
-        const eventIdInput = document.getElementById('uploadMediaEventId'); const eventTitleEl = document.getElementById('uploadMediaEventTitle');
-        const existingMediaContainer = document.getElementById('existingMediaContainer'); const feedbackDiv = document.getElementById('uploadMediaFeedback');
-        const uploadForm = document.getElementById('uploadMediaForm');
-        if (eventIdInput) eventIdInput.value = eventId; if (eventTitleEl) eventTitleEl.textContent = sanitizeText(eventTitle);
-        if (uploadForm) uploadForm.reset(); if (feedbackDiv) feedbackDiv.innerHTML = '';
-        if (existingMediaContainer) existingMediaContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media...</p>';
-        openModal('uploadMediaModal');
-        try {
-            const response = await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`);
-            const result = await response.json();
-            if (result.success && result.media) renderExistingMedia(result.media, eventId);
-            else if (existingMediaContainer) existingMediaContainer.innerHTML = `<p>Nessun media o errore: ${sanitizeText(result.message || 'Sconosciuto.')}</p>`;
-        } catch (error) {
-            console.error('Errore recupero media:', error);
-            if (existingMediaContainer) existingMediaContainer.innerHTML = `<p class="error-message">Errore connessione: ${sanitizeText(error.message)}</p>`;
-        }
-    }
-    function renderExistingMedia(mediaItems, eventId) {
-        const container = document.getElementById('existingMediaContainer'); if (!container) return;
-        if (mediaItems.length === 0) { container.innerHTML = '<p>Nessun media caricato.</p>'; return; }
-        let html = '<div class="existing-media-grid">';
-        mediaItems.forEach(item => {
-            const filename = item.url_media ? item.url_media.split('/').pop() : 'File'; const itemDesc = sanitizeText(item.Descrizione || '');
-            html += `<div class="existing-media-item">`;
-            if (item.tipo_media === 'image') html += `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Vedi: ${sanitizeForAttribute(filename)} ${itemDesc ? '- ' + itemDesc : ''}"><img src="${sanitizeForAttribute(item.url_media)}" alt="${itemDesc || filename}" loading="lazy" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;" title="Immagine: ${sanitizeForAttribute(filename)}"><i class="fas fa-image"></i></div>`;
-            else if (item.tipo_media === 'video') html += `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Vedi: ${sanitizeForAttribute(filename)} ${itemDesc ? '- ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`;
-            else html += `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Apri: ${sanitizeForAttribute(filename)} ${itemDesc ? '- ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`;
-            html += `<p class="media-filename" title="${sanitizeForAttribute(item.url_media)}">${sanitizeText(filename)}</p>`;
-            if (itemDesc) html += `<p class="media-description"><em>${itemDesc}</em></p>`;
-            html += `<button class="btn-admin btn-admin-danger btn-sm btn-delete-media" data-media-id="${item.id_media}" data-event-id="${eventId}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div>`;
-        });
-        html += '</div>'; container.innerHTML = html;
-        container.querySelectorAll('.btn-delete-media').forEach(button => button.addEventListener('click', function() { if (confirm('Eliminare questo media?')) deleteMediaItem(this.dataset.mediaId, this.dataset.eventId); }));
-    }
-    async function deleteMediaItem(mediaId, eventId) {
-        const feedbackDiv = document.getElementById('uploadMediaFeedback');
-        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
-        try {
-            const formData = new FormData(); formData.append('action', 'delete_event_media'); formData.append('media_id', mediaId);
-            const response = await fetch('manage_event_media.php', { method: 'POST', body: formData }); const result = await response.json();
-            if (result.success) {
-                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); fetchDashboardData();
-            } else if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;
-        } catch (error) { console.error('Errore eliminazione media:', error); if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore connessione: ${sanitizeText(error.message)}</p>`;}
-        setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 4000);
-    }
-    const uploadMediaForm = document.getElementById('uploadMediaForm');
-    if(uploadMediaForm) uploadMediaForm.addEventListener('submit', async function(e) {
-        e.preventDefault(); const eventId = document.getElementById('uploadMediaEventId').value;
-        const feedbackDiv = document.getElementById('uploadMediaFeedback');
-        if (document.getElementById('mediaFiles').files.length === 0) { if(feedbackDiv) feedbackDiv.innerHTML = '<p class="error-message">Seleziona file.</p>'; return; }
-        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
-        const formData = new FormData(this); formData.set('action', 'upload_media'); formData.set('event_id', eventId);
-        try {
-            const response = await fetch('manage_event_media.php', { method: 'POST', body: formData }); const result = await response.json();
-            if (result.success) {
-                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); fetchDashboardData(); this.reset();
-            } else if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;
-        } catch (error) { console.error('Errore uploadMedia:', error); if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`; }
-        setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 5000);
-    });
-    // --- Fine Gestione Media ---
-
-    // --- Gestione Commenti ---
-    let currentEventIdForComments = null;
-    async function openManageCommentsModal(eventId, eventTitle) {
-        currentEventIdForComments = eventId; const titleEl = document.getElementById('commentsEventTitle');
-        let listContainerEl = document.getElementById('commentsListContainer'); const feedbackEl = document.getElementById('commentsManagementFeedback');
-        if(titleEl) titleEl.textContent = sanitizeText(eventTitle); if(feedbackEl) feedbackEl.innerHTML = '';
-        if (listContainerEl && listContainerEl.parentNode) {
-            const newClonedListContainer = listContainerEl.cloneNode(false);
-            listContainerEl.parentNode.replaceChild(newClonedListContainer, listContainerEl); listContainerEl = newClonedListContainer;
-            attachAdminCommentListeners(listContainerEl);
-        } else { console.error("commentsListContainer non trovato."); if(feedbackEl) feedbackEl.innerHTML = '<p class="error-message">Errore UI.</p>'; openModal('manageCommentsModal'); return;}
-        listContainerEl.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p></li>'; openModal('manageCommentsModal');
-        try {
-            const response = await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`);
-            if (!response.ok) { let errTxt = `Errore HTTP ${response.status}`; try { const errData = await response.json(); errTxt = errData.message || errTxt;} catch(e){} throw new Error(errTxt);}
-            const result = await response.json();
-            if (result.success && result.comments) renderCommentsForAdminThreaded(result.comments, eventId, listContainerEl);
-            else listContainerEl.innerHTML = `<li><p>${sanitizeText(result.message || 'Nessun commento o errore.')}</p></li>`;
-        } catch (error) { console.error('Errore caricamento commenti:', error); listContainerEl.innerHTML = `<li><p class="error-message">Impossibile caricare: ${sanitizeText(error.message)}</p></li>`;}
-    }
-    function renderCommentsForAdminThreaded(comments, eventId, parentUlElement, depth = 0) {
-        if (depth === 0) { parentUlElement.innerHTML = ''; if (!comments || comments.length === 0) { parentUlElement.innerHTML = '<li style="list-style-type:none; text-align:center; margin:1rem 0;"><p>Nessun commento.</p></li>'; return;}}
-        comments.forEach(comment => {
-            const commentItemLi = document.createElement('li'); commentItemLi.className = 'comment-item-admin-styled'; commentItemLi.id = `admin-comment-${comment.Progressivo}`;
-            if (comment.is_admin_reply) commentItemLi.classList.add('commento-admin-generale');
-            const commenterAvatar = comment.commenter_icon_path || defaultUserIconPath; const commenterName = sanitizeText(comment.utente_display_name || 'Utente');
-            const commentDate = sanitizeText(comment.data_creazione_formattata || 'Data non disp.'); const commentText = sanitizeTextForHTML(comment.Descrizione);
-            let adminBadgeHTML = comment.is_admin_reply ? '<span class="badge-admin-dashboard">(Admin)</span>' : '';
-            commentItemLi.innerHTML = `
-            <div class="comment-header"><img src="${commenterAvatar}" alt="Avatar" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';"><div class="comment-meta"><strong>${commenterName}</strong> ${adminBadgeHTML} <small>${commentDate}</small><small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta ? ` | Risposta a: ${comment.CodRisposta}` : ''}</small></div></div>
-            <div class="comment-text-admin">${commentText}</div><div class="comment-actions-admin"><button class="btn-admin btn-admin-reply" data-comment-id="${comment.Progressivo}" title="Rispondi"><i class="fas fa-reply"></i> Rispondi</button><button class="btn-admin btn-admin-danger btn-admin-delete-comment" data-comment-id="${comment.Progressivo}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div>
-            <div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}" style="display:none;"><form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}"><textarea name="Descrizione" placeholder="Rispondi come ${adminNameGlobalJS}..." rows="3" required></textarea><div class="form-actions-reply"><button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia</button></div><div class="form-message-local" style="margin-top:0.5em;"></div></form></div>`;
-            parentUlElement.appendChild(commentItemLi);
-            if (comment.replies && comment.replies.length > 0) { const repliesUl = document.createElement('ul'); repliesUl.className = 'comment-replies-list-styled'; commentItemLi.appendChild(repliesUl); renderCommentsForAdminThreaded(comment.replies, eventId, repliesUl, depth + 1);}
-        });
-    }
-    function attachAdminCommentListeners(commentsListContainerUL) {
-        if (!commentsListContainerUL) return;
-        commentsListContainerUL.addEventListener('click', async function(event) {
-            const target = event.target; const replyButton = target.closest('.btn-admin-reply');
-            if (replyButton) { event.preventDefault(); const commentId = replyButton.dataset.commentId; const replyFormDiv = document.getElementById(`reply-form-admin-${commentId}`);
-                if (replyFormDiv) { const isActive = replyFormDiv.style.display === 'block'; replyFormDiv.style.display = isActive ? 'none' : 'block'; if (!isActive) replyFormDiv.querySelector('textarea')?.focus(); const localMsg = replyFormDiv.querySelector('.form-message-local'); if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none';}} return;}
-            const deleteButton = target.closest('.btn-admin-delete-comment');
-            if (deleteButton) { event.preventDefault(); const commentId = deleteButton.dataset.commentId; if (currentEventIdForComments) deleteAdminComment(commentId, currentEventIdForComments); else alert("Errore: ID evento mancante."); return;}
-        });
-        commentsListContainerUL.addEventListener('submit', async function(event){
-            const targetForm = event.target.closest('.reply-form-admin form'); if(targetForm){ event.preventDefault(); const eventId = targetForm.dataset.eventId; await handleAdminReplySubmit(targetForm, eventId);}});
-    }
-    async function handleAdminReplySubmit(formElement, eventId) {
-        const parentCommentId = formElement.dataset.parentCommentId; const replyText = formElement.querySelector('textarea[name="Descrizione"]').value.trim();
-        const feedbackEl = formElement.querySelector('.form-message-local'); const submitBtn = formElement.querySelector('button[type="submit"]');
-        if (!replyText) { if(feedbackEl) { feedbackEl.textContent = 'Risposta vuota.'; feedbackEl.className = 'form-message-local error-message'; feedbackEl.style.display='block';} return;}
-        const originalBtnHTML = submitBtn.innerHTML; if(submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-mini"></span> Invio...';} if(feedbackEl) { feedbackEl.textContent = ''; feedbackEl.style.display = 'none';}
-        try {
-            const formData = new FormData(); formData.append('action', 'submit_admin_reply'); formData.append('event_id', eventId); formData.append('comment_id', parentCommentId); formData.append('reply_text', replyText);
-            const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
-            if (!response.ok) { let errData={message:`Errore HTTP ${response.status}`}; try{errData=await response.json();}catch(e){} throw new Error(errData.message||`Errore server`);}
-            const result = await response.json();
-            if (result.success) {
-                if(feedbackEl) {feedbackEl.textContent='Risposta inviata!'; feedbackEl.className='form-message-local success-message'; feedbackEl.style.display='block'; setTimeout(() => {if(feedbackEl){feedbackEl.style.display='none';feedbackEl.textContent='';}},3000);}
-                formElement.reset(); const replyFormDiv = formElement.closest('.reply-form-admin'); if(replyFormDiv) replyFormDiv.style.display = 'none';
-                await openManageCommentsModal(eventId, document.getElementById('commentsEventTitle')?.textContent || "Evento"); fetchDashboardData();
-            } else throw new Error(result.message || 'Errore invio.');
-        } catch (error) { console.error("Errore invio risposta:", error); if(feedbackEl) { feedbackEl.textContent = `Errore: ${sanitizeText(error.message)}`; feedbackEl.className = 'form-message-local error-message'; feedbackEl.style.display = 'block';}}
-        finally { if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML;}}
-    }
-    async function deleteAdminComment(commentId, eventIdForReload) {
-        if (!confirm('Eliminare commento e risposte? Irreversibile.')) return;
-        const feedbackDiv = document.getElementById('commentsManagementFeedback');
-        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
-        try {
-            const formData = new FormData(); formData.append('action', 'delete_comment'); formData.append('comment_id', commentId);
-            const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
-            if (!response.ok) { let errData={message:`Errore HTTP ${response.status}`}; try{errData=await response.json();}catch(e){} throw new Error(errData.message||`Errore server`);}
-            const result = await response.json();
-            if (result.success) { if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`; await openManageCommentsModal(eventIdForReload, document.getElementById('commentsEventTitle')?.textContent || "Evento"); fetchDashboardData();}
-            else throw new Error(result.message || "Errore eliminazione.");
-        } catch (error) { console.error('Errore deleteComment:', error); if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;}
-        setTimeout(() => { if(feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 3000);
-    }
-    // --- Fine Gestione Commenti ---
-
-    // --- Gestione Eliminazione Evento ---
-    async function confirmDeleteEvent(eventId, eventTitle) {
-        if (!confirm(`ATTENZIONE: Eliminare evento "${sanitizeText(eventTitle)}" (ID: ${eventId}) e tutti i dati associati? L'azione è irreversibile.`)) return;
-        const cardEl = document.getElementById(`admin-event-${eventId}`); if (cardEl) cardEl.style.opacity = '0.5';
-        try {
-            const formData = new FormData(); formData.append('action', 'delete_event'); formData.append('event_id', eventId);
-            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData }); const result = await response.json();
-            alert(sanitizeText(result.message)); if (result.success) fetchDashboardData(); else if (cardEl) cardEl.style.opacity = '1';
-        } catch (error) { console.error('Errore deleteEvent:', error); alert(`Errore: ${sanitizeText(error.message)}`); if (cardEl) cardEl.style.opacity = '1';}
-    }
-    // --- Fine Gestione Eliminazione Evento ---
+        const eventIdInput=document.getElementById('uploadMediaEventId'); const eventTitleEl=document.getElementById('uploadMediaEventTitle'); const existingMediaContainer=document.getElementById('existingMediaContainer'); const feedbackDiv=document.getElementById('uploadMediaFeedback'); const uploadForm=document.getElementById('uploadMediaForm');
+        if(eventIdInput)eventIdInput.value=eventId; if(eventTitleEl)eventTitleEl.textContent=sanitizeText(eventTitle); if(uploadForm)uploadForm.reset(); if(feedbackDiv)feedbackDiv.innerHTML=''; if(existingMediaContainer)existingMediaContainer.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>'; openModal('uploadMediaModal');
+        try{const response=await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`); const result=await response.json(); if(result.success&&result.media)renderExistingMedia(result.media,eventId); else if(existingMediaContainer)existingMediaContainer.innerHTML=`<p>Nessun media o errore: ${sanitizeText(result.message||'Sconosciuto.')}</p>`;}
+        catch(error){console.error('Errore recupero media:',error); if(existingMediaContainer)existingMediaContainer.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;}}
+    function renderExistingMedia(mediaItems,eventId){ const container=document.getElementById('existingMediaContainer'); if(!container)return; if(mediaItems.length===0){container.innerHTML='<p>Nessun media caricato.</p>';return;} let html='<div class="existing-media-grid">';
+        mediaItems.forEach(item=>{ const filename=item.url_media?item.url_media.split('/').pop():'File'; const itemDesc=sanitizeText(item.Descrizione||''); html+=`<div class="existing-media-item">`; if(item.tipo_media==='image')html+=`<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Vedi: ${sanitizeForAttribute(filename)} ${itemDesc?'- '+itemDesc:''}"><img src="${sanitizeForAttribute(item.url_media)}" alt="${itemDesc||filename}" loading="lazy" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;" title="Immagine: ${sanitizeForAttribute(filename)}"><i class="fas fa-image"></i></div>`; else if(item.tipo_media==='video')html+=`<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Vedi: ${sanitizeForAttribute(filename)} ${itemDesc?'- '+itemDesc:''}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`; else html+=`<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Apri: ${sanitizeForAttribute(filename)} ${itemDesc?'- '+itemDesc:''}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`; html+=`<p class="media-filename" title="${sanitizeForAttribute(item.url_media)}">${sanitizeText(filename)}</p>`; if(itemDesc)html+=`<p class="media-description"><em>${itemDesc}</em></p>`; html+=`<button class="btn-admin btn-admin-danger btn-sm btn-delete-media" data-media-id="${item.id_media}" data-event-id="${eventId}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div>`;});
+        html+='</div>'; container.innerHTML=html; container.querySelectorAll('.btn-delete-media').forEach(button=>button.addEventListener('click',function(){if(confirm('Eliminare questo media?'))deleteMediaItem(this.dataset.mediaId,this.dataset.eventId);}));}
+    async function deleteMediaItem(mediaId,eventId){ const feedbackDiv=document.getElementById('uploadMediaFeedback'); if(feedbackDiv)feedbackDiv.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
+        try{const formData=new FormData();formData.append('action','delete_event_media');formData.append('media_id',mediaId); const response=await fetch('manage_event_media.php',{method:'POST',body:formData});const result=await response.json(); if(result.success){if(feedbackDiv)feedbackDiv.innerHTML=`<p class="success-message">${sanitizeText(result.message)}</p>`;openManageMediaModal(eventId,document.getElementById('uploadMediaEventTitle')?.textContent||"Evento");fetchDashboardData();}else if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;}
+        catch(error){console.error('Errore eliminazione media:',error);if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(()=>{if(feedbackDiv)feedbackDiv.innerHTML='';},4000);}
+    const eventUploadMediaForm = document.getElementById('uploadMediaForm'); // rinominato per evitare conflitti
+    if(eventUploadMediaForm) eventUploadMediaForm.addEventListener('submit', async function(e) { e.preventDefault(); const eventId=document.getElementById('uploadMediaEventId').value; const feedbackDiv=document.getElementById('uploadMediaFeedback'); if(document.getElementById('mediaFiles').files.length===0){if(feedbackDiv)feedbackDiv.innerHTML='<p class="error-message">Seleziona file.</p>';return;} if(feedbackDiv)feedbackDiv.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>'; const formData=new FormData(this);formData.set('action','upload_media');formData.set('event_id',eventId);
+        try{const response=await fetch('manage_event_media.php',{method:'POST',body:formData});const result=await response.json(); if(result.success){if(feedbackDiv)feedbackDiv.innerHTML=`<p class="success-message">${sanitizeText(result.message)}</p>`;openManageMediaModal(eventId,document.getElementById('uploadMediaEventTitle')?.textContent||"Evento");fetchDashboardData();this.reset();}else if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;}
+        catch(error){console.error('Errore uploadMedia:',error);if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(()=>{if(feedbackDiv)feedbackDiv.innerHTML='';},5000);});
+    let currentEventIdForCommentsGl = null; // rinominato per evitare conflitti
+    async function openManageCommentsModal(eventId,eventTitle){ currentEventIdForCommentsGl=eventId;const titleEl=document.getElementById('commentsEventTitle'); let listContainerEl=document.getElementById('commentsListContainer');const feedbackEl=document.getElementById('commentsManagementFeedback'); if(titleEl)titleEl.textContent=sanitizeText(eventTitle);if(feedbackEl)feedbackEl.innerHTML=''; if(listContainerEl&&listContainerEl.parentNode){const newClonedListContainer=listContainerEl.cloneNode(false); listContainerEl.parentNode.replaceChild(newClonedListContainer,listContainerEl);listContainerEl=newClonedListContainer;attachAdminCommentListeners(listContainerEl);}else{console.error("commentsListContainer non trovato.");if(feedbackEl)feedbackEl.innerHTML='<p class="error-message">Errore UI.</p>';openModal('manageCommentsModal');return;} listContainerEl.innerHTML='<li><p><i class="fas fa-spinner fa-spin"></i>Caricamento...</p></li>';openModal('manageCommentsModal');
+        try{const response=await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`); if(!response.ok){let errTxt=`Errore HTTP ${response.status}`;try{const errData=await response.json();errTxt=errData.message||errTxt;}catch(e){}throw new Error(errTxt);} const result=await response.json(); if(result.success&&result.comments)renderCommentsForAdminThreaded(result.comments,eventId,listContainerEl); else listContainerEl.innerHTML=`<li><p>${sanitizeText(result.message||'Nessun commento o errore.')}</p></li>`;}
+        catch(error){console.error('Errore caricamento commenti:',error);listContainerEl.innerHTML=`<li><p class="error-message">Impossibile caricare: ${sanitizeText(error.message)}</p></li>`;}}
+    function renderCommentsForAdminThreaded(comments,eventId,parentUlElement,depth=0){ if(depth===0){parentUlElement.innerHTML='';if(!comments||comments.length===0){parentUlElement.innerHTML='<li style="list-style-type:none;text-align:center;margin:1rem 0;"><p>Nessun commento.</p></li>';return;}}
+        comments.forEach(comment=>{ const commentItemLi=document.createElement('li');commentItemLi.className='comment-item-admin-styled';commentItemLi.id=`admin-comment-${comment.Progressivo}`; if(comment.is_admin_reply)commentItemLi.classList.add('commento-admin-generale'); const commenterAvatar=comment.commenter_icon_path||defaultUserIconPath;const commenterName=sanitizeText(comment.utente_display_name||'Utente'); const commentDate=sanitizeText(comment.data_creazione_formattata||'Data non disp.');const commentText=sanitizeTextForHTML(comment.Descrizione); let adminBadgeHTML=comment.is_admin_reply?'<span class="badge-admin-dashboard">(Admin)</span>':'';
+            commentItemLi.innerHTML=`<div class="comment-header"><img src="${commenterAvatar}" alt="Avatar" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';"><div class="comment-meta"><strong>${commenterName}</strong> ${adminBadgeHTML} <small>${commentDate}</small><small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta?` | Risposta a: ${comment.CodRisposta}`:''}</small></div></div><div class="comment-text-admin">${commentText}</div><div class="comment-actions-admin"><button class="btn-admin btn-admin-reply" data-comment-id="${comment.Progressivo}" title="Rispondi"><i class="fas fa-reply"></i> Rispondi</button><button class="btn-admin btn-admin-danger btn-admin-delete-comment" data-comment-id="${comment.Progressivo}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div><div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}" style="display:none;"><form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}"><textarea name="Descrizione" placeholder="Rispondi come ${adminNameGlobalJS}..." rows="3" required></textarea><div class="form-actions-reply"><button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia</button></div><div class="form-message-local" style="margin-top:0.5em;"></div></form></div>`; parentUlElement.appendChild(commentItemLi);
+            if(comment.replies&&comment.replies.length>0){const repliesUl=document.createElement('ul');repliesUl.className='comment-replies-list-styled';commentItemLi.appendChild(repliesUl);renderCommentsForAdminThreaded(comment.replies,eventId,repliesUl,depth+1);}});}
+    function attachAdminCommentListeners(commentsListContainerUL){ if(!commentsListContainerUL)return; commentsListContainerUL.addEventListener('click',async function(event){ const target=event.target;const replyButton=target.closest('.btn-admin-reply'); if(replyButton){event.preventDefault();const commentId=replyButton.dataset.commentId;const replyFormDiv=document.getElementById(`reply-form-admin-${commentId}`); if(replyFormDiv){const isActive=replyFormDiv.style.display==='block';replyFormDiv.style.display=isActive?'none':'block';if(!isActive)replyFormDiv.querySelector('textarea')?.focus();const localMsg=replyFormDiv.querySelector('.form-message-local');if(localMsg){localMsg.textContent='';localMsg.style.display='none';}}return;} const deleteButton=target.closest('.btn-admin-delete-comment'); if(deleteButton){event.preventDefault();const commentId=deleteButton.dataset.commentId;if(currentEventIdForCommentsGl)deleteAdminComment(commentId,currentEventIdForCommentsGl);else alert("Errore: ID evento mancante.");return;}}); commentsListContainerUL.addEventListener('submit',async function(event){ const targetForm=event.target.closest('.reply-form-admin form');if(targetForm){event.preventDefault();const eventId=targetForm.dataset.eventId;await handleAdminReplySubmit(targetForm,eventId);}}); }
+    async function handleAdminReplySubmit(formElement,eventId){ const parentCommentId=formElement.dataset.parentCommentId;const replyText=formElement.querySelector('textarea[name="Descrizione"]').value.trim(); const feedbackEl=formElement.querySelector('.form-message-local');const submitBtn=formElement.querySelector('button[type="submit"]'); if(!replyText){if(feedbackEl){feedbackEl.textContent='Risposta vuota.';feedbackEl.className='form-message-local error-message';feedbackEl.style.display='block';}return;} const originalBtnHTML=submitBtn.innerHTML;if(submitBtn){submitBtn.disabled=true;submitBtn.innerHTML='<span class="spinner-mini"></span> Invio...';}if(feedbackEl){feedbackEl.textContent='';feedbackEl.style.display='none';}
+        try{const formData=new FormData();formData.append('action','submit_admin_reply');formData.append('event_id',eventId);formData.append('comment_id',parentCommentId);formData.append('reply_text',replyText); const response=await fetch('manage_comments_admin.php',{method:'POST',body:formData}); if(!response.ok){let errData={message:`Errore HTTP ${response.status}`};try{errData=await response.json();}catch(e){}throw new Error(errData.message||`Errore server`);} const result=await response.json(); if(result.success){if(feedbackEl){feedbackEl.textContent='Risposta inviata!';feedbackEl.className='form-message-local success-message';feedbackEl.style.display='block';setTimeout(()=>{if(feedbackEl){feedbackEl.style.display='none';feedbackEl.textContent='';}},3000);} formElement.reset();const replyFormDiv=formElement.closest('.reply-form-admin');if(replyFormDiv)replyFormDiv.style.display='none'; await openManageCommentsModal(eventId,document.getElementById('commentsEventTitle')?.textContent||"Evento");fetchDashboardData();}else throw new Error(result.message||'Errore invio.');}
+        catch(error){console.error("Errore invio risposta:",error);if(feedbackEl){feedbackEl.textContent=`Errore: ${sanitizeText(error.message)}`;feedbackEl.className='form-message-local error-message';feedbackEl.style.display='block';}} finally{if(submitBtn){submitBtn.disabled=false;submitBtn.innerHTML=originalBtnHTML;}}}
+    async function deleteAdminComment(commentId,eventIdForReload){ if(!confirm('Eliminare commento e risposte? Irreversibile.'))return; const feedbackDiv=document.getElementById('commentsManagementFeedback'); if(feedbackDiv)feedbackDiv.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
+        try{const formData=new FormData();formData.append('action','delete_comment');formData.append('comment_id',commentId); const response=await fetch('manage_comments_admin.php',{method:'POST',body:formData}); if(!response.ok){let errData={message:`Errore HTTP ${response.status}`};try{errData=await response.json();}catch(e){}throw new Error(errData.message||`Errore server`);} const result=await response.json(); if(result.success){if(feedbackDiv)feedbackDiv.innerHTML=`<p class="success-message">${sanitizeText(result.message)}</p>`;await openManageCommentsModal(eventIdForReload,document.getElementById('commentsEventTitle')?.textContent||"Evento");fetchDashboardData();}else throw new Error(result.message||"Errore eliminazione.");}
+        catch(error){console.error('Errore deleteComment:',error);if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(()=>{if(feedbackDiv&&!feedbackDiv.querySelector('.error-message'))feedbackDiv.innerHTML='';},3000);}
+    async function confirmDeleteEvent(eventId,eventTitle){ if(!confirm(`ATTENZIONE: Eliminare evento "${sanitizeText(eventTitle)}" (ID: ${eventId}) e dati associati? Irreversibile.`))return; const cardEl=document.getElementById(`admin-event-${eventId}`);if(cardEl)cardEl.style.opacity='0.5';
+        try{const formData=new FormData();formData.append('action','delete_event');formData.append('event_id',eventId); const response=await fetch('gestione_eventi.php',{method:'POST',body:formData});const result=await response.json(); alert(sanitizeText(result.message));if(result.success)fetchDashboardData();else if(cardEl)cardEl.style.opacity='1';}
+        catch(error){console.error('Errore deleteEvent:',error);alert(`Errore: ${sanitizeText(error.message)}`);if(cardEl)cardEl.style.opacity='1';}}
 
     // Inizializzazione Pagina
     document.addEventListener('DOMContentLoaded', () => {
         const adminUserString = localStorage.getItem('adminUserEFF');
-        if (adminUserString) {
-            try {
-                const adminUser = JSON.parse(adminUserString);
-                const navUser = document.getElementById('navbar-username'); if(navUser && adminUser.nome) navUser.textContent = adminUser.nome;
-                const navAvatar = document.querySelector('#navbar-avatar img'); if(navAvatar && adminUser.iconPath) navAvatar.src = adminUser.iconPath; else if(navAvatar) navAvatar.src = adminAvatarPath;
-            } catch(e) { console.error("Errore localStorage admin:", e); }
-        }
-        updatePriceFieldVisibilityDashboard(); fetchDashboardData();
+        if (adminUserString) { try { const adminUser = JSON.parse(adminUserString); const navUser=document.getElementById('navbar-username'); if(navUser&&adminUser.nome)navUser.textContent=adminUser.nome; const navAvatar=document.querySelector('#navbar-avatar img'); if(navAvatar&&adminUser.iconPath)navAvatar.src=adminUser.iconPath; else if(navAvatar)navAvatar.src=adminAvatarPath;} catch(e){console.error("Errore localStorage admin:",e);}}
+        updatePriceFieldVisibilityDashboard();
+        const sortCriteriaSelect = document.getElementById('sortCriteria'); const sortDirectionSelect = document.getElementById('sortDirection'); const groupCriteriaSelect = document.getElementById('groupCriteria');
+        if(sortDirectionSelect) sortDirectionSelect.value = 'asc'; if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese'; if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese';
+        if(sortCriteriaSelect) sortCriteriaSelect.addEventListener('change', applyFiltersAndRender); if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender); if(groupCriteriaSelect) groupCriteriaSelect.addEventListener('change', applyFiltersAndRender);
+        fetchDashboardData(); // Carica i dati all'avvio
     });
     // === FINE BLOCCO SCRIPT COMPLETO ===
 </script>
