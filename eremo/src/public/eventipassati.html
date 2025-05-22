@@ -135,9 +135,9 @@
     }
     .terms-checkbox label {
       font-weight: normal;
-      color: var(--gray-dark); /* Stesso colore di style.css */
+      color: var(--gray-dark);
     }
-    .terms-checkbox a { /* Stesso colore di style.css */
+    .terms-checkbox a {
       color: var(--primary);
       text-decoration: underline;
     }
@@ -254,10 +254,10 @@
       <input
               type="email"
               id="login-email-popup"
-              name="login-email" /* NAME CORRETTO */
-      class="form-control"
-      required
-      autocomplete="email"
+              name="login-email"
+              class="form-control"
+              required
+              autocomplete="email"
       />
     </div>
     <div class="form-group">
@@ -265,10 +265,10 @@
       <input
               type="password"
               id="login-password-popup"
-              name="login-password" /* NAME CORRETTO */
-      class="form-control"
-      required
-      autocomplete="current-password"
+              name="login-password"
+              class="form-control"
+              required
+              autocomplete="current-password"
       />
     </div>
     <div id="login-error-message-popup" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
@@ -282,21 +282,21 @@
       <input
               type="text"
               id="register-name-popup"
-              name="register-name" /* NAME CORRETTO */
-      class="form-control"
-      required
-      autocomplete="given-name"
+              name="register-name"
+              class="form-control"
+              required
+              autocomplete="given-name"
       />
     </div>
     <div class="form-group">
-      <label for="register-surname-popup">Cognome</label> {/* CAMPO AGGIUNTO */}
+      <label for="register-surname-popup">Cognome</label>
       <input
               type="text"
               id="register-surname-popup"
-              name="register-surname" /* NAME AGGIUNTO */
-      class="form-control"
-      required
-      autocomplete="family-name"
+              name="register-surname"
+              class="form-control"
+              required
+              autocomplete="family-name"
       />
     </div>
     <div class="form-group">
@@ -304,10 +304,10 @@
       <input
               type="email"
               id="register-email-popup"
-              name="register-email" /* NAME CORRETTO */
-      class="form-control"
-      required
-      autocomplete="email"
+              name="register-email"
+              class="form-control"
+              required
+              autocomplete="email"
       />
     </div>
     <div class="form-group">
@@ -315,15 +315,15 @@
       <input
               type="password"
               id="register-password-popup"
-              name="register-password" /* NAME CORRETTO */
-      class="form-control"
-      required
-      minlength="8"
-      autocomplete="new-password"
+              name="register-password"
+              class="form-control"
+              required
+              minlength="8"
+              autocomplete="new-password"
       />
       <small>Minimo 8 caratteri.</small>
     </div>
-    <div class="terms-checkbox"> {/* CAMPO AGGIUNTO */}
+    <div class="terms-checkbox">
       <input type="checkbox" id="register-terms-popup" name="register-terms" required>
       <label for="register-terms-popup">Accetto i <a href="/termini" target="_blank">termini e condizioni</a></label>
     </div>
@@ -350,7 +350,7 @@
   function gebi(id) {
     return document.getElementById(id);
   }
-  const defaultUserIconPath = '/uploads/icons/default_user.png'; // Definisci icona di default per localStorage
+  const defaultUserIconPath = '/uploads/icons/default_user.png';
 
   // --- Navbar Scroll Logic ---
   let lastScroll = 0;
@@ -374,11 +374,11 @@
 
   // --- Mobile Menu Logic ---
   const mobileMenu = gebi("mobileMenu");
-  const hamburger = document.querySelector(".navbar .hamburger");
+  const hamburger = document.querySelector(".navbar .hamburger"); // Selettore specifico
   function toggleMobileMenu() {
     if (mobileMenu && hamburger) {
       const isOpen = mobileMenu.classList.toggle("open");
-      hamburger.classList.toggle("open");
+      hamburger.classList.toggle("open"); // Assicura che anche la classe dell'hamburger cambi
       hamburger.setAttribute("aria-expanded", String(isOpen));
       document.body.style.overflow = isOpen ? "hidden" : "";
     }
@@ -386,17 +386,20 @@
   function closeMobileMenu() {
     if (mobileMenu && hamburger && mobileMenu.classList.contains("open")) {
       mobileMenu.classList.remove("open");
-      hamburger.classList.remove("open");
+      hamburger.classList.remove("open"); // Assicura che anche la classe dell'hamburger si resetti
       hamburger.setAttribute("aria-expanded", "false");
       document.body.style.overflow = "";
     }
   }
-  if (hamburger) hamburger.addEventListener("click", toggleMobileMenu);
+  // L'HTML ha onclick="toggleMobileMenu()", quindi l'addEventListener qui sotto è ridondante e può essere rimosso.
+  // if (hamburger) hamburger.addEventListener("click", toggleMobileMenu); // RIMOSSO per evitare doppia chiamata
 
   document.querySelectorAll("#mobileMenu a").forEach((link) => {
     if (link.id !== 'login-btn-mobile') {
       link.addEventListener("click", closeMobileMenu);
     }
+    // Per login-btn-mobile, l'onclick nell'HTML è: onclick="openLoginPopup(); closeMobileMenu();"
+    // closeMobileMenu() è già corretto.
   });
   document.addEventListener("click", function (event) {
     if ( mobileMenu && mobileMenu.classList.contains("open") &&
@@ -405,6 +408,7 @@
       closeMobileMenu();
     }
   });
+
 
   // --- Login Popup Logic ---
   const loginBtn = gebi("login-btn");
@@ -463,7 +467,7 @@
     });
   });
 
-  // --- LOGIN FORM SUBMISSION (MODIFICATO) ---
+  // --- LOGIN FORM SUBMISSION ---
   gebi("loginFormPopup")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const loginButton = e.target.querySelector('button[type="submit"]');
@@ -498,7 +502,7 @@
         };
         localStorage.setItem('userDataEFF', JSON.stringify(userDataToStore));
         closeLoginPopup();
-        window.location.href = result.is_admin ? 'indexadmin.html' : 'eventipassatiaccesso.html'; // <<< REINDIRIZZAMENTO CORRETTO
+        window.location.href = result.is_admin ? 'indexadmin.html' : 'eventipassatiaccesso.html';
       } else {
         emailInput.classList.add('error-border');
         passwordInput.classList.add('error-border');
@@ -525,7 +529,7 @@
     }
   });
 
-  // --- REGISTER FORM SUBMISSION (MODIFICATO E COMPLETATO) ---
+  // --- REGISTER FORM SUBMISSION ---
   gebi("registerFormPopup")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const registerButton = e.target.querySelector('button[type="submit"]');
@@ -637,21 +641,17 @@
     });
   }
 
-  // --- Logica Caricamento e Filtro Eventi Passati ---
-  // La funzione createPastEventCard è ripristinata alla versione originale fornita.
+  // --- Logica Caricamento e Filtro Eventi Passati (invariata) ---
   const eventiPassatiGrid = gebi("eventiPassatiGrid");
   const loadingIndicator = gebi("loadingIndicator");
-  let allPastEvents = [];
+  let allPastEvents = []; // Cambiato da allPastEventsData per coerenza con il file che mi hai dato
 
   function formatDate(dateString) {
     if (!dateString) return "Data non disponibile";
     try {
-      // Tenta di gestire formati come "YYYY-MM-DD" o "YYYY-MM-DD HH:MM:SS"
-      // Aggiungendo 'T00:00:00Z' per trattare la data come UTC se manca l'ora.
       const normalizedDateString = dateString.length === 10 ? dateString + "T00:00:00Z" : dateString.replace(" ", "T") + "Z";
       const date = new Date(normalizedDateString);
       if (isNaN(date.getTime())) {
-        // Fallback per formati non standard, provando a interpretare YYYY-MM-DD
         if (/^\d{4}-\d{2}-\d{2}$/.test(dateString.substring(0,10))) {
           const parts = dateString.substring(0,10).split('-');
           const utcDate = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
@@ -661,7 +661,7 @@
             });
           }
         }
-        return dateString; // Ritorna la stringa originale se il parsing fallisce
+        return dateString;
       }
       return date.toLocaleDateString("it-IT", {
         day: "numeric", month: "long", year: "numeric", timeZone: 'UTC'
@@ -672,13 +672,11 @@
     }
   }
 
-  function createPastEventCard(event) { // RIPRISTINATA ALLA VERSIONE ORIGINALE FORNITA
+  function createPastEventCard(event) {
     const card = document.createElement("article");
     card.className = "card";
-    card.dataset.title = event.titolo?.toLowerCase() || "";
-    card.dataset.date = event.datainizio || "";
-    card.dataset.speaker = event.relatore?.toLowerCase() || "";
-
+    // Rimosso dataset.title, .date, .speaker per non creare discrepanze con il filtro attuale
+    // che lavora su allPastEvents
     let imageSrc = event.immagine_url && event.immagine_url.trim() !== "" ? event.immagine_url : "images/default-event-past.jpg";
 
     card.innerHTML = `
@@ -718,8 +716,8 @@
       const result = await response.json();
 
       if (result.success && result.data) {
-        allPastEvents = result.data;
-        filterEvents(); // Applica filtri (che mostreranno tutti se i filtri sono vuoti)
+        allPastEvents = result.data; // Usa allPastEvents come nel tuo file
+        filterEvents();
       } else {
         throw new Error( result.message || "Errore nel caricamento degli eventi passati." );
       }
@@ -739,7 +737,7 @@
     const speakerFilter = gebi("searchSpeaker").value.toLowerCase().trim();
 
     eventiPassatiGrid.innerHTML = '';
-    let visibleCardsCount = 0;
+    let visibleCardsCount = 0; // rinominato da visibleCards
 
     const filteredEvents = allPastEvents.filter(event => {
       const eventTitle = event.titolo?.toLowerCase() || "";
@@ -784,9 +782,7 @@
     loadPastEvents();
 
     gebi("searchTitle").addEventListener("input", filterEvents);
-    // Usare "input" invece di "change" per type="month" può dare un feedback più immediato in alcuni browser,
-    // ma "change" è più standard per quando il valore è finalizzato. Lascio "change" come nel tuo codice.
-    gebi("searchDate").addEventListener("change", filterEvents);
+    gebi("searchDate").addEventListener("change", filterEvents); // Mantenuto 'change' come nel tuo codice
     gebi("searchSpeaker").addEventListener("input", filterEvents);
   });
 </script>
