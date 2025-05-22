@@ -57,12 +57,11 @@ function inviaEmailNotificaCoda($destinatarioEmail, $nomeEvento, $postiRichiesti
         <div class='email-header'><h1>Eremo Frate Francesco</h1></div>
         <div class='email-content'>
           <p>Gentile " . htmlspecialchars($nomeUtenteDestinatario) . ",</p>
-          <p>Buone notizie! Si sono liberati dei posti per l'evento \"<strong>" . htmlspecialchars($nomeEvento) . "</strong>\" (ID: {$idEvento}), per il quale eri in lista d'attesa.</p>
+          <p>Buone notizie! Si sono liberati dei posti per l'evento \"<strong>" . htmlspecialchars($nomeEvento) . "</strong>\", per il quale eri in lista d'attesa.</p>
           <p>Al momento, sull'evento risultano nuovamente disponibili <strong>" . $postiOraDisponibiliEvento . "</strong> posti.</p>
           <p>Se sei ancora interessato/a, ti invitiamo a visitare la nostra pagina del calendario attività per cercare l'evento e procedere con la prenotazione il prima possibile.
              <strong>Affrettati, i posti sono limitati e verranno assegnati ai primi che completano la prenotazione!</strong></p>
           <p style='text-align:center;'><a href='" . $linkPaginaEventi . "' class='email-button'>Vai al Calendario Attività</a></p>
-          <p>Una volta sulla pagina del calendario, cerca l'evento \"" . htmlspecialchars($nomeEvento) . "\" per prenotare.</p>
           <p>Grazie,<br>Lo staff dell'Eremo Frate Francesco</p>
         </div>
         <div class='email-footer'>
