@@ -3054,169 +3054,357 @@ body.page-dashboard .modal-content {
 
 
 
-/* Sezione Commenti */
+/* ----- Sezione Commenti Restyling ----- */
 
 .comments-section {
   margin-top: 4rem;
   border-top: 1px solid var(--gray-light);
   padding-top: 3rem;
-}
-.comments-section > h2, .comments-section > h3 {
-  text-align: center;
-  margin-bottom: 3rem;
-  color: var(--secondary);
+  background-color: #f9f9f9; /* Sfondo leggermente diverso per la sezione */
+  border-radius: var(--border-radius-large); /* Angoli arrotondati per la sezione */
+  padding: 2rem clamp(1rem, 5vw, 3rem); /* Padding interno responsivo */
+  box-shadow: 0 8px 25px rgba(0,0,0,0.07); /* Ombra più morbida per la sezione */
 }
 
-.comment-form {
-  background: var(--light);
-  border-radius: var(--border-radius-medium);
-  padding: 2.2rem;
-  margin-bottom: 3rem;
-  box-shadow: inset 0 1.8px 4px rgba(0,0,0,0.07);
+.comments-section > h2, .comments-section > h3 {
+  text-align: center;
+  margin-bottom: 2.5rem; /* Ridotto un po' il margine */
+  color: var(--primary); /* Colore primario per i titoli principali */
+  font-weight: 600;
 }
+.comments-section > h2 { /* Titolo "Condividi i tuoi pensieri" */
+  font-size: clamp(2rem, 4.5vw, 2.6rem);
+}
+.comments-section > h3 { /* Titolo "Commenti:" */
+  font-size: clamp(1.6rem, 3.8vw, 2.2rem);
+  margin-top: 3rem; /* Più spazio sopra "Commenti:" */
+  color: var(--secondary); /* Colore secondario per distinguerlo */
+}
+
+/* Form per nuovo commento */
+.comment-form {
+  background: var(--white); /* Sfondo bianco per il form */
+  border-radius: var(--border-radius-medium);
+  padding: clamp(1.5rem, 3vw, 2rem); /* Padding responsivo */
+  margin-bottom: 3rem;
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--gray-light);
+}
+
 .comment-form h4 {
-  margin-bottom: 1.4rem;
-  font-size: 1.65rem;
+  margin-bottom: 1.5rem;
+  font-size: clamp(1.3rem, 2.5vw, 1.5rem); /* Dimensione più contenuta */
   color: var(--primary);
   text-align: left;
+  font-weight: 600; /* Grassetto per il titolo del form */
 }
+
 .comment-form-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1.4rem;
-  align-items: flex-start;
+  flex-direction: column; /* Elementi in colonna per migliore gestione mobile-first */
+  gap: 1rem; /* Spazio tra textarea e bottone */
 }
+
 .comment-form textarea {
   flex-grow: 1;
-  min-height: 110px;
+  min-height: 120px; /* Altezza minima per scrivere comodamente */
   resize: vertical;
   width: 100%;
-  font-size: 1.2rem;
+  font-size: 1.1rem; /* Leggermente più piccolo per coerenza */
+  padding: 0.8rem 1rem; /* Padding interno */
+  border: 1px solid var(--gray-medium);
+  border-radius: 9px; /* Uguale a .form-control */
+  transition: var(--transition-fast);
 }
-@media (min-width: 768px) {
-  .comment-form-container textarea {
-    width: auto;
-  }
+.comment-form textarea:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3.5px rgba(141, 177, 135, 0.35); /* Focus style come .form-control */
+  outline: none;
 }
 
 .btn-comment {
   background: var(--secondary);
   color: white;
   border: none;
-  padding: 1rem 2.2rem;
-  border-radius: 50px;
-  font-size: 1.2rem;
+  padding: 0.9rem 1.8rem; /* Leggermente aggiustato */
+  border-radius: 9px; /* Coerente con altri bottoni */
+  font-size: 1.1rem; /* Coerente */
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition-medium);
-  height: fit-content;
-  margin-left: auto;
-  display: inline-flex; align-items: center; gap: 0.65em;
+  align-self: flex-end; /* Allinea il bottone a destra */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
 }
 .btn-comment:hover {
   background: var(--primary);
-  text-decoration: none;
+  transform: translateY(-2px); /* Leggero effetto al hover */
+  box-shadow: var(--shadow-light);
 }
-.btn-comment.btn-small {
-  padding: 0.8rem 1.4rem;
-  font-size: 1.15rem;
+.btn-comment.btn-small { /* Per risposte */
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
 }
 
-
+/* Lista dei commenti */
 .comments-list {
+  margin-top: 2rem; /* Spazio sopra la lista */
 }
+
 .comment {
   background: var(--white);
   border-radius: var(--border-radius-medium);
-  padding: 2.2rem;
-  margin-bottom: 2.2rem;
-  box-shadow: var(--shadow-light);
-  border-left: 5.5px solid var(--secondary);
+  padding: clamp(1.5rem, 3vw, 2rem); /* Padding responsivo */
+  margin-bottom: 1.8rem; /* Spazio tra i commenti */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08); /* Ombra più definita */
+  border: 1px solid var(--gray-light); /* Bordo sottile */
+  position: relative; /* Per posizionare elementi decorativi se necessario */
+  overflow: hidden; /* Per gestire meglio gli angoli e gli pseudo-elementi */
 }
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 1.4rem;
-  margin-bottom: 1.1rem;
+/* Linea verticale decorativa per i commenti principali */
+.comment:not(.reply)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background-color: var(--secondary);
+  border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);
 }
-.comment .user-avatar {
-  width: 50px; height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3.5px solid var(--light);
+.comment.admin-comment-highlight:not(.reply)::before {
+  background-color: var(--accent); /* Colore diverso per lo staff */
 }
-.comment-meta strong {
-  font-size: 1.3rem;
-  color: var(--dark);
-}
-.comment-meta small {
-  font-size: 1.05rem;
-  color: var(--gray-dark);
-  margin-left: 0.7rem;
-}
-.comment p {
-  margin-bottom: 1.4rem;
-  color: var(--dark);
-  font-size: 1.25rem;
-  word-wrap: break-word;
-  text-align: left;
-}
-.comment-actions {
-  display: flex;
-  gap: 1.4rem;
-  align-items: center;
-  font-size: 1.2rem;
-  margin-top: 0.8rem;
-}
-.like-btn, .btn-reply {
-  background: none; border: none;
-  color: var(--gray-dark);
-  cursor: pointer;
-  display: flex; align-items: center; gap: 0.55rem;
-  padding: 0.45rem 0.8rem;
-  border-radius: 6.5px;
-  transition: var(--transition-fast);
-}
-.like-btn i, .btn-reply i {
-  width: 19px;
-  text-align: center;
+/* Adattamento padding per non sovrapporre la linea */
+.comment:not(.reply) {
+  padding-left: clamp(2rem, 4vw, 2.8rem);
 }
 
+
+.comment-header {
+  display: flex;
+  align-items: flex-start; /* Allinea avatar in alto se il nome va a capo */
+  gap: 1rem; /* Spazio tra avatar e meta */
+  margin-bottom: 1rem;
+}
+
+.comment .user-avatar {
+  width: 45px; /* Leggermente più piccolo */
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--light); /* Bordo più sottile */
+  flex-shrink: 0; /* Impedisce all'avatar di restringersi */
+}
+
+.comment-meta {
+  display: flex;
+  flex-direction: column; /* Nome sopra, data/badge sotto */
+  align-items: flex-start; /* Allinea a sinistra */
+  flex-grow: 1;
+}
+.comment-meta .author-line {
+  display: flex;
+  align-items: center; /* Allinea nome e badge */
+  flex-wrap: wrap; /* Permette al badge di andare a capo se necessario */
+  margin-bottom: 0.2rem; /* Spazio tra linea autore e data */
+}
+.comment-meta strong { /* Nome autore */
+  font-size: 1.1rem; /* Leggermente più piccolo */
+  color: var(--primary); /* Colore primario per il nome */
+  font-weight: 600; /* Grassetto */
+  margin-right: 0.5rem; /* Spazio prima del badge */
+}
+.comment-meta small { /* Data */
+  font-size: 0.85rem; /* Più piccolo */
+  color: var(--gray-dark);
+}
+
+/* Stile badge staff (già presente, ma assicuriamoci coerenza) */
+.badge-staff {
+  font-size: 0.7rem; /* Più piccolo */
+  font-weight: 700;
+  color: var(--white);
+  background-color: var(--accent);
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  line-height: 1.3; /* Per allineamento verticale */
+  vertical-align: middle; /* Se necessario con strong */
+}
+
+.comment p { /* Testo del commento */
+  margin-bottom: 1.2rem;
+  color: #4a4a4a; /* Colore testo più scuro per leggibilità */
+  font-size: 1.05rem; /* Dimensione standard per testo lungo */
+  line-height: 1.7; /* Interlinea per leggibilità */
+  word-wrap: break-word;
+  text-align: left;
+  /* Per commenti molto lunghi, considera un'altezza massima e scroll, ma potrebbe essere eccessivo */
+  /* max-height: 300px; overflow-y: auto; padding-right: 10px; */
+}
+
+.comment-actions {
+  display: flex;
+  gap: 1rem; /* Spazio tra i bottoni */
+  align-items: center;
+  font-size: 0.9rem; /* Leggermente più piccolo */
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gray-light); /* Separatore */
+}
+
+.like-btn, .btn-reply {
+  background: none;
+  border: 1px solid transparent; /* Per allineamento e hover */
+  color: var(--gray-dark);
+  cursor: pointer;
+  display: inline-flex; /* Per allineare icona e testo */
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+  font-weight: 500; /* Testo leggermente più bold */
+}
+.like-btn i, .btn-reply i {
+  font-size: 0.95em; /* Dimensione icona */
+}
 .like-btn:hover, .btn-reply:hover {
   background-color: var(--gray-light);
   color: var(--primary);
+  border-color: var(--gray-medium); /* Bordo visibile al hover */
   text-decoration: none;
 }
 .like-btn.active {
   color: var(--danger);
+  /* background-color: rgba(var(--danger-rgb), 0.1); Puoi aggiungere uno sfondo se vuoi */
+}
+.like-btn.active:hover {
+  color: var(--danger);
+  background-color: rgba(var(--danger-rgb), 0.15);
 }
 
+/* Stili per le risposte */
+.replies {
+  margin-top: 1.5rem; /* Spazio sopra il blocco delle risposte */
+  padding-left: clamp(1.5rem, 4vw, 2.5rem); /* Indentazione principale per le risposte */
+  position: relative;
+}
+/* Linea verticale che collega le risposte al genitore */
+.replies::before {
+  content: "";
+  position: absolute;
+  left: calc(clamp(1.5rem, 4vw, 2.5rem) / 2 - 2px); /* Centra la linea nell'indentazione */
+  top: -1rem; /* Inizia un po' prima della prima risposta */
+  bottom: 0;
+  width: 2px;
+  background-color: var(--gray-light);
+  /* z-index: -1; per metterla dietro ai box di risposta se necessario */
+}
 
-.reply-form {
+.comment.reply {
+  background-color: #fdfdfd; /* Sfondo leggermente diverso per le risposte */
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06); /* Ombra più leggera per le risposte */
+  border: 1px solid #eef0f1;
+  padding: clamp(1.2rem, 2.5vw, 1.8rem); /* Padding leggermente ridotto */
+  margin-bottom: 1.5rem; /* Spazio tra le risposte */
+  /* Rimuoviamo la linea laterale colorata per le risposte, già indentate */
+}
+.comment.reply:not(.reply)::before { /* Sovrascrive la linea laterale per le risposte */
   display: none;
-  margin-top: 1.4rem;
-  margin-left: 4.2rem;
-  padding-left: 1.4rem;
-  border-left: 3.5px solid var(--gray-light);
+}
+/* Il padding-left non serve più specifico per .comment.reply se .replies gestisce l'indentazione */
+
+.reply-form { /* Form per rispondere a un commento */
+  display: none; /* Gestito da JS */
+  margin-top: 1.2rem;
+  padding: clamp(1rem, 2vw, 1.2rem);
+  background-color: var(--white); /* Sfondo più chiaro per il form di risposta */
+  border-radius: var(--border-radius-medium);
+  border: 1px solid var(--gray-light);
+  box-shadow: var(--shadow-light);
   animation: fadeIn 0.3s ease-out;
+  /* L'indentazione può essere ereditata da .replies se il form è al suo interno,
+     o puoi aggiungerla qui se è fuori dal div .replies */
+  /* margin-left: clamp(1.5rem, 4vw, 2.5rem); /* Se necessario */
 }
 .reply-form.active { display: block; }
+
+.reply-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
 .reply-form textarea {
-  width: 100%; font-size: 1.2rem; min-height: 80px;
-  margin-bottom: 0.7rem;
+  width: 100%;
+  font-size: 1rem; /* Più piccolo per le risposte */
+  min-height: 70px; /* Più compatto */
+  padding: 0.6rem 0.8rem;
+}
+.reply-form .btn-comment.btn-small {
+  align-self: flex-end;
+}
+.form-message-local {
+  font-size: 0.85rem;
+  text-align: left;
+}
+.form-message-local.error { color: var(--danger); }
+.form-message-local.success { color: var(--success); }
+
+
+/* Stili per messaggi "Nessun commento", "Accedi per commentare" */
+.no-content-message {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: var(--gray-dark);
+  background-color: var(--white);
+  border-radius: var(--border-radius-medium);
+  border: 1px dashed var(--gray-medium);
+  margin: 2rem auto; /* Centra il messaggio */
+  max-width: 600px; /* Limita la larghezza */
+}
+#login-to-comment-message a {
+  color: var(--secondary);
+  font-weight: 500;
+  text-decoration: underline;
+}
+#login-to-comment-message a:hover {
+  color: var(--primary);
 }
 
-.replies {
-  margin-left: 4.2rem;
-  padding-left: 1.4rem;
-  border-left: 3.5px solid var(--gray-light);
-  margin-top: 1.4rem;
-}
-.comment.reply {
-  background-color: var(--light);
-  box-shadow: inset 0 1.8px 3px rgba(0,0,0,0.07);
-  border-left-color: var(--accent);
-  padding: 1.4rem;
+/* Considerazioni per commenti lunghi e leggibilità */
+@media (max-width: 767px) {
+  .comments-section {
+    padding: 1.5rem clamp(0.8rem, 3vw, 1.5rem);
+  }
+  .comment, .comment.reply {
+    padding: 1.2rem;
+  }
+  .comment:not(.reply) {
+    padding-left: 1.8rem; /* Adatta padding per linea laterale su mobile */
+  }
+  .comment-header {
+    /* Potrebbe essere utile flex-direction: column su mobile se lo spazio è poco,
+       ma flex-start sull'avatar dovrebbe già aiutare. */
+  }
+  .comment-actions {
+    flex-wrap: wrap; /* Permette ai bottoni di andare a capo */
+    justify-content: flex-start; /* Allinea a sinistra su mobile */
+  }
+  .replies {
+    padding-left: 1.2rem; /* Riduci indentazione su mobile */
+  }
+  .replies::before {
+    left: calc(1.2rem / 2 - 1px); /* Adatta posizione linea */
+  }
+  .reply-form {
+    /* margin-left: 1.2rem; /* Se necessario */
+  }
 }
 
 /* === GALLERIA EVENTO === */
@@ -3590,10 +3778,16 @@ body.page-dashboard .modal-content {
   border-color: var(--dark);
 }
 
-/* Contenitore Unico per Tabs e Contenuto Eventi */
+/* Contenitore principale per il contenuto delle tab (griglie eventi) */
 .tabbed-content-area.dashboard-section {
-  padding: 0; background-color: transparent; box-shadow: none; border: none;
-  margin-bottom: 2rem;
+  background-color: var(--white);
+  padding: 0; /* Il padding sarà gestito da #eventManagementContent all'interno */
+  border: 1px solid var(--gray-medium);       /* APPLICA BORDO SU TUTTI I LATI */
+  border-radius: var(--border-radius-medium); /* APPLICA STONDATURA SU TUTTI GLI ANGOLI */
+  box-shadow: var(--shadow-light);
+  margin-top: 1.5rem; /* Aggiunge spazio sopra, separandolo da .event-view-controls */
+  /* Se .event-view-controls ha già margin-bottom, potresti voler regolare questo */
+  overflow: hidden; /* IMPORTANTE: per assicurare che i figli rispettino la stondatura */
 }
 .event-tabs-container { display: flex; position: relative; z-index: 1; }
 .event-tab-button {
@@ -3614,9 +3808,10 @@ body.page-dashboard .modal-content {
 .event-tab-button:hover i { color: var(--primary); }
 
 #eventManagementContent {
-  background-color: var(--white); padding: 1.5rem; border: 1px solid var(--gray-medium);
-  border-top: none; border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
-  box-shadow: var(--shadow-light); margin-top: -1px; position: relative;
+  padding: 1.5rem; /* Padding per il contenuto interno (griglie, barra "Nuovo Evento") */
+  /* Rimuovi eventuali background-color, border, border-radius, box-shadow specifici per questo ID,
+     poiché ora sono gestiti dal genitore .tabbed-content-area.dashboard-section */
+  background-color: transparent; /* O ometti se il genitore ha già var(--white) */
 }
 #eventManagementContent .event-tab-content { display: none; }
 #eventManagementContent .event-tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
@@ -3721,7 +3916,7 @@ body.page-dashboard .modal-content {
   .event-tab-button:last-child { border-bottom: none; border-radius: 0 0 10px 10px; }
   .event-tab-button.active { border-color: var(--gray-medium); border-left: 3px solid var(--accent); border-right: 3px solid var(--accent); border-bottom: 1px solid var(--gray-medium);}
 
-  #eventManagementContent.dashboard-section { border-radius: var(--border-radius-medium); border-top: 1px solid var(--gray-light); margin-top: 1rem; }
+  #eventManagementContent.dashboard-section { border-top: 1px solid var(--gray-light); margin-top: 1rem; }
 
   .admin-event-grid { grid-template-columns: 1fr; }
   .admin-event-card { max-width: none; min-height: auto; }
@@ -3860,3 +4055,332 @@ body.page-dashboard .modal-content {
   }
 }
 /* ----- FINE STILI CONTROLLI ORDINAMENTO DASHBOARD ----- */
+
+/* ----- INIZIO STILI NUOVA BARRA FILTRI/TAB E CONTROLLI VISTA ----- */
+
+/* Contenitore principale per la riga con bottone Filtri e Tab Eventi */
+.event-tabs-and-filter-container {
+  display: flex;
+  align-items: flex-start; /* Allinea gli elementi all'inizio se hanno altezze diverse */
+  position: relative;
+  background-color: var(--light); /* Sfondo per la barra base */
+  /* Rimuoviamo bordi e radius da qui, gestiti dai bottoni e dal contenuto sotto */
+  margin-bottom: 0; /* Si attaccherà a event-view-controls o eventManagementContent */
+}
+
+.filter-trigger-container {
+  position: relative; /* Per il posizionamento assoluto del pannello filtri */
+  z-index: 10; /* Per stare sopra altri elementi della riga */
+}
+
+/* Bottone Filtri */
+#filterToggleButton.event-tab-button.filter-tab-button {
+  border-radius: 10px 0 0 0;
+  margin-right: -1px; /* Sovrappone il bordo per un look unito */
+  border: 1px solid var(--gray-medium);
+  border-bottom: none; /* Il bordo inferiore è gestito dal contenuto sotto o dal pannello */
+  background-color: var(--gray-light); /* Colore di default come gli altri tab non attivi */
+}
+#filterToggleButton.event-tab-button.filter-tab-button.active {
+  background-color: var(--white); /* Sfondo bianco quando il pannello filtri è aperto */
+  border-bottom-color: var(--white); /* Nasconde il bordo inferiore del bottone per unirlo al pannello */
+  position: relative; /* Per z-index se necessario */
+  z-index: 11; /* Per stare sopra la linea del contenitore sottostante */
+}
+
+.dropdown-arrow-filter {
+  margin-left: 0.5em;
+  font-size: 0.8em;
+  transition: transform 0.2s ease-in-out;
+}
+#filterToggleButton.active .dropdown-arrow-filter {
+  transform: rotate(180deg);
+}
+
+/* Pannello Filtri Dropdown */
+.filter-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% - 1px); /* Si sovrappone al bordo inferiore del bottone per continuità */
+  left: 0;
+  z-index: 100; /* Sopra il contenuto della pagina */
+  background-color: var(--white);
+  border: 1px solid var(--gray-medium);
+  /* border-top: none; Se il bottone.active gestisce bene la connessione */
+  box-shadow: var(--shadow-medium);
+  padding: 1.5rem;
+  width: 320px; /* Larghezza fissa o min-width/max-width */
+  border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+}
+.filter-panel.active {
+  display: block;
+  animation: fadeInDropdown 0.2s ease-out;
+}
+.filter-panel h4 {
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  font-size: 1.1rem;
+  color: var(--primary);
+  border-bottom: 1px solid var(--gray-light);
+  padding-bottom: 0.6rem;
+  text-align: left;
+}
+.filter-panel .form-group {
+  margin-bottom: 1rem;
+}
+.filter-panel .form-group label { text-align: left; }
+.filter-panel .filter-panel-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: space-between; /* O flex-end se vuoi i bottoni a destra */
+  gap: 0.5rem;
+}
+.filter-panel .filter-panel-actions .btn-admin {
+  flex-grow: 1; /* Fa sì che i bottoni si espandano se c'è spazio */
+  /* flex-basis: calc(50% - 0.5rem); Se vuoi due bottoni di uguale larghezza */
+}
+
+
+/* Contenitore per i tab "Eventi Futuri", "Archivio Eventi" */
+.event-tabs-container {
+  display: flex;
+  flex-grow: 1; /* Occupa lo spazio rimanente nella riga */
+  /* Stile già definito per .event-tab-button dovrebbe andare bene */
+}
+/* Assicurati che il primo tab evento non abbia un angolo arrotondato a sinistra se segue il bottone Filtri */
+.event-tabs-container .event-tab-button:first-child {
+  border-top-left-radius: 0;
+}
+.event-tabs-container .event-tab-button:last-child {
+  border-top-right-radius: 10px; /* Arrotonda l'ultimo tab a destra */
+}
+
+
+/* Controlli di Vista (Ordina per, Raggruppa per) */
+.event-view-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  padding: 1rem 1.5rem;
+  background-color: #f8f9fa; /* Sfondo leggermente diverso per distinguerlo */
+  border-left: 1px solid var(--gray-medium);
+  border-right: 1px solid var(--gray-medium);
+  border-bottom: 1px solid var(--gray-medium);
+  /* Non c'è bordo superiore perché si attacca alla barra dei tab/filtri */
+  margin-bottom: 1.5rem; /* Spazio prima della griglia eventi */
+  border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+  /* box-shadow: var(--shadow-light); Ombra leggera */
+}
+.event-view-controls .form-group {
+  flex-grow: 1;
+  flex-basis: 180px; /* Base per ogni controllo, permettendo flessibilità */
+  min-width: 160px; /* Minima larghezza per controllo */
+}
+.event-view-controls label {
+  font-size: 0.85rem; /* Leggermente più piccolo */
+  margin-bottom: 0.3rem;
+  color: var(--primary);
+  display: block;
+  font-weight: 500;
+  text-align: left;
+}
+.event-view-controls select.form-control {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--gray-medium);
+  border-radius: 6px; /* Raggio più piccolo */
+  font-size: 0.9rem;
+  background-color: var(--white);
+  line-height: 1.4;
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23365e51%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 0.6em auto;
+  padding-right: 2rem; /* Spazio per la freccina */
+  cursor: pointer;
+}
+.event-view-controls select.form-control:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(141, 177, 135, 0.25);
+  outline: none;
+}
+
+/* Stile per il contenitore principale del contenuto delle tab (griglie eventi) */
+/* Questo è .tabbed-content-area > #eventManagementContent */
+#eventManagementContent {
+  background-color: var(--white);
+  padding: 1.5rem;
+  border: 1px solid var(--gray-medium);
+  border-top: none; /* Si collega a .event-view-controls */
+  box-shadow: var(--shadow-light);
+  /* Rimuovi margin-top se .event-view-controls è direttamente sopra */
+  margin-top: 0;
+}
+
+/* Adattamenti responsive */
+@media (max-width: 991px) { /* Tablet */
+  .event-view-controls {
+    /* Potrebbero andare due controlli per riga invece di tre */
+    /* flex-basis e min-width aiutano già, ma potresti voler forzare */
+  }
+}
+
+@media (max-width: 767px) { /* Mobile */
+  .event-tabs-and-filter-container {
+    flex-direction: column;
+    /* Non serve più il border-radius qui, sarà sui singoli elementi */
+    background-color: transparent; /* Sfondo neutro */
+    border: none; /* Nessun bordo generale */
+  }
+  .filter-trigger-container {
+    width: 100%;
+    margin-bottom: -1px; /* Sovrapponi al primo tab evento */
+  }
+  #filterToggleButton.event-tab-button.filter-tab-button {
+    border-radius: 10px 10px 0 0;
+    width: 100%;
+    justify-content: center;
+    border-right: 1px solid var(--gray-medium); /* Ripristina bordo destro */
+    border-left: 1px solid var(--gray-medium);
+    border-bottom: 1px solid var(--gray-medium); /* Bordo inferiore se il pannello è chiuso */
+  }
+  #filterToggleButton.event-tab-button.filter-tab-button.active {
+    border-bottom-color: var(--white); /* Si collega al pannello */
+  }
+
+  .filter-panel {
+    width: calc(100% - 2px); /* Sottrai i bordi laterali del contenitore */
+    position: static; /* Flusso normale sotto il bottone */
+    border-radius: 0 0 10px 10px; /* Arrotonda se è l'ultimo */
+    box-shadow: var(--shadow-light); /* Ripristina ombra */
+    border-left: 1px solid var(--gray-medium);
+    border-right: 1px solid var(--gray-medium);
+    border-bottom: 1px solid var(--gray-medium);
+    margin-bottom: 1rem; /* Spazio prima dei tab eventi */
+  }
+
+  .event-tabs-container {
+    width: 100%;
+    flex-direction: column;
+  }
+  .event-tabs-container .event-tab-button {
+    border-radius: 0;
+    margin-right: 0;
+    border-left: 1px solid var(--gray-medium);
+    border-right: 1px solid var(--gray-medium);
+  }
+  .event-tabs-container .event-tab-button:first-child {
+    border-radius: 10px 10px 0 0; /* Primo tab arrotondato sopra */
+  }
+  .event-tabs-container .event-tab-button:last-child {
+    border-radius: 0 0 10px 10px; /* Ultimo tab arrotondato sotto */
+    border-bottom: 1px solid var(--gray-medium);
+  }
+
+  .event-view-controls {
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: var(--border-radius-medium);
+    margin-top: 1rem;
+    border: 1px solid var(--gray-medium); /* Bordo completo se blocco separato */
+  }
+  #eventManagementContent {
+    border-radius: var(--border-radius-medium);
+    margin-top: 1rem;
+    border: 1px solid var(--gray-medium); /* Bordo completo */
+  }
+}
+/* ----- FINE STILI NUOVA BARRA FILTRI/TAB E CONTROLLI VISTA ----- */
+
+/* ----- ULTIMI FIX COMMENTI ----- */
+/* ----- Stili per visibilità commenti e bottoni ----- */
+.comments-list-wrapper.collapsed #commentsList > ul > li:nth-child(n+4) { /* Nasconde dal 4° commento in poi (se MAX_INITIAL_TOP_LEVEL_COMMENTS = 3) */
+  display: none;
+}
+
+#comments-visibility-controls { /* Contenitore per i bottoni "Mostra/Nascondi" */
+  /* text-align: center; margin-top: 1.5rem; sono già inline */
+}
+
+.btn-secondary-style { /* Stile per un bottone secondario, es. "Mostra meno" */
+  background-color: var(--gray-light);
+  color: var(--dark);
+  border: 1px solid var(--gray-medium);
+  padding: 0.9rem 1.8rem; /* Stesso padding del .btn-comment per coerenza */
+  border-radius: 9px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-medium);
+}
+.btn-secondary-style:hover {
+  background-color: var(--gray-medium);
+  color: var(--dark); /* Mantiene il colore del testo scuro */
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-light);
+}
+
+/* ----- Affinamenti Stili Commenti (dal restyling precedente + correzioni bug visivo) ----- */
+
+.comment {
+  /* ... stili esistenti dal restyling ... */
+  box-sizing: border-box; /* Assicura che padding e border non aggiungano alla larghezza */
+  width: 100%; /* Occupa tutta la larghezza del suo parent <li> */
+  overflow-wrap: break-word; /* Per prevenire overflow da parole lunghe */
+}
+
+.comment p {
+  /* ... stili esistenti dal restyling ... */
+  overflow-wrap: break-word; /* Alternativa più moderna a word-wrap */
+  word-wrap: break-word; /* Mantenuto per compatibilità */
+  min-width: 0; /* Aiuta gli elementi flex a restringersi e fare wrap correttamente */
+}
+
+.comment-meta strong,
+.comment-meta small {
+  word-break: break-word; /* Se nomi o date molto lunghe causano problemi */
+}
+
+.replies {
+  margin-top: 1.5rem;
+  /* Leggermente ridotta l'indentazione massima e resa più consistente */
+  padding-left: clamp(1.2rem, 3.5vw, 1.8rem);
+  position: relative;
+  box-sizing: border-box;
+}
+
+.replies::before {
+  content: "";
+  position: absolute;
+  /* Adattato per il nuovo padding-left e una linea più sottile */
+  left: calc(clamp(1.2rem, 3.5vw, 1.8rem) / 2 - 1px);
+  top: -0.5rem; /* Inizia leggermente sopra il primo commento di risposta */
+  bottom: 0.5rem; /* Termina leggermente prima della fine dell'ultimo commento di risposta */
+  width: 2px; /* Larghezza della linea di connessione */
+  background-color: #e0e0e0; /* Colore più chiaro per la linea */
+  border-radius: 2px; /* Angoli arrotondati per la linea */
+}
+
+/* Assicurati che il badge staff sia come definito nel restyling precedente se ti piaceva */
+.badge-staff {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--white);
+  background-color: var(--accent);
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  line-height: 1.3;
+  vertical-align: middle;
+  margin-left: 0.5rem; /* Spazio dal nome autore */
+}
+
+.comment-meta .author-line { /* Contenitore per nome autore e badge */
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.2rem;
+}
