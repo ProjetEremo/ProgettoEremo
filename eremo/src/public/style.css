@@ -4085,3 +4085,205 @@ body.page-dashboard .modal-content {
   flex-wrap: wrap;
   margin-bottom: 0.2rem;
 }
+
+/* ----- INIZIO RESTYLING SEZIONE COMMENTI E POPUP CONVERSAZIONE (v4) ----- */
+
+/* Stili generali per .comments-section, .comment-form, .btn-comment, .comments-list-ul (come da v3) */
+.comments-section {
+  margin-top: 3rem; border-top: 1px solid var(--gray-light); padding-top: 2.5rem;
+  background-color: #fdfdfd; border-radius: var(--border-radius-large);
+  padding: 2rem clamp(1rem, 4vw, 2.5rem); box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+}
+.comments-section > h2, .comments-section > h3 {
+  text-align: center; margin-bottom: 2rem; color: var(--primary); font-weight: 600;
+}
+.comments-section > h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); }
+.comments-section > h3 { font-size: clamp(1.5rem, 3.5vw, 2rem); margin-top: 2.5rem; color: var(--secondary); }
+.comment-form {
+  background: var(--white); border-radius: var(--border-radius-medium);
+  padding: clamp(1.2rem, 2.5vw, 1.8rem); margin-bottom: 2.5rem;
+  box-shadow: var(--shadow-light); border: 1px solid var(--gray-light);
+}
+.comment-form h4 {
+  margin-bottom: 1.2rem; font-size: clamp(1.2rem, 2.2vw, 1.4rem);
+  color: var(--primary); text-align: left; font-weight: 600;
+}
+.comment-form-container { display: flex; flex-direction: column; gap: 0.8rem; }
+.comment-form textarea {
+  flex-grow: 1; min-height: 100px; width: 100%; font-size: 1rem;
+  padding: 0.7rem 0.9rem; border: 1px solid var(--gray-medium); border-radius: 8px;
+}
+.comment-form textarea:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3.5px rgba(var(--secondary-rgb, 141, 177, 135), 0.3); outline: none;
+}
+.btn-comment {
+  background: var(--secondary); color: white; border: none; padding: 0.8rem 1.5rem;
+  border-radius: 8px; font-size: 1rem; font-weight: 500; align-self: flex-end; gap: 0.5em;
+}
+.btn-comment:hover { background: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-light); }
+.btn-comment.btn-small { padding: 0.6rem 1rem; font-size: 0.9rem; }
+.comments-list-ul { list-style: none; padding-left: 0; margin: 0; }
+
+/* Stili commenti principali (pagina e popup) */
+.comment {
+  background: var(--white); border-radius: var(--border-radius-medium);
+  padding: clamp(1.2rem, 2.5vw, 1.8rem); margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07); border: 1px solid #e9e9e9;
+  position: relative; overflow-wrap: break-word; width: 100%; box-sizing: border-box;
+  min-width: 200px; /* Evita che i commenti diventino troppo stretti con indentazione */
+}
+.comment:not(.reply) { padding-left: clamp(1.8rem, 3.5vw, 2.5rem); }
+.comment:not(.reply)::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+  background-color: var(--secondary);
+  border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);
+}
+.comment.admin-comment-highlight:not(.reply)::before { background-color: var(--accent); }
+.comment-header { display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 0.8rem; }
+.comment .user-avatar {
+  width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--gray-light); flex-shrink: 0;
+}
+.comment-meta { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; }
+.comment-meta .author-line { display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 0.1rem; }
+.comment-meta strong {
+  font-size: 1rem; color: var(--primary); font-weight: 600; margin-right: 0.4em; word-break: break-word;
+}
+.comment-meta small { font-size: 0.8rem; color: var(--gray-dark); word-break: break-word; }
+.badge-staff {
+  display: inline-block; margin-left: 0.5em; padding: 0.15em 0.5em; font-size: 0.7rem; font-weight: 700;
+  color: var(--white); background-color: var(--accent); border-radius: 4px;
+  line-height: 1.2; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.comment p {
+  margin-bottom: 1rem; color: #333; font-size: 1rem; line-height: 1.75;
+  word-wrap: break-word; text-align: left; overflow-wrap: break-word; min-width: 0;
+}
+.comment-actions {
+  display: flex; gap: 0.8rem; align-items: center; font-size: 0.85rem;
+  margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--gray-light);
+}
+.like-btn, .btn-reply {
+  background: none; border: 1px solid transparent; color: var(--gray-dark); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 0.4em; padding: 0.3rem 0.6rem;
+  border-radius: 6px; transition: all 0.2s ease-in-out; font-weight: 500;
+}
+.like-btn i, .btn-reply i { font-size: 0.9em; }
+.like-btn:hover, .btn-reply:hover { background-color: var(--gray-light); color: var(--primary); text-decoration: none; }
+.like-btn.active { color: var(--danger); }
+.like-btn.active i { font-weight: 900; }
+.like-btn.active:hover { color: var(--danger); background-color: rgba(var(--danger-rgb), 0.1); }
+
+.replies { margin-top: 1rem; padding-left: clamp(1rem, 3vw, 1.5rem); position: relative; box-sizing: border-box; }
+.replies::before {
+  content: ""; position: absolute; left: calc(clamp(1rem, 3vw, 1.5rem) / 2 - 1px);
+  top: 0; bottom: 0; width: 2px; background-color: #e0e0e0; border-radius: 2px;
+}
+/* Adattamenti per la linea di connessione delle risposte */
+.comment > .replies::before { top: 1rem; } /* Inizia più in basso se è direttamente figlio di .comment */
+li.reply-item > .comment.reply > .replies::before { top: 1rem; }
+ul.nested > li.reply-item:first-child > .comment.reply > .replies::before { top: 1rem; }
+ul.nested > li.reply-item:last-child > .comment.reply > .replies { margin-bottom: -1rem; } /* Tenta di far finire la linea correttamente */
+ul.nested > li.reply-item:last-child > .comment.reply > .replies::before { bottom: 1rem; }
+
+
+.comment.reply {
+  background-color: #f9f9f9; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;
+  padding: clamp(1rem, 2vw, 1.5rem); margin-bottom: 1rem;
+}
+.comment.reply:not(.reply)::before { display: none; }
+.comment.reply.admin-comment-highlight { background-color: #fff8f0 !important; }
+
+.reply-form {
+  display: none; margin-top: 1rem; padding: clamp(0.8rem, 1.8vw, 1rem);
+  background-color: var(--white); border-radius: var(--border-radius-medium);
+  border: 1px solid var(--gray-light); box-shadow: var(--shadow-light); animation: fadeIn 0.3s ease-out;
+}
+.reply-form.active { display: block; }
+.reply-form form { display: flex; flex-direction: column; gap: 0.6rem; }
+.reply-form textarea { width: 100%; font-size: 0.9rem; min-height: 60px; padding: 0.5rem 0.7rem; }
+.reply-form .btn-comment.btn-small { align-self: flex-end; }
+.form-message-local { font-size: 0.8rem; text-align: left; }
+
+li.top-level-comment-item { padding-bottom: 0.5rem; margin-bottom: 1rem; }
+li.top-level-comment-item:last-child { border-bottom: none; margin-bottom: 0; }
+
+.btn-expand-conversation {
+  display: block; width: auto; max-width: calc(100% - 1rem); margin: 1rem auto 0.5rem;
+  padding: 0.7rem 1.2rem; font-size: 0.9rem; font-weight: 500; color: var(--primary);
+  background-color: var(--light); border: 1px solid var(--gray-medium); border-radius: 8px;
+  cursor: pointer; transition: all 0.2s ease-in-out; text-align: center;
+}
+.btn-expand-conversation i { margin-right: 0.5em; }
+.btn-expand-conversation:hover {
+  background-color: #e9e9e9; border-color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Popup per Conversazione Estesa - Stili Corretti */
+.modal-content.conversation-popup-main {
+  max-width: 780px; width: 95%; padding: 1.2rem; max-height: 90vh;
+  opacity: 0; transform: translateY(20px) scale(0.98);
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+}
+.modal.active > .modal-content.conversation-popup-main { opacity: 1; transform: translateY(0) scale(1); }
+.modal-content.conversation-popup-main h3#conversationPopupTitle {
+  font-size: 1.3rem; color: var(--primary); margin-top: 0; margin-bottom: 1rem;
+  padding-bottom: 0.6rem; border-bottom: 1px solid var(--gray-light); text-align: left;
+}
+.modal-content.conversation-popup-main .modal-content-scrollable {
+  padding-right: 8px; max-height: calc(90vh - 70px - 2.4rem);
+}
+
+/* Stili specifici per commenti DENTRO il Popup */
+#conversationPopupUL .comment {
+  background-color: var(--light); border: 1px solid #ddd;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  padding: 0.8rem 1rem; margin-bottom: 0.8rem;
+}
+#conversationPopupUL .comment:not(.reply)::before { background-color: var(--accent); width: 4px; }
+#conversationPopupUL .comment.reply { background-color: #fcfcfc; border-color: #e8e8e8; }
+#conversationPopupUL .comment p { font-size: 0.9rem; line-height: 1.6; }
+#conversationPopupUL .comment-header { gap: 0.6rem; margin-bottom: 0.5rem; }
+#conversationPopupUL .comment .user-avatar { width: 35px; height: 35px; }
+#conversationPopupUL .comment-meta strong { font-size: 0.9rem; }
+#conversationPopupUL .comment-meta small { font-size: 0.75rem; }
+#conversationPopupUL .badge-staff { font-size: 0.65rem; padding: 0.1em 0.4em; }
+#conversationPopupUL .comment-actions {
+  margin-top: 0.6rem; padding-top: 0.6rem; font-size: 0.75rem; gap: 0.5rem;
+}
+#conversationPopupUL .like-btn, #conversationPopupUL .btn-reply { padding: 0.2rem 0.4rem; }
+#conversationPopupUL .reply-form { padding: 0.6rem; margin-top: 0.6rem; }
+#conversationPopupUL .reply-form textarea { font-size: 0.85rem; min-height: 50px; padding: 0.4rem; }
+#conversationPopupUL .reply-form .btn-comment.btn-small { font-size: 0.8rem; padding: 0.4rem 0.8rem; }
+#conversationPopupUL .btn-expand-conversation { display: none !important; } /* Mai bottoni espandi nel popup */
+
+
+/* Gestione indentazione progressiva nel popup */
+#conversationPopupUL .replies { padding-left: 1rem; }
+#conversationPopupUL .replies::before { left: calc(1rem / 2 - 1px); background-color: #e8e8e8; }
+
+#conversationPopupUL .replies .replies { padding-left: 0.8rem; } /* Livello 2 */
+#conversationPopupUL .replies .replies::before { left: calc(0.8rem / 2 - 1px); }
+
+#conversationPopupUL .replies .replies .replies { padding-left: 0.6rem; } /* Livello 3 */
+#conversationPopupUL .replies .replies .replies::before { left: calc(0.6rem / 2 - 1px); }
+
+#conversationPopupUL .replies .replies .replies .replies { /* Livello 4+ */
+  padding-left: 0.4rem; border-left: none;
+}
+#conversationPopupUL .replies .replies .replies .replies::before { display: none; }
+
+
+.modal-content.conversation-popup-main .close-modal-btn {
+  z-index: 10; top: 0.6rem; right: 0.6rem; font-size: 1.8rem;
+}
+.no-content-message {
+  text-align: center; padding: 1.5rem; font-size: 1.05rem; color: var(--gray-dark);
+  background-color: var(--white); border-radius: var(--border-radius-medium);
+  border: 1px dashed var(--gray-medium); margin: 1.5rem auto; max-width: 600px;
+}
+#login-to-comment-message a { color: var(--secondary); font-weight: 500; text-decoration: underline; }
+#login-to-comment-message a:hover { color: var(--primary); }
+
+/* ----- FINE RESTYLING SEZIONE COMMENTI (v4) ----- */
