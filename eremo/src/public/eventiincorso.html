@@ -114,172 +114,6 @@
       text-decoration: underline;
     }
 
-    /* Stili popup prenotazione (assicurati siano nel tuo style.css o qui) */
-    .booking-popup-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(var(--dark-rgb, 30, 59, 47), 0.8);
-      z-index: 1050;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-      backdrop-filter: blur(5px);
-    }
-
-    .booking-popup-overlay.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 1;
-    }
-
-    /* Modificato per flex centering */
-    .booking-popup {
-      display: none;
-      /* Inizialmente gestito da JS */
-      transform: scale(0.95);
-      width: 90%;
-      max-width: 550px;
-      max-height: 90vh;
-      overflow-y: auto;
-      background: var(--white);
-      border-radius: var(--border-radius-medium);
-      padding: 2rem;
-      box-shadow: var(--shadow-medium);
-      z-index: 1051;
-      opacity: 0;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-
-    .booking-popup.active {
-      display: block;
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    .booking-popup h2 {
-      color: var(--primary);
-      margin-top: 0;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      font-size: 1.8rem;
-    }
-
-    .booking-popup .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .booking-popup .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: var(--primary);
-      font-weight: 500;
-      font-size: 0.95rem;
-      text-align: left;
-    }
-
-    .booking-popup .form-control {
-      width: 100%;
-      padding: 0.7rem 1rem;
-      border: 1px solid var(--gray-medium);
-      border-radius: 8px;
-      font-size: 1rem;
-      background-color: var(--white);
-    }
-
-    .booking-popup .form-control:focus {
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(141, 177, 135, 0.3);
-      outline: none;
-    }
-
-    .participant-fields-container {
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-      max-height: 200px;
-      overflow-y: auto;
-      padding-right: 5px;
-      border: 1px solid var(--gray-light);
-      border-radius: 9px;
-      padding: 1rem;
-    }
-
-    .participant-fields-container .participant-entry {
-      padding-bottom: 1rem;
-      margin-bottom: 1rem;
-      border-bottom: 1px dotted var(--gray-light);
-    }
-
-    .participant-fields-container .participant-entry:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-    }
-
-    .participant-fields-container .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem 1rem;
-      align-items: center;
-    }
-
-    .participant-fields-container .form-grid label {
-      font-size: 0.9rem;
-      margin-bottom: 0.2rem;
-    }
-
-    .booking-popup .form-actions {
-      margin-top: 1.5rem;
-      text-align: right;
-    }
-
-    .booking-popup .btn-popup {
-      padding: 0.7rem 1.5rem;
-      border-radius: 50px;
-      border: none;
-      font-weight: 500;
-      cursor: pointer;
-      background: var(--secondary);
-      color: white;
-      transition: var(--transition-medium);
-    }
-
-    .booking-popup .btn-popup:hover {
-      background: var(--primary);
-    }
-
-    .booking-popup .close-popup {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: none;
-      border: none;
-      font-size: 1.8rem;
-      font-weight: bold;
-      line-height: 1;
-      color: var(--gray-medium);
-      cursor: pointer;
-      padding: 0.25rem;
-      transition: var(--transition-fast);
-    }
-
-    .booking-popup .close-popup:hover {
-      color: var(--dark);
-      transform: rotate(90deg) scale(1.1);
-    }
-
-    #bookingResponseMessage,
-    #waitlistResponseMessage {
-      margin-top: 1rem;
-      padding: 0.8rem 1rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      text-align: center;
-      display: none;
-    }
-
     #eventiGridContainer .no-events,
     #eventiGridContainer .error-message {
       grid-column: 1 / -1;
@@ -580,7 +414,7 @@
       nPI.max = maxE; nPI.value = 1; if (mSB) mSB.textContent = maxE; if (iPP) iPP.textContent = `Puoi prenotare da 1 a ${maxE} posti. (Già prenotati: ${pGPN}/${MAX_TOTAL_SEATS_PER_USER})`; generateParticipantFields(1, pFC, 'bp', maxE); if (bRM) { bRM.style.display = 'none'; bRM.className = 'form-message'; } if (bO) bO.classList.add('active'); if (bP) bP.classList.add('active'); document.body.style.overflow = 'hidden'; }; function cBP() { if (bO) bO.classList.remove('active'); if (bP) bP.classList.remove('active'); document.body.style.overflow = ''; if (pFC) pFC.innerHTML = ''; if (bF) bF.reset(); if (iPP) iPP.textContent = ''; } if (cB) cB.addEventListener('click', cBP); if (bO) bO.addEventListener('click', (e) => { if (e.target === bO) cBP(); });
     if (nPI && pFC) nPI.addEventListener('input', (e) => generateParticipantFields(e.target.value, pFC, 'bp', parseInt(nPI.max)));
     if (bF) bF.addEventListener('submit', async function (e) { e.preventDefault(); if (!currentUserData || !currentUserData.email) { alert("Sessione scaduta."); window.location.href = 'index.html'; return; } const btn = this.querySelector('button[type="submit"]'); const oT = btn.textContent; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini"></div> Elaboro...'; if (bRM) bRM.style.display = 'none'; const fd = new FormData(); fd.append('eventId', bEII.value); fd.append('numeroPosti', nPI.value); fd.append('contatto', currentUserData.email); const N = pFC.querySelectorAll('input[name="participant_nome[]"]'); const C = pFC.querySelectorAll('input[name="participant_cognome[]"]'); let v = true; if (N.length !== parseInt(nPI.value)) { v = false; if (bRM) bRM.textContent = 'Num. partecipanti non corrisponde.'; } else { for (let i = 0; i < N.length; i++) { if (N[i].value.trim() === '' || C[i].value.trim() === '') { v = false; if (bRM) bRM.textContent = 'Nome e cognome obbligatori.'; break; } fd.append('partecipanti_nomi[]', N[i].value.trim()); fd.append('partecipanti_cognomi[]', C[i].value.trim()); } } if (!v) { if (bRM) { bRM.className = 'form-message error'; bRM.style.display = 'block'; } btn.disabled = false; btn.textContent = oT; return; }
-      try { const r = await fetch('prenota_evento.php', { method: 'POST', body: fd }); const rt = await r.text(); let j; try { j = JSON.parse(rt); } catch (err) { throw new Error("Risposta non valida: " + rt.substring(0, 100)); } if (j.success) { if (bRM) { bRM.textContent = j.message || 'Prenotazione confermata!'; bRM.className = 'form-message success'; } loadEvents(); setTimeout(cBP, 2000); } else { throw new Error(j.message || 'Errore prenotazione.'); } } catch (err) { if (bRM) { bRM.textContent = `Errore: ${err.message}`; bRM.className = 'form-message error'; } } finally { if (bRM) bRM.style.display = 'block'; btn.disabled = false; btn.textContent = oT; } });
+      try { const r = await fetch('prenota_evento.php', { method: 'POST', body: fd }); const rt = await r.text(); let j; try { j = JSON.parse(rt); } catch (err) { throw new Error("Risposta non valida: " + rt.substring(0, 100)); } if (j.success) { if (bRM) { bRM.textContent = j.message || 'Prenotazione confermata!'; bRM.className = 'form-message success'; } loadEvents(); } else { throw new Error(j.message || 'Errore prenotazione.'); } } catch (err) { if (bRM) { bRM.textContent = `Errore: ${err.message}`; bRM.className = 'form-message error'; } } finally { if (bRM) bRM.style.display = 'block'; btn.disabled = false; btn.textContent = oT; } });
   }
   function generateParticipantFields(c, cont, bId, maxA) { if (!cont) return; cont.innerHTML = ''; let vC = parseInt(c); if (isNaN(vC) || vC < 1) vC = 1; if (isNaN(maxA) || maxA < 1) maxA = MAX_SEATS_PER_BOOKING; if (vC > maxA) vC = maxA; const nI = cont.closest('form')?.querySelector('input[type="number"]'); if (nI && parseInt(nI.value) !== vC) nI.value = vC; if (vC > 0) { for (let i = 1; i <= vC; i++) { const fS = document.createElement('div'); fS.className = 'participant-entry'; fS.innerHTML = `<p style="margin-bottom:0.5rem;font-weight:500;color:var(--dark);">Partecipante ${i}:</p><div class="form-grid"><div><label for="${bId}_nome_${i}">Nome*</label><input type="text" id="${bId}_nome_${i}" name="participant_nome[]" class="form-control" required></div><div><label for="${bId}_cognome_${i}">Cognome*</label><input type="text" id="${bId}_cognome_${i}" name="participant_cognome[]" class="form-control" required></div></div>`; cont.appendChild(fS); } } }
   function initializeWaitlistPopupHandlers() { const wO = gebi('waitlistPopupOverlay'); const wP = gebi('waitlistPopup'); const cB = gebi('closeWaitlistPopupBtn'); const wF = gebi('waitlistForm'); const wNPI = gebi('waitlistNumeroPosti'); const wEII = gebi('waitlistEventId'); const wPT = gebi('waitlistPopupTitle'); const wEI = gebi('waitlistEventInfo'); const wRM = gebi('waitlistResponseMessage'); const mSEW = gebi('maxSeatsAllowedWaitlist');
@@ -588,7 +422,7 @@
     function cWP() { if (wO) wO.classList.remove('active'); if (wP) wP.classList.remove('active'); document.body.style.overflow = ''; if (wF) wF.reset(); }
     if (cB) cB.addEventListener('click', cWP); if (wO) wO.addEventListener('click', (e) => { if (e.target === wO) cWP(); });
     if (wF) wF.addEventListener('submit', async function (e) { e.preventDefault(); if (!currentUserData || !currentUserData.email) { alert("Sessione scaduta."); window.location.href = 'index.html'; return; } const btn = this.querySelector('button[type="submit"]'); const oT = btn.textContent; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini"></div> Elaboro...'; if (wRM) wRM.style.display = 'none'; const fd = new FormData(); fd.append('eventId', wEII.value); fd.append('numeroPosti', wNPI.value); fd.append('contatto', currentUserData.email);
-      try { const r = await fetch('gestisci_coda.php', { method: 'POST', body: fd }); const rt = await r.text(); let j; try { j = JSON.parse(rt); } catch (err) { throw new Error("Risposta non valida: " + rt.substring(0, 100)); } if (j.success) { if (wRM) { wRM.textContent = j.message || "Richiesta coda inviata!"; wRM.className = 'form-message success'; } loadEvents(); setTimeout(cWP, 2000); } else { throw new Error(j.message || "Errore richiesta coda."); } } catch (err) { if (wRM) { wRM.textContent = `Errore: ${err.message}`; wRM.className = 'form-message error'; } } finally { if (wRM) wRM.style.display = 'block'; btn.disabled = false; btn.textContent = oT; } });
+      try { const r = await fetch('gestisci_coda.php', { method: 'POST', body: fd }); const rt = await r.text(); let j; try { j = JSON.parse(rt); } catch (err) { throw new Error("Risposta non valida: " + rt.substring(0, 100)); } if (j.success) { if (wRM) { wRM.textContent = j.message || "Richiesta coda inviata!"; wRM.className = 'form-message success'; } loadEvents(); } else { throw new Error(j.message || "Errore richiesta coda."); } } catch (err) { if (wRM) { wRM.textContent = `Errore: ${err.message}`; wRM.className = 'form-message error'; } } finally { if (wRM) wRM.style.display = 'block'; btn.disabled = false; btn.textContent = oT; } });
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
