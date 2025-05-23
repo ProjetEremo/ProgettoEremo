@@ -7,69 +7,15 @@
     <title>Admin Dashboard - Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* Eventuali stili specifici aggiuntivi per la dashboard se non coperti da style.css */
-        .event-tabs-and-filter-container {
-            display: flex;
-            justify-content: space-between; /* Spinge i gruppi di tab e filtri ai lati */
-            align-items: flex-start;
-            position: relative;
-            background-color: var(--light);
-            padding-bottom: 0; /* Rimuove padding sotto se i controlli vista sono separati */
-            border-bottom: 1px solid var(--gray-medium); /* Linea di separazione se i controlli vista sono sotto */
-        }
-
-        .event-tabs-container {
-            display: flex;
-            /* Non serve flex-grow: 1 se il filter-trigger-container usa margin-left: auto */
-        }
-        .event-tabs-container .event-tab-button:first-child {
-            border-top-left-radius: 10px;
-            border-top-right-radius: 0;
-        }
-        .event-tabs-container .event-tab-button:last-child {
-            border-top-left-radius: 0;
-            border-top-right-radius: 10px;
-            margin-left: -1px; /* Sovrappone il bordo per un look unito */
-            border-right: 1px solid var(--gray-medium); /* Aggiungi bordo destro all'ultimo tab */
-        }
-        .event-tabs-container .event-tab-button.active {
-            border-bottom-color: var(--white); /* Nasconde il bordo inferiore del tab attivo */
-        }
-
-
-        .filter-trigger-container {
-            position: relative;
-            z-index: 10;
-            /* margin-left: auto; Non più necessario con justify-content: space-between */
-        }
-
-        #filterToggleButton.event-tab-button.filter-tab-button {
-            border-radius: 10px 10px 0 0; /* Arrotonda tutti gli angoli superiori */
-            /* Rimuovi il margin-left: -1px se non è più adiacente ad altri tab */
-        }
-        #filterToggleButton.event-tab-button.filter-tab-button.active {
-            border-bottom-color: var(--white);
-        }
-
-        .filter-panel {
-            right: 0; /* Allinea il pannello a destra del suo contenitore */
-            left: auto; /* Sovrascrive il left:0 di default */
-        }
-        .event-view-controls {
-            border-top: none; /* Rimuovi il bordo superiore se si attacca alla barra dei tab */
-            border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
-        }
-
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body class="page-dashboard">
 
 <header class="navbar-container" id="navbarContainer">
     <nav class="navbar">
         <div class="logo">
-            <a href="index.html"> <span class="emoji">🏔️</span> <h2>Eremo Frate Francesco - Admin</h2>
+            <a href="indexadmin.html"> <span class="emoji">🏔️</span>
+                <h2>Eremo Frate Francesco - Admin</h2>
             </a>
         </div>
         <div class="right-menu">
@@ -81,7 +27,8 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
                     <a href="dashboard.html">Dashboard</a>
-                    <a href="areapersonale.html">Il mio profilo</a> <a href="eventiincorsoAdmin.html">Gestione Eventi Avanzata</a>
+                    <a href="areapersonale.html">Il mio profilo</a>
+                    <a href="eventiincorsoAdmin.html">Gestione Eventi Estesa</a>
                     <a href="#" onclick="logout()">Esci</a>
                 </div>
             </div>
@@ -91,7 +38,7 @@
     <div class="mobile-menu" id="mobileMenu">
         <a href="dashboard.html" onclick="closeMobileMenu()">Dashboard</a>
         <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
-        <a href="eventiincorsoAdmin.html" onclick="closeMobileMenu()">Gestione Eventi Avanzata</a>
+        <a href="eventiincorsoAdmin.html" onclick="closeMobileMenu()">Gestione Eventi Estesa</a>
         <a href="#" onclick="logout(); closeMobileMenu();">Esci</a>
     </div>
 </header>
@@ -100,14 +47,6 @@
     <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
 
     <div class="event-tabs-and-filter-container">
-        <div class="event-tabs-container">
-            <button class="event-tab-button active" data-tab="upcoming">
-                <i class="fas fa-calendar-day"></i> Eventi Futuri
-            </button>
-            <button class="event-tab-button" data-tab="past">
-                <i class="fas fa-history"></i> Archivio Eventi
-            </button>
-        </div>
         <div class="filter-trigger-container">
             <button id="filterToggleButton" class="event-tab-button filter-tab-button" aria-expanded="false" aria-controls="filterPanelDropdown">
                 <i class="fas fa-filter"></i> Filtri <span class="dropdown-arrow-filter">▼</span>
@@ -134,6 +73,10 @@
                 </div>
             </div>
         </div>
+
+        <div class="event-tabs-container"> <button class="event-tab-button active" data-tab="upcoming"><i class="fas fa-calendar-day"></i> Eventi Futuri</button>
+            <button class="event-tab-button" data-tab="past"><i class="fas fa-history"></i> Archivio Eventi</button>
+        </div>
     </div>
 
     <div class="event-view-controls">
@@ -151,8 +94,8 @@
         <div class="form-group sorting-group">
             <label for="sortDirection">Direzione:</label>
             <select id="sortDirection" class="form-control">
-                <option value="desc" selected>Decrescente</option> <option value="asc">Crescente</option>
-            </select>
+                <option value="desc">Decrescente</option>
+                <option value="asc" selected>Crescente</option> </select>
         </div>
         <div class="form-group grouping-group">
             <label for="groupCriteria">Raggruppa per:</label>
@@ -231,28 +174,17 @@
         <div class="form-group"> <label for="event-title-dashboard">Titolo Evento*</label> <input type="text" id="event-title-dashboard" name="event-title" class="form-control" required> </div>
         <div class="form-grid">
             <div class="form-group"> <label for="event-date-dashboard">Data Inizio*</label> <input type="date" id="event-date-dashboard" name="event-date" class="form-control" required> </div>
-            <div class="form-group">
-                <label for="event-start-time-dashboard">Orario Inizio*</label>
-                <input type="time" id="event-start-time-dashboard" name="event-start-time" class="form-control" required>
-            </div>
-        </div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="event-end-time-dashboard">Orario Fine</label>
-                <input type="time" id="event-end-time-dashboard" name="event-end-time" class="form-control">
-            </div>
-            <div class="form-group"> <label for="event-prefix-dashboard">Prefisso Relatore</label> <input type="text" id="event-prefix-dashboard" name="event-prefix" class="form-control" placeholder="Default: Relatore"> </div>
+            <div class="form-group"> <label for="event-time-dashboard">Orario</label> <input type="text" id="event-time-dashboard" name="event-time" class="form-control" placeholder="es. 18:00-19:30"> </div>
         </div>
         <div class="form-group"> <label for="event-short-desc-dashboard">Descrizione Breve* (max 255 caratteri)</label> <textarea id="event-short-desc-dashboard" name="event-short-desc" class="form-control" rows="3" required maxlength="255"></textarea> </div>
         <div class="form-group"> <label for="event-long-desc-dashboard">Descrizione Estesa</label> <textarea id="event-long-desc-dashboard" name="event-long-desc" class="form-control" rows="5"></textarea> </div>
-
         <div class="form-grid">
+            <div class="form-group"> <label for="event-prefix-dashboard">Prefisso Relatore</label> <input type="text" id="event-prefix-dashboard" name="event-prefix" class="form-control" placeholder="Default: Relatore"> </div>
             <div class="form-group"> <label for="event-speaker-dashboard">Nome Relatore*</label> <input type="text" id="event-speaker-dashboard" name="event-speaker" class="form-control" required> </div>
-            <div class="form-group"> <label for="event-association-dashboard">Associazione</label> <input type="text" id="event-association-dashboard" name="event-association" class="form-control"> </div>
         </div>
         <div class="form-grid">
+            <div class="form-group"> <label for="event-association-dashboard">Associazione</label> <input type="text" id="event-association-dashboard" name="event-association" class="form-control"> </div>
             <div class="form-group"> <label for="event-seats-dashboard">Posti Disponibili Iniziali*</label> <input type="number" id="event-seats-dashboard" name="event-seats" class="form-control" required min="0"> </div>
-            <div class="form-group" id="event-price-container-dashboard" style="display: block;"> <label for="event-price-dashboard">Prezzo (€)</label> <input type="number" id="event-price-dashboard" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00"> </div>
         </div>
         <div class="form-group">
             <label for="event-image-dashboard">Immagine Copertina</label> <input type="file" id="event-image-dashboard" name="event-image" class="form-control" accept="image/*">
@@ -266,7 +198,7 @@
         </div>
         <div class="form-check-group"> <input type="checkbox" id="event-booking-dashboard" name="event-booking"> <label for="event-booking-dashboard">Prenotazioni aperte</label> </div>
         <div class="form-check-group"> <input type="checkbox" id="event-voluntary-dashboard" name="event-voluntary"> <label for="event-voluntary-dashboard">Offerta libera</label> </div>
-
+        <div class="form-group" id="event-price-container-dashboard" style="display: block;"> <label for="event-price-dashboard">Prezzo (€)</label> <input type="number" id="event-price-dashboard" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00"> </div>
         <div id="eventFormMessageDashboard" class="form-message" style="display:none;"></div>
         <div class="form-actions"> <button type="submit" class="btn-popup">Salva Evento</button> </div>
     </form>
@@ -305,19 +237,17 @@
         const mobileMenu = document.getElementById("mobileMenu");
         const hamburger = document.querySelector(".navbar .hamburger");
         if(mobileMenu && hamburger){
-            const isOpen = mobileMenu.classList.toggle("open");
+            mobileMenu.classList.toggle("open");
             hamburger.classList.toggle("open");
-            hamburger.setAttribute('aria-expanded', isOpen.toString());
-            document.body.style.overflow = isOpen ? 'hidden' : '';
+            document.body.style.overflow = mobileMenu.classList.contains("open") ? 'hidden' : '';
         }
     }
     function closeMobileMenu() {
         const mobileMenu = document.getElementById("mobileMenu");
         const hamburger = document.querySelector(".navbar .hamburger");
-        if(mobileMenu && hamburger && mobileMenu.classList.contains("open")){
+        if(mobileMenu && hamburger){
             mobileMenu.classList.remove("open");
             hamburger.classList.remove("open");
-            hamburger.setAttribute('aria-expanded', 'false');
             document.body.style.overflow = '';
         }
     }
@@ -346,27 +276,26 @@
             closeMobileMenu();
         }
     });
-    function logout() { // Semplificata, la logica completa di gestione sessione è in altre pagine
-        localStorage.removeItem('adminUserEFF'); // o la chiave usata per la sessione admin
-        alert('Logout effettuato. Sarai reindirizzato alla pagina di login.');
-        window.location.href = 'login_admin.html'; // Assumendo esista una pagina login_admin.html
+    function logout() {
+        localStorage.removeItem('adminUserEFF');
+        alert('Logout effettuato.');
+        window.location.href = 'login_admin.html';
     }
     // --- Fine Navbar & Mobile Menu ---
 
     // --- Logica Modali Generici ---
     function openModal(modalId) {
         const modal = document.getElementById(modalId);
-        if (modal) { modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10); }
+        if (modal) modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
     function closeModal(modalId) {
         const modal = document.getElementById(modalId);
-        if (modal) { modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 200); }
-        const anyModalActive = document.querySelector('.modal.active, .event-popup.active');
+        if (modal) modal.classList.remove('active');
+        const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active, .login-popup-overlay.active, .booking-popup-overlay.active, .volantino-morph-overlay.active');
         if (!anyModalActive) {
             document.body.style.overflow = '';
         }
-        // Reset specific modal content
         if (modalId === 'uploadMediaModal') {
             document.getElementById('uploadMediaForm')?.reset();
             const uploadFeedback = document.getElementById('uploadMediaFeedback'); if (uploadFeedback) uploadFeedback.innerHTML = '';
@@ -375,7 +304,9 @@
         if (modalId === 'manageCommentsModal') {
             let commentsListContainer = document.getElementById('commentsListContainer');
             if (commentsListContainer) {
-                commentsListContainer.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p></li>';
+                const newClonedListContainer = commentsListContainer.cloneNode(false);
+                newClonedListContainer.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p></li>';
+                if(commentsListContainer.parentNode) commentsListContainer.parentNode.replaceChild(newClonedListContainer, commentsListContainer);
             }
             const commentsFeedback = document.getElementById('commentsManagementFeedback'); if (commentsFeedback) commentsFeedback.innerHTML = '';
         }
@@ -393,12 +324,32 @@
     // --- Fine Logica Modali Generici ---
 
     // --- Funzioni Utility ---
-    function sanitizeText(text) { if (text === null || typeof text === 'undefined') return ''; const element = document.createElement('div'); element.innerText = String(text); return element.innerHTML; }
-    function formatHTMLWithLineBreaks(str) { if (typeof str !== 'string') str = String(str || ''); return str.replace(/\r\n|\r|\n/g, '<br>'); } // Rinominata per chiarezza
-    function sanitizeForAttribute(str) { if (typeof str !== 'string' || str === null) return ''; return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;"); }
-    function formatDbDate(dateString) { if (!dateString) return 'N/D'; try { const date = new Date(dateString.replace(/-/g, '/')); if (isNaN(date.getTime())) return dateString; return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });} catch (e) { return dateString; } }
-    function formatMonthYear(dateString) { if (!dateString) return 'Data sconosciuta'; try { const date = new Date(dateString.replace(/-/g,'/')); if (isNaN(date.getTime())) return 'Data non valida'; const options = { month: 'long', year: 'numeric' }; return new Intl.DateTimeFormat('it-IT', options).format(date); } catch (e) { return 'Data non valida'; } }
-    function getMonthIndexFromString(monthName) { const months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"]; return months.indexOf(monthName.toLowerCase()); }
+    function sanitizeText(text) {
+        if (text === null || typeof text === 'undefined') return '';
+        const element = document.createElement('div'); element.innerText = String(text); return element.innerHTML;
+    }
+    function sanitizeTextForHTML(str) {
+        if (typeof str !== 'string') str = String(str || '');
+        const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');
+    }
+    function sanitizeForAttribute(str) {
+        if (typeof str !== 'string' || str === null) return '';
+        return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+    }
+    function formatDbDate(dateString) {
+        if (!dateString) return 'N/D';
+        try { const date = new Date(dateString.replace(/-/g, '/')); if (isNaN(date.getTime())) return dateString; return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });}
+        catch (e) { return dateString; }
+    }
+    function formatMonthYear(dateString) {
+        if (!dateString) return 'Data sconosciuta';
+        try { const date = new Date(dateString.replace(/-/g, '/')); if (isNaN(date.getTime())) return 'Data non valida'; const options = { month: 'long', year: 'numeric' }; return new Intl.DateTimeFormat('it-IT', options).format(date); }
+        catch (e) { return 'Data non valida'; }
+    }
+    function getMonthIndexFromString(monthName) {
+        const months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+        return months.indexOf(monthName.toLowerCase());
+    }
     // --- Fine Funzioni Utility ---
 
     // --- Logica Pop-up Aggiungi/Modifica Evento ---
@@ -414,9 +365,6 @@
     const eventFormMessageDashboard = document.getElementById('eventFormMessageDashboard');
     const currentImagePreviewDashboard = document.getElementById('current-event-image-preview-dashboard');
     const currentFlyerPreviewDashboard = document.getElementById('current-event-flyer-preview-dashboard');
-    const eventStartTimeInput = document.getElementById('event-start-time-dashboard');
-    const eventEndTimeInput = document.getElementById('event-end-time-dashboard');
-
 
     function updatePriceFieldVisibilityDashboard() {
         if (voluntaryCheckboxDashboard && priceContainerDashboard && eventPriceInputDashboard) {
@@ -437,16 +385,7 @@
             document.getElementById('event-title-dashboard').value = eventData.Titolo || '';
             const eventDate = eventData.Data ? new Date(eventData.Data.replace(/-/g, '/')) : null;
             document.getElementById('event-date-dashboard').value = (eventDate && !isNaN(eventDate)) ? eventDate.toISOString().split('T')[0] : '';
-
-            if (eventData.Durata) {
-                const timeParts = eventData.Durata.split('-');
-                eventStartTimeInput.value = timeParts[0] || '';
-                eventEndTimeInput.value = timeParts[1] || '';
-            } else {
-                eventStartTimeInput.value = '';
-                eventEndTimeInput.value = '';
-            }
-
+            document.getElementById('event-time-dashboard').value = eventData.Durata || '';
             document.getElementById('event-short-desc-dashboard').value = eventData.descrizione || '';
             document.getElementById('event-long-desc-dashboard').value = eventData.descrizione_estesa || '';
             document.getElementById('event-prefix-dashboard').value = eventData.prefisso_relatore || 'Relatore';
@@ -462,16 +401,13 @@
             eventPopupTitleDashboard.textContent = 'Aggiungi Nuovo Evento'; eventIdInputDashboard.value = '';
             document.getElementById('event-booking-dashboard').checked = true; voluntaryCheckboxDashboard.checked = false; updatePriceFieldVisibilityDashboard();
             document.getElementById('event-seats-dashboard').value = '50'; document.getElementById('event-prefix-dashboard').value = 'Relatore';
-            eventStartTimeInput.value = ''; eventEndTimeInput.value = ''; // Pulisci orari per nuovo evento
         }
-        if(eventPopupOverlayDashboard) {eventPopupOverlayDashboard.style.display='block'; eventPopupOverlayDashboard.classList.add('active');}
-        if(eventPopupDashboard) {eventPopupDashboard.style.display='block'; eventPopupDashboard.classList.add('active');}
+        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.add('active'); if(eventPopupDashboard) eventPopupDashboard.classList.add('active');
         document.body.style.overflow = 'hidden'; const titleInput = document.getElementById('event-title-dashboard'); if(titleInput) titleInput.focus();
     }
     function closeEventPopupDashboard() {
-        if(eventPopupOverlayDashboard) {eventPopupOverlayDashboard.classList.remove('active'); setTimeout(()=>eventPopupOverlayDashboard.style.display='none', 250);}
-        if(eventPopupDashboard) {eventPopupDashboard.classList.remove('active'); setTimeout(()=>eventPopupDashboard.style.display='none', 250);}
-        const anyModalActive = document.querySelector('.modal.active'); if (!anyModalActive) document.body.style.overflow = '';
+        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.remove('active'); if(eventPopupDashboard) eventPopupDashboard.classList.remove('active');
+        const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active'); if (!anyModalActive) document.body.style.overflow = '';
     }
     if (closeEventPopupBtnDashboard) closeEventPopupBtnDashboard.addEventListener('click', closeEventPopupDashboard);
     document.addEventListener('keydown', function(event) {
@@ -482,26 +418,8 @@
         submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
         if(eventFormMessageDashboard) { eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';}
         try {
-            const formData = new FormData(this);
-            const startTime = document.getElementById('event-start-time-dashboard').value;
-            const endTime = document.getElementById('event-end-time-dashboard').value;
-            let durataString = "";
-            if (startTime) {
-                durataString = startTime;
-                if (endTime && endTime > startTime) { // Solo se fine è dopo inizio
-                    durataString += `-${endTime}`;
-                } else if (endTime && endTime <= startTime) {
-                    // Non aggiungere orario di fine se non valido, ma non bloccare il salvataggio
-                    console.warn("Orario di fine non valido, salvato solo orario di inizio.");
-                }
-            }
-            formData.append('event-time', durataString); // Campo 'event-time' per 'Durata' DB
-            formData.delete('event-start-time');
-            formData.delete('event-end-time');
-
-            formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
+            const formData = new FormData(this); formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
             if (formData.get('event-voluntary') === 'on') formData.set('event-price', '0.00');
-
             const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData }); const responseText = await response.text();
             let result; try { result = JSON.parse(responseText); } catch (jsonError) { console.error("Risposta non JSON:", responseText); throw new Error(`Risposta server non valida.`); }
             if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
@@ -513,8 +431,8 @@
     // --- Fine Logica Pop-up Evento ---
 
     // --- Logica Tabs Eventi ---
-    const tabButtons = document.querySelectorAll('.event-tabs-container .event-tab-button');
-    const tabContents = document.querySelectorAll('#eventManagementContent .event-tab-content');
+    const tabButtons = document.querySelectorAll('.event-tabs-container .event-tab-button'); // Selettore più specifico
+    const tabContents = document.querySelectorAll('#eventManagementContent .event-tab-content'); // Selettore più specifico
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             tabButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active');
@@ -524,7 +442,6 @@
                 content.style.display = isActiveTab ? 'block' : 'none';
                 if (isActiveTab) content.classList.add('active'); else content.classList.remove('active');
             });
-            applyFiltersAndRender(); // Rieffettua il render quando si cambia tab
         });
     });
     // --- Fine Logica Tabs Eventi ---
@@ -540,7 +457,7 @@
             event.stopPropagation(); const isActive = filterPanelDropdown.classList.toggle('active');
             filterToggleButton.classList.toggle('active', isActive); filterToggleButton.setAttribute('aria-expanded', isActive.toString());
         });
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function(event) { // Chiudi cliccando fuori
             if (filterPanelDropdown.classList.contains('active') && !filterPanelDropdown.contains(event.target) && !filterToggleButton.contains(event.target)) {
                 filterPanelDropdown.classList.remove('active'); filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');
             }
@@ -554,15 +471,25 @@
         const searchTitleInput = document.getElementById('searchTitleDashboard'); if(searchTitleInput) searchTitleInput.value = '';
         const searchDateInput = document.getElementById('searchDateDashboard'); if(searchDateInput) searchDateInput.value = '';
         const searchSpeakerInput = document.getElementById('searchSpeakerDashboard'); if(searchSpeakerInput) searchSpeakerInput.value = '';
-        // Applica subito i filtri resettati
-        applyFiltersAndRender();
-        if (filterPanelDropdown) filterPanelDropdown.classList.remove('active');
-        if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}
+        // Non applica subito, l'utente premerà "Applica"
     });
     // --- Fine Logica Filtro Dropdown ---
 
-    async function fetchDashboardData() { /* ... (invariata) ... */ }
-    // La lascio invariata per brevità, ma sarebbe qui
+
+    // --- Logica Caricamento Dati Dashboard, Filtri, Ordinamento e Raggruppamento ---
+    async function fetchDashboardData() {
+        const upcomingGrid = document.getElementById('upcomingEventsGrid'); const pastGrid = document.getElementById('pastEventsGrid');
+        if (!upcomingGrid || !pastGrid) { console.error("Elementi griglia eventi mancanti."); return; }
+        upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
+        pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
+        try {
+            const response = await fetch('get_dashboard_event_data.php');
+            if (!response.ok) throw new Error(`Errore HTTP: ${response.status} ${response.statusText}`);
+            const data = await response.json();
+            if (data.success) { allUpcomingEventsData = data.upcoming_events || []; allPastEventsData = data.past_events || []; applyFiltersAndRender(); }
+            else { const errorMsg = sanitizeText(data.message || 'Formato dati non corretto.'); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore: ${errorMsg}</p></div>`);}
+        } catch (error) { console.error('Errore fetchDashboardData:', error); const errorMsg = sanitizeText(error.message); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare: ${errorMsg}</p></div>`);}
+    }
 
     function applyFiltersAndRender() {
         const titleFilter = document.getElementById('searchTitleDashboard').value.toLowerCase().trim();
@@ -579,58 +506,27 @@
             let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
             return titleMatch && dateMatch && speakerMatch;
         };
-
-        const activeTab = document.querySelector('.event-tabs-container .event-tab-button.active').dataset.tab;
-        let eventsToProcess = activeTab === 'upcoming' ? allUpcomingEventsData : allPastEventsData;
-        let filteredEvents = eventsToProcess.filter(filterEvent);
+        let filteredUpcoming = allUpcomingEventsData.filter(filterEvent); let filteredPast = allPastEventsData.filter(filterEvent);
 
         const compareFunction = (a, b) => {
             let valA, valB;
             switch (sortBy) {
-                case 'mese': valA = new Date(a.Data.replace(/-/g, '/')); valB = new Date(b.Data.replace(/-/g, '/')); break;
+                case 'mese': valA = new Date(a.Data); valB = new Date(b.Data); break;
                 case 'relatore': valA = a.relatore?.toLowerCase() || ''; valB = b.relatore?.toLowerCase() || ''; break;
                 case 'prenotazioni': valA = a.elenco_prenotazioni?.length || 0; valB = b.elenco_prenotazioni?.length || 0; break;
                 case 'titolo': valA = a.Titolo?.toLowerCase() || ''; valB = b.Titolo?.toLowerCase() || ''; break;
-                case 'post_occupati': valA = parseInt(a.posti_occupati || 0); valB = parseInt(b.posti_occupati || 0); break;
-                case 'post_tot': valA = parseInt(a.posti_configurati_totali || 0); valB = parseInt(b.posti_configurati_totali || 0); break;
-                default: valA = new Date(a.Data.replace(/-/g, '/')); valB = new Date(b.Data.replace(/-/g, '/'));
+                case 'post_occupati': valA = a.posti_occupati || 0; valB = b.posti_occupati || 0; break;
+                case 'post_tot': valA = a.posti_configurati_totali || 0; valB = b.posti_configurati_totali || 0; break;
+                default: valA = new Date(a.Data); valB = new Date(b.Data);
             }
-
-            let comparison = 0;
-            if (typeof valA === 'string' && typeof valB === 'string') { comparison = valA.localeCompare(valB,'it',{sensitivity:'base'}); }
-            else { if (valA < valB) comparison = -1; if (valA > valB) comparison = 1;}
-
-            if (comparison !== 0) return sortDirection === 'asc' ? comparison : -comparison;
-
-            // Secondary sort: Date descending (newer first)
-            let dA = new Date(a.Data.replace(/-/g, '/')); let dB = new Date(b.Data.replace(/-/g, '/'));
-            if (dA < dB) return 1;
-            if (dA > dB) return -1;
-            return (parseInt(a.IDEvento) < parseInt(b.IDEvento))?-1:1; // Tertiary by ID
+            if (typeof valA === 'string' && typeof valB === 'string') { const comp = valA.localeCompare(valB,'it',{sensitivity:'base'}); if(comp!==0) return sortDirection==='asc'?comp:-comp;}
+            else { if (valA < valB) return sortDirection === 'asc' ? -1 : 1; if (valA > valB) return sortDirection === 'asc' ? 1 : -1;}
+            let dA = new Date(a.Data); let dB = new Date(b.Data); let dFactor = (sortDirection==='asc')?1:-1;
+            if (dA < dB) return dFactor * -1; if (dA > dB) return dFactor * 1; return (a.IDEvento < b.IDEvento)?-1:1;
         };
-        filteredEvents.sort(compareFunction);
-
-        if (activeTab === 'upcoming') {
-            renderEventsSection(filteredEvents, 'upcomingEventsGrid', true, groupBy, sortDirection);
-        } else {
-            renderEventsSection(filteredEvents, 'pastEventsGrid', false, groupBy, sortDirection);
-        }
-    }
-
-    // fetchDashboardData e renderEventsSection (con getWeekRangeString, formatMonthYear etc.) rimangono come nella versione precedente.
-    // Le incollo qui per completezza, assicurandomi che siano corrette.
-    async function fetchDashboardData() {
-        const upcomingGrid = document.getElementById('upcomingEventsGrid'); const pastGrid = document.getElementById('pastEventsGrid');
-        if (!upcomingGrid || !pastGrid) { console.error("Elementi griglia eventi mancanti."); return; }
-        upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
-        pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
-        try {
-            const response = await fetch('get_dashboard_event_data.php');
-            if (!response.ok) throw new Error(`Errore HTTP: ${response.status} ${response.statusText}`);
-            const data = await response.json();
-            if (data.success) { allUpcomingEventsData = data.upcoming_events || []; allPastEventsData = data.past_events || []; applyFiltersAndRender(); }
-            else { const errorMsg = sanitizeText(data.message || 'Formato dati non corretto.'); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore: ${errorMsg}</p></div>`);}
-        } catch (error) { console.error('Errore fetchDashboardData:', error); const errorMsg = sanitizeText(error.message); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare: ${errorMsg}</p></div>`);}
+        filteredUpcoming.sort(compareFunction); filteredPast.sort(compareFunction);
+        renderEventsSection(filteredUpcoming, 'upcomingEventsGrid', true, groupBy, sortDirection);
+        renderEventsSection(filteredPast, 'pastEventsGrid', false, groupBy, sortDirection);
     }
 
     function getWeekStartDate(dInput) {
@@ -648,7 +544,7 @@
     function renderEventsSection(events, gridContainerId, isUpcoming, groupBy, sortDirection) {
         const gridContainer = document.getElementById(gridContainerId); if (!gridContainer) return; gridContainer.innerHTML = '';
         if (isUpcoming) { const addEl = document.createElement('div'); addEl.className='add-event-bar'; addEl.innerHTML=`<i class="fas fa-plus-circle"></i><span>Nuovo Evento</span>`; addEl.addEventListener('click',()=>openEventPopupDashboard(null)); gridContainer.appendChild(addEl);}
-        if (events.length === 0) { if (!(isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar'))) { gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'} trovato con i filtri applicati.</p>`;} return;}
+        if (events.length === 0) { if (!(isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar'))) { gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'}.</p>`;} return;}
         if (groupBy === "nessuno") { events.forEach(event => gridContainer.appendChild(createAdminEventCard(event))); return;}
         const groupedEvents = events.reduce((acc, event) => {
             let groupKey = 'Non specificato'; try { switch (groupBy) {
@@ -661,26 +557,18 @@
             if (!acc[groupKey]) acc[groupKey] = []; acc[groupKey].push(event); return acc;
         }, {});
         let sortedGroupKeys = Object.keys(groupedEvents);
-        // Logica di ordinamento dei gruppi (assicurati che sia corretta per le date)
-        if (groupBy === 'giorno' || groupBy === 'mese' || groupBy === 'anno' || groupBy === 'settimana') {
-            sortedGroupKeys.sort((a, b) => {
-                let dateA, dateB;
-                try {
-                    if (groupBy === 'giorno') { const pA=a.split('/'); dateA=new Date(pA[2],pA[1]-1,pA[0]); const pB=b.split('/'); dateB=new Date(pB[2],pB[1]-1,pB[0]);}
-                    else if (groupBy === 'settimana') { /* La chiave settimana è una stringa "Sett. GG Mese - GG Mese ANNO", prendi la prima data */ const matchA = a.match(/(\d{2})\s*([a-z]+)\.?\s*-\s*\d{2}\s*[a-z]+\.?\s*(\d{4})/i); const matchB = b.match(/(\d{2})\s*([a-z]+)\.?\s*-\s*\d{2}\s*[a-z]+\.?\s*(\d{4})/i); if(matchA && matchB){ dateA = new Date(parseInt(matchA[3]), getMonthIndexFromString(matchA[2]), parseInt(matchA[1])); dateB = new Date(parseInt(matchB[3]), getMonthIndexFromString(matchB[2]), parseInt(matchB[1])); } else { dateA = new Date(0); dateB = new Date(0); /* fallback per chiavi non parsabili */ } }
-                    else if (groupBy === 'mese') { const pA=a.split(' '); dateA=new Date(pA[1],getMonthIndexFromString(pA[0])); const pB=b.split(' '); dateB=new Date(pB[1],getMonthIndexFromString(pB[0]));}
-                    else if (groupBy === 'anno') { dateA=new Date(a,0,1); dateB=new Date(b,0,1);}
-                    if(dateA && dateB && !isNaN(dateA) && !isNaN(dateB)) return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
-                } catch(e){ /* non fare nulla, usa sort stringa sotto */ }
-                return sortDirection==='asc'?String(a).localeCompare(String(b)):String(b).localeCompare(String(a));
-            });
+        if (groupBy === 'giorno' || groupBy === 'settimana' || groupBy === 'mese' || groupBy === 'anno') {
+            sortedGroupKeys.sort((a, b) => { let dateA, dateB; try {
+                if (groupBy === 'giorno') { const pA=a.split('/'); dateA=new Date(pA[2],pA[1]-1,pA[0]); const pB=b.split('/'); dateB=new Date(pB[2],pB[1]-1,pB[0]);}
+                else if (groupBy === 'settimana') { const yA=parseInt(a.substring(a.lastIndexOf(' ')+1)); const mdA=a.split(' ')[1].split('/'); dateA=new Date(yA,getMonthIndexFromString(a.split(' ')[2].replace('.','')),parseInt(mdA[0])); const yB=parseInt(b.substring(b.lastIndexOf(' ')+1)); const mdB=b.split(' ')[1].split('/'); dateB=new Date(yB,getMonthIndexFromString(b.split(' ')[2].replace('.','')),parseInt(mdB[0]));}
+                else if (groupBy === 'mese') { const pA=a.split(' '); dateA=new Date(pA[1],getMonthIndexFromString(pA[0])); const pB=b.split(' '); dateB=new Date(pB[1],getMonthIndexFromString(pB[0]));}
+                else if (groupBy === 'anno') { dateA=new Date(a,0,1); dateB=new Date(b,0,1);}} catch(e){return sortDirection==='asc'?String(a).localeCompare(String(b)):String(b).localeCompare(String(a));}
+                if(dateA&&dateB&&!isNaN(dateA)&&!isNaN(dateB))return sortDirection==='asc'?dateA-dateB:dateB-dateA; return sortDirection==='asc'?String(a).localeCompare(String(b)):String(b).localeCompare(String(a));});
         } else if (groupBy === 'relatore') sortedGroupKeys.sort((a,b)=>sortDirection==='asc'?a.localeCompare(b,'it',{sensitivity:'base'}):b.localeCompare(a,'it',{sensitivity:'base'}));
-
         for (const groupKey of sortedGroupKeys) { const h=document.createElement('h3'); h.className='month-year-header'; h.textContent=groupKey; gridContainer.appendChild(h); groupedEvents[groupKey].forEach(ev=>gridContainer.appendChild(createAdminEventCard(ev)));}
     }
-    // createAdminEventCard e tutte le funzioni di gestione modale (media, commenti, prenotazioni, delete event) rimangono come nella versione precedente.
-    // Le incollo per completezza
-    function createAdminEventCard(event) {
+
+    function createAdminEventCard(event) { // Funzione esistente (leggermente aggiornata per relatore in card)
         const eventCard = document.createElement('article'); eventCard.className = 'admin-event-card'; eventCard.id = `admin-event-${event.IDEvento}`;
         const numPrenotazioni = event.elenco_prenotazioni?.length || 0; const partecipanti = event.posti_occupati || 0;
         const postiConfigurati = event.posti_configurati_totali || 0; const commentCount = event.comment_count || 0; const mediaCount = event.media_count || 0;
@@ -699,70 +587,75 @@
         const bookingsButton = eventCard.querySelector('.btn-bookings'); if(bookingsButton) bookingsButton.addEventListener('click', function() { const eventForBookings = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); if (eventForBookings) openManageBookingsModal(eventForBookings); else alert("Dati evento non trovati.");});
         return eventCard;
     }
-    function openManageBookingsModal(eventData) { /* ...come prima... */ }
-    function renderGroupedBookings(bookings, eventId) { /* ...come prima... */ }
-    function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) { /* ...come prima... */ }
-    async function cancelBookingInModal(idPrenotazione, eventIdForModalReload) { /* ...come prima... */ }
-    async function openManageMediaModal(eventId, eventTitle) { /* ...come prima... */ }
-    function renderExistingMedia(mediaItems,eventId){ /* ...come prima... */ }
-    async function deleteMediaItem(mediaId,eventId){ /* ...come prima... */ }
-    const eventUploadMediaForm = document.getElementById('uploadMediaForm');
-    if(eventUploadMediaForm) eventUploadMediaForm.addEventListener('submit', async function(e) { /* ...come prima... */ });
-    let currentEventIdForCommentsGl = null;
-    async function openManageCommentsModal(eventId,eventTitle){ /* ...come prima... */ }
-    function renderCommentsForAdminThreaded(comments,eventId,parentUlElement,depth=0){ /* ...come prima... */ }
-    function attachAdminCommentListeners(commentsListContainerUL){ /* ...come prima... */ }
-    async function handleAdminReplySubmit(formElement,eventId){ /* ...come prima... */ }
-    async function deleteAdminComment(commentId,eventIdForReload){ /* ...come prima... */ }
-    async function confirmDeleteEvent(eventId,eventTitle){ /* ...come prima... */ }
 
+    // --- Funzioni Gestione Prenotazioni, Media, Commenti, Eliminazione Evento (invariate rispetto alla versione precedente) ---
+    // ... (copia qui le funzioni: openManageBookingsModal, renderGroupedBookings, confirmCancelBookingInModal, cancelBookingInModal)
+    // ... (copia qui le funzioni: openManageMediaModal, renderExistingMedia, deleteMediaItem, e l'event listener per uploadMediaForm)
+    // ... (copia qui le funzioni: openManageCommentsModal, renderCommentsForAdminThreaded, attachAdminCommentListeners, handleAdminReplySubmit, deleteAdminComment)
+    // ... (copia qui la funzione: confirmDeleteEvent)
+    // --- COPIA TUTTE LE FUNZIONI HELPER PER I MODAL QUI ---
+    // COPIATE DALLA RISPOSTA PRECEDENTE PER COMPLETEZZA:
+    function openManageBookingsModal(eventData) {
+        const modalTitleEl = document.getElementById('bookingsEventTitle'); const bookingsContainerEl = document.getElementById('bookingsListContainerModal'); const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
+        if (modalTitleEl) modalTitleEl.textContent = sanitizeText(eventData.Titolo); if (feedbackEl) feedbackEl.innerHTML = '';
+        if (bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento); openModal('manageBookingsModal');
+    }
+    function renderGroupedBookings(bookings, eventId) {
+        if (!bookings || bookings.length === 0) return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione.</p>'; let html = '';
+        bookings.forEach(booking => { const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim(); const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto);
+            html += `<div class="user-booking-group" id="booking-group-${booking.idPrenotazione}"><h5>Prenotazione di: ${displayNomeUtente} <small>(${sanitizeText(booking.Contatto)})</small></h5><div class="single-booking-details"><p><strong>ID: ${booking.idPrenotazione}</strong> - Posti: ${booking.NumeroPosti}</p><strong>Partecipanti:</strong>${booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0 ? `<ul class="participant-list-inline">${booking.partecipanti_della_prenotazione.map(p => `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`).join('')}</ul>` : '<p><small>Nessun dettaglio.</small></p>'}<button class="btn-admin btn-admin-danger btn-sm" onclick="confirmCancelBookingInModal(${booking.idPrenotazione}, ${eventId}, ${booking.NumeroPosti}, '${sanitizeForAttribute(displayNomeUtente)}')" title="Annulla"><i class="fas fa-times-circle"></i> Annulla</button></div></div>`;});
+        return html;
+    }
+    function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) { if (confirm(`Annullare prenotazione ID ${idPrenotazione} (${numPosti} posti) di ${nomeUtente}?`)) cancelBookingInModal(idPrenotazione, eventId);}
+    async function cancelBookingInModal(idPrenotazione, eventIdForModalReload) {
+        const feedbackEl = document.getElementById('bookingsManagementFeedbackModal'); if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento...</p>`;
+        try { const formData = new FormData(); formData.append('id_prenotazione', idPrenotazione); const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData }); const result = await response.json();
+            if (feedbackEl) { if (result.success) { feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`; await fetchDashboardData(); const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === String(eventIdForModalReload)); if(updatedEventData) { const bookingsContainerEl = document.getElementById('bookingsListContainerModal'); if(bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(updatedEventData.elenco_prenotazioni || [], updatedEventData.IDEvento);} else closeModal('manageBookingsModal');} else feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare.')}</p>`;}}
+        catch (error) { console.error("Errore AJAX annullamento modal:", error); if (feedbackEl) feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore connessione: ${sanitizeText(error.message)}</p>`;}
+    }
+    async function openManageMediaModal(eventId, eventTitle) {
+        const eventIdInput=document.getElementById('uploadMediaEventId'); const eventTitleEl=document.getElementById('uploadMediaEventTitle'); const existingMediaContainer=document.getElementById('existingMediaContainer'); const feedbackDiv=document.getElementById('uploadMediaFeedback'); const uploadForm=document.getElementById('uploadMediaForm');
+        if(eventIdInput)eventIdInput.value=eventId; if(eventTitleEl)eventTitleEl.textContent=sanitizeText(eventTitle); if(uploadForm)uploadForm.reset(); if(feedbackDiv)feedbackDiv.innerHTML=''; if(existingMediaContainer)existingMediaContainer.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>'; openModal('uploadMediaModal');
+        try{const response=await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`); const result=await response.json(); if(result.success&&result.media)renderExistingMedia(result.media,eventId); else if(existingMediaContainer)existingMediaContainer.innerHTML=`<p>Nessun media o errore: ${sanitizeText(result.message||'Sconosciuto.')}</p>`;}
+        catch(error){console.error('Errore recupero media:',error); if(existingMediaContainer)existingMediaContainer.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;}}
+    function renderExistingMedia(mediaItems,eventId){ const container=document.getElementById('existingMediaContainer'); if(!container)return; if(mediaItems.length===0){container.innerHTML='<p>Nessun media caricato.</p>';return;} let html='<div class="existing-media-grid">';
+        mediaItems.forEach(item=>{ const filename=item.url_media?item.url_media.split('/').pop():'File'; const itemDesc=sanitizeText(item.Descrizione||''); html+=`<div class="existing-media-item">`; if(item.tipo_media==='image')html+=`<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Vedi: ${sanitizeForAttribute(filename)} ${itemDesc?'- '+itemDesc:''}"><img src="${sanitizeForAttribute(item.url_media)}" alt="${itemDesc||filename}" loading="lazy" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;" title="Immagine: ${sanitizeForAttribute(filename)}"><i class="fas fa-image"></i></div>`; else if(item.tipo_media==='video')html+=`<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Vedi: ${sanitizeForAttribute(filename)} ${itemDesc?'- '+itemDesc:''}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`; else html+=`<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Apri: ${sanitizeForAttribute(filename)} ${itemDesc?'- '+itemDesc:''}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`; html+=`<p class="media-filename" title="${sanitizeForAttribute(item.url_media)}">${sanitizeText(filename)}</p>`; if(itemDesc)html+=`<p class="media-description"><em>${itemDesc}</em></p>`; html+=`<button class="btn-admin btn-admin-danger btn-sm btn-delete-media" data-media-id="${item.id_media}" data-event-id="${eventId}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div>`;});
+        html+='</div>'; container.innerHTML=html; container.querySelectorAll('.btn-delete-media').forEach(button=>button.addEventListener('click',function(){if(confirm('Eliminare questo media?'))deleteMediaItem(this.dataset.mediaId,this.dataset.eventId);}));}
+    async function deleteMediaItem(mediaId,eventId){ const feedbackDiv=document.getElementById('uploadMediaFeedback'); if(feedbackDiv)feedbackDiv.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
+        try{const formData=new FormData();formData.append('action','delete_event_media');formData.append('media_id',mediaId); const response=await fetch('manage_event_media.php',{method:'POST',body:formData});const result=await response.json(); if(result.success){if(feedbackDiv)feedbackDiv.innerHTML=`<p class="success-message">${sanitizeText(result.message)}</p>`;openManageMediaModal(eventId,document.getElementById('uploadMediaEventTitle')?.textContent||"Evento");fetchDashboardData();}else if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;}
+        catch(error){console.error('Errore eliminazione media:',error);if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(()=>{if(feedbackDiv)feedbackDiv.innerHTML='';},4000);}
+    const eventUploadMediaForm = document.getElementById('uploadMediaForm'); // rinominato per evitare conflitti
+    if(eventUploadMediaForm) eventUploadMediaForm.addEventListener('submit', async function(e) { e.preventDefault(); const eventId=document.getElementById('uploadMediaEventId').value; const feedbackDiv=document.getElementById('uploadMediaFeedback'); if(document.getElementById('mediaFiles').files.length===0){if(feedbackDiv)feedbackDiv.innerHTML='<p class="error-message">Seleziona file.</p>';return;} if(feedbackDiv)feedbackDiv.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>'; const formData=new FormData(this);formData.set('action','upload_media');formData.set('event_id',eventId);
+        try{const response=await fetch('manage_event_media.php',{method:'POST',body:formData});const result=await response.json(); if(result.success){if(feedbackDiv)feedbackDiv.innerHTML=`<p class="success-message">${sanitizeText(result.message)}</p>`;openManageMediaModal(eventId,document.getElementById('uploadMediaEventTitle')?.textContent||"Evento");fetchDashboardData();this.reset();}else if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;}
+        catch(error){console.error('Errore uploadMedia:',error);if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(()=>{if(feedbackDiv)feedbackDiv.innerHTML='';},5000);});
+    let currentEventIdForCommentsGl = null; // rinominato per evitare conflitti
+    async function openManageCommentsModal(eventId,eventTitle){ currentEventIdForCommentsGl=eventId;const titleEl=document.getElementById('commentsEventTitle'); let listContainerEl=document.getElementById('commentsListContainer');const feedbackEl=document.getElementById('commentsManagementFeedback'); if(titleEl)titleEl.textContent=sanitizeText(eventTitle);if(feedbackEl)feedbackEl.innerHTML=''; if(listContainerEl&&listContainerEl.parentNode){const newClonedListContainer=listContainerEl.cloneNode(false); listContainerEl.parentNode.replaceChild(newClonedListContainer,listContainerEl);listContainerEl=newClonedListContainer;attachAdminCommentListeners(listContainerEl);}else{console.error("commentsListContainer non trovato.");if(feedbackEl)feedbackEl.innerHTML='<p class="error-message">Errore UI.</p>';openModal('manageCommentsModal');return;} listContainerEl.innerHTML='<li><p><i class="fas fa-spinner fa-spin"></i>Caricamento...</p></li>';openModal('manageCommentsModal');
+        try{const response=await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`); if(!response.ok){let errTxt=`Errore HTTP ${response.status}`;try{const errData=await response.json();errTxt=errData.message||errTxt;}catch(e){}throw new Error(errTxt);} const result=await response.json(); if(result.success&&result.comments)renderCommentsForAdminThreaded(result.comments,eventId,listContainerEl); else listContainerEl.innerHTML=`<li><p>${sanitizeText(result.message||'Nessun commento o errore.')}</p></li>`;}
+        catch(error){console.error('Errore caricamento commenti:',error);listContainerEl.innerHTML=`<li><p class="error-message">Impossibile caricare: ${sanitizeText(error.message)}</p></li>`;}}
+    function renderCommentsForAdminThreaded(comments,eventId,parentUlElement,depth=0){ if(depth===0){parentUlElement.innerHTML='';if(!comments||comments.length===0){parentUlElement.innerHTML='<li style="list-style-type:none;text-align:center;margin:1rem 0;"><p>Nessun commento.</p></li>';return;}}
+        comments.forEach(comment=>{ const commentItemLi=document.createElement('li');commentItemLi.className='comment-item-admin-styled';commentItemLi.id=`admin-comment-${comment.Progressivo}`; if(comment.is_admin_reply)commentItemLi.classList.add('commento-admin-generale'); const commenterAvatar=comment.commenter_icon_path||defaultUserIconPath;const commenterName=sanitizeText(comment.utente_display_name||'Utente'); const commentDate=sanitizeText(comment.data_creazione_formattata||'Data non disp.');const commentText=sanitizeTextForHTML(comment.Descrizione); let adminBadgeHTML=comment.is_admin_reply?'<span class="badge-admin-dashboard">(Admin)</span>':'';
+            commentItemLi.innerHTML=`<div class="comment-header"><img src="${commenterAvatar}" alt="Avatar" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';"><div class="comment-meta"><strong>${commenterName}</strong> ${adminBadgeHTML} <small>${commentDate}</small><small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta?` | Risposta a: ${comment.CodRisposta}`:''}</small></div></div><div class="comment-text-admin">${commentText}</div><div class="comment-actions-admin"><button class="btn-admin btn-admin-reply" data-comment-id="${comment.Progressivo}" title="Rispondi"><i class="fas fa-reply"></i> Rispondi</button><button class="btn-admin btn-admin-danger btn-admin-delete-comment" data-comment-id="${comment.Progressivo}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div><div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}" style="display:none;"><form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}"><textarea name="Descrizione" placeholder="Rispondi come ${adminNameGlobalJS}..." rows="3" required></textarea><div class="form-actions-reply"><button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia</button></div><div class="form-message-local" style="margin-top:0.5em;"></div></form></div>`; parentUlElement.appendChild(commentItemLi);
+            if(comment.replies&&comment.replies.length>0){const repliesUl=document.createElement('ul');repliesUl.className='comment-replies-list-styled';commentItemLi.appendChild(repliesUl);renderCommentsForAdminThreaded(comment.replies,eventId,repliesUl,depth+1);}});}
+    function attachAdminCommentListeners(commentsListContainerUL){ if(!commentsListContainerUL)return; commentsListContainerUL.addEventListener('click',async function(event){ const target=event.target;const replyButton=target.closest('.btn-admin-reply'); if(replyButton){event.preventDefault();const commentId=replyButton.dataset.commentId;const replyFormDiv=document.getElementById(`reply-form-admin-${commentId}`); if(replyFormDiv){const isActive=replyFormDiv.style.display==='block';replyFormDiv.style.display=isActive?'none':'block';if(!isActive)replyFormDiv.querySelector('textarea')?.focus();const localMsg=replyFormDiv.querySelector('.form-message-local');if(localMsg){localMsg.textContent='';localMsg.style.display='none';}}return;} const deleteButton=target.closest('.btn-admin-delete-comment'); if(deleteButton){event.preventDefault();const commentId=deleteButton.dataset.commentId;if(currentEventIdForCommentsGl)deleteAdminComment(commentId,currentEventIdForCommentsGl);else alert("Errore: ID evento mancante.");return;}}); commentsListContainerUL.addEventListener('submit',async function(event){ const targetForm=event.target.closest('.reply-form-admin form');if(targetForm){event.preventDefault();const eventId=targetForm.dataset.eventId;await handleAdminReplySubmit(targetForm,eventId);}}); }
+    async function handleAdminReplySubmit(formElement,eventId){ const parentCommentId=formElement.dataset.parentCommentId;const replyText=formElement.querySelector('textarea[name="Descrizione"]').value.trim(); const feedbackEl=formElement.querySelector('.form-message-local');const submitBtn=formElement.querySelector('button[type="submit"]'); if(!replyText){if(feedbackEl){feedbackEl.textContent='Risposta vuota.';feedbackEl.className='form-message-local error-message';feedbackEl.style.display='block';}return;} const originalBtnHTML=submitBtn.innerHTML;if(submitBtn){submitBtn.disabled=true;submitBtn.innerHTML='<span class="spinner-mini"></span> Invio...';}if(feedbackEl){feedbackEl.textContent='';feedbackEl.style.display='none';}
+        try{const formData=new FormData();formData.append('action','submit_admin_reply');formData.append('event_id',eventId);formData.append('comment_id',parentCommentId);formData.append('reply_text',replyText); const response=await fetch('manage_comments_admin.php',{method:'POST',body:formData}); if(!response.ok){let errData={message:`Errore HTTP ${response.status}`};try{errData=await response.json();}catch(e){}throw new Error(errData.message||`Errore server`);} const result=await response.json(); if(result.success){if(feedbackEl){feedbackEl.textContent='Risposta inviata!';feedbackEl.className='form-message-local success-message';feedbackEl.style.display='block';setTimeout(()=>{if(feedbackEl){feedbackEl.style.display='none';feedbackEl.textContent='';}},3000);} formElement.reset();const replyFormDiv=formElement.closest('.reply-form-admin');if(replyFormDiv)replyFormDiv.style.display='none'; await openManageCommentsModal(eventId,document.getElementById('commentsEventTitle')?.textContent||"Evento");fetchDashboardData();}else throw new Error(result.message||'Errore invio.');}
+        catch(error){console.error("Errore invio risposta:",error);if(feedbackEl){feedbackEl.textContent=`Errore: ${sanitizeText(error.message)}`;feedbackEl.className='form-message-local error-message';feedbackEl.style.display='block';}} finally{if(submitBtn){submitBtn.disabled=false;submitBtn.innerHTML=originalBtnHTML;}}}
+    async function deleteAdminComment(commentId,eventIdForReload){ if(!confirm('Eliminare commento e risposte? Irreversibile.'))return; const feedbackDiv=document.getElementById('commentsManagementFeedback'); if(feedbackDiv)feedbackDiv.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
+        try{const formData=new FormData();formData.append('action','delete_comment');formData.append('comment_id',commentId); const response=await fetch('manage_comments_admin.php',{method:'POST',body:formData}); if(!response.ok){let errData={message:`Errore HTTP ${response.status}`};try{errData=await response.json();}catch(e){}throw new Error(errData.message||`Errore server`);} const result=await response.json(); if(result.success){if(feedbackDiv)feedbackDiv.innerHTML=`<p class="success-message">${sanitizeText(result.message)}</p>`;await openManageCommentsModal(eventIdForReload,document.getElementById('commentsEventTitle')?.textContent||"Evento");fetchDashboardData();}else throw new Error(result.message||"Errore eliminazione.");}
+        catch(error){console.error('Errore deleteComment:',error);if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(()=>{if(feedbackDiv&&!feedbackDiv.querySelector('.error-message'))feedbackDiv.innerHTML='';},3000);}
+    async function confirmDeleteEvent(eventId,eventTitle){ if(!confirm(`ATTENZIONE: Eliminare evento "${sanitizeText(eventTitle)}" (ID: ${eventId}) e dati associati? Irreversibile.`))return; const cardEl=document.getElementById(`admin-event-${eventId}`);if(cardEl)cardEl.style.opacity='0.5';
+        try{const formData=new FormData();formData.append('action','delete_event');formData.append('event_id',eventId); const response=await fetch('gestione_eventi.php',{method:'POST',body:formData});const result=await response.json(); alert(sanitizeText(result.message));if(result.success)fetchDashboardData();else if(cardEl)cardEl.style.opacity='1';}
+        catch(error){console.error('Errore deleteEvent:',error);alert(`Errore: ${sanitizeText(error.message)}`);if(cardEl)cardEl.style.opacity='1';}}
 
     // Inizializzazione Pagina
     document.addEventListener('DOMContentLoaded', () => {
-        // Gestione Sessione Admin (semplificata per il contesto dashboard)
-        const adminUserString = localStorage.getItem('adminUserEFF'); // Usa la stessa chiave delle altre pagine
-        let isAdminLoggedIn = false;
-        if (adminUserString) {
-            try {
-                const adminUser = JSON.parse(adminUserString);
-                if (adminUser && adminUser.isAdmin) {
-                    isAdminLoggedIn = true;
-                    const navUser = document.getElementById('navbar-username');
-                    if (navUser && adminUser.nome) navUser.textContent = adminUser.nome;
-                    else if (navUser) navUser.textContent = "Admin";
-
-                    const navAvatarImg = document.querySelector('#navbar-avatar img');
-                    if (navAvatarImg && adminUser.iconPath) navAvatarImg.src = adminUser.iconPath;
-                    else if (navAvatarImg) navAvatarImg.src = adminAvatarPath; // Fallback a logo se non c'è iconPath
-                    if(navAvatarImg) navAvatarImg.onerror = function() { this.src = adminAvatarPath; }
-
-                }
-            } catch (e) { console.error("Errore parsing dati admin:", e); }
-        }
-        if (!isAdminLoggedIn) {
-            // Se si vuole un reindirizzamento forzato se non è admin
-            // alert("Accesso non autorizzato.");
-            // window.location.href = 'login_admin.html'; // o index.html
-            // Per ora, la dashboard mostra i dati ma alcune azioni fallirebbero senza sessione PHP
-            console.warn("Nessun admin loggato via localStorage, alcune funzionalità potrebbero non essere disponibili.");
-        }
-
-
+        const adminUserString = localStorage.getItem('adminUserEFF');
+        if (adminUserString) { try { const adminUser = JSON.parse(adminUserString); const navUser=document.getElementById('navbar-username'); if(navUser&&adminUser.nome)navUser.textContent=adminUser.nome; const navAvatar=document.querySelector('#navbar-avatar img'); if(navAvatar&&adminUser.iconPath)navAvatar.src=adminUser.iconPath; else if(navAvatar)navAvatar.src=adminAvatarPath;} catch(e){console.error("Errore localStorage admin:",e);}}
         updatePriceFieldVisibilityDashboard();
-        const sortCriteriaSelect = document.getElementById('sortCriteria');
-        const sortDirectionSelect = document.getElementById('sortDirection');
-        const groupCriteriaSelect = document.getElementById('groupCriteria');
-
-        // Imposta valori di default per i select se necessario
-        if(sortDirectionSelect) sortDirectionSelect.value = 'desc'; // Default a Decrescente
-        if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese';
-        if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese';
-
-        if(sortCriteriaSelect) sortCriteriaSelect.addEventListener('change', applyFiltersAndRender);
-        if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender);
-        if(groupCriteriaSelect) groupCriteriaSelect.addEventListener('change', applyFiltersAndRender);
-
-        fetchDashboardData();
+        const sortCriteriaSelect = document.getElementById('sortCriteria'); const sortDirectionSelect = document.getElementById('sortDirection'); const groupCriteriaSelect = document.getElementById('groupCriteria');
+        if(sortDirectionSelect) sortDirectionSelect.value = 'asc'; if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese'; if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese';
+        if(sortCriteriaSelect) sortCriteriaSelect.addEventListener('change', applyFiltersAndRender); if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender); if(groupCriteriaSelect) groupCriteriaSelect.addEventListener('change', applyFiltersAndRender);
+        fetchDashboardData(); // Carica i dati all'avvio
     });
     // === FINE BLOCCO SCRIPT COMPLETO ===
 </script>
