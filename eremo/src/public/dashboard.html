@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Stili aggiuntivi per il layout dei bottoni e l'anteprima della card */
         .event-controls-header {
             display: flex;
             justify-content: space-between;
@@ -21,16 +20,17 @@
 
         .event-tabs-container-main {
             display: flex;
-            /* gap: -1px; Rimosso gap negativo, gestiamo i bordi direttamente */
             flex-grow: 1;
             align-items: flex-end;
         }
 
         .filter-trigger-container-main {
             position: relative;
-            margin-left: auto; /* Mantiene il filtro a destra */
+            margin-left: auto;
             align-self: flex-end;
+            display: inline-block; /* Assicura che il contenitore si adatti al pulsante */
         }
+
 
         .event-controls-header .event-tab-button {
             padding: 0.9rem 1.5rem;
@@ -48,7 +48,7 @@
             line-height: 1.4;
             text-align: center;
             justify-content: center;
-            margin-right: -1px; /* Sovrappone i bordi verticali dei tab */
+            margin-right: -1px;
         }
         .event-controls-header .event-tab-button:hover {
             background-color: #e0e0e0;
@@ -66,33 +66,24 @@
             color: var(--accent);
         }
 
-        /* Tab Eventi (Futuri, Archivio) */
+        .event-tabs-container-main .event-tab-button {
+            border-radius: 0;
+            border-right: none;
+        }
         .event-tabs-container-main .event-tab-button:first-child {
             border-top-left-radius: 10px;
-            border-top-right-radius: 0;
-            /* border-right: none; gestito da margin-right: -1px sopra */
         }
-        /* "Archivio Eventi" (ultimo dei tab principali) */
-        .event-tabs-container-main .event-tab-button:nth-child(2) { /* Se Archivio Eventi è sempre il secondo */
-            border-top-left-radius: 0;
-            border-top-right-radius: 10px;
-            /* border-right: 1px solid var(--gray-medium); Ripristina bordo destro se necessario prima del gap */
-        }
-        /* Se ci fossero più di due tab principali, e Archivio è l'ultimo di essi */
         .event-tabs-container-main > .event-tab-button:last-of-type {
             border-top-right-radius: 10px;
-            border-right: 1px solid var(--gray-medium); /* Assicura che l'ultimo tab abbia il bordo destro */
+            border-right: 1px solid var(--gray-medium);
         }
 
-
-        /* Bottone Filtri */
         .filter-trigger-container-main #filterToggleButton.event-tab-button {
-            border-top-left-radius: 10px;  /* Stondatura in alto a sinistra per Filtri */
-            border-top-right-radius: 10px; /* Stondatura in alto a destra per Filtri */
-            margin-right: 0; /* Nessun margine destro per l'ultimo elemento */
-            border-left: 1px solid var(--gray-medium); /* Bordo sinistro per separarlo */
-            /* Aggiungiamo un piccolo margine sinistro per separarlo visivamente dai tab */
-            margin-left: 8px; /* O il valore di gap che preferisci */
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            margin-right: 0;
+            border-left: 1px solid var(--gray-medium);
+            margin-left: 8px;
         }
         .filter-trigger-container-main #filterToggleButton.event-tab-button.active {
             border-bottom-color: var(--white);
@@ -112,7 +103,8 @@
             display: none;
             position: absolute;
             top: calc(100% - 1px);
-            right: 0;
+            right: 0; /* Allinea il bordo DESTRO del pannello con il bordo DESTRO del suo contenitore (.filter-trigger-container-main) */
+            left: auto; /* Assicura che 'left' non interferisca */
             z-index: 100;
             background-color: var(--white);
             border: 1px solid var(--gray-medium);
@@ -120,8 +112,20 @@
             box-shadow: var(--shadow-medium);
             padding: 1.5rem;
             width: 320px;
+            max-width: calc(100vw - 20px);
+            box-sizing: border-box; /* padding e border inclusi nella width */
             border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
         }
+        /* Se il pannello dovesse comunque "scappare" a destra, potresti provare ad ancorarlo forzatamente a sinistra del pulsante
+           ma questo avrebbe senso solo se il pulsante non è all'estrema destra della pagina.
+           Esempio alternativo (da testare con cautela, potrebbe non essere ciò che vuoi se il bottone è largo):
+        .filter-panel {
+            left: 0; // Allinea il bordo SINISTRO del pannello con il bordo SINISTRO del contenitore
+            right: auto;
+            border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium); // O tutti gli angoli se si apre diversamente
+        }
+        */
+
         .filter-panel.active {
             display: block;
             animation: fadeInDropdown 0.2s ease-out;
@@ -180,7 +184,6 @@
             outline: none;
         }
 
-
         .event-form-and-preview-container {
             display: flex;
             flex-wrap: wrap;
@@ -196,6 +199,15 @@
             border-radius: var(--border-radius-medium);
             border: 1px solid var(--gray-light);
         }
+        #eventFormDashboard .form-row {
+            margin-bottom: 1rem;
+        }
+        #eventFormDashboard .form-row-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
 
         #eventCardPreviewContainer {
             flex: 1;
@@ -273,7 +285,6 @@
         }
         #current-event-flyer-preview-dashboard a { font-size: 0.9rem; }
 
-        /* Responsive adjustments */
         @media (max-width: 767px) {
             .event-controls-header {
                 flex-direction: column;
@@ -281,20 +292,20 @@
             }
             .event-tabs-container-main {
                 width: 100%;
-                margin-bottom: 0; /* Rimosso -1px, gestiamo con z-index e bordi */
-                display: grid; /* Per far sì che i due tab occupino 50% ciascuno */
+                margin-bottom: 0;
+                display: grid;
                 grid-template-columns: 1fr 1fr;
             }
             .event-tabs-container-main .event-tab-button {
-                margin-right: 0; /* Rimuovi margine per i tab su mobile */
-                border-radius:0 !important; /* Reset completo */
-                border-bottom: 1px solid var(--gray-medium); /* Bordo inferiore per separarli dal filtro */
+                margin-right: 0;
+                border-radius:0 !important;
+                border-bottom: 1px solid var(--gray-medium);
             }
             .event-tabs-container-main .event-tab-button:first-child {
                 border-top-left-radius: 10px !important;
-                border-right: 1px solid var(--gray-medium); /* Bordo tra i due tab */
+                border-right: 1px solid var(--gray-medium);
             }
-            .event-tabs-container-main .event-tab-button:nth-child(2) { /* Archivio Eventi */
+            .event-tabs-container-main .event-tab-button:nth-child(2) {
                 border-top-right-radius: 10px !important;
             }
 
@@ -306,26 +317,27 @@
             .filter-trigger-container-main #filterToggleButton.event-tab-button {
                 width: 100%;
                 justify-content: center;
-                border-radius: 0 0 10px 10px !important; /* Stondato solo sotto */
-                border-left: 1px solid var(--gray-medium) !important; /* Bordo sinistro */
-                border-right: 1px solid var(--gray-medium) !important; /* Bordo destro */
-                margin-left: 0; /* Reset margine */
+                border-radius: 0 0 10px 10px !important;
+                border-left: 1px solid var(--gray-medium) !important;
+                border-right: 1px solid var(--gray-medium) !important;
+                margin-left: 0;
             }
             .filter-trigger-container-main #filterToggleButton.event-tab-button.active {
                 border-radius:0 !important;
-                border-bottom: none !important; /* Nasconde bordo inferiore quando attivo per unire al pannello */
+                border-bottom: none !important;
             }
 
             .filter-panel {
-                position: static;
-                width: 100%;
-                box-shadow: none;
-                border-radius: 0 0 10px 10px;
-                border-top: 1px solid var(--gray-medium); /* Mostra bordo sopra se il bottone non lo ha */
-                margin-bottom: 1rem;
+                position: static; /* Cambia a static per il layout mobile in colonna */
+                width: 100%; /* Occupa tutta la larghezza disponibile */
+                box-shadow: none; /* Rimuovi ombra se è in flusso normale */
+                border-radius: 0 0 10px 10px; /* Stondatura solo sotto */
+                border-top: 1px solid var(--gray-medium); /* Bordo sopra per separarlo dal bottone */
+                margin-bottom: 1rem; /* Spazio prima dei controlli di vista */
             }
+            /* Nasconde il bordo superiore del pannello se il bottone Filtri è attivo e "connesso" */
             .filter-trigger-container-main #filterToggleButton.event-tab-button.active + .filter-panel {
-                border-top: none; /* Nasconde il bordo superiore del pannello se il bottone è attivo */
+                border-top: none;
             }
 
 
@@ -515,14 +527,21 @@
                 <input type="text" id="event-title-dashboard" name="event-title" class="form-control" required>
             </div>
 
-            <div class="form-grid">
+            <div class="form-row">
                 <div class="form-group">
                     <label for="event-date-dashboard">Data Inizio*</label>
                     <input type="date" id="event-date-dashboard" name="event-date" class="form-control" required>
                 </div>
+            </div>
+
+            <div class="form-row-grid">
                 <div class="form-group">
-                    <label for="event-time-dashboard">Orario (HH:MM)</label>
-                    <input type="time" id="event-time-dashboard" name="event-time" class="form-control">
+                    <label for="event-start-time-dashboard">Orario Inizio (HH:MM)</label>
+                    <input type="time" id="event-start-time-dashboard" name="event-start-time" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="event-end-time-dashboard">Orario Fine (HH:MM)</label>
+                    <input type="time" id="event-end-time-dashboard" name="event-end-time" class="form-control">
                 </div>
             </div>
 
@@ -603,7 +622,7 @@
                 <div class="preview-card-content">
                     <h5 id="previewTitle">Titolo Evento</h5>
                     <p id="previewDate"><b>Data:</b> <span class="value">Seleziona data</span></p>
-                    <p id="previewTime"><b>Orario:</b> <span class="value"></span></p>
+                    <p id="previewTime" style="display:none;"><b>Orario:</b> <span class="value"></span></p>
                     <p id="previewSpeaker" class="preview-relatore"><b>Relatore:</b> <span class="value">Nome Relatore</span></p>
                     <p id="previewShortDesc">Descrizione breve dell'evento qui...</p>
                     <p id="previewSeats" class="preview-posti"><b>Posti:</b> <span class="value">0</span></p>
@@ -615,21 +634,19 @@
 </div>
 
 
-<footer>
+<footer >
     <p>© <span id="currentYear"></span> Eremo Frate Francesco. Operazioni Admin.</p>
 </footer>
 
 <script>
-    // === INIZIO BLOCCO SCRIPT COMPLETO ===
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 
     let allUpcomingEventsData = [];
     let allPastEventsData = [];
     const defaultUserIconPath = '/uploads/icons/default_user.png';
-    const adminAvatarPath = 'images/logo.png'; // Assicurati che questo percorso sia corretto
-    const adminNameGlobalJS = "Admin Eremo"; // Nome admin di default
+    const adminAvatarPath = 'images/logo.png';
+    const adminNameGlobalJS = "Admin Eremo";
 
-    // --- Navbar & Mobile Menu Logic ---
     const SnavbarContainer = document.getElementById('navbarContainer');
     let SlastScroll = 0;
     if (SnavbarContainer) {
@@ -686,8 +703,6 @@
         if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerEl && !hamburgerEl.contains(event.target) && !mobileMenuEl.contains(event.target)) {
             closeMobileMenu();
         }
-
-        // Chiudi il pannello filtri se si clicca fuori
         const filterPanel = document.getElementById('filterPanelDropdown');
         const filterToggle = document.getElementById('filterToggleButton');
         if (filterPanel && filterPanel.classList.contains('active') && !filterPanel.contains(event.target) && !filterToggle.contains(event.target)) {
@@ -696,15 +711,12 @@
             filterToggle.setAttribute('aria-expanded', 'false');
         }
     });
-
     function logout() {
-        localStorage.removeItem('adminUserEFF'); // Assicurati che la chiave sia corretta
+        localStorage.removeItem('adminUserEFF');
         alert('Logout effettuato.');
-        window.location.href = 'login_admin.html'; // O la tua pagina di login admin
+        window.location.href = 'login_admin.html';
     }
-    // --- Fine Navbar & Mobile Menu ---
 
-    // --- Logica Modali Generici ---
     function openModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) modal.classList.add('active');
@@ -713,12 +725,10 @@
     function closeModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) modal.classList.remove('active');
-        // Controlla se ci sono altri modal attivi prima di ripristinare lo scroll
         const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active');
         if (!anyModalActive) {
             document.body.style.overflow = '';
         }
-        // Reset specifici per modal
         if (modalId === 'uploadMediaModal') {
             document.getElementById('uploadMediaForm')?.reset();
             const uploadFeedback = document.getElementById('uploadMediaFeedback'); if (uploadFeedback) uploadFeedback.innerHTML = '';
@@ -726,11 +736,10 @@
         }
         if (modalId === 'manageCommentsModal') {
             let commentsListContainer = document.getElementById('commentsListContainer');
-            if (commentsListContainer && commentsListContainer.parentNode) { // Aggiunto controllo parentNode
-                const newClonedListContainer = commentsListContainer.cloneNode(false); // Pulisce i listener
+            if (commentsListContainer && commentsListContainer.parentNode) {
+                const newClonedListContainer = commentsListContainer.cloneNode(false);
                 newClonedListContainer.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p></li>';
                 commentsListContainer.parentNode.replaceChild(newClonedListContainer, commentsListContainer);
-                // Ri-attacca i listener al nuovo elemento se necessario, o gestiscili con delega eventi
             }
             const commentsFeedback = document.getElementById('commentsManagementFeedback'); if (commentsFeedback) commentsFeedback.innerHTML = '';
         }
@@ -739,45 +748,41 @@
             const bookingsFeedback = document.getElementById('bookingsManagementFeedbackModal'); if (bookingsFeedback) bookingsFeedback.innerHTML = '';
         }
     }
-    window.onclick = function(event) { // Gestione chiusura modal cliccando sull'overlay
+    window.onclick = function(event) {
         const genericModals = document.querySelectorAll('.modal');
         genericModals.forEach(modal => { if (event.target === modal && modal.classList.contains('active')) closeModal(modal.id); });
 
         const eventPopupOverlay = document.getElementById('eventPopupOverlayDashboard');
         if (eventPopupOverlay && event.target === eventPopupOverlay && eventPopupOverlay.classList.contains('active')) closeEventPopupDashboard();
     };
-    // --- Fine Logica Modali Generici ---
-
-    // --- Funzioni Utility ---
     function sanitizeText(text) {
         if (text === null || typeof text === 'undefined') return '';
         const element = document.createElement('div'); element.innerText = String(text); return element.innerHTML;
     }
-    function sanitizeTextForHTML(str) { // Per textarea visualizzate come HTML (es. descrizioni)
+    function sanitizeTextForHTML(str) {
         if (typeof str !== 'string') str = String(str || '');
         const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');
     }
-    function sanitizeForAttribute(str) { // Per valori di attributi HTML
+    function sanitizeForAttribute(str) {
         if (typeof str !== 'string' || str === null) return '';
         return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
     }
-    function formatDbDate(dateString) { // Formatta YYYY-MM-DD in DD/MM/YYYY
+    function formatDbDate(dateString) {
         if (!dateString) return 'N/D';
         try {
-            // Prova a creare una data, gestendo il fuso orario per evitare off-by-one
             const parts = dateString.substring(0, 10).split('-');
             if (parts.length === 3) {
                 const year = parseInt(parts[0]);
-                const month = parseInt(parts[1]) -1; // Mesi sono 0-indexed
+                const month = parseInt(parts[1]) -1;
                 const day = parseInt(parts[2]);
-                const date = new Date(Date.UTC(year, month, day)); // Usa UTC per consistenza
-                if (isNaN(date.getTime())) return dateString; // Data non valida
+                const date = new Date(Date.UTC(year, month, day));
+                if (isNaN(date.getTime())) return dateString;
                 return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
             }
-            return dateString; // Se non è nel formato atteso
+            return dateString;
         } catch (e) {
             console.warn("Errore formattazione data DB:", dateString, e);
-            return dateString; // Fallback alla stringa originale
+            return dateString;
         }
     }
     function formatMonthYear(dateString) {
@@ -802,9 +807,7 @@
         const months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
         return months.indexOf(monthName.toLowerCase());
     }
-    // --- Fine Funzioni Utility ---
 
-    // --- Logica Pop-up Aggiungi/Modifica Evento ---
     const eventPopupOverlayDashboard = document.getElementById('eventPopupOverlayDashboard');
     const eventPopupDashboard = document.getElementById('eventPopupDashboard');
     const closeEventPopupBtnDashboard = document.getElementById('closeEventPopupBtnDashboard');
@@ -818,12 +821,12 @@
     const currentImagePreviewDashboard = document.getElementById('current-event-image-preview-dashboard');
     const currentFlyerPreviewDashboard = document.getElementById('current-event-flyer-preview-dashboard');
 
-    // Elementi per l'anteprima dinamica
     const previewImageEl = document.getElementById('previewImage');
     const previewNoImagePlaceholder = document.querySelector('#eventCardPreviewContainer .no-image-placeholder');
     const previewTitleEl = document.getElementById('previewTitle');
     const previewDateEl = document.querySelector('#previewDate .value');
     const previewTimeEl = document.querySelector('#previewTime .value');
+    const previewTimeContainerEl = document.getElementById('previewTime');
     const previewSpeakerEl = document.querySelector('#previewSpeaker .value');
     const previewShortDescEl = document.getElementById('previewShortDesc');
     const previewSeatsEl = document.querySelector('#previewSeats .value');
@@ -835,30 +838,34 @@
             const isVoluntary = voluntaryCheckboxDashboard.checked;
             priceContainerDashboard.style.display = isVoluntary ? 'none' : 'block';
             eventPriceInputDashboard.required = !isVoluntary;
-            if (isVoluntary) {
-                eventPriceInputDashboard.value = ''; // Pulisci il prezzo se offerta libera
-            }
-            updateEventPreview(); // Aggiorna l'anteprima quando cambia lo stato di offerta libera
+            if (isVoluntary) eventPriceInputDashboard.value = '';
+            updateEventPreview();
         }
     }
     if (voluntaryCheckboxDashboard) voluntaryCheckboxDashboard.addEventListener('change', updatePriceFieldVisibilityDashboard);
 
 
     function updateEventPreview() {
-        if (!previewTitleEl) return; // Se l'anteprima non è visibile/esiste
+        if (!previewTitleEl) return;
 
         previewTitleEl.textContent = document.getElementById('event-title-dashboard').value || 'Titolo Evento';
-
         const dateValue = document.getElementById('event-date-dashboard').value;
         previewDateEl.textContent = dateValue ? formatDbDate(dateValue) : 'Seleziona data';
 
-        const timeValue = document.getElementById('event-time-dashboard').value;
-        const timeContainer = document.getElementById('previewTime');
-        if (timeValue) {
-            timeContainer.style.display = 'block';
-            previewTimeEl.textContent = timeValue;
-        } else {
-            timeContainer.style.display = 'none';
+        const startTimeValue = document.getElementById('event-start-time-dashboard').value;
+        const endTimeValue = document.getElementById('event-end-time-dashboard').value;
+        let timeString = '';
+        if (startTimeValue && endTimeValue) {
+            timeString = `${startTimeValue} - ${endTimeValue}`;
+        } else if (startTimeValue) {
+            timeString = startTimeValue;
+        }
+
+        if (timeString && previewTimeContainerEl && previewTimeEl) {
+            previewTimeContainerEl.style.display = 'block';
+            previewTimeEl.textContent = timeString;
+        } else if (previewTimeContainerEl && previewTimeEl) {
+            previewTimeContainerEl.style.display = 'none';
             previewTimeEl.textContent = '';
         }
 
@@ -866,7 +873,7 @@
         const speakerName = document.getElementById('event-speaker-dashboard').value || 'Nome Relatore';
         previewSpeakerEl.textContent = `${speakerPrefix}: ${speakerName}`;
 
-        previewShortDescEl.textContent = document.getElementById('event-short-desc-dashboard').value || 'Descrizione breve dell evento qui...';
+        previewShortDescEl.textContent = document.getElementById('event-short-desc-dashboard').value || 'Descrizione breve dell\'evento qui...';
         previewSeatsEl.textContent = document.getElementById('event-seats-dashboard').value || '0';
 
         const isVoluntary = document.getElementById('event-voluntary-dashboard').checked;
@@ -877,7 +884,6 @@
             previewPriceEl.textContent = !isNaN(priceValue) && priceValue > 0 ? `€ ${priceValue.toFixed(2)}` : '€ 0.00';
         }
 
-        // Anteprima immagine
         const imageInput = document.getElementById('event-image-dashboard');
         if (imageInput.files && imageInput.files[0]) {
             const reader = new FileReader();
@@ -888,21 +894,20 @@
             }
             reader.readAsDataURL(imageInput.files[0]);
         } else if (currentImagePreviewDashboard && currentImagePreviewDashboard.src !== '#' && currentImagePreviewDashboard.style.display !== 'none') {
-            // Se c'è un'immagine corrente e nessun nuovo file, usa quella corrente
             previewImageEl.src = currentImagePreviewDashboard.src;
             previewImageEl.style.display = 'block';
             if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
         } else {
-            // Nessun file e nessuna immagine corrente, mostra placeholder o immagine di default
-            previewImageEl.src = 'images/default-event.jpg'; // o nascondi e mostra placeholder
-            // previewImageEl.style.display = 'none';
-            // if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'block';
+            previewImageEl.src = 'images/default-event.jpg';
+            previewImageEl.style.display = 'block';
+            if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
         }
     }
 
     function attachPreviewListeners() {
         const formElementsToWatch = [
-            'event-title-dashboard', 'event-date-dashboard', 'event-time-dashboard',
+            'event-title-dashboard', 'event-date-dashboard',
+            'event-start-time-dashboard', 'event-end-time-dashboard',
             'event-short-desc-dashboard', 'event-prefix-dashboard', 'event-speaker-dashboard',
             'event-seats-dashboard', 'event-price-dashboard', 'event-voluntary-dashboard',
             'event-image-dashboard'
@@ -911,7 +916,7 @@
             const element = document.getElementById(id);
             if (element) {
                 element.addEventListener('input', updateEventPreview);
-                if (element.type === 'checkbox' || element.type === 'file') { // Anche per 'change' su checkbox e file
+                if (element.type === 'checkbox' || element.type === 'file') {
                     element.addEventListener('change', updateEventPreview);
                 }
             }
@@ -920,12 +925,15 @@
 
 
     function openEventPopupDashboard(eventData = null) {
-        if (!eventFormDashboard || !eventPopupTitleDashboard || !eventIdInputDashboard || !currentImagePreviewDashboard || !currentFlyerPreviewDashboard || !eventFormMessageDashboard) { console.error("Elementi popup evento mancanti."); return; }
+        if (!eventFormDashboard || !eventPopupTitleDashboard || !eventIdInputDashboard) { console.error("Elementi popup evento mancanti."); return; }
         eventFormDashboard.reset();
-        updatePriceFieldVisibilityDashboard(); // Deve essere chiamato dopo reset e prima di popolare i campi
+        updatePriceFieldVisibilityDashboard();
         eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';
         currentImagePreviewDashboard.style.display = 'none'; currentImagePreviewDashboard.src = '#';
         currentFlyerPreviewDashboard.innerHTML = '';
+
+        document.getElementById('event-start-time-dashboard').value = '';
+        document.getElementById('event-end-time-dashboard').value = '';
 
         if (eventData) {
             eventPopupTitleDashboard.textContent = 'Modifica Evento'; eventIdInputDashboard.value = eventData.IDEvento;
@@ -933,19 +941,18 @@
             const eventDate = eventData.Data ? new Date(eventData.Data.replace(/-/g, '/')) : null;
             document.getElementById('event-date-dashboard').value = (eventDate && !isNaN(eventDate)) ? eventDate.toISOString().split('T')[0] : '';
 
-            // Gestione orario: se è una stringa "HH:MM:SS", prendi solo HH:MM
-            let eventTime = eventData.Durata || '';
-            if (eventTime && eventTime.match(/^\d{2}:\d{2}:\d{2}$/)) {
-                eventTime = eventTime.substring(0, 5);
-            } else if (eventTime && !eventTime.match(/^\d{2}:\d{2}$/)) {
-                // Se non è nel formato HH:MM o HH:MM:SS, potrebbe essere un testo descrittivo.
-                // In tal caso, il campo time non lo accetterà, quindi lo lasciamo vuoto o gestiamo diversamente.
-                // Per ora, se non è HH:MM, lo impostiamo vuoto per il campo time.
-                // Potresti voler mantenere il testo originale in un campo separato se necessario.
-                console.warn("Formato orario non standard:", eventData.Durata, "Impostato a vuoto per input time.");
-                eventTime = '';
+            let startTime = '';
+            let endTime = '';
+            const durata = eventData.Durata || '';
+            if (durata.includes('-')) {
+                const parts = durata.split('-');
+                startTime = parts[0].trim().match(/^\d{2}:\d{2}/) ? parts[0].trim().substring(0,5) : '';
+                endTime = parts[1].trim().match(/^\d{2}:\d{2}/) ? parts[1].trim().substring(0,5) : '';
+            } else if (durata.match(/^\d{2}:\d{2}/)) {
+                startTime = durata.substring(0,5);
             }
-            document.getElementById('event-time-dashboard').value = eventTime;
+            document.getElementById('event-start-time-dashboard').value = startTime;
+            document.getElementById('event-end-time-dashboard').value = endTime;
 
             document.getElementById('event-short-desc-dashboard').value = eventData.descrizione || '';
             document.getElementById('event-long-desc-dashboard').value = eventData.descrizione_estesa || '';
@@ -953,10 +960,10 @@
             document.getElementById('event-speaker-dashboard').value = eventData.relatore || '';
             document.getElementById('event-association-dashboard').value = eventData.associazione || '';
             document.getElementById('event-seats-dashboard').value = eventData.posti_configurati_totali !== null ? eventData.posti_configurati_totali : '0';
-            document.getElementById('event-booking-dashboard').checked = !!parseInt(eventData.FlagPrenotabile); // Assicura che sia booleano
+            document.getElementById('event-booking-dashboard').checked = !!parseInt(eventData.FlagPrenotabile);
 
             voluntaryCheckboxDashboard.checked = eventData.costo !== null && parseFloat(eventData.costo) === 0;
-            updatePriceFieldVisibilityDashboard(); // Chiamata importante dopo aver settato il checkbox
+            updatePriceFieldVisibilityDashboard();
 
             if (!voluntaryCheckboxDashboard.checked && eventData.costo !== null && parseFloat(eventData.costo) > 0) {
                 eventPriceInputDashboard.value = parseFloat(eventData.costo).toFixed(2);
@@ -966,17 +973,17 @@
 
             if (eventData.immagine_url) { currentImagePreviewDashboard.src = eventData.immagine_url; currentImagePreviewDashboard.style.display = 'block'; }
             if (eventData.volantino_url) { const fileName = eventData.volantino_url.split('/').pop(); currentFlyerPreviewDashboard.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank">Vedi volantino (${sanitizeText(fileName)})</a>`; }
-        } else { // Nuovo evento
+        } else {
             eventPopupTitleDashboard.textContent = 'Aggiungi Nuovo Evento'; eventIdInputDashboard.value = '';
             document.getElementById('event-booking-dashboard').checked = true;
             voluntaryCheckboxDashboard.checked = false;
-            updatePriceFieldVisibilityDashboard(); // Chiamata dopo aver settato il checkbox
+            updatePriceFieldVisibilityDashboard();
             document.getElementById('event-seats-dashboard').value = '50';
             document.getElementById('event-prefix-dashboard').value = 'Relatore';
-            eventPriceInputDashboard.value = ''; // Assicura che il prezzo sia vuoto per nuovi eventi
+            eventPriceInputDashboard.value = '';
         }
 
-        updateEventPreview(); // Aggiorna l'anteprima con i dati caricati o di default
+        updateEventPreview();
 
         if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.add('active');
         if(eventPopupDashboard) eventPopupDashboard.classList.add('active');
@@ -1007,9 +1014,19 @@
             const formData = new FormData(this);
             formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
             if (formData.get('event-voluntary') === 'on') formData.set('event-price', '0.00');
-            else if (!formData.get('event-price') && !formData.get('event-voluntary')) { // Se il prezzo è vuoto e non è offerta libera, imposta a 0
+            else if (!formData.get('event-price') && !formData.get('event-voluntary')) {
                 formData.set('event-price', '0.00');
             }
+
+            const startTime = formData.get('event-start-time');
+            const endTime = formData.get('event-end-time');
+            let durataString = '';
+            if (startTime && endTime) {
+                durataString = `${startTime}-${endTime}`;
+            } else if (startTime) {
+                durataString = startTime;
+            }
+            formData.append('event-time-combined', durataString);
 
 
             const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
@@ -1023,7 +1040,7 @@
                     eventFormMessageDashboard.textContent = result.message || 'Operazione completata!';
                     eventFormMessageDashboard.classList.remove('error'); eventFormMessageDashboard.classList.add('success');
                 }
-                await fetchDashboardData(); // Ricarica i dati della dashboard
+                await fetchDashboardData();
                 setTimeout(closeEventPopupDashboard, 1500);
             } else {
                 throw new Error(result.message || 'Errore salvataggio.');
@@ -1039,16 +1056,12 @@
             submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText;
         }
     });
-    // --- Fine Logica Pop-up Evento ---
 
-    // --- Logica Tabs Eventi ---
-    const tabButtons = document.querySelectorAll('.event-tabs-container-main .event-tab-button'); // Selettore più specifico
+    const tabButtons = document.querySelectorAll('.event-tabs-container-main .event-tab-button');
     const tabContents = document.querySelectorAll('#eventManagementContent .event-tab-content');
-
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // Gestione tab eventi (futuri/passati)
-            if (!button.id || !button.id.startsWith('filterToggle')) { // Non agire se è il bottone filtro
+            if (!button.id || !button.id.startsWith('filterToggle')) {
                 tabButtons.forEach(btn => {
                     if (!btn.id || !btn.id.startsWith('filterToggle')) btn.classList.remove('active');
                 });
@@ -1062,9 +1075,7 @@
             }
         });
     });
-    // --- Fine Logica Tabs Eventi ---
 
-    // --- Logica Filtro Dropdown ---
     const filterToggleButton = document.getElementById('filterToggleButton');
     const filterPanelDropdown = document.getElementById('filterPanelDropdown');
     const applyFiltersFromPanelBtn = document.getElementById('applyFiltersFromPanelBtn');
@@ -1072,7 +1083,7 @@
 
     if (filterToggleButton && filterPanelDropdown) {
         filterToggleButton.addEventListener('click', function(event) {
-            event.stopPropagation(); // Impedisce la chiusura immediata dal listener su document
+            event.stopPropagation();
             const isActive = filterPanelDropdown.classList.toggle('active');
             filterToggleButton.classList.toggle('active', isActive);
             filterToggleButton.setAttribute('aria-expanded', isActive.toString());
@@ -1087,15 +1098,11 @@
         const searchTitleInput = document.getElementById('searchTitleDashboard'); if(searchTitleInput) searchTitleInput.value = '';
         const searchDateInput = document.getElementById('searchDateDashboard'); if(searchDateInput) searchDateInput.value = '';
         const searchSpeakerInput = document.getElementById('searchSpeakerDashboard'); if(searchSpeakerInput) searchSpeakerInput.value = '';
-        // Non applica subito, l'utente premerà "Applica" o la chiusura del pannello potrebbe applicare
-        applyFiltersAndRender(); // Applica subito il reset
+        applyFiltersAndRender();
         if (filterPanelDropdown) filterPanelDropdown.classList.remove('active');
         if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}
     });
-    // --- Fine Logica Filtro Dropdown ---
 
-
-    // --- Logica Caricamento Dati Dashboard, Filtri, Ordinamento e Raggruppamento ---
     async function fetchDashboardData() {
         const upcomingGrid = document.getElementById('upcomingEventsGrid');
         const pastGrid = document.getElementById('pastEventsGrid');
@@ -1104,7 +1111,7 @@
         upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>';
         pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento archivio eventi...</p>';
         try {
-            const response = await fetch('get_dashboard_event_data.php'); // Assicurati che esista questo script PHP
+            const response = await fetch('get_dashboard_event_data.php');
             if (!response.ok) throw new Error(`Errore HTTP: ${response.status} ${response.statusText}`);
             const data = await response.json();
 
@@ -1125,7 +1132,7 @@
 
     function applyFiltersAndRender() {
         const titleFilter = document.getElementById('searchTitleDashboard').value.toLowerCase().trim();
-        const dateFilter = document.getElementById('searchDateDashboard').value; // YYYY-MM
+        const dateFilter = document.getElementById('searchDateDashboard').value;
         const speakerFilter = document.getElementById('searchSpeakerDashboard').value.toLowerCase().trim();
         const sortBy = document.getElementById('sortCriteria').value;
         const sortDirection = document.getElementById('sortDirection').value;
@@ -1133,7 +1140,7 @@
 
         const filterEvent = (event) => {
             const eventTitle = event.Titolo?.toLowerCase() || '';
-            const eventDateStr = event.Data || ''; // YYYY-MM-DD
+            const eventDateStr = event.Data || '';
             const eventSpeaker = event.relatore?.toLowerCase() || '';
 
             let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
@@ -1150,7 +1157,7 @@
             let comparison = 0;
 
             switch (sortBy) {
-                case 'mese': // Data Evento
+                case 'mese':
                     valA = new Date(a.Data);
                     valB = new Date(b.Data);
                     if (valA < valB) comparison = -1;
@@ -1184,26 +1191,22 @@
                     if (valA < valB) comparison = -1;
                     if (valA > valB) comparison = 1;
                     break;
-                default: // Default to date
+                default:
                     valA = new Date(a.Data);
                     valB = new Date(b.Data);
                     if (valA < valB) comparison = -1;
                     if (valA > valB) comparison = 1;
             }
 
-            // Se i valori primari sono uguali, ordina per data (crescente per default)
             if (comparison === 0 && sortBy !== 'mese') {
                 let dateA = new Date(a.Data);
                 let dateB = new Date(b.Data);
                 if (dateA < dateB) comparison = -1;
                 if (dateA > dateB) comparison = 1;
             }
-            // Se ancora uguali, ordina per ID per stabilità (crescente)
             if (comparison === 0) {
                 comparison = (parseInt(a.IDEvento) || 0) < (parseInt(b.IDEvento) || 0) ? -1 : 1;
             }
-
-
             return sortDirection === 'asc' ? comparison : -comparison;
         };
 
@@ -1214,16 +1217,15 @@
         renderEventsSection(filteredPast, 'pastEventsGrid', false, groupBy, sortDirection);
     }
 
-
-    function getWeekStartDate(dInput) { // dInput è una stringa YYYY-MM-DD
+    function getWeekStartDate(dInput) {
         const parts = dInput.split('-');
         const d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
-        const day = d.getUTCDay(); // 0 per Domenica, 1 per Lunedì...
-        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1); // Imposta Lunedì come primo giorno della settimana
+        const day = d.getUTCDay();
+        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
         return new Date(d.setUTCDate(diff));
     }
 
-    function getWeekRangeString(dateStr) { // dateStr è YYYY-MM-DD
+    function getWeekRangeString(dateStr) {
         if (!dateStr || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return 'Data non valida';
         try {
             const weekStart = getWeekStartDate(dateStr);
@@ -1239,11 +1241,10 @@
         }
     }
 
-
     function renderEventsSection(events, gridContainerId, isUpcoming, groupBy, sortDirection) {
         const gridContainer = document.getElementById(gridContainerId);
         if (!gridContainer) return;
-        gridContainer.innerHTML = ''; // Pulisce la griglia
+        gridContainer.innerHTML = '';
 
         if (isUpcoming) {
             const addEventBar = document.createElement('div');
@@ -1254,7 +1255,6 @@
         }
 
         if (events.length === 0) {
-            // Se è la griglia degli eventi futuri e l'unico elemento è la barra "Aggiungi", non mostrare "Nessun evento"
             if (!(isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar'))) {
                 gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'} trovato con i filtri applicati.</p>`;
             }
@@ -1285,16 +1285,14 @@
 
         let sortedGroupKeys = Object.keys(groupedEvents);
 
-        // Ordinamento delle chiavi di gruppo (es. mesi, anni)
         if (groupBy === 'giorno' || groupBy === 'settimana' || groupBy === 'mese' || groupBy === 'anno') {
             sortedGroupKeys.sort((a, b) => {
                 let dateA, dateB;
                 try {
-                    if (groupBy === 'giorno') { // Formato DD/MM/YYYY
+                    if (groupBy === 'giorno') {
                         const pA = a.split('/'); dateA = new Date(Date.UTC(pA[2], pA[1]-1, pA[0]));
                         const pB = b.split('/'); dateB = new Date(Date.UTC(pB[2], pB[1]-1, pB[0]));
-                    } else if (groupBy === 'settimana') { // Formato "Sett. DD Mmm - DD Mmm YYYY"
-                        // Estrai la data di inizio settimana per l'ordinamento
+                    } else if (groupBy === 'settimana') {
                         const matchA = a.match(/Sett\. (\d{2}) (\w+)/);
                         const yearA = parseInt(a.substring(a.lastIndexOf(' ') + 1));
                         if (matchA) dateA = new Date(Date.UTC(yearA, getMonthIndexFromString(matchA[2]), parseInt(matchA[1])));
@@ -1303,38 +1301,34 @@
                         const yearB = parseInt(b.substring(b.lastIndexOf(' ') + 1));
                         if (matchB) dateB = new Date(Date.UTC(yearB, getMonthIndexFromString(matchB[2]), parseInt(matchB[1])));
 
-                    } else if (groupBy === 'mese') { // Formato "mese YYYY"
+                    } else if (groupBy === 'mese') {
                         const pA = a.split(' '); dateA = new Date(Date.UTC(pA[1], getMonthIndexFromString(pA[0]), 1));
                         const pB = b.split(' '); dateB = new Date(Date.UTC(pB[1], getMonthIndexFromString(pB[0]), 1));
-                    } else if (groupBy === 'anno') { // Formato "YYYY"
+                    } else if (groupBy === 'anno') {
                         dateA = new Date(Date.UTC(a, 0, 1));
                         dateB = new Date(Date.UTC(b, 0, 1));
                     }
                 } catch(e) {
-                    // Fallback a ordinamento stringa se il parsing fallisce
                     return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
                 }
 
                 if (dateA && dateB && !isNaN(dateA) && !isNaN(dateB)) {
                     return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
                 }
-                // Fallback per chiavi non parsabili come date (es. 'Data sconosciuta')
                 return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
             });
         } else if (groupBy === 'relatore') {
             sortedGroupKeys.sort((a,b) => sortDirection === 'asc' ? a.localeCompare(b,'it',{sensitivity:'base'}) : b.localeCompare(a,'it',{sensitivity:'base'}));
         }
 
-
         for (const groupKey of sortedGroupKeys) {
             const headerEl = document.createElement('h3');
-            headerEl.className = 'month-year-header'; // O una classe più generica se serve
+            headerEl.className = 'month-year-header';
             headerEl.textContent = groupKey;
             gridContainer.appendChild(headerEl);
             groupedEvents[groupKey].forEach(event => gridContainer.appendChild(createAdminEventCard(event)));
         }
     }
-
 
     function createAdminEventCard(event) {
         const eventCard = document.createElement('article');
@@ -1399,10 +1393,6 @@
         });
         return eventCard;
     }
-
-    // --- Funzioni Gestione Prenotazioni, Media, Commenti, Eliminazione Evento ---
-    // (Queste funzioni rimangono sostanzialmente invariate, ma assicurati che i selettori e i dati usati siano corretti)
-
     function openManageBookingsModal(eventData) {
         const modalTitleEl = document.getElementById('bookingsEventTitle');
         const bookingsContainerEl = document.getElementById('bookingsListContainerModal');
@@ -1413,13 +1403,12 @@
         if (bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento);
         openModal('manageBookingsModal');
     }
-
     function renderGroupedBookings(bookings, eventId) {
         if (!bookings || bookings.length === 0) return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione per questo evento.</p>';
         let html = '';
         bookings.forEach(booking => {
             const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim();
-            const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto); // Fallback all'email/contatto
+            const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto);
             const partecipantiHTML = booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0
                 ? `<ul class="participant-list-inline">${booking.partecipanti_della_prenotazione.map(p => `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`).join('')}</ul>`
                 : '<p><small>Nessun dettaglio partecipante fornito.</small></p>';
@@ -1439,33 +1428,30 @@
         });
         return html;
     }
-
     function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) {
         if (confirm(`Sei sicuro di voler annullare la prenotazione ID ${idPrenotazione} (${numPosti} posti) effettuata da ${nomeUtente}? L'azione è irreversibile.`)) {
             cancelBookingInModal(idPrenotazione, eventId);
         }
     }
-
     async function cancelBookingInModal(idPrenotazione, eventIdForModalReload) {
         const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
         if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento in corso...</p>`;
         try {
             const formData = new FormData();
             formData.append('id_prenotazione', idPrenotazione);
-            // Assicurati che 'annulla_prenotazione_admin.php' esista e gestisca la richiesta
             const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData });
             const result = await response.json();
 
             if (feedbackEl) {
                 if (result.success) {
                     feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`;
-                    await fetchDashboardData(); // Ricarica tutti i dati per aggiornare le card
+                    await fetchDashboardData();
                     const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === String(eventIdForModalReload));
-                    if(updatedEventData) { // Se l'evento esiste ancora, aggiorna il modal delle prenotazioni
+                    if(updatedEventData) {
                         const bookingsContainerEl = document.getElementById('bookingsListContainerModal');
                         if(bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(updatedEventData.elenco_prenotazioni || [], updatedEventData.IDEvento);
                     } else {
-                        closeModal('manageBookingsModal'); // Chiudi se l'evento non c'è più (improbabile in questo scenario)
+                        closeModal('manageBookingsModal');
                     }
                 } else {
                     feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare la prenotazione.')}</p>`;
@@ -1476,7 +1462,6 @@
             if (feedbackEl) feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore di connessione: ${sanitizeText(error.message)}</p>`;
         }
     }
-
     async function openManageMediaModal(eventId, eventTitle) {
         const eventIdInput = document.getElementById('uploadMediaEventId');
         const eventTitleEl = document.getElementById('uploadMediaEventTitle');
@@ -1492,7 +1477,6 @@
         openModal('uploadMediaModal');
 
         try {
-            // Assicurati che 'manage_event_media.php' esista e gestisca l'azione 'get_event_media'
             const response = await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`);
             const result = await response.json();
             if (result.success && result.media) {
@@ -1505,7 +1489,6 @@
             if(existingMediaContainer) existingMediaContainer.innerHTML = `<p class="error-message">Errore durante il caricamento dei media: ${sanitizeText(error.message)}</p>`;
         }
     }
-
     function renderExistingMedia(mediaItems, eventId) {
         const container = document.getElementById('existingMediaContainer');
         if (!container) return;
@@ -1521,9 +1504,8 @@
             if (item.tipo_media === 'image') {
                 mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Visualizza: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><img src="${sanitizeForAttribute(item.url_media)}" alt="${itemDesc || filename}" loading="lazy" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;" title="Immagine: ${sanitizeForAttribute(filename)}"><i class="fas fa-image"></i></div>`;
             } else if (item.tipo_media === 'video') {
-                // Potresti voler usare un tag <video> per l'anteprima se il browser lo supporta per i tipi comuni
                 mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Guarda: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`;
-            } else { // PDF o altro
+            } else {
                 mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Apri: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`;
             }
 
@@ -1547,7 +1529,6 @@
             });
         });
     }
-
     async function deleteMediaItem(mediaId, eventId) {
         const feedbackDiv = document.getElementById('uploadMediaFeedback');
         if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione media in corso...</p>';
@@ -1555,13 +1536,11 @@
             const formData = new FormData();
             formData.append('action', 'delete_event_media');
             formData.append('media_id', mediaId);
-            // Assicurati che 'manage_event_media.php' gestisca 'delete_event_media'
             const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
             const result = await response.json();
 
             if (result.success) {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                // Ricarica la lista dei media e i dati della dashboard per aggiornare i conteggi
                 openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento");
                 fetchDashboardData();
             } else {
@@ -1571,9 +1550,8 @@
             console.error('Errore eliminazione media:', error);
             if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore di connessione: ${sanitizeText(error.message)}</p>`;
         }
-        setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 4000); // Pulisce il feedback dopo un po'
+        setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 4000);
     }
-
     const eventUploadMediaForm = document.getElementById('uploadMediaForm');
     if(eventUploadMediaForm) eventUploadMediaForm.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -1587,20 +1565,19 @@
         }
         if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media in corso...</p>';
 
-        const formData = new FormData(this); // 'this' è il form
-        formData.set('action', 'upload_media'); // Sovrascrive o aggiunge 'action'
-        formData.set('event_id', eventId); // Sovrascrive o aggiunge 'event_id'
+        const formData = new FormData(this);
+        formData.set('action', 'upload_media');
+        formData.set('event_id', eventId);
 
         try {
-            // Assicurati che 'manage_event_media.php' gestisca 'upload_media'
             const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
             const result = await response.json();
 
             if (result.success) {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                this.reset(); // Resetta il form dopo il successo
-                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); // Ricarica i media
-                fetchDashboardData(); // Aggiorna i conteggi nella dashboard
+                this.reset();
+                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento");
+                fetchDashboardData();
             } else {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore upload: ${sanitizeText(result.message)}</p>`;
             }
@@ -1608,29 +1585,27 @@
             console.error('Errore uploadMedia:', error);
             if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore di connessione o risposta server non valida: ${sanitizeText(error.message)}</p>`;
         }
-        setTimeout(() => { if(feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 5000); // Pulisce solo i messaggi di successo
+        setTimeout(() => { if(feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 5000);
     });
-
     let currentEventIdForCommentsGl = null;
     async function openManageCommentsModal(eventId, eventTitle) {
         currentEventIdForCommentsGl = eventId;
         const titleEl = document.getElementById('commentsEventTitle');
-        let listContainerEl = document.getElementById('commentsListContainer'); // Nota: questo è un UL
+        let listContainerEl = document.getElementById('commentsListContainer');
         const feedbackEl = document.getElementById('commentsManagementFeedback');
 
         if(titleEl) titleEl.textContent = sanitizeText(eventTitle);
         if(feedbackEl) feedbackEl.innerHTML = '';
 
-        // Pulisci e ricrea il contenitore dei commenti per evitare listener duplicati
         if (listContainerEl && listContainerEl.parentNode) {
-            const newClonedListContainer = listContainerEl.cloneNode(false); // true per clonare figli, false solo il nodo
+            const newClonedListContainer = listContainerEl.cloneNode(false);
             listContainerEl.parentNode.replaceChild(newClonedListContainer, listContainerEl);
-            listContainerEl = newClonedListContainer; // Usa il nuovo contenitore
-            attachAdminCommentListeners(listContainerEl); // Attacca listener al nuovo contenitore
+            listContainerEl = newClonedListContainer;
+            attachAdminCommentListeners(listContainerEl);
         } else {
             console.error("Elemento commentsListContainer non trovato o senza genitore.");
             if(feedbackEl) feedbackEl.innerHTML = '<p class="error-message">Errore UI: impossibile inizializzare la lista commenti.</p>';
-            openModal('manageCommentsModal'); // Apre il modal anche se c'è un errore UI per mostrare il messaggio
+            openModal('manageCommentsModal');
             return;
         }
 
@@ -1638,11 +1613,10 @@
         openModal('manageCommentsModal');
 
         try {
-            // Assicurati che 'manage_comments_admin.php' esista e gestisca 'get_comments'
             const response = await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`);
             if (!response.ok) {
                 let errTxt = `Errore HTTP ${response.status}`;
-                try { const errData = await response.json(); errTxt = errData.message || errTxt; } catch(e) { /* ignora errore parsing json dell'errore */ }
+                try { const errData = await response.json(); errTxt = errData.message || errTxt; } catch(e) { /* ignora */ }
                 throw new Error(errTxt);
             }
             const result = await response.json();
@@ -1656,10 +1630,9 @@
             listContainerEl.innerHTML = `<li><p class="error-message">Impossibile caricare i commenti: ${sanitizeText(error.message)}</p></li>`;
         }
     }
-
     function renderCommentsForAdminThreaded(comments, eventId, parentUlElement, depth = 0) {
-        if (depth === 0) { // Solo per il livello principale
-            parentUlElement.innerHTML = ''; // Pulisce il contenuto (es. "Caricamento...")
+        if (depth === 0) {
+            parentUlElement.innerHTML = '';
             if (!comments || comments.length === 0) {
                 parentUlElement.innerHTML = '<li style="list-style-type:none;text-align:center;margin:1rem 0;"><p>Nessun commento per questo evento.</p></li>';
                 return;
@@ -1668,16 +1641,16 @@
 
         comments.forEach(comment => {
             const commentItemLi = document.createElement('li');
-            commentItemLi.className = 'comment-item-admin-styled'; // Classe base per lo stile
+            commentItemLi.className = 'comment-item-admin-styled';
             commentItemLi.id = `admin-comment-${comment.Progressivo}`;
-            if (comment.is_admin_reply) { // Se il commento è una risposta dell'admin
-                commentItemLi.classList.add('commento-admin-generale'); // Classe per evidenziare risposte admin
+            if (comment.is_admin_reply) {
+                commentItemLi.classList.add('commento-admin-generale');
             }
 
             const commenterAvatar = comment.commenter_icon_path || defaultUserIconPath;
             const commenterName = sanitizeText(comment.utente_display_name || 'Utente Anonimo');
             const commentDate = sanitizeText(comment.data_creazione_formattata || 'Data non disponibile');
-            const commentText = sanitizeTextForHTML(comment.Descrizione); // Usa sanitizeTextForHTML per preservare a capo
+            const commentText = sanitizeTextForHTML(comment.Descrizione);
             let adminBadgeHTML = comment.is_admin_reply ? '<span class="badge-admin-dashboard">(Admin)</span>' : '';
 
             commentItemLi.innerHTML = `
@@ -1707,24 +1680,17 @@
 
             if (comment.replies && comment.replies.length > 0) {
                 const repliesUl = document.createElement('ul');
-                repliesUl.className = 'comment-replies-list-styled'; // Classe per indentare le risposte
+                repliesUl.className = 'comment-replies-list-styled';
                 commentItemLi.appendChild(repliesUl);
                 renderCommentsForAdminThreaded(comment.replies, eventId, repliesUl, depth + 1);
             }
         });
     }
-
     function attachAdminCommentListeners(commentsListContainerUL) {
         if (!commentsListContainerUL) return;
-        // Rimuovi vecchi listener se ce ne sono (meglio clonare il nodo come fatto prima)
-        // commentsListContainerUL.removeEventListener('click', handleCommentActionClick);
-        // commentsListContainerUL.removeEventListener('submit', handleCommentFormSubmit);
-
-        // Aggiungi nuovi listener
         commentsListContainerUL.addEventListener('click', handleCommentActionClick);
         commentsListContainerUL.addEventListener('submit', handleCommentFormSubmit);
     }
-
     async function handleCommentActionClick(event) {
         const target = event.target;
         const replyButton = target.closest('.btn-admin-reply');
@@ -1746,7 +1712,7 @@
         if (deleteButton) {
             event.preventDefault();
             const commentId = deleteButton.dataset.commentId;
-            if (currentEventIdForCommentsGl) { // Assicurati che l'ID evento sia disponibile
+            if (currentEventIdForCommentsGl) {
                 deleteAdminComment(commentId, currentEventIdForCommentsGl);
             } else {
                 alert("Errore: ID evento non specificato per l'eliminazione del commento.");
@@ -1754,17 +1720,14 @@
             return;
         }
     }
-
     async function handleCommentFormSubmit(event) {
         const targetForm = event.target.closest('.reply-form-admin form');
         if (targetForm) {
             event.preventDefault();
-            const eventId = targetForm.dataset.eventId; // ID evento dal form
+            const eventId = targetForm.dataset.eventId;
             await handleAdminReplySubmit(targetForm, eventId);
         }
     }
-
-
     async function handleAdminReplySubmit(formElement, eventId) {
         const parentCommentId = formElement.dataset.parentCommentId;
         const replyText = formElement.querySelector('textarea[name="Descrizione"]').value.trim();
@@ -1774,7 +1737,7 @@
         if (!replyText) {
             if (feedbackEl) {
                 feedbackEl.textContent = 'La risposta non può essere vuota.';
-                feedbackEl.className = 'form-message-local error-message'; // Usa classi per stile
+                feedbackEl.className = 'form-message-local error-message';
                 feedbackEl.style.display = 'block';
             }
             return;
@@ -1788,9 +1751,8 @@
             const formData = new FormData();
             formData.append('action', 'submit_admin_reply');
             formData.append('event_id', eventId);
-            formData.append('comment_id', parentCommentId); // ID del commento a cui si risponde
+            formData.append('comment_id', parentCommentId);
             formData.append('reply_text', replyText);
-            // Assicurati che 'manage_comments_admin.php' gestisca 'submit_admin_reply'
             const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
             if (!response.ok) {
                 let errData = { message: `Errore HTTP ${response.status}` };
@@ -1805,12 +1767,11 @@
                     feedbackEl.style.display = 'block';
                     setTimeout(() => { if (feedbackEl) { feedbackEl.style.display = 'none'; feedbackEl.textContent = ''; } }, 3000);
                 }
-                formElement.reset(); // Pulisce il textarea
+                formElement.reset();
                 const replyFormDiv = formElement.closest('.reply-form-admin');
-                if (replyFormDiv) replyFormDiv.style.display = 'none'; // Nasconde il form
-                // Ricarica i commenti per visualizzare la nuova risposta
+                if (replyFormDiv) replyFormDiv.style.display = 'none';
                 await openManageCommentsModal(eventId, document.getElementById('commentsEventTitle')?.textContent || "Evento");
-                fetchDashboardData(); // Aggiorna anche il conteggio commenti sulla card evento
+                fetchDashboardData();
             } else {
                 throw new Error(result.message || 'Errore durante l\'invio della risposta.');
             }
@@ -1825,18 +1786,16 @@
             if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
         }
     }
-
     async function deleteAdminComment(commentId, eventIdForReload) {
         if (!confirm('Sei sicuro di voler eliminare questo commento e tutte le sue eventuali risposte? L\'azione è irreversibile.')) return;
 
-        const feedbackDiv = document.getElementById('commentsManagementFeedback'); // Feedback globale del modal
+        const feedbackDiv = document.getElementById('commentsManagementFeedback');
         if (feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione commento in corso...</p>';
 
         try {
             const formData = new FormData();
             formData.append('action', 'delete_comment');
             formData.append('comment_id', commentId);
-            // Assicurati che 'manage_comments_admin.php' gestisca 'delete_comment'
             const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
             if (!response.ok) {
                 let errData = { message: `Errore HTTP ${response.status}` };
@@ -1846,7 +1805,6 @@
             const result = await response.json();
             if (result.success) {
                 if (feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                // Ricarica la lista dei commenti nel modal e i dati della dashboard
                 await openManageCommentsModal(eventIdForReload, document.getElementById('commentsEventTitle')?.textContent || "Evento");
                 fetchDashboardData();
             } else {
@@ -1856,28 +1814,25 @@
             console.error('Errore deleteAdminComment:', error);
             if (feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;
         }
-        // Pulisce il feedback globale dopo un po', solo se non è un errore persistente
         setTimeout(() => { if (feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 3000);
     }
-
     async function confirmDeleteEvent(eventId, eventTitle) {
         if (!confirm(`ATTENZIONE: Sei sicuro di voler eliminare l'evento "${sanitizeText(eventTitle)}" (ID: ${eventId}) e tutti i dati ad esso associati (prenotazioni, media, commenti)? L'azione è irreversibile.`)) return;
 
         const cardEl = document.getElementById(`admin-event-${eventId}`);
-        if (cardEl) cardEl.style.opacity = '0.5'; // Feedback visivo durante l'eliminazione
+        if (cardEl) cardEl.style.opacity = '0.5';
 
         try {
             const formData = new FormData();
             formData.append('action', 'delete_event');
             formData.append('event_id', eventId);
-            // Assicurati che 'gestione_eventi.php' gestisca 'delete_event'
             const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
             const result = await response.json();
-            alert(sanitizeText(result.message)); // Mostra messaggio di successo o errore
+            alert(sanitizeText(result.message));
             if (result.success) {
-                fetchDashboardData(); // Ricarica la dashboard per rimuovere l'evento
+                fetchDashboardData();
             } else {
-                if (cardEl) cardEl.style.opacity = '1'; // Ripristina opacità in caso di errore
+                if (cardEl) cardEl.style.opacity = '1';
             }
         } catch(error) {
             console.error('Errore deleteEvent:', error);
@@ -1886,56 +1841,49 @@
         }
     }
 
-
-    // Inizializzazione Pagina
     document.addEventListener('DOMContentLoaded', () => {
-        // Setup utente admin (se presente in localStorage)
-        const adminUserString = localStorage.getItem('adminUserEFF'); // Chiave corretta
+        const adminUserString = localStorage.getItem('adminUserEFF');
         if (adminUserString) {
             try {
                 const adminUser = JSON.parse(adminUserString);
                 const navUsernameEl = document.getElementById('navbar-username');
                 if (navUsernameEl && adminUser.nome) navUsernameEl.textContent = adminUser.nome;
-                else if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS; // Fallback
+                else if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
 
                 const navAvatarImgEl = document.querySelector('#navbar-avatar img');
                 if (navAvatarImgEl && adminUser.iconPath) navAvatarImgEl.src = adminUser.iconPath;
-                else if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath; // Fallback
+                else if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
             } catch(e) {
                 console.error("Errore parsing localStorage adminUserEFF:", e);
-                // Fallback ai valori di default se il parsing fallisce
                 const navUsernameEl = document.getElementById('navbar-username');
                 if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
                 const navAvatarImgEl = document.querySelector('#navbar-avatar img');
                 if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
             }
-        } else { // Se non c'è adminUserEFF, usa i fallback
+        } else {
             const navUsernameEl = document.getElementById('navbar-username');
             if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
             const navAvatarImgEl = document.querySelector('#navbar-avatar img');
             if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
         }
 
-        updatePriceFieldVisibilityDashboard(); // Inizializza visibilità campo prezzo
-        attachPreviewListeners(); // Attacca i listener per l'anteprima dinamica
+        updatePriceFieldVisibilityDashboard();
+        attachPreviewListeners();
 
-        // Impostazioni default per ordinamento e raggruppamento
         const sortCriteriaSelect = document.getElementById('sortCriteria');
         const sortDirectionSelect = document.getElementById('sortDirection');
         const groupCriteriaSelect = document.getElementById('groupCriteria');
 
-        if(sortDirectionSelect) sortDirectionSelect.value = 'asc'; // Default crescente
-        if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese'; // Default per data
-        if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese'; // Default raggruppa per mese
+        if(sortDirectionSelect) sortDirectionSelect.value = 'asc';
+        if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese';
+        if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese';
 
-        // Listener per i controlli di ordinamento e raggruppamento
         if(sortCriteriaSelect) sortCriteriaSelect.addEventListener('change', applyFiltersAndRender);
         if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender);
         if(groupCriteriaSelect) groupCriteriaSelect.addEventListener('change', applyFiltersAndRender);
 
-        fetchDashboardData(); // Carica i dati iniziali della dashboard
+        fetchDashboardData();
     });
-    // === FINE BLOCCO SCRIPT COMPLETO ===
 </script>
 </body>
 </html>
