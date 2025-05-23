@@ -1,12 +1,12 @@
 <?php
-session_start(); // DEVE ESSERE LA PRIMA ISTRUZIONE
+session_start();
 header('Content-Type: application/json; charset=utf-8');
 
 $config = [
     'host' => 'localhost',
     'db'   => 'my_eremofratefrancesco',
     'user' => 'eremofratefrancesco',
-    'pass' => '' // LA TUA PASSWORD DB
+    'pass' => '' // <--- INSERISCI QUI LA TUA PASSWORD DB
 ];
 
 $response = ['success' => false, 'message' => '', 'newLikeCount' => 0, 'liked' => false];
@@ -18,20 +18,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// --- AUTENTICAZIONE UTENTE ---
 if (!isset($_SESSION['user_email'])) {
     $response['message'] = 'Devi essere autenticato per mettere "Mi piace".';
-    http_response_code(401); // Unauthorized
+    http_response_code(401);
     echo json_encode($response);
     exit;
 }
-// $user_email_session = $_SESSION['user_email']; // Puoi usarlo se implementi tabella separata per i likes per utente
+$user_email = $_SESSION['user_email'];
 
-// Leggi l'input JSON inviato da JavaScript
 $inputData = json_decode(file_get_contents('php://input'), true);
-
 $commentId = filter_var($inputData['commentId'] ?? null, FILTER_VALIDATE_INT);
-$action = isset($inputData['action']) ? $inputData['action'] : 'like'; // 'like' o 'unlike'
+// L'azione viene determinata dal client in base allo stato attuale del pulsante
+$action = isset($inputData['action']) ? $inputData['action'] : 'like';
 
 if (!$commentId || $commentId <= 0) {
     $response['message'] = 'ID Commento mancante o non valido.';
@@ -39,11 +37,6 @@ if (!$commentId || $commentId <= 0) {
     echo json_encode($response);
     exit;
 }
-
-// NOTA: Per un sistema di like/unlike completo (un utente un voto),
-// servirebbe una tabella separata (es. 'likes_commenti') per tracciare chi ha messo like a cosa.
-// Questo script, come quello originale, gestisce solo un contatore generale.
-// La logica 'liked' restituita è una simulazione basata sull'azione inviata dal client.
 
 try {
     $conn = new PDO(
@@ -59,52 +52,67 @@ try {
 
     $conn->beginTransaction();
 
-    // Recupera il conteggio attuale dei like per determinare l'operazione
-    // e per verificare che il commento esista
-    $stmtSelectCurrent = $conn->prepare("SELECT NumLike FROM commenti WHERE Progressivo = :commentId");
-    $stmtSelectCurrent->bindParam(':commentId', $commentId, PDO::PARAM_INT);
-    $stmtSelectCurrent->execute();
-    $currentCommentState = $stmtSelectCurrent->fetch();
-
-    if (!$currentCommentState) {
+    // 1. Controlla se il commento esiste
+    $stmtCheckComment = $conn->prepare("SELECT Progressivo FROM commenti WHERE Progressivo = :commentId FOR UPDATE");
+    $stmtCheckComment->bindParam(':commentId', $commentId, PDO::PARAM_INT);
+    $stmtCheckComment->execute();
+    if (!$stmtCheckComment->fetch()) {
         $conn->rollBack();
         $response['message'] = 'Commento non trovato.';
         http_response_code(404);
         echo json_encode($response);
         exit;
     }
-    $currentLikes = (int)$currentCommentState['NumLike'];
 
-    if ($action === 'like') {
-        $stmtUpdate = $conn->prepare("UPDATE commenti SET NumLike = NumLike + 1 WHERE Progressivo = :commentId");
+    // 2. Controlla se l'utente ha già messo "Mi piace"
+    $stmtCheckLike = $conn->prepare("SELECT COUNT(*) as count FROM likes_commenti WHERE Contatto = :userEmail AND IDCommento = :commentId");
+    $stmtCheckLike->bindParam(':userEmail', $user_email, PDO::PARAM_STR);
+    $stmtCheckLike->bindParam(':commentId', $commentId, PDO::PARAM_INT);
+    $stmtCheckLike->execute();
+    $alreadyLiked = (int)$stmtCheckLike->fetch()['count'] > 0;
+
+    // 3. Esegui l'azione
+    if ($action === 'like' && !$alreadyLiked) {
+        // Aggiungi il "Mi piace"
+        $stmtInsert = $conn->prepare("INSERT INTO likes_commenti (Contatto, IDCommento) VALUES (:userEmail, :commentId)");
+        $stmtInsert->bindParam(':userEmail', $user_email, PDO::PARAM_STR);
+        $stmtInsert->bindParam(':commentId', $commentId, PDO::PARAM_INT);
+        $stmtInsert->execute();
         $response['message'] = 'Like aggiunto!';
-        $response['liked'] = true; // L'utente ora ha messo like
-    } elseif ($action === 'unlike' && $currentLikes > 0) { // Solo se ci sono like da rimuovere
-        $stmtUpdate = $conn->prepare("UPDATE commenti SET NumLike = NumLike - 1 WHERE Progressivo = :commentId");
+        $response['liked'] = true;
+    } elseif ($action === 'unlike' && $alreadyLiked) {
+        // Rimuovi il "Mi piace"
+        $stmtDelete = $conn->prepare("DELETE FROM likes_commenti WHERE Contatto = :userEmail AND IDCommento = :commentId");
+        $stmtDelete->bindParam(':userEmail', $user_email, PDO::PARAM_STR);
+        $stmtDelete->bindParam(':commentId', $commentId, PDO::PARAM_INT);
+        $stmtDelete->execute();
         $response['message'] = 'Like rimosso!';
-        $response['liked'] = false; // L'utente ora non ha messo like
-    } else if ($action === 'unlike' && $currentLikes === 0) {
-        // Nessuna azione sul DB, il conteggio è già 0
-        $conn->rollBack(); // Nessuna modifica necessaria
-        $response['success'] = true; // L'operazione è "logicamente" riuscita
-        $response['message'] = 'Il commento non aveva like da rimuovere.';
-        $response['newLikeCount'] = 0;
         $response['liked'] = false;
-        echo json_encode($response);
-        exit;
     } else {
-        $conn->rollBack();
-        $response['message'] = 'Azione non valida o non riconosciuta.';
-        http_response_code(400);
-        echo json_encode($response);
-        exit;
+        // Stato incoerente o nessuna azione necessaria, ma ricalcola comunque per sicurezza.
+        $response['liked'] = $alreadyLiked;
+        $response['message'] = $alreadyLiked ? 'Like già presente.' : 'Like non presente.';
+        // Non facciamo modifiche, ma procediamo a ricalcolare e restituire lo stato attuale.
     }
 
-    $stmtUpdate->bindParam(':commentId', $commentId, PDO::PARAM_INT);
-    $stmtUpdate->execute();
+    // 4. Aggiorna il contatore NumLike nella tabella commenti
+    $stmtUpdateCount = $conn->prepare("
+        UPDATE commenti c
+        SET c.NumLike = (SELECT COUNT(*) FROM likes_commenti lc WHERE lc.IDCommento = c.Progressivo)
+        WHERE c.Progressivo = :commentId
+    ");
+    $stmtUpdateCount->bindParam(':commentId', $commentId, PDO::PARAM_INT);
+    $stmtUpdateCount->execute();
 
-    // Recupera il nuovo conteggio dei like dopo l'aggiornamento
-    $stmtSelectNew = $conn->prepare("SELECT NumLike FROM commenti WHERE Progressivo = :commentId");
+    // 5. Recupera il nuovo conteggio e conferma lo stato del like
+    $stmtSelectNew = $conn->prepare("
+        SELECT
+            c.NumLike,
+            (SELECT COUNT(*) FROM likes_commenti lc WHERE lc.IDCommento = c.Progressivo AND lc.Contatto = :userEmail) as currentUserLiked
+        FROM commenti c
+        WHERE c.Progressivo = :commentId
+    ");
+    $stmtSelectNew->bindParam(':userEmail', $user_email, PDO::PARAM_STR);
     $stmtSelectNew->bindParam(':commentId', $commentId, PDO::PARAM_INT);
     $stmtSelectNew->execute();
     $updatedComment = $stmtSelectNew->fetch();
@@ -112,9 +120,8 @@ try {
     if ($updatedComment) {
         $response['success'] = true;
         $response['newLikeCount'] = (int)$updatedComment['NumLike'];
+        $response['liked'] = (int)$updatedComment['currentUserLiked'] > 0; // Aggiorna lo stato liked basato sul DB
     } else {
-        // Non dovrebbe succedere se il commento esisteva
-        $conn->rollBack();
         throw new Exception('Commento non trovato dopo l\'aggiornamento del like.');
     }
 
@@ -123,13 +130,13 @@ try {
 
 } catch (PDOException $e) {
     if ($conn && $conn->inTransaction()) $conn->rollBack();
-    error_log("Errore PDO in like_comment.php (CommentID: {$commentId}): " . $e->getMessage());
+    error_log("Errore PDO in like_comment.php (CommentID: {$commentId}, User: {$user_email}): " . $e->getMessage());
     $response['message'] = 'Errore database durante l\'aggiornamento del like.';
     http_response_code(500);
     echo json_encode($response);
 } catch (Exception $e) {
     if ($conn && $conn->inTransaction()) $conn->rollBack();
-    error_log("Errore generico in like_comment.php (CommentID: {$commentId}): " . $e->getMessage());
+    error_log("Errore generico in like_comment.php (CommentID: {$commentId}, User: {$user_email}): " . $e->getMessage());
     $response['message'] = 'Errore generale: ' . $e->getMessage();
     http_response_code(500);
     echo json_encode($response);
