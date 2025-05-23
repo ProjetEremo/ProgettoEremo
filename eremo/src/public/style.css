@@ -362,8 +362,6 @@ main section:first-of-type.hero-section {
 /* Titolo principale dentro .container nelle pagine */
 main > .container > h1:first-child:not(.hero-title) {
   text-align: center;
-  margin-top: 3rem;
-  margin-bottom: 3.5rem;
   color: var(--primary);
 }
 
@@ -3264,15 +3262,20 @@ body.page-dashboard .modal-content {
 
 /* Immagine di Copertina Evento */
 #eventCoverImage.event-cover-image {
-  max-width: 850px;
-  margin-left: auto;
-  margin-right: auto;
+  display: block; /* Necessario per far funzionare margin: auto; e per controllo layout */
+  width: 100%;    /* L'immagine cerca di occupare tutta la larghezza del contenitore padre */
+  max-width: 850px; /* Limite massimo alla larghezza dell'immagine su schermi grandi */
+  height: auto;   /* Mantiene le proporzioni dell'immagine quando la larghezza cambia */
+  margin-left: auto;  /* Centra l'immagine se la sua larghezza effettiva è inferiore a quella del contenitore */
+  margin-right: auto; /* Centra l'immagine */
   border: 3px solid var(--white);
   box-shadow: var(--shadow-medium);
   margin-top: 1rem;
   margin-bottom: 2.5rem;
   border-radius: var(--border-radius-medium);
-  display: block;
+  /* object-fit: cover; /* Opzionale: se vuoi che l'immagine copra sempre lo spazio mantenendo le proporzioni,
+                           ma potrebbe tagliare parti dell'immagine se le proporzioni non corrispondono.
+                           Generalmente non necessario se height è auto. */
 }
 
 /* Informazioni Meta Evento (Data, Ora, Relatore) */
@@ -4515,4 +4518,18 @@ li.top-level-comment-item:last-child { border-bottom: none; margin-bottom: 0; }
   cursor: pointer; /* Cursore per l'icona */
 }
 /* ----- Fine Stili Popup Likers ----- */
+
+/* ----- Stili per Comment Actions Responsive ----- */
+.comment-actions {
+  display: flex;
+  flex-wrap: wrap; /* Permette ai bottoni di andare a capo */
+  gap: 0.5rem 0.8rem; /* Ridotto il gap verticale, mantenuto quello orizzontale (da v4) */
+  align-items: center;
+  font-size: 0.85rem; /* (da v4) */
+  margin-top: 0.8rem; /* (da v4) */
+  padding-top: 0.8rem; /* (da v4) */
+  border-top: 1px solid var(--gray-light);
+  /* Opzionale: per allineare i gruppi di bottoni se vanno a capo */
+  /* justify-content: flex-start; */ /* o space-between se preferisci */
+}
 /* ----- FINE RESTYLING SEZIONE COMMENTI (v4) ----- */
