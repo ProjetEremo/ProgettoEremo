@@ -6,8 +6,354 @@
     <link rel="icon" href="images/logo.png" type="image/x-icon">
     <title>Admin Dashboard - Eremo Frate Francesco</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .event-controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 0 !important;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .event-tabs-container-main {
+            display: flex;
+            flex-grow: 1;
+            align-items: flex-end;
+        }
+
+        .filter-trigger-container-main {
+            position: relative;
+            margin-left: auto;
+            align-self: flex-end;
+            display: inline-block; /* Assicura che il contenitore si adatti al pulsante */
+        }
+
+
+        .event-controls-header .event-tab-button {
+            padding: 0.9rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-dark);
+            background-color: var(--gray-light);
+            border: 1px solid var(--gray-medium);
+            border-bottom: none;
+            cursor: pointer;
+            transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            line-height: 1.4;
+            text-align: center;
+            justify-content: center;
+            margin-right: -1px;
+        }
+        .event-controls-header .event-tab-button:hover {
+            background-color: #e0e0e0;
+            color: var(--primary);
+        }
+        .event-controls-header .event-tab-button.active {
+            color: var(--primary);
+            background-color: var(--white);
+            border-color: var(--gray-medium) var(--gray-medium) var(--white);
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+        .event-controls-header .event-tab-button.active i {
+            color: var(--accent);
+        }
+
+        .event-tabs-container-main .event-tab-button {
+            border-radius: 0;
+            border-right: none;
+        }
+        .event-tabs-container-main .event-tab-button:first-child {
+            border-top-left-radius: 10px;
+        }
+        .event-tabs-container-main > .event-tab-button:last-of-type {
+            border-top-right-radius: 10px;
+            border-right: 1px solid var(--gray-medium);
+        }
+
+        .filter-trigger-container-main #filterToggleButton.event-tab-button {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            margin-right: 0;
+            border-left: 1px solid var(--gray-medium);
+            margin-left: 8px;
+        }
+        .filter-trigger-container-main #filterToggleButton.event-tab-button.active {
+            border-bottom-color: var(--white);
+        }
+
+
+        .dropdown-arrow-filter {
+            margin-left: 0.5em;
+            font-size: 0.8em;
+            transition: transform 0.2s ease-in-out;
+        }
+        #filterToggleButton.active .dropdown-arrow-filter {
+            transform: rotate(180deg);
+        }
+
+        .filter-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% - 1px);
+            right: 0; /* Allinea il bordo DESTRO del pannello con il bordo DESTRO del suo contenitore (.filter-trigger-container-main) */
+            left: auto; /* Assicura che 'left' non interferisca */
+            z-index: 100;
+            background-color: var(--white);
+            border: 1px solid var(--gray-medium);
+            border-top: none;
+            box-shadow: var(--shadow-medium);
+            padding: 1.5rem;
+            width: 320px;
+            max-width: calc(100vw - 20px);
+            box-sizing: border-box; /* padding e border inclusi nella width */
+            border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+        }
+        /* Se il pannello dovesse comunque "scappare" a destra, potresti provare ad ancorarlo forzatamente a sinistra del pulsante
+           ma questo avrebbe senso solo se il pulsante non è all'estrema destra della pagina.
+           Esempio alternativo (da testare con cautela, potrebbe non essere ciò che vuoi se il bottone è largo):
+        .filter-panel {
+            left: 0; // Allinea il bordo SINISTRO del pannello con il bordo SINISTRO del contenitore
+            right: auto;
+            border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium); // O tutti gli angoli se si apre diversamente
+        }
+        */
+
+        .filter-panel.active {
+            display: block;
+            animation: fadeInDropdown 0.2s ease-out;
+        }
+        @keyframes fadeInDropdown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .filter-panel h4 {
+            margin-top: 0; margin-bottom: 1.2rem; font-size: 1.1rem; color: var(--primary);
+            border-bottom: 1px solid var(--gray-light); padding-bottom: 0.6rem; text-align: left;
+        }
+        .filter-panel .form-group { margin-bottom: 1rem; }
+        .filter-panel .form-group label { text-align: left; }
+        .filter-panel .filter-panel-actions {
+            margin-top: 1.5rem; display: flex; justify-content: space-between; gap: 0.5rem;
+        }
+        .filter-panel .filter-panel-actions .btn-admin { flex-grow: 1; }
+        .filter-panel-actions .btn-admin i { margin-right: 0.3em; }
+
+
+        .event-view-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 1.5rem;
+            padding: 1rem 1.5rem;
+            background-color: var(--white);
+            border: 1px solid var(--gray-medium);
+            border-top: none;
+            margin-bottom: 1.5rem;
+            border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            margin-top: -1px;
+        }
+
+        .event-view-controls .form-group {
+            flex-grow: 1; flex-basis: 180px; min-width: 160px;
+        }
+        .event-view-controls label {
+            font-size: 0.85rem; margin-bottom: 0.3rem; color: var(--primary);
+            display: block; font-weight: 500; text-align: left;
+        }
+        .event-view-controls select.form-control {
+            width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--gray-medium);
+            border-radius: 6px; font-size: 0.9rem; background-color: var(--white);
+            line-height: 1.4; appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23365e51%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat; background-position: right 0.6rem center;
+            background-size: 0.6em auto; padding-right: 2rem; cursor: pointer;
+        }
+        .event-view-controls select.form-control:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25);
+            outline: none;
+        }
+
+        .event-form-and-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        #eventFormDashboard {
+            flex: 2;
+            min-width: 300px;
+            background-color: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: var(--border-radius-medium);
+            border: 1px solid var(--gray-light);
+        }
+        #eventFormDashboard .form-row {
+            margin-bottom: 1rem;
+        }
+        #eventFormDashboard .form-row-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+
+        #eventCardPreviewContainer {
+            flex: 1;
+            min-width: 300px;
+            padding: 1.5rem;
+            border: 1px dashed var(--gray-medium);
+            border-radius: var(--border-radius-medium);
+            background-color: #fdfdfd;
+            height: fit-content;
+        }
+
+        #eventCardPreviewContainer h4 {
+            text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 1rem;
+            font-size: 1.2rem; border-bottom: 1px solid var(--gray-light); padding-bottom: 0.5rem;
+        }
+
+        .preview-card {
+            background: var(--white); border-radius: var(--border-radius-medium);
+            box-shadow: var(--shadow-light); overflow: hidden; border: 1px solid var(--gray-light);
+        }
+        .preview-card-image-container {
+            height: 180px; background-color: var(--gray-light); display: flex;
+            align-items: center; justify-content: center; overflow: hidden;
+        }
+        .preview-card-image-container img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-card-image-container .no-image-placeholder { font-size: 1rem; color: var(--gray-dark); }
+        .preview-card-content { padding: 1rem; }
+        .preview-card-content h5 {
+            font-size: 1.3rem; color: var(--primary); margin: 0 0 0.5rem 0;
+            font-weight: 600; min-height: 1.3em; word-break: break-word;
+        }
+        .preview-card-content p {
+            font-size: 0.9rem; color: var(--gray-dark); line-height: 1.5;
+            margin-bottom: 0.5rem; min-height: 1em; word-break: break-word;
+        }
+        .preview-card-content .preview-relatore { font-style: italic; }
+        .preview-card-content .preview-posti, .preview-card-content .preview-costo { font-weight: bold; }
+
+        #eventFormDashboard .form-group { margin-bottom: 1.2rem; }
+        #eventFormDashboard .form-group label {
+            display: block; margin-bottom: 0.4rem; color: var(--primary);
+            font-weight: 500; font-size: 0.95rem;
+        }
+        #eventFormDashboard .form-control, #eventFormDashboard select.form-control {
+            width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-medium);
+            border-radius: 8px; font-size: 1rem; background-color: var(--white);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #eventFormDashboard .form-control:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25);
+            outline: none;
+        }
+        #eventFormDashboard textarea.form-control { min-height: 80px; resize: vertical; }
+        #eventFormDashboard .form-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;
+        }
+        #eventFormDashboard .form-check-group {
+            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;
+        }
+        #eventFormDashboard .form-check-group input[type="checkbox"] {
+            width: auto; margin-right: 0.3rem; transform: scale(1.1);
+        }
+        #eventFormDashboard .form-check-group label {
+            font-weight: normal; font-size: 0.95rem; margin-bottom: 0;
+        }
+        #eventFormDashboard .form-actions { margin-top: 1.5rem; text-align: right; }
+        #eventFormDashboard .btn-popup { padding: 0.8rem 1.5rem; }
+        #eventFormDashboard small {
+            font-size: 0.8rem; color: var(--gray-dark); display: block; margin-top: 0.3rem;
+        }
+        #current-event-image-preview-dashboard, #current-event-flyer-preview-dashboard {
+            margin-top: 0.5rem; max-width: 150px; border: 1px solid var(--gray-light);
+            padding: 5px; border-radius: 6px;
+        }
+        #current-event-flyer-preview-dashboard a { font-size: 0.9rem; }
+
+        @media (max-width: 767px) {
+            .event-controls-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .event-tabs-container-main {
+                width: 100%;
+                margin-bottom: 0;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+            .event-tabs-container-main .event-tab-button {
+                margin-right: 0;
+                border-radius:0 !important;
+                border-bottom: 1px solid var(--gray-medium);
+            }
+            .event-tabs-container-main .event-tab-button:first-child {
+                border-top-left-radius: 10px !important;
+                border-right: 1px solid var(--gray-medium);
+            }
+            .event-tabs-container-main .event-tab-button:nth-child(2) {
+                border-top-right-radius: 10px !important;
+            }
+
+
+            .filter-trigger-container-main {
+                width: 100%;
+                margin-left: 0;
+            }
+            .filter-trigger-container-main #filterToggleButton.event-tab-button {
+                width: 100%;
+                justify-content: center;
+                border-radius: 0 0 10px 10px !important;
+                border-left: 1px solid var(--gray-medium) !important;
+                border-right: 1px solid var(--gray-medium) !important;
+                margin-left: 0;
+            }
+            .filter-trigger-container-main #filterToggleButton.event-tab-button.active {
+                border-radius:0 !important;
+                border-bottom: none !important;
+            }
+
+            .filter-panel {
+                position: static; /* Cambia a static per il layout mobile in colonna */
+                width: 100%; /* Occupa tutta la larghezza disponibile */
+                box-shadow: none; /* Rimuovi ombra se è in flusso normale */
+                border-radius: 0 0 10px 10px; /* Stondatura solo sotto */
+                border-top: 1px solid var(--gray-medium); /* Bordo sopra per separarlo dal bottone */
+                margin-bottom: 1rem; /* Spazio prima dei controlli di vista */
+            }
+            /* Nasconde il bordo superiore del pannello se il bottone Filtri è attivo e "connesso" */
+            .filter-trigger-container-main #filterToggleButton.event-tab-button.active + .filter-panel {
+                border-top: none;
+            }
+
+
+            .event-view-controls {
+                flex-direction: column; align-items: stretch;
+                border-radius: var(--border-radius-medium);
+                margin-top: 1rem;
+                border: 1px solid var(--gray-medium);
+            }
+            #eventManagementContent {
+                border-radius: var(--border-radius-medium);
+                margin-top: 1rem;
+                border: 1px solid var(--gray-medium);
+            }
+        }
+    </style>
 </head>
 <body class="page-dashboard">
 
@@ -15,7 +361,7 @@
     <nav class="navbar">
         <div class="logo">
             <a href="indexadmin.html"> <span class="emoji">🏔️</span>
-                <h2>Eremo Frate Francesco - Admin</h2>
+                <h2 id="navbar-title-admin">Eremo Frate Francesco - Admin</h2>
             </a>
         </div>
         <div class="right-menu">
@@ -46,8 +392,12 @@
 <main class="dashboard-main">
     <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
 
-    <div class="event-tabs-and-filter-container">
-        <div class="filter-trigger-container">
+    <div class="event-controls-header">
+        <div class="event-tabs-container-main">
+            <button class="event-tab-button active" data-tab="upcoming"><i class="fas fa-calendar-day"></i> Eventi Futuri</button>
+            <button class="event-tab-button" data-tab="past"><i class="fas fa-history"></i> Archivio Eventi</button>
+        </div>
+        <div class="filter-trigger-container-main">
             <button id="filterToggleButton" class="event-tab-button filter-tab-button" aria-expanded="false" aria-controls="filterPanelDropdown">
                 <i class="fas fa-filter"></i> Filtri <span class="dropdown-arrow-filter">▼</span>
             </button>
@@ -73,10 +423,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="event-tabs-container"> <button class="event-tab-button active" data-tab="upcoming"><i class="fas fa-calendar-day"></i> Eventi Futuri</button>
-            <button class="event-tab-button" data-tab="past"><i class="fas fa-history"></i> Archivio Eventi</button>
-        </div>
     </div>
 
     <div class="event-view-controls">
@@ -94,8 +440,9 @@
         <div class="form-group sorting-group">
             <label for="sortDirection">Direzione:</label>
             <select id="sortDirection" class="form-control">
+                <option value="asc" selected>Crescente</option>
                 <option value="desc">Decrescente</option>
-                <option value="asc" selected>Crescente</option> </select>
+            </select>
         </div>
         <div class="form-group grouping-group">
             <label for="groupCriteria">Raggruppa per:</label>
@@ -110,11 +457,12 @@
         </div>
     </div>
 
-    <div id="eventManagementContent" class="dashboard-section"> <div class="event-tab-content active" id="upcomingEventsContainer">
-        <div id="upcomingEventsGrid" class="admin-event-grid">
-            <p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>
+    <div id="eventManagementContent" class="dashboard-section">
+        <div class="event-tab-content active" id="upcomingEventsContainer">
+            <div id="upcomingEventsGrid" class="admin-event-grid">
+                <p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>
+            </div>
         </div>
-    </div>
         <div class="event-tab-content" id="pastEventsContainer" style="display: none;">
             <div id="pastEventsGrid" class="admin-event-grid">
                 <p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento archivio eventi...</p>
@@ -169,56 +517,136 @@
 <div class="event-popup" id="eventPopupDashboard">
     <button class="close-popup" id="closeEventPopupBtnDashboard" aria-label="Chiudi popup">&times;</button>
     <h2 id="eventPopupTitleDashboard">Aggiungi Nuovo Evento</h2>
-    <form id="eventFormDashboard" method="POST" enctype="multipart/form-data">
-        <input type="hidden" id="event-id-dashboard" name="event-id">
-        <div class="form-group"> <label for="event-title-dashboard">Titolo Evento*</label> <input type="text" id="event-title-dashboard" name="event-title" class="form-control" required> </div>
-        <div class="form-grid">
-            <div class="form-group"> <label for="event-date-dashboard">Data Inizio*</label> <input type="date" id="event-date-dashboard" name="event-date" class="form-control" required> </div>
-            <div class="form-group"> <label for="event-time-dashboard">Orario</label> <input type="text" id="event-time-dashboard" name="event-time" class="form-control" placeholder="es. 18:00-19:30"> </div>
+
+    <div class="event-form-and-preview-container">
+        <form id="eventFormDashboard" method="POST" enctype="multipart/form-data">
+            <input type="hidden" id="event-id-dashboard" name="event-id">
+
+            <div class="form-group">
+                <label for="event-title-dashboard">Titolo Evento*</label>
+                <input type="text" id="event-title-dashboard" name="event-title" class="form-control" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="event-date-dashboard">Data Inizio*</label>
+                    <input type="date" id="event-date-dashboard" name="event-date" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-row-grid">
+                <div class="form-group">
+                    <label for="event-start-time-dashboard">Orario Inizio (HH:MM)</label>
+                    <input type="time" id="event-start-time-dashboard" name="event-start-time" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="event-end-time-dashboard">Orario Fine (HH:MM)</label>
+                    <input type="time" id="event-end-time-dashboard" name="event-end-time" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="event-short-desc-dashboard">Descrizione Breve* (max 255 caratteri)</label>
+                <textarea id="event-short-desc-dashboard" name="event-short-desc" class="form-control" rows="2" required maxlength="255"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="event-long-desc-dashboard">Descrizione Estesa</label>
+                <textarea id="event-long-desc-dashboard" name="event-long-desc" class="form-control" rows="4"></textarea>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="event-prefix-dashboard">Prefisso Relatore</label>
+                    <input type="text" id="event-prefix-dashboard" name="event-prefix" class="form-control" placeholder="Default: Relatore">
+                </div>
+                <div class="form-group">
+                    <label for="event-speaker-dashboard">Nome Relatore*</label>
+                    <input type="text" id="event-speaker-dashboard" name="event-speaker" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="event-association-dashboard">Associazione</label>
+                    <input type="text" id="event-association-dashboard" name="event-association" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="event-seats-dashboard">Posti Disponibili Iniziali*</label>
+                    <input type="number" id="event-seats-dashboard" name="event-seats" class="form-control" required min="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="event-image-dashboard">Immagine Copertina</label>
+                <input type="file" id="event-image-dashboard" name="event-image" class="form-control" accept="image/*">
+                <small>Lascia vuoto se non vuoi modificare l'immagine esistente.</small>
+                <img id="current-event-image-preview-dashboard" src="#" alt="Anteprima Immagine" style="max-width:150px; display:none; margin-top:5px;">
+            </div>
+
+            <div class="form-group">
+                <label for="event-flyer-dashboard">Volantino (PDF/Immagine)</label>
+                <input type="file" id="event-flyer-dashboard" name="event-flyer" class="form-control" accept="image/*,application/pdf">
+                <small>Lascia vuoto se non vuoi modificare il volantino esistente.</small>
+                <div id="current-event-flyer-preview-dashboard" style="margin-top:5px;"></div>
+            </div>
+
+            <div class="form-check-group">
+                <input type="checkbox" id="event-booking-dashboard" name="event-booking">
+                <label for="event-booking-dashboard">Prenotazioni aperte</label>
+            </div>
+
+            <div class="form-check-group">
+                <input type="checkbox" id="event-voluntary-dashboard" name="event-voluntary">
+                <label for="event-voluntary-dashboard">Offerta libera</label>
+            </div>
+
+            <div class="form-group" id="event-price-container-dashboard" style="display: block;">
+                <label for="event-price-dashboard">Prezzo (€)</label>
+                <input type="number" id="event-price-dashboard" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00">
+            </div>
+
+            <div id="eventFormMessageDashboard" class="form-message" style="display:none;"></div>
+            <div class="form-actions">
+                <button type="submit" class="btn-popup">Salva Evento</button>
+            </div>
+        </form>
+
+        <div id="eventCardPreviewContainer">
+            <h4>Anteprima Card Evento</h4>
+            <div class="preview-card">
+                <div class="preview-card-image-container">
+                    <img id="previewImage" src="images/default-event.jpg" alt="Anteprima copertina evento">
+                    <span class="no-image-placeholder" style="display:none;">Nessuna immagine</span>
+                </div>
+                <div class="preview-card-content">
+                    <h5 id="previewTitle">Titolo Evento</h5>
+                    <p id="previewDate"><b>Data:</b> <span class="value">Seleziona data</span></p>
+                    <p id="previewTime" style="display:none;"><b>Orario:</b> <span class="value"></span></p>
+                    <p id="previewSpeaker" class="preview-relatore"><b>Relatore:</b> <span class="value">Nome Relatore</span></p>
+                    <p id="previewShortDesc">Descrizione breve dell'evento qui...</p>
+                    <p id="previewSeats" class="preview-posti"><b>Posti:</b> <span class="value">0</span></p>
+                    <p id="previewPrice" class="preview-costo"><b>Costo:</b> <span class="value">€ 0.00</span></p>
+                </div>
+            </div>
         </div>
-        <div class="form-group"> <label for="event-short-desc-dashboard">Descrizione Breve* (max 255 caratteri)</label> <textarea id="event-short-desc-dashboard" name="event-short-desc" class="form-control" rows="3" required maxlength="255"></textarea> </div>
-        <div class="form-group"> <label for="event-long-desc-dashboard">Descrizione Estesa</label> <textarea id="event-long-desc-dashboard" name="event-long-desc" class="form-control" rows="5"></textarea> </div>
-        <div class="form-grid">
-            <div class="form-group"> <label for="event-prefix-dashboard">Prefisso Relatore</label> <input type="text" id="event-prefix-dashboard" name="event-prefix" class="form-control" placeholder="Default: Relatore"> </div>
-            <div class="form-group"> <label for="event-speaker-dashboard">Nome Relatore*</label> <input type="text" id="event-speaker-dashboard" name="event-speaker" class="form-control" required> </div>
-        </div>
-        <div class="form-grid">
-            <div class="form-group"> <label for="event-association-dashboard">Associazione</label> <input type="text" id="event-association-dashboard" name="event-association" class="form-control"> </div>
-            <div class="form-group"> <label for="event-seats-dashboard">Posti Disponibili Iniziali*</label> <input type="number" id="event-seats-dashboard" name="event-seats" class="form-control" required min="0"> </div>
-        </div>
-        <div class="form-group">
-            <label for="event-image-dashboard">Immagine Copertina</label> <input type="file" id="event-image-dashboard" name="event-image" class="form-control" accept="image/*">
-            <small>Lascia vuoto se non vuoi modificare l'immagine esistente.</small>
-            <img id="current-event-image-preview-dashboard" src="#" alt="Anteprima" style="max-width:100px; display:none; margin-top:5px;">
-        </div>
-        <div class="form-group">
-            <label for="event-flyer-dashboard">Volantino (PDF/Immagine)</label> <input type="file" id="event-flyer-dashboard" name="event-flyer" class="form-control" accept="image/*,application/pdf">
-            <small>Lascia vuoto se non vuoi modificare il volantino esistente.</small>
-            <div id="current-event-flyer-preview-dashboard" style="margin-top:5px;"></div>
-        </div>
-        <div class="form-check-group"> <input type="checkbox" id="event-booking-dashboard" name="event-booking"> <label for="event-booking-dashboard">Prenotazioni aperte</label> </div>
-        <div class="form-check-group"> <input type="checkbox" id="event-voluntary-dashboard" name="event-voluntary"> <label for="event-voluntary-dashboard">Offerta libera</label> </div>
-        <div class="form-group" id="event-price-container-dashboard" style="display: block;"> <label for="event-price-dashboard">Prezzo (€)</label> <input type="number" id="event-price-dashboard" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00"> </div>
-        <div id="eventFormMessageDashboard" class="form-message" style="display:none;"></div>
-        <div class="form-actions"> <button type="submit" class="btn-popup">Salva Evento</button> </div>
-    </form>
+    </div>
 </div>
 
-<footer>
+
+<footer >
     <p>© <span id="currentYear"></span> Eremo Frate Francesco. Operazioni Admin.</p>
 </footer>
 
 <script>
-    // === INIZIO BLOCCO SCRIPT COMPLETO ===
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 
     let allUpcomingEventsData = [];
     let allPastEventsData = [];
     const defaultUserIconPath = '/uploads/icons/default_user.png';
     const adminAvatarPath = 'images/logo.png';
-    const adminNameGlobalJS = "Eremo Frate Francesco";
+    const adminNameGlobalJS = "Admin Eremo";
 
-    // --- Navbar & Mobile Menu Logic ---
     const SnavbarContainer = document.getElementById('navbarContainer');
     let SlastScroll = 0;
     if (SnavbarContainer) {
@@ -237,9 +665,9 @@
         const mobileMenu = document.getElementById("mobileMenu");
         const hamburger = document.querySelector(".navbar .hamburger");
         if(mobileMenu && hamburger){
-            mobileMenu.classList.toggle("open");
-            hamburger.classList.toggle("open");
-            document.body.style.overflow = mobileMenu.classList.contains("open") ? 'hidden' : '';
+            const isOpen = mobileMenu.classList.toggle("open");
+            hamburger.setAttribute("aria-expanded", isOpen.toString());
+            document.body.style.overflow = isOpen ? 'hidden' : '';
         }
     }
     function closeMobileMenu() {
@@ -247,7 +675,7 @@
         const hamburger = document.querySelector(".navbar .hamburger");
         if(mobileMenu && hamburger){
             mobileMenu.classList.remove("open");
-            hamburger.classList.remove("open");
+            hamburger.setAttribute("aria-expanded", "false");
             document.body.style.overflow = '';
         }
     }
@@ -275,15 +703,20 @@
         if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerEl && !hamburgerEl.contains(event.target) && !mobileMenuEl.contains(event.target)) {
             closeMobileMenu();
         }
+        const filterPanel = document.getElementById('filterPanelDropdown');
+        const filterToggle = document.getElementById('filterToggleButton');
+        if (filterPanel && filterPanel.classList.contains('active') && !filterPanel.contains(event.target) && !filterToggle.contains(event.target)) {
+            filterPanel.classList.remove('active');
+            filterToggle.classList.remove('active');
+            filterToggle.setAttribute('aria-expanded', 'false');
+        }
     });
     function logout() {
         localStorage.removeItem('adminUserEFF');
         alert('Logout effettuato.');
         window.location.href = 'login_admin.html';
     }
-    // --- Fine Navbar & Mobile Menu ---
 
-    // --- Logica Modali Generici ---
     function openModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) modal.classList.add('active');
@@ -292,7 +725,7 @@
     function closeModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) modal.classList.remove('active');
-        const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active, .login-popup-overlay.active, .booking-popup-overlay.active, .volantino-morph-overlay.active');
+        const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active');
         if (!anyModalActive) {
             document.body.style.overflow = '';
         }
@@ -303,10 +736,10 @@
         }
         if (modalId === 'manageCommentsModal') {
             let commentsListContainer = document.getElementById('commentsListContainer');
-            if (commentsListContainer) {
+            if (commentsListContainer && commentsListContainer.parentNode) {
                 const newClonedListContainer = commentsListContainer.cloneNode(false);
                 newClonedListContainer.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p></li>';
-                if(commentsListContainer.parentNode) commentsListContainer.parentNode.replaceChild(newClonedListContainer, commentsListContainer);
+                commentsListContainer.parentNode.replaceChild(newClonedListContainer, commentsListContainer);
             }
             const commentsFeedback = document.getElementById('commentsManagementFeedback'); if (commentsFeedback) commentsFeedback.innerHTML = '';
         }
@@ -318,12 +751,10 @@
     window.onclick = function(event) {
         const genericModals = document.querySelectorAll('.modal');
         genericModals.forEach(modal => { if (event.target === modal && modal.classList.contains('active')) closeModal(modal.id); });
+
         const eventPopupOverlay = document.getElementById('eventPopupOverlayDashboard');
         if (eventPopupOverlay && event.target === eventPopupOverlay && eventPopupOverlay.classList.contains('active')) closeEventPopupDashboard();
     };
-    // --- Fine Logica Modali Generici ---
-
-    // --- Funzioni Utility ---
     function sanitizeText(text) {
         if (text === null || typeof text === 'undefined') return '';
         const element = document.createElement('div'); element.innerText = String(text); return element.innerHTML;
@@ -338,21 +769,45 @@
     }
     function formatDbDate(dateString) {
         if (!dateString) return 'N/D';
-        try { const date = new Date(dateString.replace(/-/g, '/')); if (isNaN(date.getTime())) return dateString; return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });}
-        catch (e) { return dateString; }
+        try {
+            const parts = dateString.substring(0, 10).split('-');
+            if (parts.length === 3) {
+                const year = parseInt(parts[0]);
+                const month = parseInt(parts[1]) -1;
+                const day = parseInt(parts[2]);
+                const date = new Date(Date.UTC(year, month, day));
+                if (isNaN(date.getTime())) return dateString;
+                return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
+            }
+            return dateString;
+        } catch (e) {
+            console.warn("Errore formattazione data DB:", dateString, e);
+            return dateString;
+        }
     }
     function formatMonthYear(dateString) {
         if (!dateString) return 'Data sconosciuta';
-        try { const date = new Date(dateString.replace(/-/g, '/')); if (isNaN(date.getTime())) return 'Data non valida'; const options = { month: 'long', year: 'numeric' }; return new Intl.DateTimeFormat('it-IT', options).format(date); }
-        catch (e) { return 'Data non valida'; }
+        try {
+            const parts = dateString.substring(0, 10).split('-');
+            if (parts.length === 3) {
+                const year = parseInt(parts[0]);
+                const month = parseInt(parts[1]) -1;
+                const date = new Date(Date.UTC(year, month, 1));
+                if (isNaN(date.getTime())) return 'Data non valida';
+                const options = { month: 'long', year: 'numeric', timeZone: 'UTC' };
+                return new Intl.DateTimeFormat('it-IT', options).format(date);
+            }
+            return 'Data non valida';
+        } catch (e) {
+            console.warn("Errore formattazione Mese/Anno:", dateString, e);
+            return 'Data non valida';
+        }
     }
     function getMonthIndexFromString(monthName) {
         const months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
         return months.indexOf(monthName.toLowerCase());
     }
-    // --- Fine Funzioni Utility ---
 
-    // --- Logica Pop-up Aggiungi/Modifica Evento ---
     const eventPopupOverlayDashboard = document.getElementById('eventPopupOverlayDashboard');
     const eventPopupDashboard = document.getElementById('eventPopupDashboard');
     const closeEventPopupBtnDashboard = document.getElementById('closeEventPopupBtnDashboard');
@@ -366,87 +821,261 @@
     const currentImagePreviewDashboard = document.getElementById('current-event-image-preview-dashboard');
     const currentFlyerPreviewDashboard = document.getElementById('current-event-flyer-preview-dashboard');
 
+    const previewImageEl = document.getElementById('previewImage');
+    const previewNoImagePlaceholder = document.querySelector('#eventCardPreviewContainer .no-image-placeholder');
+    const previewTitleEl = document.getElementById('previewTitle');
+    const previewDateEl = document.querySelector('#previewDate .value');
+    const previewTimeEl = document.querySelector('#previewTime .value');
+    const previewTimeContainerEl = document.getElementById('previewTime');
+    const previewSpeakerEl = document.querySelector('#previewSpeaker .value');
+    const previewShortDescEl = document.getElementById('previewShortDesc');
+    const previewSeatsEl = document.querySelector('#previewSeats .value');
+    const previewPriceEl = document.querySelector('#previewPrice .value');
+
+
     function updatePriceFieldVisibilityDashboard() {
         if (voluntaryCheckboxDashboard && priceContainerDashboard && eventPriceInputDashboard) {
             const isVoluntary = voluntaryCheckboxDashboard.checked;
             priceContainerDashboard.style.display = isVoluntary ? 'none' : 'block';
-            eventPriceInputDashboard.required = !isVoluntary; if (isVoluntary) eventPriceInputDashboard.value = '';
+            eventPriceInputDashboard.required = !isVoluntary;
+            if (isVoluntary) eventPriceInputDashboard.value = '';
+            updateEventPreview();
         }
     }
     if (voluntaryCheckboxDashboard) voluntaryCheckboxDashboard.addEventListener('change', updatePriceFieldVisibilityDashboard);
 
+
+    function updateEventPreview() {
+        if (!previewTitleEl) return;
+
+        previewTitleEl.textContent = document.getElementById('event-title-dashboard').value || 'Titolo Evento';
+        const dateValue = document.getElementById('event-date-dashboard').value;
+        previewDateEl.textContent = dateValue ? formatDbDate(dateValue) : 'Seleziona data';
+
+        const startTimeValue = document.getElementById('event-start-time-dashboard').value;
+        const endTimeValue = document.getElementById('event-end-time-dashboard').value;
+        let timeString = '';
+        if (startTimeValue && endTimeValue) {
+            timeString = `${startTimeValue} - ${endTimeValue}`;
+        } else if (startTimeValue) {
+            timeString = startTimeValue;
+        }
+
+        if (timeString && previewTimeContainerEl && previewTimeEl) {
+            previewTimeContainerEl.style.display = 'block';
+            previewTimeEl.textContent = timeString;
+        } else if (previewTimeContainerEl && previewTimeEl) {
+            previewTimeContainerEl.style.display = 'none';
+            previewTimeEl.textContent = '';
+        }
+
+        const speakerPrefix = document.getElementById('event-prefix-dashboard').value || 'Relatore';
+        const speakerName = document.getElementById('event-speaker-dashboard').value || 'Nome Relatore';
+        previewSpeakerEl.textContent = `${speakerPrefix}: ${speakerName}`;
+
+        previewShortDescEl.textContent = document.getElementById('event-short-desc-dashboard').value || 'Descrizione breve dell\'evento qui...';
+        previewSeatsEl.textContent = document.getElementById('event-seats-dashboard').value || '0';
+
+        const isVoluntary = document.getElementById('event-voluntary-dashboard').checked;
+        if (isVoluntary) {
+            previewPriceEl.textContent = 'Offerta libera';
+        } else {
+            const priceValue = parseFloat(document.getElementById('event-price-dashboard').value);
+            previewPriceEl.textContent = !isNaN(priceValue) && priceValue > 0 ? `€ ${priceValue.toFixed(2)}` : '€ 0.00';
+        }
+
+        const imageInput = document.getElementById('event-image-dashboard');
+        if (imageInput.files && imageInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImageEl.src = e.target.result;
+                previewImageEl.style.display = 'block';
+                if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
+            }
+            reader.readAsDataURL(imageInput.files[0]);
+        } else if (currentImagePreviewDashboard && currentImagePreviewDashboard.src !== '#' && currentImagePreviewDashboard.style.display !== 'none') {
+            previewImageEl.src = currentImagePreviewDashboard.src;
+            previewImageEl.style.display = 'block';
+            if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
+        } else {
+            previewImageEl.src = 'images/default-event.jpg';
+            previewImageEl.style.display = 'block';
+            if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
+        }
+    }
+
+    function attachPreviewListeners() {
+        const formElementsToWatch = [
+            'event-title-dashboard', 'event-date-dashboard',
+            'event-start-time-dashboard', 'event-end-time-dashboard',
+            'event-short-desc-dashboard', 'event-prefix-dashboard', 'event-speaker-dashboard',
+            'event-seats-dashboard', 'event-price-dashboard', 'event-voluntary-dashboard',
+            'event-image-dashboard'
+        ];
+        formElementsToWatch.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', updateEventPreview);
+                if (element.type === 'checkbox' || element.type === 'file') {
+                    element.addEventListener('change', updateEventPreview);
+                }
+            }
+        });
+    }
+
+
     function openEventPopupDashboard(eventData = null) {
-        if (!eventFormDashboard || !eventPopupTitleDashboard || !eventIdInputDashboard || !currentImagePreviewDashboard || !currentFlyerPreviewDashboard || !eventFormMessageDashboard) { console.error("Elementi popup evento mancanti."); return; }
-        eventFormDashboard.reset(); updatePriceFieldVisibilityDashboard();
+        if (!eventFormDashboard || !eventPopupTitleDashboard || !eventIdInputDashboard) { console.error("Elementi popup evento mancanti."); return; }
+        eventFormDashboard.reset();
+        updatePriceFieldVisibilityDashboard();
         eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';
-        currentImagePreviewDashboard.style.display = 'none'; currentImagePreviewDashboard.src = '#'; currentFlyerPreviewDashboard.innerHTML = '';
+        currentImagePreviewDashboard.style.display = 'none'; currentImagePreviewDashboard.src = '#';
+        currentFlyerPreviewDashboard.innerHTML = '';
+
+        document.getElementById('event-start-time-dashboard').value = '';
+        document.getElementById('event-end-time-dashboard').value = '';
+
         if (eventData) {
             eventPopupTitleDashboard.textContent = 'Modifica Evento'; eventIdInputDashboard.value = eventData.IDEvento;
             document.getElementById('event-title-dashboard').value = eventData.Titolo || '';
             const eventDate = eventData.Data ? new Date(eventData.Data.replace(/-/g, '/')) : null;
             document.getElementById('event-date-dashboard').value = (eventDate && !isNaN(eventDate)) ? eventDate.toISOString().split('T')[0] : '';
-            document.getElementById('event-time-dashboard').value = eventData.Durata || '';
+
+            let startTime = '';
+            let endTime = '';
+            const durata = eventData.Durata || '';
+            if (durata.includes('-')) {
+                const parts = durata.split('-');
+                startTime = parts[0].trim().match(/^\d{2}:\d{2}/) ? parts[0].trim().substring(0,5) : '';
+                endTime = parts[1].trim().match(/^\d{2}:\d{2}/) ? parts[1].trim().substring(0,5) : '';
+            } else if (durata.match(/^\d{2}:\d{2}/)) {
+                startTime = durata.substring(0,5);
+            }
+            document.getElementById('event-start-time-dashboard').value = startTime;
+            document.getElementById('event-end-time-dashboard').value = endTime;
+
             document.getElementById('event-short-desc-dashboard').value = eventData.descrizione || '';
             document.getElementById('event-long-desc-dashboard').value = eventData.descrizione_estesa || '';
             document.getElementById('event-prefix-dashboard').value = eventData.prefisso_relatore || 'Relatore';
             document.getElementById('event-speaker-dashboard').value = eventData.relatore || '';
             document.getElementById('event-association-dashboard').value = eventData.associazione || '';
             document.getElementById('event-seats-dashboard').value = eventData.posti_configurati_totali !== null ? eventData.posti_configurati_totali : '0';
-            document.getElementById('event-booking-dashboard').checked = !!eventData.FlagPrenotabile;
-            voluntaryCheckboxDashboard.checked = eventData.costo !== null && parseFloat(eventData.costo) === 0; updatePriceFieldVisibilityDashboard();
-            if (!voluntaryCheckboxDashboard.checked && eventData.costo !== null && parseFloat(eventData.costo) > 0) eventPriceInputDashboard.value = parseFloat(eventData.costo).toFixed(2); else eventPriceInputDashboard.value = '';
+            document.getElementById('event-booking-dashboard').checked = !!parseInt(eventData.FlagPrenotabile);
+
+            voluntaryCheckboxDashboard.checked = eventData.costo !== null && parseFloat(eventData.costo) === 0;
+            updatePriceFieldVisibilityDashboard();
+
+            if (!voluntaryCheckboxDashboard.checked && eventData.costo !== null && parseFloat(eventData.costo) > 0) {
+                eventPriceInputDashboard.value = parseFloat(eventData.costo).toFixed(2);
+            } else {
+                eventPriceInputDashboard.value = '';
+            }
+
             if (eventData.immagine_url) { currentImagePreviewDashboard.src = eventData.immagine_url; currentImagePreviewDashboard.style.display = 'block'; }
             if (eventData.volantino_url) { const fileName = eventData.volantino_url.split('/').pop(); currentFlyerPreviewDashboard.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank">Vedi volantino (${sanitizeText(fileName)})</a>`; }
         } else {
             eventPopupTitleDashboard.textContent = 'Aggiungi Nuovo Evento'; eventIdInputDashboard.value = '';
-            document.getElementById('event-booking-dashboard').checked = true; voluntaryCheckboxDashboard.checked = false; updatePriceFieldVisibilityDashboard();
-            document.getElementById('event-seats-dashboard').value = '50'; document.getElementById('event-prefix-dashboard').value = 'Relatore';
+            document.getElementById('event-booking-dashboard').checked = true;
+            voluntaryCheckboxDashboard.checked = false;
+            updatePriceFieldVisibilityDashboard();
+            document.getElementById('event-seats-dashboard').value = '50';
+            document.getElementById('event-prefix-dashboard').value = 'Relatore';
+            eventPriceInputDashboard.value = '';
         }
-        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.add('active'); if(eventPopupDashboard) eventPopupDashboard.classList.add('active');
-        document.body.style.overflow = 'hidden'; const titleInput = document.getElementById('event-title-dashboard'); if(titleInput) titleInput.focus();
+
+        updateEventPreview();
+
+        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.add('active');
+        if(eventPopupDashboard) eventPopupDashboard.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        const titleInput = document.getElementById('event-title-dashboard'); if(titleInput) titleInput.focus();
     }
+
     function closeEventPopupDashboard() {
-        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.remove('active'); if(eventPopupDashboard) eventPopupDashboard.classList.remove('active');
-        const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active'); if (!anyModalActive) document.body.style.overflow = '';
+        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.remove('active');
+        if(eventPopupDashboard) eventPopupDashboard.classList.remove('active');
+        const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active');
+        if (!anyModalActive) document.body.style.overflow = '';
     }
     if (closeEventPopupBtnDashboard) closeEventPopupBtnDashboard.addEventListener('click', closeEventPopupDashboard);
+
     document.addEventListener('keydown', function(event) {
-        if (event.key === "Escape") { if (eventPopupDashboard && eventPopupDashboard.classList.contains('active')) closeEventPopupDashboard(); const activeModal = document.querySelector('.modal.active'); if (activeModal) closeModal(activeModal.id); }
+        if (event.key === "Escape") {
+            if (eventPopupDashboard && eventPopupDashboard.classList.contains('active')) closeEventPopupDashboard();
+            const activeModal = document.querySelector('.modal.active'); if (activeModal) closeModal(activeModal.id);
+        }
     });
+
     if(eventFormDashboard) eventFormDashboard.addEventListener('submit', async function(e) {
         e.preventDefault(); const submitBtn = this.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML;
         submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
         if(eventFormMessageDashboard) { eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';}
         try {
-            const formData = new FormData(this); formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
+            const formData = new FormData(this);
+            formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
             if (formData.get('event-voluntary') === 'on') formData.set('event-price', '0.00');
-            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData }); const responseText = await response.text();
-            let result; try { result = JSON.parse(responseText); } catch (jsonError) { console.error("Risposta non JSON:", responseText); throw new Error(`Risposta server non valida.`); }
-            if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
-            if (result.success) { if(eventFormMessageDashboard) { eventFormMessageDashboard.textContent = result.message || 'Operazione completata!'; eventFormMessageDashboard.classList.remove('error'); eventFormMessageDashboard.classList.add('success'); } await fetchDashboardData(); setTimeout(closeEventPopupDashboard, 1500); }
-            else throw new Error(result.message || 'Errore salvataggio.');
-        } catch (error) { console.error('Errore form evento:', error); if(eventFormMessageDashboard) { eventFormMessageDashboard.textContent = `Errore: ${error.message}`; eventFormMessageDashboard.classList.remove('success'); eventFormMessageDashboard.classList.add('error'); }}
-        finally { if(eventFormMessageDashboard) eventFormMessageDashboard.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; }
-    });
-    // --- Fine Logica Pop-up Evento ---
+            else if (!formData.get('event-price') && !formData.get('event-voluntary')) {
+                formData.set('event-price', '0.00');
+            }
 
-    // --- Logica Tabs Eventi ---
-    const tabButtons = document.querySelectorAll('.event-tabs-container .event-tab-button'); // Selettore più specifico
-    const tabContents = document.querySelectorAll('#eventManagementContent .event-tab-content'); // Selettore più specifico
+            const startTime = formData.get('event-start-time');
+            const endTime = formData.get('event-end-time');
+            let durataString = '';
+            if (startTime && endTime) {
+                durataString = `${startTime}-${endTime}`;
+            } else if (startTime) {
+                durataString = startTime;
+            }
+            formData.append('event-time-combined', durataString);
+
+
+            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+            const responseText = await response.text();
+            let result;
+            try { result = JSON.parse(responseText); } catch (jsonError) { console.error("Risposta non JSON:", responseText); throw new Error(`Risposta server non valida.`); }
+
+            if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
+            if (result.success) {
+                if(eventFormMessageDashboard) {
+                    eventFormMessageDashboard.textContent = result.message || 'Operazione completata!';
+                    eventFormMessageDashboard.classList.remove('error'); eventFormMessageDashboard.classList.add('success');
+                }
+                await fetchDashboardData();
+                setTimeout(closeEventPopupDashboard, 1500);
+            } else {
+                throw new Error(result.message || 'Errore salvataggio.');
+            }
+        } catch (error) {
+            console.error('Errore form evento:', error);
+            if(eventFormMessageDashboard) {
+                eventFormMessageDashboard.textContent = `Errore: ${error.message}`;
+                eventFormMessageDashboard.classList.remove('success'); eventFormMessageDashboard.classList.add('error');
+            }
+        } finally {
+            if(eventFormMessageDashboard) eventFormMessageDashboard.style.display = 'block';
+            submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText;
+        }
+    });
+
+    const tabButtons = document.querySelectorAll('.event-tabs-container-main .event-tab-button');
+    const tabContents = document.querySelectorAll('#eventManagementContent .event-tab-content');
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
-            tabButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active');
-            const targetTab = button.dataset.tab;
-            tabContents.forEach(content => {
-                const isActiveTab = content.id === `${targetTab}EventsContainer`;
-                content.style.display = isActiveTab ? 'block' : 'none';
-                if (isActiveTab) content.classList.add('active'); else content.classList.remove('active');
-            });
+            if (!button.id || !button.id.startsWith('filterToggle')) {
+                tabButtons.forEach(btn => {
+                    if (!btn.id || !btn.id.startsWith('filterToggle')) btn.classList.remove('active');
+                });
+                button.classList.add('active');
+                const targetTab = button.dataset.tab;
+                tabContents.forEach(content => {
+                    const isActiveTab = content.id === `${targetTab}EventsContainer`;
+                    content.style.display = isActiveTab ? 'block' : 'none';
+                    if (isActiveTab) content.classList.add('active'); else content.classList.remove('active');
+                });
+            }
         });
     });
-    // --- Fine Logica Tabs Eventi ---
 
-    // --- Logica Filtro Dropdown ---
     const filterToggleButton = document.getElementById('filterToggleButton');
     const filterPanelDropdown = document.getElementById('filterPanelDropdown');
     const applyFiltersFromPanelBtn = document.getElementById('applyFiltersFromPanelBtn');
@@ -454,41 +1083,51 @@
 
     if (filterToggleButton && filterPanelDropdown) {
         filterToggleButton.addEventListener('click', function(event) {
-            event.stopPropagation(); const isActive = filterPanelDropdown.classList.toggle('active');
-            filterToggleButton.classList.toggle('active', isActive); filterToggleButton.setAttribute('aria-expanded', isActive.toString());
-        });
-        document.addEventListener('click', function(event) { // Chiudi cliccando fuori
-            if (filterPanelDropdown.classList.contains('active') && !filterPanelDropdown.contains(event.target) && !filterToggleButton.contains(event.target)) {
-                filterPanelDropdown.classList.remove('active'); filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');
-            }
+            event.stopPropagation();
+            const isActive = filterPanelDropdown.classList.toggle('active');
+            filterToggleButton.classList.toggle('active', isActive);
+            filterToggleButton.setAttribute('aria-expanded', isActive.toString());
         });
     }
     if (applyFiltersFromPanelBtn) applyFiltersFromPanelBtn.addEventListener('click', () => {
-        applyFiltersAndRender(); if (filterPanelDropdown) filterPanelDropdown.classList.remove('active');
+        applyFiltersAndRender();
+        if (filterPanelDropdown) filterPanelDropdown.classList.remove('active');
         if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}
     });
     if (resetFiltersBtnPanel) resetFiltersBtnPanel.addEventListener('click', () => {
         const searchTitleInput = document.getElementById('searchTitleDashboard'); if(searchTitleInput) searchTitleInput.value = '';
         const searchDateInput = document.getElementById('searchDateDashboard'); if(searchDateInput) searchDateInput.value = '';
         const searchSpeakerInput = document.getElementById('searchSpeakerDashboard'); if(searchSpeakerInput) searchSpeakerInput.value = '';
-        // Non applica subito, l'utente premerà "Applica"
+        applyFiltersAndRender();
+        if (filterPanelDropdown) filterPanelDropdown.classList.remove('active');
+        if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}
     });
-    // --- Fine Logica Filtro Dropdown ---
 
-
-    // --- Logica Caricamento Dati Dashboard, Filtri, Ordinamento e Raggruppamento ---
     async function fetchDashboardData() {
-        const upcomingGrid = document.getElementById('upcomingEventsGrid'); const pastGrid = document.getElementById('pastEventsGrid');
+        const upcomingGrid = document.getElementById('upcomingEventsGrid');
+        const pastGrid = document.getElementById('pastEventsGrid');
         if (!upcomingGrid || !pastGrid) { console.error("Elementi griglia eventi mancanti."); return; }
-        upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
-        pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>';
+
+        upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>';
+        pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento archivio eventi...</p>';
         try {
             const response = await fetch('get_dashboard_event_data.php');
             if (!response.ok) throw new Error(`Errore HTTP: ${response.status} ${response.statusText}`);
             const data = await response.json();
-            if (data.success) { allUpcomingEventsData = data.upcoming_events || []; allPastEventsData = data.past_events || []; applyFiltersAndRender(); }
-            else { const errorMsg = sanitizeText(data.message || 'Formato dati non corretto.'); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore: ${errorMsg}</p></div>`);}
-        } catch (error) { console.error('Errore fetchDashboardData:', error); const errorMsg = sanitizeText(error.message); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare: ${errorMsg}</p></div>`);}
+
+            if (data.success) {
+                allUpcomingEventsData = data.upcoming_events || [];
+                allPastEventsData = data.past_events || [];
+                applyFiltersAndRender();
+            } else {
+                const errorMsg = sanitizeText(data.message || 'Formato dati non corretto.');
+                [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore nel caricamento: ${errorMsg}</p></div>`);
+            }
+        } catch (error) {
+            console.error('Errore fetchDashboardData:', error);
+            const errorMsg = sanitizeText(error.message);
+            [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare i dati: ${errorMsg}</p> <button onclick="fetchDashboardData()" class="btn-admin">Riprova</button></div>`);
+        }
     }
 
     function applyFiltersAndRender() {
@@ -500,164 +1139,751 @@
         const groupBy = document.getElementById('groupCriteria').value;
 
         const filterEvent = (event) => {
-            const eventTitle = event.Titolo?.toLowerCase() || ''; const eventDateStr = event.Data || ''; const eventSpeaker = event.relatore?.toLowerCase() || '';
+            const eventTitle = event.Titolo?.toLowerCase() || '';
+            const eventDateStr = event.Data || '';
+            const eventSpeaker = event.relatore?.toLowerCase() || '';
+
             let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
             let dateMatch = !dateFilter || (eventDateStr && eventDateStr.substring(0, 7) === dateFilter);
             let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
             return titleMatch && dateMatch && speakerMatch;
         };
-        let filteredUpcoming = allUpcomingEventsData.filter(filterEvent); let filteredPast = allPastEventsData.filter(filterEvent);
+
+        let filteredUpcoming = allUpcomingEventsData.filter(filterEvent);
+        let filteredPast = allPastEventsData.filter(filterEvent);
 
         const compareFunction = (a, b) => {
             let valA, valB;
+            let comparison = 0;
+
             switch (sortBy) {
-                case 'mese': valA = new Date(a.Data); valB = new Date(b.Data); break;
-                case 'relatore': valA = a.relatore?.toLowerCase() || ''; valB = b.relatore?.toLowerCase() || ''; break;
-                case 'prenotazioni': valA = a.elenco_prenotazioni?.length || 0; valB = b.elenco_prenotazioni?.length || 0; break;
-                case 'titolo': valA = a.Titolo?.toLowerCase() || ''; valB = b.Titolo?.toLowerCase() || ''; break;
-                case 'post_occupati': valA = a.posti_occupati || 0; valB = b.posti_occupati || 0; break;
-                case 'post_tot': valA = a.posti_configurati_totali || 0; valB = b.posti_configurati_totali || 0; break;
-                default: valA = new Date(a.Data); valB = new Date(b.Data);
+                case 'mese':
+                    valA = new Date(a.Data);
+                    valB = new Date(b.Data);
+                    if (valA < valB) comparison = -1;
+                    if (valA > valB) comparison = 1;
+                    break;
+                case 'titolo':
+                    valA = a.Titolo?.toLowerCase() || '';
+                    valB = b.Titolo?.toLowerCase() || '';
+                    comparison = valA.localeCompare(valB, 'it', { sensitivity: 'base' });
+                    break;
+                case 'relatore':
+                    valA = a.relatore?.toLowerCase() || '';
+                    valB = b.relatore?.toLowerCase() || '';
+                    comparison = valA.localeCompare(valB, 'it', { sensitivity: 'base' });
+                    break;
+                case 'prenotazioni':
+                    valA = parseInt(a.elenco_prenotazioni?.length) || 0;
+                    valB = parseInt(b.elenco_prenotazioni?.length) || 0;
+                    if (valA < valB) comparison = -1;
+                    if (valA > valB) comparison = 1;
+                    break;
+                case 'post_occupati':
+                    valA = parseInt(a.posti_occupati) || 0;
+                    valB = parseInt(b.posti_occupati) || 0;
+                    if (valA < valB) comparison = -1;
+                    if (valA > valB) comparison = 1;
+                    break;
+                case 'post_tot':
+                    valA = parseInt(a.posti_configurati_totali) || 0;
+                    valB = parseInt(b.posti_configurati_totali) || 0;
+                    if (valA < valB) comparison = -1;
+                    if (valA > valB) comparison = 1;
+                    break;
+                default:
+                    valA = new Date(a.Data);
+                    valB = new Date(b.Data);
+                    if (valA < valB) comparison = -1;
+                    if (valA > valB) comparison = 1;
             }
-            if (typeof valA === 'string' && typeof valB === 'string') { const comp = valA.localeCompare(valB,'it',{sensitivity:'base'}); if(comp!==0) return sortDirection==='asc'?comp:-comp;}
-            else { if (valA < valB) return sortDirection === 'asc' ? -1 : 1; if (valA > valB) return sortDirection === 'asc' ? 1 : -1;}
-            let dA = new Date(a.Data); let dB = new Date(b.Data); let dFactor = (sortDirection==='asc')?1:-1;
-            if (dA < dB) return dFactor * -1; if (dA > dB) return dFactor * 1; return (a.IDEvento < b.IDEvento)?-1:1;
+
+            if (comparison === 0 && sortBy !== 'mese') {
+                let dateA = new Date(a.Data);
+                let dateB = new Date(b.Data);
+                if (dateA < dateB) comparison = -1;
+                if (dateA > dateB) comparison = 1;
+            }
+            if (comparison === 0) {
+                comparison = (parseInt(a.IDEvento) || 0) < (parseInt(b.IDEvento) || 0) ? -1 : 1;
+            }
+            return sortDirection === 'asc' ? comparison : -comparison;
         };
-        filteredUpcoming.sort(compareFunction); filteredPast.sort(compareFunction);
+
+        filteredUpcoming.sort(compareFunction);
+        filteredPast.sort(compareFunction);
+
         renderEventsSection(filteredUpcoming, 'upcomingEventsGrid', true, groupBy, sortDirection);
         renderEventsSection(filteredPast, 'pastEventsGrid', false, groupBy, sortDirection);
     }
 
     function getWeekStartDate(dInput) {
-        const d = new Date(dInput.replace(/-/g, '/')); const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1); return new Date(d.setDate(diff));
+        const parts = dInput.split('-');
+        const d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+        const day = d.getUTCDay();
+        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
+        return new Date(d.setUTCDate(diff));
     }
+
     function getWeekRangeString(dateStr) {
-        if (!dateStr) return 'Data non valida'; try { const date = new Date(dateStr.replace(/-/g, '/')); if (isNaN(date.getTime())) return 'Data non valida';
-            const weekStart = getWeekStartDate(dateStr); const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6);
-            const options = { day: '2-digit', month: 'short' }; const year = weekStart.getFullYear();
+        if (!dateStr || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return 'Data non valida';
+        try {
+            const weekStart = getWeekStartDate(dateStr);
+            const weekEnd = new Date(weekStart);
+            weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+
+            const options = { day: '2-digit', month: 'short', timeZone: 'UTC' };
+            const year = weekStart.getUTCFullYear();
             return `Sett. ${weekStart.toLocaleDateString('it-IT', options)} - ${weekEnd.toLocaleDateString('it-IT', options)} ${year}`;
-        } catch (e) { return 'Data non valida'; }
+        } catch (e) {
+            console.warn("Errore getWeekRangeString:", dateStr, e);
+            return 'Data non valida';
+        }
     }
 
     function renderEventsSection(events, gridContainerId, isUpcoming, groupBy, sortDirection) {
-        const gridContainer = document.getElementById(gridContainerId); if (!gridContainer) return; gridContainer.innerHTML = '';
-        if (isUpcoming) { const addEl = document.createElement('div'); addEl.className='add-event-bar'; addEl.innerHTML=`<i class="fas fa-plus-circle"></i><span>Nuovo Evento</span>`; addEl.addEventListener('click',()=>openEventPopupDashboard(null)); gridContainer.appendChild(addEl);}
-        if (events.length === 0) { if (!(isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar'))) { gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'}.</p>`;} return;}
-        if (groupBy === "nessuno") { events.forEach(event => gridContainer.appendChild(createAdminEventCard(event))); return;}
+        const gridContainer = document.getElementById(gridContainerId);
+        if (!gridContainer) return;
+        gridContainer.innerHTML = '';
+
+        if (isUpcoming) {
+            const addEventBar = document.createElement('div');
+            addEventBar.className = 'add-event-bar';
+            addEventBar.innerHTML = `<i class="fas fa-plus-circle"></i><span>Aggiungi Nuovo Evento</span>`;
+            addEventBar.addEventListener('click', () => openEventPopupDashboard(null));
+            gridContainer.appendChild(addEventBar);
+        }
+
+        if (events.length === 0) {
+            if (!(isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar'))) {
+                gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'} trovato con i filtri applicati.</p>`;
+            }
+            return;
+        }
+
+        if (groupBy === "nessuno") {
+            events.forEach(event => gridContainer.appendChild(createAdminEventCard(event)));
+            return;
+        }
+
         const groupedEvents = events.reduce((acc, event) => {
-            let groupKey = 'Non specificato'; try { switch (groupBy) {
-                case 'giorno': groupKey = event.Data ? formatDbDate(event.Data) : 'Data scon.'; break;
-                case 'settimana': groupKey = event.Data ? getWeekRangeString(event.Data) : 'Data scon.'; break;
-                case 'mese': groupKey = event.Data ? formatMonthYear(event.Data) : 'Data scon.'; break;
-                case 'anno': groupKey = event.Data ? new Date(event.Data.replace(/-/g,'/')).getFullYear().toString() : 'Anno scon.'; break;
-                case 'relatore': groupKey = sanitizeText(event.relatore || 'Senza Relatore'); break;
-                default: groupKey = event.Data ? formatMonthYear(event.Data) : 'Data scon.';}} catch(e){console.warn("Errore groupKey:", event,e);}
-            if (!acc[groupKey]) acc[groupKey] = []; acc[groupKey].push(event); return acc;
+            let groupKey = 'Non specificato';
+            try {
+                switch (groupBy) {
+                    case 'giorno': groupKey = event.Data ? formatDbDate(event.Data) : 'Data sconosciuta'; break;
+                    case 'settimana': groupKey = event.Data ? getWeekRangeString(event.Data) : 'Data sconosciuta'; break;
+                    case 'mese': groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta'; break;
+                    case 'anno': groupKey = event.Data ? new Date(event.Data.replace(/-/g,'/')).getFullYear().toString() : 'Anno sconosciuto'; break;
+                    case 'relatore': groupKey = sanitizeText(event.relatore || 'Senza Relatore'); break;
+                    default: groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta';
+                }
+            } catch(e) { console.warn("Errore calcolo groupKey per evento:", event, e); }
+            if (!acc[groupKey]) acc[groupKey] = [];
+            acc[groupKey].push(event);
+            return acc;
         }, {});
+
         let sortedGroupKeys = Object.keys(groupedEvents);
+
         if (groupBy === 'giorno' || groupBy === 'settimana' || groupBy === 'mese' || groupBy === 'anno') {
-            sortedGroupKeys.sort((a, b) => { let dateA, dateB; try {
-                if (groupBy === 'giorno') { const pA=a.split('/'); dateA=new Date(pA[2],pA[1]-1,pA[0]); const pB=b.split('/'); dateB=new Date(pB[2],pB[1]-1,pB[0]);}
-                else if (groupBy === 'settimana') { const yA=parseInt(a.substring(a.lastIndexOf(' ')+1)); const mdA=a.split(' ')[1].split('/'); dateA=new Date(yA,getMonthIndexFromString(a.split(' ')[2].replace('.','')),parseInt(mdA[0])); const yB=parseInt(b.substring(b.lastIndexOf(' ')+1)); const mdB=b.split(' ')[1].split('/'); dateB=new Date(yB,getMonthIndexFromString(b.split(' ')[2].replace('.','')),parseInt(mdB[0]));}
-                else if (groupBy === 'mese') { const pA=a.split(' '); dateA=new Date(pA[1],getMonthIndexFromString(pA[0])); const pB=b.split(' '); dateB=new Date(pB[1],getMonthIndexFromString(pB[0]));}
-                else if (groupBy === 'anno') { dateA=new Date(a,0,1); dateB=new Date(b,0,1);}} catch(e){return sortDirection==='asc'?String(a).localeCompare(String(b)):String(b).localeCompare(String(a));}
-                if(dateA&&dateB&&!isNaN(dateA)&&!isNaN(dateB))return sortDirection==='asc'?dateA-dateB:dateB-dateA; return sortDirection==='asc'?String(a).localeCompare(String(b)):String(b).localeCompare(String(a));});
-        } else if (groupBy === 'relatore') sortedGroupKeys.sort((a,b)=>sortDirection==='asc'?a.localeCompare(b,'it',{sensitivity:'base'}):b.localeCompare(a,'it',{sensitivity:'base'}));
-        for (const groupKey of sortedGroupKeys) { const h=document.createElement('h3'); h.className='month-year-header'; h.textContent=groupKey; gridContainer.appendChild(h); groupedEvents[groupKey].forEach(ev=>gridContainer.appendChild(createAdminEventCard(ev)));}
+            sortedGroupKeys.sort((a, b) => {
+                let dateA, dateB;
+                try {
+                    if (groupBy === 'giorno') {
+                        const pA = a.split('/'); dateA = new Date(Date.UTC(pA[2], pA[1]-1, pA[0]));
+                        const pB = b.split('/'); dateB = new Date(Date.UTC(pB[2], pB[1]-1, pB[0]));
+                    } else if (groupBy === 'settimana') {
+                        const matchA = a.match(/Sett\. (\d{2}) (\w+)/);
+                        const yearA = parseInt(a.substring(a.lastIndexOf(' ') + 1));
+                        if (matchA) dateA = new Date(Date.UTC(yearA, getMonthIndexFromString(matchA[2]), parseInt(matchA[1])));
+
+                        const matchB = b.match(/Sett\. (\d{2}) (\w+)/);
+                        const yearB = parseInt(b.substring(b.lastIndexOf(' ') + 1));
+                        if (matchB) dateB = new Date(Date.UTC(yearB, getMonthIndexFromString(matchB[2]), parseInt(matchB[1])));
+
+                    } else if (groupBy === 'mese') {
+                        const pA = a.split(' '); dateA = new Date(Date.UTC(pA[1], getMonthIndexFromString(pA[0]), 1));
+                        const pB = b.split(' '); dateB = new Date(Date.UTC(pB[1], getMonthIndexFromString(pB[0]), 1));
+                    } else if (groupBy === 'anno') {
+                        dateA = new Date(Date.UTC(a, 0, 1));
+                        dateB = new Date(Date.UTC(b, 0, 1));
+                    }
+                } catch(e) {
+                    return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
+                }
+
+                if (dateA && dateB && !isNaN(dateA) && !isNaN(dateB)) {
+                    return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+                }
+                return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
+            });
+        } else if (groupBy === 'relatore') {
+            sortedGroupKeys.sort((a,b) => sortDirection === 'asc' ? a.localeCompare(b,'it',{sensitivity:'base'}) : b.localeCompare(a,'it',{sensitivity:'base'}));
+        }
+
+        for (const groupKey of sortedGroupKeys) {
+            const headerEl = document.createElement('h3');
+            headerEl.className = 'month-year-header';
+            headerEl.textContent = groupKey;
+            gridContainer.appendChild(headerEl);
+            groupedEvents[groupKey].forEach(event => gridContainer.appendChild(createAdminEventCard(event)));
+        }
     }
 
-    function createAdminEventCard(event) { // Funzione esistente (leggermente aggiornata per relatore in card)
-        const eventCard = document.createElement('article'); eventCard.className = 'admin-event-card'; eventCard.id = `admin-event-${event.IDEvento}`;
-        const numPrenotazioni = event.elenco_prenotazioni?.length || 0; const partecipanti = event.posti_occupati || 0;
-        const postiConfigurati = event.posti_configurati_totali || 0; const commentCount = event.comment_count || 0; const mediaCount = event.media_count || 0;
+    function createAdminEventCard(event) {
+        const eventCard = document.createElement('article');
+        eventCard.className = 'admin-event-card';
+        eventCard.id = `admin-event-${event.IDEvento}`;
+
+        const numPrenotazioni = event.elenco_prenotazioni?.length || 0;
+        const partecipanti = event.posti_occupati || 0;
+        const postiConfigurati = event.posti_configurati_totali || 0;
+        const commentCount = event.comment_count || 0;
+        const mediaCount = event.media_count || 0;
+
         let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-admin.jpg';
-        const relatoreDisplay = event.relatore ? `<span class="admin-event-date" style="display:block; margin-top:2px;">${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>` : '';
+        const relatoreDisplay = event.relatore ? `<span class="admin-event-date" style="display:block; margin-top:2px; font-style:italic;">${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>` : '';
+
         eventCard.innerHTML = `
-            <div class="admin-event-card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.Titolo)}" class="admin-event-card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+            <div class="admin-event-card-image-container">
+                <img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.Titolo)}" class="admin-event-card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
+            </div>
             <div class="admin-event-card-content">
-                <div class="admin-event-card-header"><h3 class="admin-event-title">${sanitizeText(event.Titolo)} (ID: ${event.IDEvento})</h3><span class="admin-event-date">Data: ${formatDbDate(event.Data)} ${sanitizeText(event.Durata) || ''}</span>${relatoreDisplay}</div>
-                <div class="admin-event-card-quick-stats"><div class="stat-item" title="Prenotazioni"><i class="fas fa-ticket-alt"></i> ${numPrenotazioni} Pren.</div><div class="stat-item" title="Partecipanti / Posti Config."><i class="fas fa-users"></i> ${partecipanti}/${postiConfigurati}</div><div class="stat-item" title="Media"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div><div class="stat-item" title="Commenti"><i class="fas fa-comments"></i> ${commentCount} Comm.</div></div>
-                <div class="admin-event-card-actions top-actions"><button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Media"><i class="fas fa-photo-video"></i> Media</button><button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Commenti"><i class="fas fa-comments"></i> Commenti</button><button class="btn-admin btn-bookings" data-event-id="${event.IDEvento}" title="Prenotazioni"><i class="fas fa-list-alt"></i> Prenotazioni</button></div>
-                <div class="admin-event-card-actions bottom-actions"><button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="PDF"><i class="fas fa-file-pdf"></i> PDF</button><button class="btn-admin btn-edit" data-event-id="${event.IDEvento}" title="Modifica"><i class="fas fa-edit"></i> Modifica</button><button class="btn-admin btn-admin-danger btn-delete" data-event-id="${event.IDEvento}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div>
+                <div class="admin-event-card-header">
+                    <h3 class="admin-event-title">${sanitizeText(event.Titolo)} <small>(ID: ${event.IDEvento})</small></h3>
+                    <span class="admin-event-date">Data: ${formatDbDate(event.Data)} ${sanitizeText(event.Durata) || ''}</span>
+                    ${relatoreDisplay}
+                </div>
+                <div class="admin-event-card-quick-stats">
+                    <div class="stat-item" title="Prenotazioni"><i class="fas fa-ticket-alt"></i> ${numPrenotazioni} Pren.</div>
+                    <div class="stat-item" title="Partecipanti / Posti Config."><i class="fas fa-users"></i> ${partecipanti}/${postiConfigurati}</div>
+                    <div class="stat-item" title="Media"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div>
+                    <div class="stat-item" title="Commenti"><i class="fas fa-comments"></i> ${commentCount} Comm.</div>
+                </div>
+                <div class="admin-event-card-actions top-actions">
+                    <button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Media"><i class="fas fa-photo-video"></i> Media</button>
+                    <button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Commenti"><i class="fas fa-comments"></i> Commenti</button>
+                    <button class="btn-admin btn-bookings" data-event-id="${event.IDEvento}" title="Prenotazioni"><i class="fas fa-list-alt"></i> Prenotazioni</button>
+                </div>
+                <div class="admin-event-card-actions bottom-actions">
+                    <button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="PDF"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button class="btn-admin btn-edit" data-event-id="${event.IDEvento}" title="Modifica"><i class="fas fa-edit"></i> Modifica</button>
+                    <button class="btn-admin btn-admin-danger btn-delete" data-event-id="${event.IDEvento}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button>
+                </div>
             </div>`;
-        const editButton = eventCard.querySelector('.btn-edit'); if(editButton) editButton.addEventListener('click', function() { const eventToEdit = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); if (eventToEdit) openEventPopupDashboard(eventToEdit); else alert("Dati evento non trovati.");});
-        const deleteButton = eventCard.querySelector('.btn-delete'); if(deleteButton) deleteButton.addEventListener('click', function() { const eventToDelete = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); confirmDeleteEvent(this.dataset.eventId, eventToDelete ? eventToDelete.Titolo : "evento");});
-        const bookingsButton = eventCard.querySelector('.btn-bookings'); if(bookingsButton) bookingsButton.addEventListener('click', function() { const eventForBookings = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); if (eventForBookings) openManageBookingsModal(eventForBookings); else alert("Dati evento non trovati.");});
+
+        const editButton = eventCard.querySelector('.btn-edit');
+        if(editButton) editButton.addEventListener('click', function() {
+            const eventToEdit = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId);
+            if (eventToEdit) openEventPopupDashboard(eventToEdit);
+            else alert("Dati evento non trovati per la modifica.");
+        });
+
+        const deleteButton = eventCard.querySelector('.btn-delete');
+        if(deleteButton) deleteButton.addEventListener('click', function() {
+            const eventToDelete = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId);
+            confirmDeleteEvent(this.dataset.eventId, eventToDelete ? eventToDelete.Titolo : "evento sconosciuto");
+        });
+
+        const bookingsButton = eventCard.querySelector('.btn-bookings');
+        if(bookingsButton) bookingsButton.addEventListener('click', function() {
+            const eventForBookings = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId);
+            if (eventForBookings) openManageBookingsModal(eventForBookings);
+            else alert("Dati evento non trovati per le prenotazioni.");
+        });
         return eventCard;
     }
-
-    // --- Funzioni Gestione Prenotazioni, Media, Commenti, Eliminazione Evento (invariate rispetto alla versione precedente) ---
-    // ... (copia qui le funzioni: openManageBookingsModal, renderGroupedBookings, confirmCancelBookingInModal, cancelBookingInModal)
-    // ... (copia qui le funzioni: openManageMediaModal, renderExistingMedia, deleteMediaItem, e l'event listener per uploadMediaForm)
-    // ... (copia qui le funzioni: openManageCommentsModal, renderCommentsForAdminThreaded, attachAdminCommentListeners, handleAdminReplySubmit, deleteAdminComment)
-    // ... (copia qui la funzione: confirmDeleteEvent)
-    // --- COPIA TUTTE LE FUNZIONI HELPER PER I MODAL QUI ---
-    // COPIATE DALLA RISPOSTA PRECEDENTE PER COMPLETEZZA:
     function openManageBookingsModal(eventData) {
-        const modalTitleEl = document.getElementById('bookingsEventTitle'); const bookingsContainerEl = document.getElementById('bookingsListContainerModal'); const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
-        if (modalTitleEl) modalTitleEl.textContent = sanitizeText(eventData.Titolo); if (feedbackEl) feedbackEl.innerHTML = '';
-        if (bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento); openModal('manageBookingsModal');
+        const modalTitleEl = document.getElementById('bookingsEventTitle');
+        const bookingsContainerEl = document.getElementById('bookingsListContainerModal');
+        const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
+
+        if (modalTitleEl) modalTitleEl.textContent = sanitizeText(eventData.Titolo);
+        if (feedbackEl) feedbackEl.innerHTML = '';
+        if (bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento);
+        openModal('manageBookingsModal');
     }
     function renderGroupedBookings(bookings, eventId) {
-        if (!bookings || bookings.length === 0) return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione.</p>'; let html = '';
-        bookings.forEach(booking => { const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim(); const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto);
-            html += `<div class="user-booking-group" id="booking-group-${booking.idPrenotazione}"><h5>Prenotazione di: ${displayNomeUtente} <small>(${sanitizeText(booking.Contatto)})</small></h5><div class="single-booking-details"><p><strong>ID: ${booking.idPrenotazione}</strong> - Posti: ${booking.NumeroPosti}</p><strong>Partecipanti:</strong>${booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0 ? `<ul class="participant-list-inline">${booking.partecipanti_della_prenotazione.map(p => `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`).join('')}</ul>` : '<p><small>Nessun dettaglio.</small></p>'}<button class="btn-admin btn-admin-danger btn-sm" onclick="confirmCancelBookingInModal(${booking.idPrenotazione}, ${eventId}, ${booking.NumeroPosti}, '${sanitizeForAttribute(displayNomeUtente)}')" title="Annulla"><i class="fas fa-times-circle"></i> Annulla</button></div></div>`;});
+        if (!bookings || bookings.length === 0) return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione per questo evento.</p>';
+        let html = '';
+        bookings.forEach(booking => {
+            const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim();
+            const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto);
+            const partecipantiHTML = booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0
+                ? `<ul class="participant-list-inline">${booking.partecipanti_della_prenotazione.map(p => `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`).join('')}</ul>`
+                : '<p><small>Nessun dettaglio partecipante fornito.</small></p>';
+
+            html += `
+                <div class="user-booking-group" id="booking-group-${booking.idPrenotazione}">
+                    <h5>Prenotazione di: ${displayNomeUtente} <small>(${sanitizeText(booking.Contatto)})</small></h5>
+                    <div class="single-booking-details">
+                        <p><strong>ID Prenotazione: ${booking.idPrenotazione}</strong> - Posti Prenotati: ${booking.NumeroPosti}</p>
+                        <strong>Partecipanti:</strong>
+                        ${partecipantiHTML}
+                        <button class="btn-admin btn-admin-danger btn-sm" onclick="confirmCancelBookingInModal(${booking.idPrenotazione}, ${eventId}, ${booking.NumeroPosti}, '${sanitizeForAttribute(displayNomeUtente)}')" title="Annulla Prenotazione">
+                            <i class="fas fa-times-circle"></i> Annulla
+                        </button>
+                    </div>
+                </div>`;
+        });
         return html;
     }
-    function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) { if (confirm(`Annullare prenotazione ID ${idPrenotazione} (${numPosti} posti) di ${nomeUtente}?`)) cancelBookingInModal(idPrenotazione, eventId);}
+    function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) {
+        if (confirm(`Sei sicuro di voler annullare la prenotazione ID ${idPrenotazione} (${numPosti} posti) effettuata da ${nomeUtente}? L'azione è irreversibile.`)) {
+            cancelBookingInModal(idPrenotazione, eventId);
+        }
+    }
     async function cancelBookingInModal(idPrenotazione, eventIdForModalReload) {
-        const feedbackEl = document.getElementById('bookingsManagementFeedbackModal'); if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento...</p>`;
-        try { const formData = new FormData(); formData.append('id_prenotazione', idPrenotazione); const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData }); const result = await response.json();
-            if (feedbackEl) { if (result.success) { feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`; await fetchDashboardData(); const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === String(eventIdForModalReload)); if(updatedEventData) { const bookingsContainerEl = document.getElementById('bookingsListContainerModal'); if(bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(updatedEventData.elenco_prenotazioni || [], updatedEventData.IDEvento);} else closeModal('manageBookingsModal');} else feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare.')}</p>`;}}
-        catch (error) { console.error("Errore AJAX annullamento modal:", error); if (feedbackEl) feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore connessione: ${sanitizeText(error.message)}</p>`;}
+        const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
+        if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento in corso...</p>`;
+        try {
+            const formData = new FormData();
+            formData.append('id_prenotazione', idPrenotazione);
+            const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (feedbackEl) {
+                if (result.success) {
+                    feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`;
+                    await fetchDashboardData();
+                    const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === String(eventIdForModalReload));
+                    if(updatedEventData) {
+                        const bookingsContainerEl = document.getElementById('bookingsListContainerModal');
+                        if(bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(updatedEventData.elenco_prenotazioni || [], updatedEventData.IDEvento);
+                    } else {
+                        closeModal('manageBookingsModal');
+                    }
+                } else {
+                    feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare la prenotazione.')}</p>`;
+                }
+            }
+        } catch (error) {
+            console.error("Errore AJAX annullamento prenotazione nel modal:", error);
+            if (feedbackEl) feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore di connessione: ${sanitizeText(error.message)}</p>`;
+        }
     }
     async function openManageMediaModal(eventId, eventTitle) {
-        const eventIdInput=document.getElementById('uploadMediaEventId'); const eventTitleEl=document.getElementById('uploadMediaEventTitle'); const existingMediaContainer=document.getElementById('existingMediaContainer'); const feedbackDiv=document.getElementById('uploadMediaFeedback'); const uploadForm=document.getElementById('uploadMediaForm');
-        if(eventIdInput)eventIdInput.value=eventId; if(eventTitleEl)eventTitleEl.textContent=sanitizeText(eventTitle); if(uploadForm)uploadForm.reset(); if(feedbackDiv)feedbackDiv.innerHTML=''; if(existingMediaContainer)existingMediaContainer.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>'; openModal('uploadMediaModal');
-        try{const response=await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`); const result=await response.json(); if(result.success&&result.media)renderExistingMedia(result.media,eventId); else if(existingMediaContainer)existingMediaContainer.innerHTML=`<p>Nessun media o errore: ${sanitizeText(result.message||'Sconosciuto.')}</p>`;}
-        catch(error){console.error('Errore recupero media:',error); if(existingMediaContainer)existingMediaContainer.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;}}
-    function renderExistingMedia(mediaItems,eventId){ const container=document.getElementById('existingMediaContainer'); if(!container)return; if(mediaItems.length===0){container.innerHTML='<p>Nessun media caricato.</p>';return;} let html='<div class="existing-media-grid">';
-        mediaItems.forEach(item=>{ const filename=item.url_media?item.url_media.split('/').pop():'File'; const itemDesc=sanitizeText(item.Descrizione||''); html+=`<div class="existing-media-item">`; if(item.tipo_media==='image')html+=`<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Vedi: ${sanitizeForAttribute(filename)} ${itemDesc?'- '+itemDesc:''}"><img src="${sanitizeForAttribute(item.url_media)}" alt="${itemDesc||filename}" loading="lazy" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;" title="Immagine: ${sanitizeForAttribute(filename)}"><i class="fas fa-image"></i></div>`; else if(item.tipo_media==='video')html+=`<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Vedi: ${sanitizeForAttribute(filename)} ${itemDesc?'- '+itemDesc:''}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`; else html+=`<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Apri: ${sanitizeForAttribute(filename)} ${itemDesc?'- '+itemDesc:''}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`; html+=`<p class="media-filename" title="${sanitizeForAttribute(item.url_media)}">${sanitizeText(filename)}</p>`; if(itemDesc)html+=`<p class="media-description"><em>${itemDesc}</em></p>`; html+=`<button class="btn-admin btn-admin-danger btn-sm btn-delete-media" data-media-id="${item.id_media}" data-event-id="${eventId}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div>`;});
-        html+='</div>'; container.innerHTML=html; container.querySelectorAll('.btn-delete-media').forEach(button=>button.addEventListener('click',function(){if(confirm('Eliminare questo media?'))deleteMediaItem(this.dataset.mediaId,this.dataset.eventId);}));}
-    async function deleteMediaItem(mediaId,eventId){ const feedbackDiv=document.getElementById('uploadMediaFeedback'); if(feedbackDiv)feedbackDiv.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
-        try{const formData=new FormData();formData.append('action','delete_event_media');formData.append('media_id',mediaId); const response=await fetch('manage_event_media.php',{method:'POST',body:formData});const result=await response.json(); if(result.success){if(feedbackDiv)feedbackDiv.innerHTML=`<p class="success-message">${sanitizeText(result.message)}</p>`;openManageMediaModal(eventId,document.getElementById('uploadMediaEventTitle')?.textContent||"Evento");fetchDashboardData();}else if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;}
-        catch(error){console.error('Errore eliminazione media:',error);if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(()=>{if(feedbackDiv)feedbackDiv.innerHTML='';},4000);}
-    const eventUploadMediaForm = document.getElementById('uploadMediaForm'); // rinominato per evitare conflitti
-    if(eventUploadMediaForm) eventUploadMediaForm.addEventListener('submit', async function(e) { e.preventDefault(); const eventId=document.getElementById('uploadMediaEventId').value; const feedbackDiv=document.getElementById('uploadMediaFeedback'); if(document.getElementById('mediaFiles').files.length===0){if(feedbackDiv)feedbackDiv.innerHTML='<p class="error-message">Seleziona file.</p>';return;} if(feedbackDiv)feedbackDiv.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>'; const formData=new FormData(this);formData.set('action','upload_media');formData.set('event_id',eventId);
-        try{const response=await fetch('manage_event_media.php',{method:'POST',body:formData});const result=await response.json(); if(result.success){if(feedbackDiv)feedbackDiv.innerHTML=`<p class="success-message">${sanitizeText(result.message)}</p>`;openManageMediaModal(eventId,document.getElementById('uploadMediaEventTitle')?.textContent||"Evento");fetchDashboardData();this.reset();}else if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;}
-        catch(error){console.error('Errore uploadMedia:',error);if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(()=>{if(feedbackDiv)feedbackDiv.innerHTML='';},5000);});
-    let currentEventIdForCommentsGl = null; // rinominato per evitare conflitti
-    async function openManageCommentsModal(eventId,eventTitle){ currentEventIdForCommentsGl=eventId;const titleEl=document.getElementById('commentsEventTitle'); let listContainerEl=document.getElementById('commentsListContainer');const feedbackEl=document.getElementById('commentsManagementFeedback'); if(titleEl)titleEl.textContent=sanitizeText(eventTitle);if(feedbackEl)feedbackEl.innerHTML=''; if(listContainerEl&&listContainerEl.parentNode){const newClonedListContainer=listContainerEl.cloneNode(false); listContainerEl.parentNode.replaceChild(newClonedListContainer,listContainerEl);listContainerEl=newClonedListContainer;attachAdminCommentListeners(listContainerEl);}else{console.error("commentsListContainer non trovato.");if(feedbackEl)feedbackEl.innerHTML='<p class="error-message">Errore UI.</p>';openModal('manageCommentsModal');return;} listContainerEl.innerHTML='<li><p><i class="fas fa-spinner fa-spin"></i>Caricamento...</p></li>';openModal('manageCommentsModal');
-        try{const response=await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`); if(!response.ok){let errTxt=`Errore HTTP ${response.status}`;try{const errData=await response.json();errTxt=errData.message||errTxt;}catch(e){}throw new Error(errTxt);} const result=await response.json(); if(result.success&&result.comments)renderCommentsForAdminThreaded(result.comments,eventId,listContainerEl); else listContainerEl.innerHTML=`<li><p>${sanitizeText(result.message||'Nessun commento o errore.')}</p></li>`;}
-        catch(error){console.error('Errore caricamento commenti:',error);listContainerEl.innerHTML=`<li><p class="error-message">Impossibile caricare: ${sanitizeText(error.message)}</p></li>`;}}
-    function renderCommentsForAdminThreaded(comments,eventId,parentUlElement,depth=0){ if(depth===0){parentUlElement.innerHTML='';if(!comments||comments.length===0){parentUlElement.innerHTML='<li style="list-style-type:none;text-align:center;margin:1rem 0;"><p>Nessun commento.</p></li>';return;}}
-        comments.forEach(comment=>{ const commentItemLi=document.createElement('li');commentItemLi.className='comment-item-admin-styled';commentItemLi.id=`admin-comment-${comment.Progressivo}`; if(comment.is_admin_reply)commentItemLi.classList.add('commento-admin-generale'); const commenterAvatar=comment.commenter_icon_path||defaultUserIconPath;const commenterName=sanitizeText(comment.utente_display_name||'Utente'); const commentDate=sanitizeText(comment.data_creazione_formattata||'Data non disp.');const commentText=sanitizeTextForHTML(comment.Descrizione); let adminBadgeHTML=comment.is_admin_reply?'<span class="badge-admin-dashboard">(Admin)</span>':'';
-            commentItemLi.innerHTML=`<div class="comment-header"><img src="${commenterAvatar}" alt="Avatar" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';"><div class="comment-meta"><strong>${commenterName}</strong> ${adminBadgeHTML} <small>${commentDate}</small><small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta?` | Risposta a: ${comment.CodRisposta}`:''}</small></div></div><div class="comment-text-admin">${commentText}</div><div class="comment-actions-admin"><button class="btn-admin btn-admin-reply" data-comment-id="${comment.Progressivo}" title="Rispondi"><i class="fas fa-reply"></i> Rispondi</button><button class="btn-admin btn-admin-danger btn-admin-delete-comment" data-comment-id="${comment.Progressivo}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div><div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}" style="display:none;"><form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}"><textarea name="Descrizione" placeholder="Rispondi come ${adminNameGlobalJS}..." rows="3" required></textarea><div class="form-actions-reply"><button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia</button></div><div class="form-message-local" style="margin-top:0.5em;"></div></form></div>`; parentUlElement.appendChild(commentItemLi);
-            if(comment.replies&&comment.replies.length>0){const repliesUl=document.createElement('ul');repliesUl.className='comment-replies-list-styled';commentItemLi.appendChild(repliesUl);renderCommentsForAdminThreaded(comment.replies,eventId,repliesUl,depth+1);}});}
-    function attachAdminCommentListeners(commentsListContainerUL){ if(!commentsListContainerUL)return; commentsListContainerUL.addEventListener('click',async function(event){ const target=event.target;const replyButton=target.closest('.btn-admin-reply'); if(replyButton){event.preventDefault();const commentId=replyButton.dataset.commentId;const replyFormDiv=document.getElementById(`reply-form-admin-${commentId}`); if(replyFormDiv){const isActive=replyFormDiv.style.display==='block';replyFormDiv.style.display=isActive?'none':'block';if(!isActive)replyFormDiv.querySelector('textarea')?.focus();const localMsg=replyFormDiv.querySelector('.form-message-local');if(localMsg){localMsg.textContent='';localMsg.style.display='none';}}return;} const deleteButton=target.closest('.btn-admin-delete-comment'); if(deleteButton){event.preventDefault();const commentId=deleteButton.dataset.commentId;if(currentEventIdForCommentsGl)deleteAdminComment(commentId,currentEventIdForCommentsGl);else alert("Errore: ID evento mancante.");return;}}); commentsListContainerUL.addEventListener('submit',async function(event){ const targetForm=event.target.closest('.reply-form-admin form');if(targetForm){event.preventDefault();const eventId=targetForm.dataset.eventId;await handleAdminReplySubmit(targetForm,eventId);}}); }
-    async function handleAdminReplySubmit(formElement,eventId){ const parentCommentId=formElement.dataset.parentCommentId;const replyText=formElement.querySelector('textarea[name="Descrizione"]').value.trim(); const feedbackEl=formElement.querySelector('.form-message-local');const submitBtn=formElement.querySelector('button[type="submit"]'); if(!replyText){if(feedbackEl){feedbackEl.textContent='Risposta vuota.';feedbackEl.className='form-message-local error-message';feedbackEl.style.display='block';}return;} const originalBtnHTML=submitBtn.innerHTML;if(submitBtn){submitBtn.disabled=true;submitBtn.innerHTML='<span class="spinner-mini"></span> Invio...';}if(feedbackEl){feedbackEl.textContent='';feedbackEl.style.display='none';}
-        try{const formData=new FormData();formData.append('action','submit_admin_reply');formData.append('event_id',eventId);formData.append('comment_id',parentCommentId);formData.append('reply_text',replyText); const response=await fetch('manage_comments_admin.php',{method:'POST',body:formData}); if(!response.ok){let errData={message:`Errore HTTP ${response.status}`};try{errData=await response.json();}catch(e){}throw new Error(errData.message||`Errore server`);} const result=await response.json(); if(result.success){if(feedbackEl){feedbackEl.textContent='Risposta inviata!';feedbackEl.className='form-message-local success-message';feedbackEl.style.display='block';setTimeout(()=>{if(feedbackEl){feedbackEl.style.display='none';feedbackEl.textContent='';}},3000);} formElement.reset();const replyFormDiv=formElement.closest('.reply-form-admin');if(replyFormDiv)replyFormDiv.style.display='none'; await openManageCommentsModal(eventId,document.getElementById('commentsEventTitle')?.textContent||"Evento");fetchDashboardData();}else throw new Error(result.message||'Errore invio.');}
-        catch(error){console.error("Errore invio risposta:",error);if(feedbackEl){feedbackEl.textContent=`Errore: ${sanitizeText(error.message)}`;feedbackEl.className='form-message-local error-message';feedbackEl.style.display='block';}} finally{if(submitBtn){submitBtn.disabled=false;submitBtn.innerHTML=originalBtnHTML;}}}
-    async function deleteAdminComment(commentId,eventIdForReload){ if(!confirm('Eliminare commento e risposte? Irreversibile.'))return; const feedbackDiv=document.getElementById('commentsManagementFeedback'); if(feedbackDiv)feedbackDiv.innerHTML='<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>';
-        try{const formData=new FormData();formData.append('action','delete_comment');formData.append('comment_id',commentId); const response=await fetch('manage_comments_admin.php',{method:'POST',body:formData}); if(!response.ok){let errData={message:`Errore HTTP ${response.status}`};try{errData=await response.json();}catch(e){}throw new Error(errData.message||`Errore server`);} const result=await response.json(); if(result.success){if(feedbackDiv)feedbackDiv.innerHTML=`<p class="success-message">${sanitizeText(result.message)}</p>`;await openManageCommentsModal(eventIdForReload,document.getElementById('commentsEventTitle')?.textContent||"Evento");fetchDashboardData();}else throw new Error(result.message||"Errore eliminazione.");}
-        catch(error){console.error('Errore deleteComment:',error);if(feedbackDiv)feedbackDiv.innerHTML=`<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(()=>{if(feedbackDiv&&!feedbackDiv.querySelector('.error-message'))feedbackDiv.innerHTML='';},3000);}
-    async function confirmDeleteEvent(eventId,eventTitle){ if(!confirm(`ATTENZIONE: Eliminare evento "${sanitizeText(eventTitle)}" (ID: ${eventId}) e dati associati? Irreversibile.`))return; const cardEl=document.getElementById(`admin-event-${eventId}`);if(cardEl)cardEl.style.opacity='0.5';
-        try{const formData=new FormData();formData.append('action','delete_event');formData.append('event_id',eventId); const response=await fetch('gestione_eventi.php',{method:'POST',body:formData});const result=await response.json(); alert(sanitizeText(result.message));if(result.success)fetchDashboardData();else if(cardEl)cardEl.style.opacity='1';}
-        catch(error){console.error('Errore deleteEvent:',error);alert(`Errore: ${sanitizeText(error.message)}`);if(cardEl)cardEl.style.opacity='1';}}
+        const eventIdInput = document.getElementById('uploadMediaEventId');
+        const eventTitleEl = document.getElementById('uploadMediaEventTitle');
+        const existingMediaContainer = document.getElementById('existingMediaContainer');
+        const feedbackDiv = document.getElementById('uploadMediaFeedback');
+        const uploadForm = document.getElementById('uploadMediaForm');
 
-    // Inizializzazione Pagina
+        if(eventIdInput) eventIdInput.value = eventId;
+        if(eventTitleEl) eventTitleEl.textContent = sanitizeText(eventTitle);
+        if(uploadForm) uploadForm.reset();
+        if(feedbackDiv) feedbackDiv.innerHTML = '';
+        if(existingMediaContainer) existingMediaContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media esistenti...</p>';
+        openModal('uploadMediaModal');
+
+        try {
+            const response = await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`);
+            const result = await response.json();
+            if (result.success && result.media) {
+                renderExistingMedia(result.media, eventId);
+            } else if (existingMediaContainer) {
+                existingMediaContainer.innerHTML = `<p>${sanitizeText(result.message || 'Nessun media trovato o errore nel recupero.')}</p>`;
+            }
+        } catch(error) {
+            console.error('Errore recupero media:', error);
+            if(existingMediaContainer) existingMediaContainer.innerHTML = `<p class="error-message">Errore durante il caricamento dei media: ${sanitizeText(error.message)}</p>`;
+        }
+    }
+    function renderExistingMedia(mediaItems, eventId) {
+        const container = document.getElementById('existingMediaContainer');
+        if (!container) return;
+        if (mediaItems.length === 0) {
+            container.innerHTML = '<p>Nessun media attualmente caricato per questo evento.</p>';
+            return;
+        }
+        let html = '<div class="existing-media-grid">';
+        mediaItems.forEach(item => {
+            const filename = item.url_media ? item.url_media.split('/').pop() : 'File sconosciuto';
+            const itemDesc = sanitizeText(item.Descrizione || '');
+            let mediaPreviewHTML = '';
+            if (item.tipo_media === 'image') {
+                mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Visualizza: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><img src="${sanitizeForAttribute(item.url_media)}" alt="${itemDesc || filename}" loading="lazy" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;" title="Immagine: ${sanitizeForAttribute(filename)}"><i class="fas fa-image"></i></div>`;
+            } else if (item.tipo_media === 'video') {
+                mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Guarda: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`;
+            } else {
+                mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Apri: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`;
+            }
+
+            html += `
+                <div class="existing-media-item">
+                    ${mediaPreviewHTML}
+                    <p class="media-filename" title="${sanitizeForAttribute(item.url_media)}">${sanitizeText(filename)}</p>
+                    ${itemDesc ? `<p class="media-description"><em>${itemDesc}</em></p>` : ''}
+                    <button class="btn-admin btn-admin-danger btn-sm btn-delete-media" data-media-id="${item.id_media}" data-event-id="${eventId}" title="Elimina Media">
+                        <i class="fas fa-trash-alt"></i> Elimina
+                    </button>
+                </div>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+        container.querySelectorAll('.btn-delete-media').forEach(button => {
+            button.addEventListener('click', function() {
+                if (confirm('Sei sicuro di voler eliminare questo file media? L\'azione è irreversibile.')) {
+                    deleteMediaItem(this.dataset.mediaId, this.dataset.eventId);
+                }
+            });
+        });
+    }
+    async function deleteMediaItem(mediaId, eventId) {
+        const feedbackDiv = document.getElementById('uploadMediaFeedback');
+        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione media in corso...</p>';
+        try {
+            const formData = new FormData();
+            formData.append('action', 'delete_event_media');
+            formData.append('media_id', mediaId);
+            const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (result.success) {
+                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
+                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento");
+                fetchDashboardData();
+            } else {
+                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore eliminazione: ${sanitizeText(result.message)}</p>`;
+            }
+        } catch(error) {
+            console.error('Errore eliminazione media:', error);
+            if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore di connessione: ${sanitizeText(error.message)}</p>`;
+        }
+        setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 4000);
+    }
+    const eventUploadMediaForm = document.getElementById('uploadMediaForm');
+    if(eventUploadMediaForm) eventUploadMediaForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const eventId = document.getElementById('uploadMediaEventId').value;
+        const feedbackDiv = document.getElementById('uploadMediaFeedback');
+        const mediaFilesInput = document.getElementById('mediaFiles');
+
+        if (mediaFilesInput.files.length === 0) {
+            if(feedbackDiv) feedbackDiv.innerHTML = '<p class="error-message">Per favore, seleziona almeno un file da caricare.</p>';
+            return;
+        }
+        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media in corso...</p>';
+
+        const formData = new FormData(this);
+        formData.set('action', 'upload_media');
+        formData.set('event_id', eventId);
+
+        try {
+            const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (result.success) {
+                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
+                this.reset();
+                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento");
+                fetchDashboardData();
+            } else {
+                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore upload: ${sanitizeText(result.message)}</p>`;
+            }
+        } catch(error) {
+            console.error('Errore uploadMedia:', error);
+            if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore di connessione o risposta server non valida: ${sanitizeText(error.message)}</p>`;
+        }
+        setTimeout(() => { if(feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 5000);
+    });
+    let currentEventIdForCommentsGl = null;
+    async function openManageCommentsModal(eventId, eventTitle) {
+        currentEventIdForCommentsGl = eventId;
+        const titleEl = document.getElementById('commentsEventTitle');
+        let listContainerEl = document.getElementById('commentsListContainer');
+        const feedbackEl = document.getElementById('commentsManagementFeedback');
+
+        if(titleEl) titleEl.textContent = sanitizeText(eventTitle);
+        if(feedbackEl) feedbackEl.innerHTML = '';
+
+        if (listContainerEl && listContainerEl.parentNode) {
+            const newClonedListContainer = listContainerEl.cloneNode(false);
+            listContainerEl.parentNode.replaceChild(newClonedListContainer, listContainerEl);
+            listContainerEl = newClonedListContainer;
+            attachAdminCommentListeners(listContainerEl);
+        } else {
+            console.error("Elemento commentsListContainer non trovato o senza genitore.");
+            if(feedbackEl) feedbackEl.innerHTML = '<p class="error-message">Errore UI: impossibile inizializzare la lista commenti.</p>';
+            openModal('manageCommentsModal');
+            return;
+        }
+
+        listContainerEl.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p></li>';
+        openModal('manageCommentsModal');
+
+        try {
+            const response = await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`);
+            if (!response.ok) {
+                let errTxt = `Errore HTTP ${response.status}`;
+                try { const errData = await response.json(); errTxt = errData.message || errTxt; } catch(e) { /* ignora */ }
+                throw new Error(errTxt);
+            }
+            const result = await response.json();
+            if (result.success && result.comments) {
+                renderCommentsForAdminThreaded(result.comments, eventId, listContainerEl);
+            } else {
+                listContainerEl.innerHTML = `<li><p>${sanitizeText(result.message || 'Nessun commento trovato o errore nel recupero.')}</p></li>`;
+            }
+        } catch(error) {
+            console.error('Errore caricamento commenti:', error);
+            listContainerEl.innerHTML = `<li><p class="error-message">Impossibile caricare i commenti: ${sanitizeText(error.message)}</p></li>`;
+        }
+    }
+    function renderCommentsForAdminThreaded(comments, eventId, parentUlElement, depth = 0) {
+        if (depth === 0) {
+            parentUlElement.innerHTML = '';
+            if (!comments || comments.length === 0) {
+                parentUlElement.innerHTML = '<li style="list-style-type:none;text-align:center;margin:1rem 0;"><p>Nessun commento per questo evento.</p></li>';
+                return;
+            }
+        }
+
+        comments.forEach(comment => {
+            const commentItemLi = document.createElement('li');
+            commentItemLi.className = 'comment-item-admin-styled';
+            commentItemLi.id = `admin-comment-${comment.Progressivo}`;
+            if (comment.is_admin_reply) {
+                commentItemLi.classList.add('commento-admin-generale');
+            }
+
+            const commenterAvatar = comment.commenter_icon_path || defaultUserIconPath;
+            const commenterName = sanitizeText(comment.utente_display_name || 'Utente Anonimo');
+            const commentDate = sanitizeText(comment.data_creazione_formattata || 'Data non disponibile');
+            const commentText = sanitizeTextForHTML(comment.Descrizione);
+            let adminBadgeHTML = comment.is_admin_reply ? '<span class="badge-admin-dashboard">(Admin)</span>' : '';
+
+            commentItemLi.innerHTML = `
+                <div class="comment-header">
+                    <img src="${commenterAvatar}" alt="Avatar di ${commenterName}" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';">
+                    <div class="comment-meta">
+                        <strong>${commenterName}</strong> ${adminBadgeHTML}
+                        <small>${commentDate}</small>
+                        <small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta ? ` | Risposta a ID: ${comment.CodRisposta}` : ''}</small>
+                    </div>
+                </div>
+                <div class="comment-text-admin">${commentText}</div>
+                <div class="comment-actions-admin">
+                    <button class="btn-admin btn-admin-reply btn-sm" data-comment-id="${comment.Progressivo}" title="Rispondi a questo commento"><i class="fas fa-reply"></i> Rispondi</button>
+                    <button class="btn-admin btn-admin-danger btn-admin-delete-comment btn-sm" data-comment-id="${comment.Progressivo}" title="Elimina questo commento"><i class="fas fa-trash-alt"></i> Elimina</button>
+                </div>
+                <div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}" style="display:none;">
+                    <form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}">
+                        <textarea name="Descrizione" placeholder="Scrivi la tua risposta come ${adminNameGlobalJS}..." rows="3" required class="form-control"></textarea>
+                        <div class="form-actions-reply" style="text-align:right; margin-top:0.5rem;">
+                            <button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia Risposta</button>
+                        </div>
+                        <div class="form-message-local" style="margin-top:0.5em; font-size:0.85rem;"></div>
+                    </form>
+                </div>`;
+            parentUlElement.appendChild(commentItemLi);
+
+            if (comment.replies && comment.replies.length > 0) {
+                const repliesUl = document.createElement('ul');
+                repliesUl.className = 'comment-replies-list-styled';
+                commentItemLi.appendChild(repliesUl);
+                renderCommentsForAdminThreaded(comment.replies, eventId, repliesUl, depth + 1);
+            }
+        });
+    }
+    function attachAdminCommentListeners(commentsListContainerUL) {
+        if (!commentsListContainerUL) return;
+        commentsListContainerUL.addEventListener('click', handleCommentActionClick);
+        commentsListContainerUL.addEventListener('submit', handleCommentFormSubmit);
+    }
+    async function handleCommentActionClick(event) {
+        const target = event.target;
+        const replyButton = target.closest('.btn-admin-reply');
+        if (replyButton) {
+            event.preventDefault();
+            const commentId = replyButton.dataset.commentId;
+            const replyFormDiv = document.getElementById(`reply-form-admin-${commentId}`);
+            if (replyFormDiv) {
+                const isActive = replyFormDiv.style.display === 'block';
+                replyFormDiv.style.display = isActive ? 'none' : 'block';
+                if (!isActive) replyFormDiv.querySelector('textarea')?.focus();
+                const localMsg = replyFormDiv.querySelector('.form-message-local');
+                if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }
+            }
+            return;
+        }
+
+        const deleteButton = target.closest('.btn-admin-delete-comment');
+        if (deleteButton) {
+            event.preventDefault();
+            const commentId = deleteButton.dataset.commentId;
+            if (currentEventIdForCommentsGl) {
+                deleteAdminComment(commentId, currentEventIdForCommentsGl);
+            } else {
+                alert("Errore: ID evento non specificato per l'eliminazione del commento.");
+            }
+            return;
+        }
+    }
+    async function handleCommentFormSubmit(event) {
+        const targetForm = event.target.closest('.reply-form-admin form');
+        if (targetForm) {
+            event.preventDefault();
+            const eventId = targetForm.dataset.eventId;
+            await handleAdminReplySubmit(targetForm, eventId);
+        }
+    }
+    async function handleAdminReplySubmit(formElement, eventId) {
+        const parentCommentId = formElement.dataset.parentCommentId;
+        const replyText = formElement.querySelector('textarea[name="Descrizione"]').value.trim();
+        const feedbackEl = formElement.querySelector('.form-message-local');
+        const submitBtn = formElement.querySelector('button[type="submit"]');
+
+        if (!replyText) {
+            if (feedbackEl) {
+                feedbackEl.textContent = 'La risposta non può essere vuota.';
+                feedbackEl.className = 'form-message-local error-message';
+                feedbackEl.style.display = 'block';
+            }
+            return;
+        }
+
+        const originalBtnHTML = submitBtn.innerHTML;
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-mini" style="border-top-color:white;"></span> Invio...'; }
+        if (feedbackEl) { feedbackEl.textContent = ''; feedbackEl.style.display = 'none'; }
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'submit_admin_reply');
+            formData.append('event_id', eventId);
+            formData.append('comment_id', parentCommentId);
+            formData.append('reply_text', replyText);
+            const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
+            if (!response.ok) {
+                let errData = { message: `Errore HTTP ${response.status}` };
+                try { errData = await response.json(); } catch (e) { /* ignora */ }
+                throw new Error(errData.message || `Errore server sconosciuto.`);
+            }
+            const result = await response.json();
+            if (result.success) {
+                if (feedbackEl) {
+                    feedbackEl.textContent = 'Risposta inviata con successo!';
+                    feedbackEl.className = 'form-message-local success-message';
+                    feedbackEl.style.display = 'block';
+                    setTimeout(() => { if (feedbackEl) { feedbackEl.style.display = 'none'; feedbackEl.textContent = ''; } }, 3000);
+                }
+                formElement.reset();
+                const replyFormDiv = formElement.closest('.reply-form-admin');
+                if (replyFormDiv) replyFormDiv.style.display = 'none';
+                await openManageCommentsModal(eventId, document.getElementById('commentsEventTitle')?.textContent || "Evento");
+                fetchDashboardData();
+            } else {
+                throw new Error(result.message || 'Errore durante l\'invio della risposta.');
+            }
+        } catch(error) {
+            console.error("Errore invio risposta admin:", error);
+            if (feedbackEl) {
+                feedbackEl.textContent = `Errore: ${sanitizeText(error.message)}`;
+                feedbackEl.className = 'form-message-local error-message';
+                feedbackEl.style.display = 'block';
+            }
+        } finally {
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
+        }
+    }
+    async function deleteAdminComment(commentId, eventIdForReload) {
+        if (!confirm('Sei sicuro di voler eliminare questo commento e tutte le sue eventuali risposte? L\'azione è irreversibile.')) return;
+
+        const feedbackDiv = document.getElementById('commentsManagementFeedback');
+        if (feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione commento in corso...</p>';
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'delete_comment');
+            formData.append('comment_id', commentId);
+            const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
+            if (!response.ok) {
+                let errData = { message: `Errore HTTP ${response.status}` };
+                try { errData = await response.json(); } catch (e) { /* ignora */ }
+                throw new Error(errData.message || `Errore server sconosciuto.`);
+            }
+            const result = await response.json();
+            if (result.success) {
+                if (feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
+                await openManageCommentsModal(eventIdForReload, document.getElementById('commentsEventTitle')?.textContent || "Evento");
+                fetchDashboardData();
+            } else {
+                throw new Error(result.message || "Errore durante l'eliminazione del commento.");
+            }
+        } catch(error) {
+            console.error('Errore deleteAdminComment:', error);
+            if (feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;
+        }
+        setTimeout(() => { if (feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 3000);
+    }
+    async function confirmDeleteEvent(eventId, eventTitle) {
+        if (!confirm(`ATTENZIONE: Sei sicuro di voler eliminare l'evento "${sanitizeText(eventTitle)}" (ID: ${eventId}) e tutti i dati ad esso associati (prenotazioni, media, commenti)? L'azione è irreversibile.`)) return;
+
+        const cardEl = document.getElementById(`admin-event-${eventId}`);
+        if (cardEl) cardEl.style.opacity = '0.5';
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'delete_event');
+            formData.append('event_id', eventId);
+            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+            const result = await response.json();
+            alert(sanitizeText(result.message));
+            if (result.success) {
+                fetchDashboardData();
+            } else {
+                if (cardEl) cardEl.style.opacity = '1';
+            }
+        } catch(error) {
+            console.error('Errore deleteEvent:', error);
+            alert(`Errore durante l'eliminazione dell'evento: ${sanitizeText(error.message)}`);
+            if (cardEl) cardEl.style.opacity = '1';
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const adminUserString = localStorage.getItem('adminUserEFF');
-        if (adminUserString) { try { const adminUser = JSON.parse(adminUserString); const navUser=document.getElementById('navbar-username'); if(navUser&&adminUser.nome)navUser.textContent=adminUser.nome; const navAvatar=document.querySelector('#navbar-avatar img'); if(navAvatar&&adminUser.iconPath)navAvatar.src=adminUser.iconPath; else if(navAvatar)navAvatar.src=adminAvatarPath;} catch(e){console.error("Errore localStorage admin:",e);}}
+        if (adminUserString) {
+            try {
+                const adminUser = JSON.parse(adminUserString);
+                const navUsernameEl = document.getElementById('navbar-username');
+                if (navUsernameEl && adminUser.nome) navUsernameEl.textContent = adminUser.nome;
+                else if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
+
+                const navAvatarImgEl = document.querySelector('#navbar-avatar img');
+                if (navAvatarImgEl && adminUser.iconPath) navAvatarImgEl.src = adminUser.iconPath;
+                else if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
+            } catch(e) {
+                console.error("Errore parsing localStorage adminUserEFF:", e);
+                const navUsernameEl = document.getElementById('navbar-username');
+                if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
+                const navAvatarImgEl = document.querySelector('#navbar-avatar img');
+                if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
+            }
+        } else {
+            const navUsernameEl = document.getElementById('navbar-username');
+            if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
+            const navAvatarImgEl = document.querySelector('#navbar-avatar img');
+            if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
+        }
+
         updatePriceFieldVisibilityDashboard();
-        const sortCriteriaSelect = document.getElementById('sortCriteria'); const sortDirectionSelect = document.getElementById('sortDirection'); const groupCriteriaSelect = document.getElementById('groupCriteria');
-        if(sortDirectionSelect) sortDirectionSelect.value = 'asc'; if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese'; if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese';
-        if(sortCriteriaSelect) sortCriteriaSelect.addEventListener('change', applyFiltersAndRender); if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender); if(groupCriteriaSelect) groupCriteriaSelect.addEventListener('change', applyFiltersAndRender);
-        fetchDashboardData(); // Carica i dati all'avvio
+        attachPreviewListeners();
+
+        const sortCriteriaSelect = document.getElementById('sortCriteria');
+        const sortDirectionSelect = document.getElementById('sortDirection');
+        const groupCriteriaSelect = document.getElementById('groupCriteria');
+
+        if(sortDirectionSelect) sortDirectionSelect.value = 'asc';
+        if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese';
+        if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese';
+
+        if(sortCriteriaSelect) sortCriteriaSelect.addEventListener('change', applyFiltersAndRender);
+        if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender);
+        if(groupCriteriaSelect) groupCriteriaSelect.addEventListener('change', applyFiltersAndRender);
+
+        fetchDashboardData();
     });
-    // === FINE BLOCCO SCRIPT COMPLETO ===
 </script>
 </body>
 </html>
