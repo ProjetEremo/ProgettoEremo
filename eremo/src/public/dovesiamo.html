@@ -8,152 +8,140 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    /* Stili aggiuntivi per coerenza e messaggi di errore */
-    .login-popup input.form-control.error-border {
-      border-color: var(--danger, red) !important;
-    }
+    /* Stili popup login/registrazione */
+    .login-popup input.form-control { transition: border-color 0.3s ease; border: 1px solid #ced4da; background-color: white !important; box-shadow: none !important; outline: none !important; }
+    .login-popup input.error-border { border-color: var(--danger, red) !important; }
     .login-popup input:-webkit-autofill,
     .login-popup input:-webkit-autofill:hover,
-    .login-popup input:-webkit-autofill:focus {
-      -webkit-box-shadow: 0 0 0px 1000px var(--white, white) inset !important;
-      -webkit-text-fill-color: var(--dark, #333) !important;
-    }
-    .form-message.error {
-      color: var(--danger, red);
-      background-color: rgba(var(--danger-rgb, 231, 76, 60), 0.1);
-      border: 1px solid rgba(var(--danger-rgb, 231, 76, 60), 0.3);
-      padding: 0.75rem;
-      border-radius: 8px;
-      font-size: 0.9em;
-      margin-top: 0.5em;
-      text-align: left;
-    }
-    .spinner-mini-light { /* Spinner per bottoni */
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      border: 2px solid rgba(0,0,0,0.2); /* Colore base spinner */
-      border-radius: 50%;
-      border-top-color: #000; /* Colore del loader che gira */
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-left: 5px;
-    }
+    .login-popup input:-webkit-autofill:focus { -webkit-box-shadow: 0 0 0px 1000px white inset !important; -webkit-text-fill-color: var(--dark, #333) !important; }
+    .form-message { display: none; padding: 0.75rem; border-radius: 8px; font-size: 0.9em; margin-top: 0.5em; text-align: left;}
+    .form-message.error { color: var(--danger, red); background-color: rgba(var(--danger-rgb, 231, 76, 60), 0.1); border: 1px solid rgba(var(--danger-rgb, 231, 76, 60), 0.3); }
+    .form-message.success { color: var(--success, green); background-color: rgba(var(--success-rgb, 46, 204, 113), 0.1); border: 1px solid rgba(var(--success-rgb, 46, 204, 113), 0.3); }
+    .spinner-mini-light { display: inline-block; width: 1em; height: 1em; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; vertical-align: middle; margin-left: 5px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    /* Assicurati che .terms-checkbox sia stilizzato se non lo è già globalmente in style.css */
-    .terms-checkbox {
-      text-align: left;
-      font-size: 0.9em;
-      margin-top: 0.5rem;
-      margin-bottom: 1rem; /* Default da style.css è .mb-3 */
-      color: var(--gray-dark);
-    }
-    .terms-checkbox input[type="checkbox"] {
-      margin-right: 0.5rem;
-      vertical-align: middle;
-    }
-    .terms-checkbox label {
-      font-weight: normal;
-      color: var(--gray-dark);
-    }
-    .terms-checkbox a {
-      color: var(--primary);
-      text-decoration: underline;
-    }
+    .user-avatar img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
+    .terms-checkbox { text-align: left; font-size: 0.9em; margin-top: 0.5rem; margin-bottom: 1rem; color: var(--gray-dark); }
+    .terms-checkbox input[type="checkbox"] { margin-right: 0.5rem; vertical-align: middle; }
+    .terms-checkbox label { font-weight: normal; color: var(--gray-dark); } .terms-checkbox a { color: var(--primary); text-decoration: underline; }
+
+    /* Stili Modifica Pagina Admin */
+    #editPageBtnContainer { position: fixed; bottom: 20px; right: 20px; z-index: 1001; display: none; }
+    #editPageBtn, #savePageChangesBtn, #cancelPageChangesBtn { background-color: var(--accent); color: white; padding: 10px 18px; border: none; border-radius: 50px; box-shadow: var(--shadow-medium); cursor: pointer; font-size: 0.95rem; margin-left: 10px; transition: background-color 0.2s; }
+    #editPageBtn i, #savePageChangesBtn i, #cancelPageChangesBtn i { margin-right: 8px; }
+    #savePageChangesBtn { background-color: var(--success); } #cancelPageChangesBtn { background-color: var(--gray-dark); }
+    #editPageBtn:hover { background-color: #c07b50; } #savePageChangesBtn:hover { background-color: #27ae60; } #cancelPageChangesBtn:hover { background-color: var(--dark); }
+    .editable-text-wrapper { position: relative; display: block; width:100%; }
+    .editable-iframe-wrapper, .editable-href-wrapper { position: relative; display: block; } /* Wrapper per iframe e link */
+    .editable-text-wrapper:hover .edit-icon-text,
+    .editable-iframe-wrapper:hover .edit-icon-iframe,
+    .editable-href-wrapper:hover .edit-icon-href { display: inline-flex; align-items: center; justify-content: center; }
+    .edit-icon-text, .edit-icon-iframe, .edit-icon-href { display: none; position: absolute; top: -5px; right: -5px; background: var(--accent); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 0.75em; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-align: center; line-height: 22px; z-index:5; }
+    .main-title-editable-wrapper > h1 + .edit-icon-text { top: 50%; right: -5px; transform: translateY(-50%);}
+    .location-description .editable-text-wrapper h2 + .edit-icon-text { top: 0px; right: 0px; } /* Specifico per H2 dentro location-description */
+    .location-info-cards .editable-text-wrapper h2 + .edit-icon-text { top: 5px; right: -25px;}
+
+
+    .edit-content-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(var(--dark-rgb, 30, 59, 47), 0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center;}
+    .edit-content-modal-content { background-color: var(--white); padding: 25px; border-radius: var(--border-radius-medium); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;}
+    .edit-content-modal-content h3 { margin-top: 0; color: var(--primary); }
+    .edit-content-modal .form-group { margin-bottom: 15px; }
+    .edit-content-modal .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: var(--dark); text-align: left; }
+    .edit-content-modal .form-group input[type="text"], .edit-content-modal .form-group textarea, .edit-content-modal .form-group input[type="url"] { width: 100%; padding: 10px; border: 1px solid var(--gray-medium); border-radius: 8px; font-size: 1rem;}
+    .edit-content-modal .form-group textarea { min-height: 100px; resize: vertical; }
+    .edit-content-modal-actions { margin-top: 20px; text-align: right; } .edit-content-modal-actions button { margin-left: 10px; }
+    .close-modal-btn { position: absolute; top: 10px; right: 15px; font-size: 1.8rem; color: var(--gray-medium); background: none; border: none; cursor: pointer; line-height: 1;}
+    .close-modal-btn:hover { color: var(--dark); }
+    #pageOverallStatus { position: fixed; bottom: 70px; right: 20px; background-color: var(--primary); color: white; padding: 8px 15px; border-radius: 5px; z-index: 1000; display: none; font-size: 0.9em; }
   </style>
 </head>
 <body>
 <header class="navbar-container" id="navbarContainer">
   <nav class="navbar">
     <div class="logo">
-      <a href="index.html"
-      ><span class="emoji">🏔️</span>
-        <h2>Eremo Frate Francesco</h2></a
-      >
+      <a href="index.html" id="logoLink"><span class="emoji">🏔️</span><h2 id="navbarTitle">Eremo Frate Francesco</h2></a>
     </div>
-    <div class="menu">
-      <a href="eventiincorso.html">Calendario attività</a>
-      <a href="eventipassati.html">Archivio attività</a
-      ><span class="separator">|</span>
-      <a href="incontrisullaparola.html">Incontri sulla parola</a
-      ><span class="separator">|</span>
-      <a href="dovesiamo.html" class="active">Dove siamo</a>
-      <a href="contatti.html">Contatti</a>
+    <div class="menu" id="mainMenu">
+      <a href="eventiincorso.html" id="navCalendarioAttivita">Calendario attività</a>
+      <a href="eventipassati.html" id="navArchivioAttivita">Archivio attività</a>
+      <span class="separator">|</span>
+      <a href="incontrisullaparola_unificato.html" id="navIncontriParola">Incontri sulla parola</a>
+      <span class="separator">|</span>
+      <a href="dovesiamo.html" class="active" id="navDoveSiamo">Dove siamo</a>
+      <a href="contatti.html" id="navContatti">Contatti</a>
     </div>
     <div class="right-menu">
-      <button id="login-btn" class="login-btn">Accedi</button>
-      <button
-              class="hamburger"
-              onclick="toggleMobileMenu()"
-              aria-label="Toggle menu"
-      >
-        ☰
-      </button>
+      <button id="login-btn-desktop" class="login-btn" style="display: none;">Accedi</button>
+      <div class="user-dropdown" id="userDropdownContainer" style="display: none;">
+        <button class="user-btn" id="userBtnTrigger" aria-haspopup="true" aria-expanded="false">
+          <span class="user-avatar" id="navbar-avatar"><img src="uploads/icons/default_user.png" alt="User Icon"></span>
+          <span class="user-name" id="navbar-username">Utente</span>
+          <span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="dropdown-menu" id="userDropdownMenu">
+          <a href="areapersonale.html" id="dropdownProfilo" style="display: none;">Il mio profilo</a>
+          <a href="areapersonale.html#prenotazioni" id="dropdownPrenotazioni" style="display: none;">Le mie prenotazioni</a>
+          <a href="#" id="dropdownLogout">Esci</a>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="eventiincorso.html" onclick="closeMobileMenu()"
-    >Calendario attività</a
-    >
-    <a href="eventipassati.html" onclick="closeMobileMenu()"
-    >Archivio attività</a
-    >
-    <a href="incontrisullaparola.html" onclick="closeMobileMenu()"
-    >Incontri sulla parola</a
-    >
-    <a href="dovesiamo.html" onclick="closeMobileMenu()">Dove siamo</a>
-    <a href="contatti.html" onclick="closeMobileMenu()">Contatti</a>
-    <a
-            href="#"
-            id="login-btn-mobile"
-            onclick="openLoginPopup(); closeMobileMenu();"
-    >Accedi</a
-    >
+    <a href="eventiincorso.html" id="mobileNavCalendarioAttivita">Calendario attività</a>
+    <a href="eventipassati.html" id="mobileNavArchivioAttivita">Archivio attività</a>
+    <a href="incontrisullaparola_unificato.html" id="mobileNavIncontriParola">Incontri sulla parola</a>
+    <a href="dovesiamo.html" id="mobileNavDoveSiamo">Dove siamo</a>
+    <a href="contatti.html" id="mobileNavContatti">Contatti</a>
+    <hr id="mobileMenuSeparator" style="border-color: rgba(255,255,255,0.1); display:none;">
+    <a href="#" id="login-btn-mobile" style="display: none;">Accedi</a>
+    <a href="areapersonale.html" id="mobileNavProfilo" style="display: none;">Il mio profilo</a>
+    <a href="areapersonale.html#prenotazioni" id="mobileNavPrenotazioni" style="display: none;">Le mie prenotazioni</a>
+    <a href="#" id="mobileLogoutLink" style="display: none;">Esci</a>
   </div>
 </header>
 
 <main>
-  <div class="container section-padding pb-0"><h1>Dove Siamo</h1></div>
+  <div class="container section-padding pb-0">
+    <div class="editable-text-wrapper main-title-editable-wrapper" style="text-align: center;">
+      <h1 id="content-pageTitle" data-content-key="pageTitle"></h1>
+      <span class="edit-icon-text" data-key="pageTitle" data-type="text" title="Modifica Titolo Pagina">&#9998;</span>
+    </div>
+  </div>
 
   <div class="container section-padding pt-0">
     <section class="map-section">
-      <div class="map-container">
-        <iframe
-                class="iframe-map"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2789.726565080011!2d9.764753015573094!3d45.73689917910574!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4781500767b61a2b%3A0x501071be12e6a613!2sChiesa%20di%20San%20Vito%20Martire!5e0!3m2!1sit!2sit!4v1678886000000!5m2!1sit!2sit" /* Esempio URL Mappa Reale */
-        allowfullscreen=""
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"
-        title="Mappa Eremo Frate Francesco"
-        >
-        </iframe>
+      <div class="map-container editable-iframe-wrapper">
+        <iframe class="iframe-map" id="content-mapIframeSrc" data-content-key="mapIframeSrc" src="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mappa Eremo Frate Francesco"></iframe>
+        <span class="edit-icon-iframe" data-key="mapIframeSrc" data-type="iframe_src" title="Modifica URL Mappa">&#9998;</span>
       </div>
       <div class="location-description">
-        <h2>Raggiungici a San Vito di Nembro</h2>
-        <p>
-          L'Eremo Frate Francesco si trova in una posizione tranquilla e
-          suggestiva, ideale per il raccoglimento, nella frazione di San
-          Vito a Nembro (BG).
-        </p>
-        <p>
-          <strong>Indirizzo:</strong> Via San Vito, 24027 Nembro BG (Presso
-          la Chiesa di San Vito)
-        </p>
-        <p>
-          <strong>Indicazioni:</strong> Dalla SP35, seguire per Nembro
-          centro e poi per San Vito. L'eremo si trova nella parte alta della
-          frazione.
-        </p>
-        <p><strong>Parcheggio:</strong> Disponibile nelle vicinanze.</p>
+        <div class="editable-text-wrapper">
+          <h2 id="content-locationHeading" data-content-key="locationHeading"></h2>
+          <span class="edit-icon-text" data-key="locationHeading" data-type="text" title="Modifica Titolo Sezione">&#9998;</span>
+        </div>
+        <div class="editable-text-wrapper">
+          <p id="content-locationText1" data-content-key="locationText1"></p>
+          <span class="edit-icon-text" data-key="locationText1" data-type="textarea" title="Modifica Testo">&#9998;</span>
+        </div>
+        <div class="editable-text-wrapper">
+          <p id="content-locationAddress" data-content-key="locationAddress"></p>
+          <span class="edit-icon-text" data-key="locationAddress" data-type="textarea" title="Modifica Indirizzo">&#9998;</span>
+        </div>
+        <div class="editable-text-wrapper">
+          <p id="content-locationDirections" data-content-key="locationDirections"></p>
+          <span class="edit-icon-text" data-key="locationDirections" data-type="textarea" title="Modifica Indicazioni">&#9998;</span>
+        </div>
+        <div class="editable-text-wrapper">
+          <p id="content-locationParking" data-content-key="locationParking"></p>
+          <span class="edit-icon-text" data-key="locationParking" data-type="text" title="Modifica Info Parcheggio">&#9998;</span>
+        </div>
         <div class="location-actions">
-          <a
-                  href="https://www.google.com/maps/dir/?api=1&destination=Chiesa+San+Vito+Nembro" /* Esempio URL Indicazioni */
-          target="_blank"
-          rel="noopener noreferrer"
-          class="btn-primary"
-          >
-          <i class="fas fa-directions"></i> Indicazioni
-          </a>
+          <div class="editable-href-wrapper">
+            <a id="content-locationDirectionsButtonHref" data-content-key="locationDirectionsButtonHref" href="" target="_blank" rel="noopener noreferrer" class="btn-primary">
+              <i class="fas fa-directions"></i> Indicazioni Stradali
+            </a>
+            <span class="edit-icon-href" data-key="locationDirectionsButtonHref" data-type="href" title="Modifica Link Indicazioni">&#9998;</span>
+          </div>
           <a href="contatti.html" class="btn-secondary">
             <i class="fas fa-envelope"></i> Contattaci
           </a>
@@ -162,47 +150,49 @@
     </section>
 
     <section class="location-info-cards">
-      <h2 class="text-center mb-4">Informazioni Utili</h2>
+      <div class="editable-text-wrapper">
+        <h2 class="text-center mb-4" id="content-infoUtiliHeading" data-content-key="infoUtiliHeading"></h2>
+        <span class="edit-icon-text" data-key="infoUtiliHeading" data-type="text" title="Modifica Titolo Sezione">&#9998;</span>
+      </div>
       <div class="card-grid">
         <div class="card">
           <div class="card-content">
             <h3><i class="fas fa-clock"></i> Orari</h3>
-            <p>
-              L'accesso all'Eremo è legato alle attività programmate. Per
-              visite o ritiri personali, è necessario contattarci
-              preventivamente.
-            </p>
-            <p>
-              Le celebrazioni seguono orari specifici (consultare
-              <a href="eventiincorso.html">calendario</a>).
-            </p>
+            <div class="editable-text-wrapper">
+              <p id="content-orariCardText1" data-content-key="orariCardText1"></p>
+              <span class="edit-icon-text" data-key="orariCardText1" data-type="textarea" title="Modifica Testo Orari">&#9998;</span>
+            </div>
+            <div class="editable-text-wrapper">
+              <p id="content-orariCardText2" data-content-key="orariCardText2"></p>
+              <span class="edit-icon-text" data-key="orariCardText2" data-type="textarea" title="Modifica Testo Orari (link)">&#9998;</span>
+            </div>
           </div>
         </div>
         <div class="card">
           <div class="card-content">
             <h3><i class="fas fa-phone-alt"></i> Contatti Rapidi</h3>
-            <p>Per info su attività, ritiri o ospitalità:</p>
-            <p>
-              <strong>Tel:</strong> +39 123 456789<br />
-              <strong>Email:</strong> info@eremo.it
-            </p>
-            <a
-                    href="contatti.html"
-                    class="card-btn card-btn-secondary"
-                    style="margin-top: 1rem"
-            >Vedi tutti i contatti</a
-            >
+            <div class="editable-text-wrapper">
+              <p id="content-contattiRapidiCardText1" data-content-key="contattiRapidiCardText1"></p>
+              <span class="edit-icon-text" data-key="contattiRapidiCardText1" data-type="text" title="Modifica Testo Contatti">&#9998;</span>
+            </div>
+            <div class="editable-text-wrapper">
+              <p id="content-contattiRapidiCardText2" data-content-key="contattiRapidiCardText2"></p>
+              <span class="edit-icon-text" data-key="contattiRapidiCardText2" data-type="textarea" title="Modifica Dettagli Contatto">&#9998;</span>
+            </div>
+            <a href="contatti.html" class="card-btn card-btn-secondary" style="margin-top: 1rem">Vedi tutti i contatti</a>
           </div>
         </div>
         <div class="card">
           <div class="card-content">
             <h3><i class="fas fa-wheelchair"></i> Accessibilità</h3>
-            <p>
-              L'area presenta percorsi con pendenze. Per esigenze specifiche
-              di accessibilità, vi preghiamo di contattarci per discutere le
-              possibilità.
-            </p>
-            <p>Faremo il possibile per accogliervi al meglio.</p>
+            <div class="editable-text-wrapper">
+              <p id="content-accessibilitaCardText1" data-content-key="accessibilitaCardText1"></p>
+              <span class="edit-icon-text" data-key="accessibilitaCardText1" data-type="textarea" title="Modifica Testo Accessibilità">&#9998;</span>
+            </div>
+            <div class="editable-text-wrapper">
+              <p id="content-accessibilitaCardText2" data-content-key="accessibilitaCardText2"></p>
+              <span class="edit-icon-text" data-key="accessibilitaCardText2" data-type="text" title="Modifica Testo Accessibilità">&#9998;</span>
+            </div>
           </div>
         </div>
       </div>
@@ -212,391 +202,305 @@
 
 <div class="login-popup-overlay" id="loginOverlay"></div>
 <div class="login-popup" id="loginPopup">
-  <button class="close-popup" id="closePopup" aria-label="Chiudi popup">
-    ×
-  </button>
-  <div class="login-tabs">
-    <div class="login-tab active" data-tab="login">Accedi</div>
-    <div class="login-tab" data-tab="register">Registrati</div>
-  </div>
+  <button class="close-popup" id="closeLoginPopupBtn" aria-label="Chiudi popup"> × </button>
+  <div class="login-tabs"> <div class="login-tab active" data-tab="login">Accedi</div> <div class="login-tab" data-tab="register">Registrati</div></div>
   <form class="login-form active" id="loginForm" method="POST">
-    <div class="form-group mb-3">
-      <label for="login-email">Email</label>
-      <input
-              type="email"
-              id="login-email"
-              name="login-email"
-              class="form-control"
-              required
-              autocomplete="email"
-      />
-    </div>
-    <div class="form-group mb-3">
-      <label for="login-password">Password</label>
-      <input
-              type="password"
-              id="login-password"
-              name="login-password"
-              class="form-control"
-              required
-              autocomplete="current-password"
-      />
-    </div>
+    <div class="form-group mb-3"><label for="login-email">Email</label><input type="email" id="login-email" name="login-email" class="form-control" required autocomplete="email"/></div>
+    <div class="form-group mb-3"><label for="login-password">Password</label><input type="password" id="login-password" name="login-password" class="form-control" required autocomplete="current-password"/></div>
     <div id="login-error-message" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
-    <div class="form-actions">
-      <button type="submit" class="btn-popup">Accedi</button>
-    </div>
+    <div class="form-actions"><button type="submit" class="btn-popup">Accedi</button></div>
   </form>
   <form class="login-form" id="registerForm" method="POST">
-    <div class="form-group mb-3">
-      <label for="register-name">Nome</label>
-      <input
-              type="text"
-              id="register-name"
-              name="register-name"
-              class="form-control"
-              required
-              autocomplete="given-name"
-      />
-    </div>
-    <div class="form-group mb-3">
-      <label for="register-surname">Cognome</label>
-      <input
-              type="text"
-              id="register-surname"
-              name="register-surname"
-              class="form-control"
-              required
-              autocomplete="family-name"
-      />
-    </div>
-    <div class="form-group mb-3">
-      <label for="register-email">Email</label>
-      <input
-              type="email"
-              id="register-email"
-              name="register-email"
-              class="form-control"
-              required
-              autocomplete="email"
-      />
-    </div>
-    <div class="form-group mb-3">
-      <label for="register-password">Password</label>
-      <input
-              type="password"
-              id="register-password"
-              name="register-password"
-              class="form-control"
-              required
-              minlength="8"
-              autocomplete="new-password"
-      />
-      <small>Minimo 8 caratteri.</small>
-    </div>
-    <div class="terms-checkbox mb-3">
-      <input
-              type="checkbox"
-              id="register-terms"
-              name="register-terms"
-              required
-      />
-      <label for="register-terms"
-      >Accetto i
-        <a href="/termini" target="_blank">termini e condizioni</a></label
-      >
-    </div>
+    <div class="form-group mb-3"><label for="register-name">Nome</label><input type="text" id="register-name" name="register-name" class="form-control" required autocomplete="given-name"/></div>
+    <div class="form-group mb-3"><label for="register-surname">Cognome</label><input type="text" id="register-surname" name="register-surname" class="form-control" required autocomplete="family-name"/></div>
+    <div class="form-group mb-3"><label for="register-email">Email</label><input type="email" id="register-email" name="register-email" class="form-control" required autocomplete="email"/></div>
+    <div class="form-group mb-3"><label for="register-password">Password</label><input type="password" id="register-password" name="register-password" class="form-control" required minlength="8" autocomplete="new-password"/><small>Minimo 8 caratteri.</small></div>
+    <div class="terms-checkbox mb-3"><input type="checkbox" id="register-terms" name="register-terms" required/><label for="register-terms">Accetto i <a href="termini.html" target="_blank">termini e condizioni</a></label></div>
     <div id="register-error-message" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
-    <div class="form-actions">
-      <button type="submit" class="btn-popup">Registrati</button>
-    </div>
+    <div class="form-actions"><button type="submit" class="btn-popup">Registrati</button></div>
   </form>
 </div>
 
+<div id="editPageBtnContainer">
+  <button id="editPageBtn"><i class="fas fa-pencil-alt"></i> Attiva Modifiche</button>
+  <button id="savePageChangesBtn" style="display:none;"><i class="fas fa-save"></i> Salva Modifiche Pagina</button>
+  <button id="cancelPageChangesBtn" style="display:none;"><i class="fas fa-times"></i> Annulla Modifiche</button>
+</div>
+<div id="pageOverallStatus" class="form-message" style="position: fixed; bottom: 70px; right: 20px; z-index: 1000; display: none; font-size: 0.9em;"></div>
+
+<div id="editContentModal" class="edit-content-modal">
+  <div class="edit-content-modal-content">
+    <button class="close-modal-btn" id="closeEditContentModalBtn" aria-label="Chiudi">&times;</button>
+    <h3 id="editModalTitle">Modifica Contenuto</h3>
+    <div class="form-group">
+      <label id="editModalFieldLabelText">Testo:</label>
+      <textarea id="editModalTextarea" class="form-control" rows="5" style="display:none;"></textarea>
+      <input type="text" id="editModalInputText" class="form-control" style="display:none;">
+      <input type="url" id="editModalInputUrl" class="form-control" style="display:none;" placeholder="https://esempio.com">
+    </div>
+    <div id="editModalMessage" class="form-message" style="margin-bottom:1rem;"></div>
+    <div class="edit-content-modal-actions">
+      <button type="button" class="btn-popup btn-secondary" id="cancelEditModalBtn">Annulla</button>
+      <button type="button" class="btn-popup" id="saveEditModalBtn">Salva</button>
+    </div>
+  </div>
+</div>
+
 <footer>
-  <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia</p>
+  <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
 </footer>
 
 <script>
-  const defaultUserIconPath = '/uploads/icons/default_user.png';
+  const PAGE_NAME_FOR_CONTENT = 'dovesiamo';
+  const defaultUserIconPath = 'uploads/icons/default_user.png';
+  let currentUserData = null;
+  let isEditModeActive = false;
+  let originalPageContentsForCancel = {};
+  let currentPageDbContents = {};
 
-  // --- Navbar Scroll Logic ---
-  let lastScroll = 0;
-  const navbarContainer = document.getElementById("navbarContainer");
-  if (navbarContainer) {
-    window.addEventListener(
-            "scroll",
-            function () {
-              const currentScroll =
-                      window.pageYOffset || document.documentElement.scrollTop;
-              if (currentScroll <= 50) {
-                navbarContainer.classList.remove("hidden");
-                lastScroll = 0;
-                return;
-              }
-              if (
-                      currentScroll > lastScroll &&
-                      !navbarContainer.classList.contains("hidden")
-              ) {
-                navbarContainer.classList.add("hidden");
-              } else if (
-                      currentScroll < lastScroll &&
-                      navbarContainer.classList.contains("hidden")
-              ) {
-                navbarContainer.classList.remove("hidden");
-              }
-              lastScroll = currentScroll;
-            },
-            false
-    );
-  }
+  const defaultPageContents = {
+    pageTitle: "Dove Siamo",
+    mapIframeSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2789.347633945809!2d9.74881191550263!3d45.7459160791057!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47814f1262601e2b%3A0x501078d09910799b!2sSantuario%20Madonna%20dello%20Zuccarello%20-%20Nembro%20(BG)!5e0!3m2!1sit!2sit!4v1620050000000!5m2!1sit!2sit", // Sostituisci con un URL di default valido se necessario
+    locationHeading: "Raggiungici a San Vito di Nembro",
+    locationText1: "L'Eremo Frate Francesco si trova in una posizione tranquilla e suggestiva, ideale per il raccoglimento, nella frazione di San Vito a Nembro (BG).",
+    locationAddress: "<strong>Indirizzo:</strong> Via San Vito, 24027 Nembro BG (Presso la Chiesa di San Vito)",
+    locationDirections: "<strong>Indicazioni:</strong> Dalla SP35, seguire per Nembro centro e poi per San Vito. L'eremo si trova nella parte alta della frazione.",
+    locationParking: "<strong>Parcheggio:</strong> Disponibile nelle vicinanze.",
+    locationDirectionsButtonHref: "https://maps.google.com/?q=Chiesa+di+San+Vito,+Nembro+BG",
+    infoUtiliHeading: "Informazioni Utili",
+    orariCardText1: "L'accesso all'Eremo è legato alle attività programmate. Per visite o ritiri personali, è necessario contattarci preventivamente.",
+    orariCardText2: "Le celebrazioni seguono orari specifici (consultare <a href=\"eventiincorso.html\">calendario</a>).",
+    contattiRapidiCardText1: "Per info su attività, ritiri o ospitalità:",
+    contattiRapidiCardText2: "<strong>Tel:</strong> +39 123 456789<br /><strong>Email:</strong> info@eremo.it",
+    accessibilitaCardText1: "L'area presenta percorsi con pendenze. Per esigenze specifiche di accessibilità, vi preghiamo di contattarci per discutere le possibilità.",
+    accessibilitaCardText2: "Faremo il possibile per accogliervi al meglio."
+  };
 
-  // --- Mobile Menu Logic ---
-  const mobileMenu = document.getElementById("mobileMenu");
-  const hamburger = document.querySelector(".navbar .hamburger");
-  function toggleMobileMenu() {
-    if (mobileMenu && hamburger) {
-      const isOpen = mobileMenu.classList.toggle("open");
-      hamburger.classList.toggle("open"); // MODIFICA: Aggiunto per cambiare l'icona dell'hamburger
-      hamburger.setAttribute("aria-expanded", String(isOpen)); // Assicura che sia una stringa
-      document.body.style.overflow = isOpen ? "hidden" : "";
+  function gebi(id) { return document.getElementById(id); }
+  function formatHTMLContent(str) { if (typeof str !== 'string') str = String(str || ''); return str.replace(/\r\n|\r|\n/g, '<br>'); }
+  function loadUserData() { const uds = localStorage.getItem('userDataEFF'); if (uds) { try { currentUserData = JSON.parse(uds); if (!currentUserData || typeof currentUserData.email === 'undefined') {currentUserData = null; localStorage.removeItem('userDataEFF');}} catch (e) { console.error("Err parsing userDataEFF:", e); currentUserData = null; localStorage.removeItem('userDataEFF');}} else { currentUserData = null; }}
+
+  async function fetchAndUpdateUserDisplayDataFromApi() {
+    if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
+      updateNavbarUI();
+      return;
     }
-  }
-  function closeMobileMenu() {
-    if (mobileMenu && hamburger && mobileMenu.classList.contains("open")) {
-      mobileMenu.classList.remove("open");
-      hamburger.classList.remove("open"); // MODIFICA: Aggiunto per resettare l'icona dell'hamburger
-      hamburger.setAttribute("aria-expanded", "false");
-      document.body.style.overflow = "";
-    }
-  }
-  // L'event listener if (hamburger) hamburger.addEventListener("click", toggleMobileMenu);
-  // è stato rimosso perché onclick="toggleMobileMenu()" è già presente nell'HTML del bottone hamburger,
-  // prevenendo una possibile doppia chiamata della funzione.
-
-  document.querySelectorAll("#mobileMenu a").forEach((link) => {
-    if (link.id !== 'login-btn-mobile') { // login-btn-mobile ha la sua gestione onclick
-      link.addEventListener("click", closeMobileMenu);
-    }
-  });
-  document.addEventListener("click", function (event) {
-    if (
-            mobileMenu && mobileMenu.classList.contains("open") &&
-            hamburger && !mobileMenu.contains(event.target) &&
-            !hamburger.contains(event.target)
-    ) {
-      closeMobileMenu();
-    }
-  });
-
-  // --- Login Popup Logic ---
-  const loginBtn = document.getElementById("login-btn");
-  const loginBtnMobile = document.getElementById("login-btn-mobile");
-  const loginOverlay = document.getElementById("loginOverlay");
-  const loginPopup = document.getElementById("loginPopup");
-  const closePopupBtn = document.getElementById("closePopup");
-  const loginTabs = document.querySelectorAll(".login-tab");
-  const loginForms = document.querySelectorAll(".login-popup .login-form");
-  const loginErrorMessage = document.getElementById('login-error-message');
-  const registerErrorMessage = document.getElementById('register-error-message');
-
-
-  function openLoginPopup() {
-    if(loginOverlay) loginOverlay.classList.add("active");
-    if(loginPopup) loginPopup.classList.add("active");
-    document.body.style.overflow = "hidden";
-    resetFormErrors();
-    const activeForm = loginPopup?.querySelector(".login-form.active");
-    activeForm?.querySelector('input:not([type="hidden"])')?.focus();
-  }
-
-  function closeLoginPopup() {
-    if(loginOverlay) loginOverlay.classList.remove("active");
-    if(loginPopup) loginPopup.classList.remove("active");
-    document.body.style.overflow = "";
-    resetFormErrors();
-  }
-
-  function resetFormErrors() {
-    loginForms.forEach(form => {
-      form.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border'));
-    });
-    if (loginErrorMessage) loginErrorMessage.style.display = 'none';
-    if (registerErrorMessage) registerErrorMessage.style.display = 'none';
-  }
-
-  if (loginBtn) {
-    loginBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      openLoginPopup();
-    });
-  }
-  // loginBtnMobile ha già onclick nell'HTML
-
-  if (closePopupBtn) {
-    closePopupBtn.addEventListener("click", closeLoginPopup);
-  }
-  if (loginOverlay) {
-    loginOverlay.addEventListener("click", (e) => {
-      if (e.target === loginOverlay) {
-        closeLoginPopup();
-      }
-    });
-  }
-
-  loginTabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      const tabId = tab.getAttribute("data-tab");
-      loginTabs.forEach((t) => t.classList.remove("active"));
-      tab.classList.add("active");
-      loginForms.forEach((form) => {
-        form.classList.remove("active");
-        if (form.id === `${tabId}Form`) {
-          form.classList.add("active");
-          form.querySelector('input:not([type="hidden"])')?.focus();
-        }
-      });
-      resetFormErrors();
-    });
-  });
-
-  // --- Gestione Invio Form con Fetch API ---
-  document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const loginButton = e.target.querySelector('button[type="submit"]');
-    const originalButtonText = loginButton.textContent;
-    loginButton.disabled = true;
-    loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>';
-
-    const emailInput = document.getElementById('login-email');
-    const passwordInput = document.getElementById('login-password');
-    emailInput.classList.remove('error-border');
-    passwordInput.classList.remove('error-border');
-    if(loginErrorMessage) loginErrorMessage.style.display = 'none';
-
     try {
-      const response = await fetch("login.php", {
-        method: "POST",
-        body: new FormData(e.target),
-      });
-
-      if (!response.ok) {
-        let errorData = { message: `Errore HTTP: ${response.status}` };
-        try { errorData = await response.json(); } catch (e) { /* Ignora */ }
-        throw new Error(errorData.message || `Errore HTTP: ${response.status}`);
-      }
-      const result = await response.json();
-
-      if (result.success) {
-        const userDataToStore = {
-          nome: result.nome,
-          email: result.email,
-          iconPath: defaultUserIconPath
-        };
-        localStorage.setItem('userDataEFF', JSON.stringify(userDataToStore));
-        closeLoginPopup();
-        window.location.href = result.is_admin ? "indexadmin.html" : "dovesiamoaccesso.html";
-      } else {
-        emailInput.classList.add('error-border');
-        passwordInput.classList.add('error-border');
-        if(loginErrorMessage) {
-          loginErrorMessage.textContent = result.message || "Credenziali non valide.";
-          loginErrorMessage.style.display = 'block';
-        } else {
-          alert(result.message || "Credenziali non valide.");
-        }
+      const response = await fetch(`api/api_get_user_profile.php?email=${encodeURIComponent(currentUserData.email)}`);
+      if (!response.ok) throw new Error('Errore fetch profilo utente');
+      const apiResult = await response.json();
+      if (apiResult.success && apiResult.data) {
+        const freshData = apiResult.data;
+        currentUserData.nome = freshData.nome || currentUserData.nome;
+        currentUserData.iconPath = freshData.icon || defaultUserIconPath;
+        currentUserData.cognome = freshData.cognome || (currentUserData.cognome || '');
+        localStorage.setItem('userDataEFF', JSON.stringify(currentUserData));
       }
     } catch (error) {
-      emailInput.classList.add('error-border');
-      passwordInput.classList.add('error-border');
-      if(loginErrorMessage) {
-        loginErrorMessage.textContent = "Errore di connessione o risposta non valida dal server.";
-        loginErrorMessage.style.display = 'block';
-      } else {
-        alert("Errore di connessione o risposta non valida dal server.");
-      }
-      console.error("Errore login:", error);
-    } finally {
-      loginButton.disabled = false;
-      loginButton.innerHTML = originalButtonText;
+      console.warn("DoveSiamo: Errore fetch profilo aggiornato per navbar:", error.message);
     }
-  });
+    updateNavbarUI();
+  }
 
-  document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const registerButton = e.target.querySelector('button[type="submit"]');
-    const originalButtonText = registerButton.textContent;
-    registerButton.disabled = true;
-    registerButton.innerHTML = 'Registrazione... <div class="spinner-mini-light"></div>';
-    if(registerErrorMessage) registerErrorMessage.style.display = 'none';
-    e.target.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border'));
-
-    try {
-      const response = await fetch("registrati.php", {
-        method: "POST",
-        body: new FormData(e.target),
-      });
-
-      if (!response.ok) {
-        let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`;
-        try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; }
-        catch(err) { /* Ignora se non è JSON */ }
-        throw new Error(errorMsg);
-      }
-      const result = await response.json();
-
-      if (result.success) {
-        alert(result.message || "Registrazione completata con successo! Ora puoi effettuare il login.");
-        const loginTabButton = document.querySelector('.login-tab[data-tab="login"]');
-        if(loginTabButton) loginTabButton.click();
-
-        const loginEmailInput = document.getElementById('login-email');
-        const registerEmailInput = document.getElementById('register-email');
-        if(loginEmailInput && registerEmailInput) {
-          loginEmailInput.value = registerEmailInput.value;
-        }
-        e.target.reset();
+  function updateNavbarUI() {
+    const logoLink = gebi('logoLink'); if (logoLink) logoLink.href = "index.html";
+    const navbarTitle = gebi('navbarTitle'); const loginBtnDesktop = gebi('login-btn-desktop'); const userDropdownContainer = gebi('userDropdownContainer'); const navbarAvatarSpan = gebi('navbar-avatar'); const navbarUsername = gebi('navbar-username'); const dropdownProfilo = gebi('dropdownProfilo'); const dropdownPrenotazioni = gebi('dropdownPrenotazioni'); const dropdownLogout = gebi('dropdownLogout'); const loginBtnMobile = gebi('login-btn-mobile'); const mobileNavProfilo = gebi('mobileNavProfilo'); const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni'); const mobileLogoutLink = gebi('mobileLogoutLink'); const mobileMenuSeparator = gebi('mobileMenuSeparator'); const userDropdownMenu = gebi('userDropdownMenu'); const mobileMenu = gebi('mobileMenu'); const editPageBtnContainer = gebi('editPageBtnContainer');
+    let dropdownDashboard = gebi('dropdownDashboard'); if (userDropdownMenu && !dropdownDashboard) { dropdownDashboard = document.createElement('a'); dropdownDashboard.id = 'dropdownDashboard'; dropdownDashboard.href = 'dashboard.html'; dropdownDashboard.textContent = 'Dashboard Admin'; userDropdownMenu.insertBefore(dropdownDashboard, dropdownLogout); }
+    let dropdownGestioneEventi = gebi('dropdownGestioneEventi'); if (userDropdownMenu && !dropdownGestioneEventi) { dropdownGestioneEventi = document.createElement('a'); dropdownGestioneEventi.id = 'dropdownGestioneEventi'; dropdownGestioneEventi.href = 'eventiincorsoAdmin.html'; dropdownGestioneEventi.textContent = 'Gestione Eventi'; userDropdownMenu.insertBefore(dropdownGestioneEventi, dropdownLogout); }
+    let mobileNavDashboard = gebi('mobileNavDashboard'); if (mobileMenu && !mobileNavDashboard) { mobileNavDashboard = document.createElement('a'); mobileNavDashboard.id = 'mobileNavDashboard'; mobileNavDashboard.href = 'dashboard.html'; mobileNavDashboard.textContent = 'Dashboard Admin'; mobileMenu.insertBefore(mobileNavDashboard, mobileLogoutLink); }
+    let mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); if (mobileMenu && !mobileNavGestioneEventiAdmin) { mobileNavGestioneEventiAdmin = document.createElement('a'); mobileNavGestioneEventiAdmin.id = 'mobileNavGestioneEventiAdmin'; mobileNavGestioneEventiAdmin.href = 'eventiincorsoAdmin.html'; mobileNavGestioneEventiAdmin.textContent = 'Gestione Eventi'; mobileMenu.insertBefore(mobileNavGestioneEventiAdmin, mobileLogoutLink); }
+    if (loginBtnDesktop) loginBtnDesktop.style.display = 'none'; if (userDropdownContainer) userDropdownContainer.style.display = 'none'; if (dropdownProfilo) dropdownProfilo.style.display = 'none'; if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none'; if (dropdownDashboard) dropdownDashboard.style.display = 'none'; if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none'; if (loginBtnMobile) loginBtnMobile.style.display = 'none'; if (mobileNavProfilo) mobileNavProfilo.style.display = 'none'; if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none'; if (mobileNavDashboard) mobileNavDashboard.style.display = 'none'; if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none'; if (mobileLogoutLink) mobileLogoutLink.style.display = 'none'; if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'none'; if (editPageBtnContainer) editPageBtnContainer.style.display = 'none';
+    if (currentUserData) {
+      if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block'; if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
+      const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null; if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
+      if (mobileLogoutLink) mobileLogoutLink.style.display = 'block'; if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
+      if (currentUserData.isAdmin) {
+        if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)"; if (dropdownDashboard) dropdownDashboard.style.display = 'block'; if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'block'; if (mobileNavDashboard) mobileNavDashboard.style.display = 'block'; if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'block';
+        if (editPageBtnContainer) { editPageBtnContainer.style.display = 'flex'; gebi('editPageBtn').style.display = isEditModeActive ? 'none' : 'inline-block'; gebi('savePageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; gebi('cancelPageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none';}
       } else {
-        if(registerErrorMessage) {
-          registerErrorMessage.textContent = result.message || "Errore durante la registrazione.";
-          registerErrorMessage.style.display = 'block';
+        if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco"; if (dropdownProfilo) dropdownProfilo.style.display = 'block'; if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block'; if (mobileNavProfilo) mobileNavProfilo.style.display = 'block'; if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
+      }
+    } else {
+      if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block'; if (loginBtnMobile) loginBtnMobile.style.display = 'block'; if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+    }
+  }
+
+  function handleLogout(){localStorage.removeItem('userDataEFF');currentUserData=null;isEditModeActive=false;updateNavbarUI();loadPageContentsFromServer();showPageStatus('Logout effettuato.','info');}
+  let lastScroll = 0; const navbarContainer = gebi("navbarContainer"); if (navbarContainer) { window.addEventListener("scroll", function () { const cS = window.pageYOffset||document.documentElement.scrollTop; if(cS<=50){navbarContainer.classList.remove("hidden");lastScroll=0;return;} if(cS>lastScroll&&!navbarContainer.classList.contains("hidden"))navbarContainer.classList.add("hidden"); else if(cS<lastScroll&&navbarContainer.classList.contains("hidden"))navbarContainer.classList.remove("hidden"); lastScroll=cS<=0?0:cS;}, false);}
+  const mobileMenu = gebi("mobileMenu"); const hamburgerBtn = gebi("hamburgerBtn"); function toggleMobileMenu(){if(mobileMenu&&hamburgerBtn){const iO=mobileMenu.classList.toggle("open");hamburgerBtn.classList.toggle("open"); hamburgerBtn.setAttribute("aria-expanded",String(iO));document.body.style.overflow=iO?"hidden":"";}} function closeMobileMenu(){if(mobileMenu&&hamburgerBtn&&mobileMenu.classList.contains("open")){mobileMenu.classList.remove("open");hamburgerBtn.classList.remove("open");hamburgerBtn.setAttribute("aria-expanded","false");document.body.style.overflow="";}} if(hamburgerBtn)hamburgerBtn.addEventListener("click",toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l=>{if(l.id!=='login-btn-mobile'&&l.id!=='mobileLogoutLink')l.addEventListener("click",closeMobileMenu);}); document.addEventListener("click",function(e){if(mobileMenu&&mobileMenu.classList.contains("open")&&hamburgerBtn&&!mobileMenu.contains(e.target)&&!hamburgerBtn.contains(e.target))closeMobileMenu();});
+  const userBtnTrigger = gebi('userBtnTrigger'); const userDropdownMenu = gebi('userDropdownMenu'); if(userBtnTrigger&&userDropdownMenu){userBtnTrigger.addEventListener('click',function(e){e.stopPropagation();const iS=userDropdownMenu.style.display==='block';userDropdownMenu.style.display=iS?'none':'block';this.setAttribute('aria-expanded',String(!iS));}); document.addEventListener('click',function(e){if(userDropdownMenu&&userDropdownMenu.style.display==='block'&&!userBtnTrigger.contains(e.target)&&!userDropdownMenu.contains(e.target)){userDropdownMenu.style.display='none';userBtnTrigger.setAttribute('aria-expanded','false');}});}
+  const loginOverlay = gebi('loginOverlay'); const loginPopup = gebi('loginPopup'); const closeLoginPopupBtn = gebi('closeLoginPopupBtn'); const loginTabs = document.querySelectorAll('.login-tab'); const loginForms = document.querySelectorAll('.login-popup .login-form'); const loginFormEl = gebi('loginForm'); const registerFormEl = gebi('registerForm'); const loginErrorMessageEl = gebi('login-error-message'); const registerErrorMessageEl = gebi('register-error-message');
+  function openLoginPopup(){if(loginOverlay)loginOverlay.classList.add('active');if(loginPopup)loginPopup.classList.add('active');document.body.style.overflow='hidden';resetFormErrorsAndMessages();const loginTabToActivate = loginPopup.querySelector('.login-tab[data-tab="login"]'); if(loginTabToActivate) loginTabToActivate.click(); gebi('login-email')?.focus();}
+  function closeLoginPopup(){if(loginOverlay)loginOverlay.classList.remove('active');if(loginPopup)loginPopup.classList.remove('active');document.body.style.overflow='';resetFormErrorsAndMessages();}
+  function resetFormErrorsAndMessages(){loginForms.forEach(f=>f.querySelectorAll('.form-control.error-border').forEach(i=>i.classList.remove('error-border')));if(loginErrorMessageEl)loginErrorMessageEl.style.display='none';if(registerErrorMessageEl)registerErrorMessageEl.style.display='none';}
+  gebi('login-btn-desktop')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();}); gebi('login-btn-mobile')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();closeMobileMenu();});
+  if(closeLoginPopupBtn)closeLoginPopupBtn.addEventListener('click',closeLoginPopup); if(loginOverlay)loginOverlay.addEventListener('click',(e)=>{if(e.target===loginOverlay)closeLoginPopup();});
+  loginTabs.forEach(t=>t.addEventListener('click',()=>{const id=t.dataset.tab;loginTabs.forEach(tb=>tb.classList.remove('active'));t.classList.add('active');loginForms.forEach(f=>{f.classList.remove('active');if(f.id===`${id}Form`){f.classList.add('active');f.querySelector('input:not([type="hidden"])')?.focus();}});resetFormErrorsAndMessages();}));
+  loginFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=loginFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';try{const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath,isAdmin:j.is_admin===true||j.is_admin===1};localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));await fetchAndUpdateUserDisplayDataFromApi();closeLoginPopup();await loadPageContentsFromServer();showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");}else{loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}}}catch(err){console.error("Errore login:",err);if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
+  registerFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=registerFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Registrazione...<div class="spinner-mini-light"></div>';try{const r=await fetch('registrati.php',{method:'POST',body:new FormData(registerFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){alert(j.message||"Registrazione completata! Ora puoi accedere.");const loginTabButton=document.querySelector('.login-tab[data-tab="login"]');if(loginTabButton)loginTabButton.click();const loginEmailInput=gebi('login-email');const registerEmailInput=gebi('register-email');if(loginEmailInput&&registerEmailInput)loginEmailInput.value=registerEmailInput.value;e.target.reset();}else{if(registerErrorMessageEl){registerErrorMessageEl.textContent=j.message||"Errore registrazione.";registerErrorMessageEl.style.display='block';}if(j.errors){for(const f in j.errors)gebi(`register-${f}`)?.classList.add('error-border');}}}catch(err){console.error("Errore registrazione:",err);if(registerErrorMessageEl){registerErrorMessageEl.textContent="Errore connessione o server.";registerErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
+  gebi('dropdownLogout')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();}); gebi('mobileLogoutLink')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenu();});
+
+  const editPageBtn=gebi('editPageBtn');const savePageChangesBtn=gebi('savePageChangesBtn'); const cancelPageChangesBtn=gebi('cancelPageChangesBtn');
+  const editContentModal=gebi('editContentModal'); const closeEditContentModalBtn=gebi('closeEditContentModalBtn');const editModalTitle=gebi('editModalTitle'); const editModalTextarea=gebi('editModalTextarea');const editModalInputText=gebi('editModalInputText'); const editModalInputUrl = gebi('editModalInputUrl'); const editModalFieldLabelText=gebi('editModalFieldLabelText'); const saveEditModalBtn=gebi('saveEditModalBtn');const cancelEditModalBtn=gebi('cancelEditModalBtn'); const editModalMessage=gebi('editModalMessage');const pageOverallStatus=gebi('pageOverallStatus');
+  let currentEditingKey=null;let currentEditingType='text';
+
+  function showPageStatus(message,type='info',duration=3000){if(!pageOverallStatus)return;pageOverallStatus.textContent=message;pageOverallStatus.className='form-message';if(type==='success')pageOverallStatus.classList.add('success');else if(type==='error')pageOverallStatus.classList.add('error');else{pageOverallStatus.style.backgroundColor='var(--primary)';pageOverallStatus.style.color='white';pageOverallStatus.classList.remove('success','error');} pageOverallStatus.style.display='block';setTimeout(()=>{pageOverallStatus.style.display='none';},duration);}
+
+  async function loadPageContentsFromServer(){
+    showPageStatus("Caricamento contenuti...","info",1500);
+    try{
+      const r=await fetch(`api_get_page_content.php?page=${PAGE_NAME_FOR_CONTENT}`);
+      if(!r.ok)throw new Error(`Errore server: ${r.status}`);
+      const d=await r.json();
+      if(d.success&&d.contents&&Object.keys(d.contents).length>0){
+        currentPageDbContents=d.contents;
+      } else {
+        currentPageDbContents=JSON.parse(JSON.stringify(defaultPageContents));
+      }
+    }catch(err){
+      console.error("Errore caricamento contenuti:",err);
+      currentPageDbContents=JSON.parse(JSON.stringify(defaultPageContents));
+      showPageStatus("Errore caricamento. Usati valori predefiniti.","error");
+    }
+    applyContentsToPage(currentPageDbContents);
+    originalPageContentsForCancel=JSON.parse(JSON.stringify(currentPageDbContents));
+  }
+
+  function applyContentsToPage(contents) {
+    document.querySelectorAll('[data-content-key]').forEach(el => {
+      const key = el.dataset.contentKey;
+      let contentValue = contents[key] !== undefined ? contents[key] : defaultPageContents[key];
+      if (typeof contentValue !== 'string') contentValue = String(contentValue || '');
+
+      if (contentValue !== undefined) {
+        if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') {
+          el.src = contentValue;
+        } else if (el.tagName === 'A' && key === 'locationDirectionsButtonHref') {
+          el.href = contentValue;
         } else {
-          alert("Errore Registrazione: " + (result.message || "Si è verificato un errore."));
+          el.innerHTML = formatHTMLContent(contentValue);
         }
-        if (result.errors) {
-          for (const fieldNameFromError in result.errors) {
-            const inputElement = e.target.elements[fieldNameFromError] || document.getElementById(`register-${fieldNameFromError}`);
-            if (inputElement) {
-              inputElement.classList.add('error-border');
-            }
-          }
-        }
-      }
-    } catch (error) {
-      if(registerErrorMessage) {
-        registerErrorMessage.textContent = "Errore: " + error.message;
-        registerErrorMessage.style.display = 'block';
       } else {
-        alert("Errore durante la registrazione: " + error.message);
+        if (el.tagName !== 'IFRAME' && el.tagName !== 'A') el.innerHTML = `[${key} mancante]`;
+        else if (el.tagName === 'IFRAME') el.src = "about:blank";
+        else if (el.tagName === 'A') el.href="#";
       }
-      console.error("Dettaglio errore registrazione:", error);
-    } finally {
-      registerButton.disabled = false;
-      registerButton.innerHTML = originalButtonText;
+    });
+  }
+
+  function toggleEditMode(enable){isEditModeActive=enable;document.querySelectorAll('.edit-icon-text,.edit-icon-iframe,.edit-icon-href').forEach(icon=>icon.style.display=(currentUserData?.isAdmin&&enable)?'inline-flex':'none'); const editContainer=gebi('editPageBtnContainer');const editBtn=gebi('editPageBtn');const saveBtn=gebi('savePageChangesBtn');const cancelBtn=gebi('cancelPageChangesBtn');if(editContainer&&currentUserData?.isAdmin)editContainer.style.display='flex';else if(editContainer)editContainer.style.display='none';if(editBtn)editBtn.style.display=enable?'none':(currentUserData?.isAdmin?'inline-block':'none');if(saveBtn)saveBtn.style.display=enable?'inline-block':'none';if(cancelBtn)cancelBtn.style.display=enable?'inline-block':'none';if(enable){originalPageContentsForCancel= JSON.parse(JSON.stringify(currentPageDbContents));}}
+
+  function openEditModal(key,type,currentValue){
+    currentEditingKey=key;currentEditingType=type;
+    if(!editContentModal||!editModalMessage)return;
+    editModalMessage.style.display='none';editModalMessage.textContent='';
+    editModalTitle.textContent=`Modifica: ${key}`;
+    editModalTextarea.style.display='none';editModalInputText.style.display='none';
+    editModalInputUrl.style.display='none';
+
+    let valForInput = currentValue;
+
+    if (type === 'iframe_src' || type === 'href') {
+      editModalFieldLabelText.textContent = (type === 'iframe_src' ? "URL Mappa (src iframe):" : "URL Link Indicazioni:");
+      editModalInputUrl.value = valForInput;
+      editModalInputUrl.type = 'url'; // Assicurati che sia di tipo URL
+      editModalInputUrl.style.display='block';
+      editModalInputUrl.focus();
+    } else if (type === 'textarea') {
+      const tmp = document.createElement('div'); tmp.innerHTML = currentValue;
+      valForInput = tmp.textContent || "";
+      editModalFieldLabelText.textContent="Testo (paragrafo):";
+      editModalTextarea.value=valForInput.replace(/<br\s*\/?>/gi, "\n");
+      editModalTextarea.style.display='block';editModalTextarea.focus();
+    } else { // type === 'text'
+      const tmp = document.createElement('div'); tmp.innerHTML = currentValue;
+      valForInput = tmp.textContent || "";
+      editModalFieldLabelText.textContent="Testo (titolo/corto):";
+      editModalInputText.value=valForInput.replace(/<br\s*\/?>/gi, "\n");
+      editModalInputText.style.display='block';editModalInputText.focus();
+    }
+    editContentModal.style.display='flex';
+  }
+
+  function closeEditContentModal(){if(editContentModal)editContentModal.style.display='none';currentEditingKey=null;}
+  if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
+  if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{
+    const contentsToSave = { ...currentPageDbContents };
+    document.querySelectorAll('[data-content-key]').forEach(el => {
+      const key = el.dataset.contentKey;
+      if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') {
+        contentsToSave[key] = el.src;
+      } else if (el.tagName === 'A' && key === 'locationDirectionsButtonHref') {
+        contentsToSave[key] = el.href;
+      } else {
+        contentsToSave[key] = el.innerHTML;
+      }
+    });
+    const btn=savePageChangesBtn;const oldHtml=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
+    try{
+      const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});
+      const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");
+      currentPageDbContents = JSON.parse(JSON.stringify(contentsToSave)); // Aggiorna la cache locale con quello che è stato salvato
+      originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents));
+      showPageStatus(j.message||'Modifiche salvate!','success');toggleEditMode(false);
+    }catch(err){console.error("Errore salvataggio:",err);showPageStatus(`Errore: ${err.message}`,'error');}
+    finally{btn.disabled=false;btn.innerHTML=oldHtml;}
+  });
+  if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{applyContentsToPage(originalPageContentsForCancel); currentPageDbContents = JSON.parse(JSON.stringify(originalPageContentsForCancel)); toggleEditMode(false);showPageStatus('Modifiche annullate.','info');});
+
+  document.addEventListener('click',function(e){
+    if(!isEditModeActive||!currentUserData?.isAdmin)return;
+    const editIcon=e.target.closest('.edit-icon-text,.edit-icon-iframe,.edit-icon-href');
+    let elToEdit,key,type,currentVal;
+
+    if(editIcon){
+      key=editIcon.dataset.key; type=editIcon.dataset.type;
+      elToEdit=gebi(`content-${key}`);
+      if(!elToEdit){console.error(`Elemento con id content-${key} non trovato`);return;}
+      if (type === 'iframe_src') {
+        currentVal = elToEdit.src;
+      } else if (type === 'href') {
+        currentVal = elToEdit.href;
+      } else {
+        currentVal = elToEdit.innerHTML;
+      }
+      openEditModal(key, type, currentVal);
     }
   });
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && loginPopup && loginPopup.classList.contains("active")) {
-      closeLoginPopup();
+  if(closeEditContentModalBtn)closeEditContentModalBtn.addEventListener('click',closeEditContentModal);
+  if(cancelEditModalBtn)cancelEditModalBtn.addEventListener('click',closeEditContentModal);
+
+  if(saveEditModalBtn)saveEditModalBtn.addEventListener('click',async()=>{
+    if(!currentEditingKey)return;
+    let targetElement = gebi(`content-${currentEditingKey}`);
+    if(!targetElement){if(editModalMessage){editModalMessage.textContent="Err: Elem. non trovato.";editModalMessage.className='form-message error';editModalMessage.style.display='block';}return;}
+
+    let newValue='';
+    if(currentEditingType === 'iframe_src' || currentEditingType === 'href'){
+      newValue = editModalInputUrl.value.trim();
+      if(currentEditingType === 'iframe_src') targetElement.src = newValue;
+      else targetElement.href = newValue;
+      currentPageDbContents[currentEditingKey] = newValue;
+    } else if(currentEditingType==='textarea'){
+      newValue = editModalTextarea.value;
+      targetElement.innerHTML = formatHTMLContent(newValue);
+      currentPageDbContents[currentEditingKey] = targetElement.innerHTML;
+    } else { // type 'text'
+      newValue = editModalInputText.value;
+      targetElement.innerHTML = formatHTMLContent(newValue);
+      currentPageDbContents[currentEditingKey] = targetElement.innerHTML;
     }
+    closeEditContentModal();
   });
 
-  document.addEventListener('DOMContentLoaded', function() {
-    const currentYearEl = document.getElementById("currentYear");
-    if (currentYearEl) {
-      currentYearEl.textContent = new Date().getFullYear();
-    }
+  document.addEventListener('DOMContentLoaded',async()=>{
+    const c=gebi('currentYear');if(c)c.textContent=new Date().getFullYear();
+    loadUserData();
+    await loadPageContentsFromServer();
+    await fetchAndUpdateUserDisplayDataFromApi();
+    if(!isEditModeActive||!currentUserData?.isAdmin){document.querySelectorAll('.edit-icon-text,.edit-icon-iframe,.edit-icon-href').forEach(i=>i.style.display='none');} else { toggleEditMode(false); }
+    document.addEventListener('keydown',(e)=>{if(e.key==='Escape'){if(loginPopup?.classList.contains('active'))closeLoginPopup(); if(editContentModal?.style.display==='flex')closeEditContentModal();}});
   });
 </script>
 
