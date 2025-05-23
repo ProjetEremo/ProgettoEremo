@@ -72,12 +72,12 @@
         .btn-edit-comment:hover {
             background-color: rgba(var(--warning), 0.1);
             color: var(--warning);
-            border-color: rgba(var(--warning), 0.3);
+            /* border-color: rgba(var(--warning), 0.3); */ /* Rimosso per coerenza con bottoni like/reply */
         }
         .btn-delete-comment:hover {
             background-color: rgba(var(--danger-rgb), 0.1);
             color: var(--danger);
-            border-color: rgba(var(--danger-rgb), 0.3);
+            /* border-color: rgba(var(--danger-rgb), 0.3); */ /* Rimosso per coerenza */
         }
         .btn-edit-comment i { color: var(--warning); }
         .btn-delete-comment i { color: var(--danger); }
@@ -192,7 +192,7 @@
 
 <div id="conversationPopupOverlay" class="modal">
     <div id="conversationPopup" class="modal-content conversation-popup-main">
-        <button class="close-modal-btn" onclick="closeConversationPopup()">&times;</button>
+        <button class="close-modal-btn" onclick="closeConversationPopup()">×</button>
         <h3 id="conversationPopupTitle">Conversazione</h3>
         <div id="conversationPopupContent" class="modal-content-scrollable">
             <ul id="conversationPopupUL" class="comments-list-ul"></ul>
@@ -202,11 +202,10 @@
 
 <div id="likersPopupOverlay" class="modal">
     <div id="likersPopup" class="modal-content likers-popup-main">
-        <button class="close-modal-btn" onclick="closeLikersPopup()">&times;</button>
+        <button class="close-modal-btn" onclick="closeLikersPopup()">×</button>
         <h3>Persone a cui piace</h3>
         <div id="likersPopupContent" class="modal-content-scrollable">
-            <ul id="likersPopupUL" class="likers-list">
-            </ul>
+            <ul id="likersPopupUL" class="likers-list"></ul>
             <div id="likersLoadingIndicator" class="loading-overlay visible" style="min-height:100px; background:transparent; position:relative; display:none;">
                 <div class="spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>
                 <p>Caricamento...</p>
@@ -216,14 +215,13 @@
     </div>
 </div>
 
-
 <footer> <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p> </footer>
 
 <script>
     let currentUser = null;
     const defaultUserIconPath = '/uploads/icons/default_user.png';
-    const MAX_MESSAGES_VISIBLE_MAIN_PAGE = 3; // Per commenti radice
-    const MAX_REPLIES_SHOWN_INITIALLY_MAIN_PAGE = 2; // Per risposte sotto un commento radice prima di "vedi tutto"
+    const MAX_MESSAGES_VISIBLE_MAIN_PAGE = 3;
+    const MAX_REPLIES_SHOWN_INITIALLY_MAIN_PAGE = 2;
 
     async function callApi(url, method = 'GET', data = null) {
         const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
@@ -235,10 +233,8 @@
             const response = await fetch(url, options);
             if (!response.ok) {
                 let errorData = { message: `Errore HTTP ${response.status} (${response.statusText})` };
-                try {
-                    const potentialErrorJson = await response.text();
-                    errorData = JSON.parse(potentialErrorJson);
-                } catch (e) { /* usa errorData di default */ }
+                try { const potentialErrorJson = await response.text(); errorData = JSON.parse(potentialErrorJson); }
+                catch (e) { /* usa errorData di default */ }
                 throw new Error(errorData.message || `Errore server: ${response.status}`);
             }
             return response.status === 204 ? {} : await response.json();
@@ -261,13 +257,9 @@
     }
 
     function handleLogout() {
-        localStorage.removeItem('userDataEFF');
-        currentUser = null;
+        localStorage.removeItem('userDataEFF'); currentUser = null;
         fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' })
-            .finally(() => {
-                alert('Logout effettuato.');
-                window.location.href = 'index.html';
-            });
+            .finally(() => { alert('Logout effettuato.'); window.location.href = 'index.html'; });
     }
 
     function setupUserSessionAndNavbar() {
@@ -275,18 +267,9 @@
         if (userDataString) {
             try {
                 currentUser = JSON.parse(userDataString);
-                if (!currentUser || !currentUser.email) {
-                    currentUser = null;
-                    localStorage.removeItem('userDataEFF');
-                }
-            } catch (e) {
-                currentUser = null;
-                localStorage.removeItem('userDataEFF');
-                console.error("Errore parsing userDataEFF da localStorage", e);
-            }
-        } else {
-            currentUser = null;
-        }
+                if (!currentUser || !currentUser.email) { currentUser = null; localStorage.removeItem('userDataEFF'); }
+            } catch (e) { currentUser = null; localStorage.removeItem('userDataEFF'); console.error("Errore parsing userDataEFF", e); }
+        } else { currentUser = null; }
         updateNavbarUserUI();
         document.getElementById('logout-link-dropdown')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
         document.getElementById('logout-link-mobile')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenu(); });
@@ -305,11 +288,10 @@
                 localStorage.setItem('userDataEFF', JSON.stringify(currentUser));
                 updateNavbarUserUI();
             }
-        } catch (error) { console.warn("Non è stato possibile aggiornare i dati del profilo utente dalla API:", error.message); }
+        } catch (error) { console.warn("Impossibile aggiornare dati profilo utente:", error.message); }
     }
 
-    let lastScroll = 0;
-    const navbarContainer = document.getElementById('navbarContainer');
+    let lastScroll = 0; const navbarContainer = document.getElementById('navbarContainer');
     if (navbarContainer) {
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
@@ -329,14 +311,11 @@
             userDropdownButton.setAttribute('aria-expanded', String(!isCurrentlyOpen));
         }
     }
-    const mobileMenu = document.getElementById("mobileMenu");
-    const hamburger = document.querySelector(".navbar .hamburger");
+    const mobileMenu = document.getElementById("mobileMenu"); const hamburger = document.querySelector(".navbar .hamburger");
     function toggleMobileMenu() {
         if (mobileMenu && hamburger) {
-            const isOpen = mobileMenu.classList.toggle("open");
-            hamburger.classList.toggle("open");
-            hamburger.setAttribute("aria-expanded", isOpen.toString());
-            document.body.style.overflow = isOpen ? 'hidden' : '';
+            const isOpen = mobileMenu.classList.toggle("open"); hamburger.classList.toggle("open");
+            hamburger.setAttribute("aria-expanded", isOpen.toString()); document.body.style.overflow = isOpen ? 'hidden' : '';
         }
     }
     function closeMobileMenu() {
@@ -350,421 +329,185 @@
         if (userDropdownMenu && userDropdownMenu.style.display === 'block') {
             const userDropdownContainer = document.getElementById('userDropdownContainer');
             if (userDropdownContainer && !userDropdownContainer.contains(globalEvent.target)) {
-                userDropdownMenu.style.display = 'none';
-                if (userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
+                userDropdownMenu.style.display = 'none'; if (userDropdownButton) userDropdownButton.setAttribute('aria-expanded', 'false');
             }
         }
         if (mobileMenu && mobileMenu.classList.contains('open')) {
-            if (globalEvent.target.closest('.mobile-menu a')) {
-                closeMobileMenu();
-            } else if (hamburger && !hamburger.contains(globalEvent.target) && !mobileMenu.contains(globalEvent.target)) {
-                closeMobileMenu();
-            }
+            if (globalEvent.target.closest('.mobile-menu a')) closeMobileMenu();
+            else if (hamburger && !hamburger.contains(globalEvent.target) && !mobileMenu.contains(globalEvent.target)) closeMobileMenu();
         }
     });
 
-    const lightbox = document.getElementById('lightbox');
-    const lightboxContent = lightbox ? lightbox.querySelector('.lightbox-content') : null;
-    const lightboxCaption = document.getElementById('lightbox-caption');
-    const lightboxCloseBtn = lightbox ? lightbox.querySelector('.lightbox-close') : null;
-    const lightboxPrevBtn = lightbox ? lightbox.querySelector('.lightbox-prev') : null;
-    const lightboxNextBtn = lightbox ? lightbox.querySelector('.lightbox-next') : null;
-    let currentMediaIndexInLightbox = 0;
-    let galleryItemsData = [];
-
+    const lightbox = document.getElementById('lightbox'); const lightboxContent = lightbox?.querySelector('.lightbox-content');
+    const lightboxCaption = document.getElementById('lightbox-caption'); const lightboxCloseBtn = lightbox?.querySelector('.lightbox-close');
+    const lightboxPrevBtn = lightbox?.querySelector('.lightbox-prev'); const lightboxNextBtn = lightbox?.querySelector('.lightbox-next');
+    let currentMediaIndexInLightbox = 0; let galleryItemsData = [];
     function openLightbox(index) {
         if (!lightbox || !lightboxContent || !lightboxCaption || galleryItemsData.length === 0 || index < 0 || index >= galleryItemsData.length) return;
-        currentMediaIndexInLightbox = index;
-        const item = galleryItemsData[index];
-        lightboxContent.innerHTML = '';
-        if (item.type === 'video') {
-            const video = document.createElement('video');
-            video.src = item.href; video.controls = true; video.autoplay = true;
-            video.style.maxWidth = '100%'; video.style.maxHeight = '85vh';
-            lightboxContent.appendChild(video);
-        } else if (item.type === 'image') {
-            const img = document.createElement('img');
-            img.src = item.href; img.alt = item.title || "Immagine ingrandita";
-            img.style.maxWidth = '100%'; img.style.maxHeight = '85vh';
-            lightboxContent.appendChild(img);
-        } else {
-            lightboxContent.innerHTML = `<div style="color:white; text-align:center; padding:20px;">Anteprima non disponibile per questo tipo di file. <br><a href="${item.href}" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:underline;">Apri media in una nuova scheda</a></div>`;
-        }
-        const captionText = item.title || '';
-        lightboxCaption.innerHTML = sanitizeTextForHTML(captionText);
+        currentMediaIndexInLightbox = index; const item = galleryItemsData[index]; lightboxContent.innerHTML = '';
+        if (item.type === 'video') { const video = document.createElement('video'); video.src = item.href; video.controls = true; video.autoplay = true; video.style.maxWidth = '100%'; video.style.maxHeight = '85vh'; lightboxContent.appendChild(video); }
+        else if (item.type === 'image') { const img = document.createElement('img'); img.src = item.href; img.alt = item.title || "Immagine ingrandita"; img.style.maxWidth = '100%'; img.style.maxHeight = '85vh'; lightboxContent.appendChild(img); }
+        else { lightboxContent.innerHTML = `<div style="color:white; text-align:center; padding:20px;">Anteprima non disponibile. <br><a href="${item.href}" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:underline;">Apri media</a></div>`; }
+        const captionText = item.title || ''; lightboxCaption.innerHTML = sanitizeTextForHTML(captionText);
         lightboxCaption.style.display = captionText.trim() && captionText.toLowerCase() !== 'media' ? 'block' : 'none';
-        lightbox.classList.add('active'); document.body.style.overflow = 'hidden';
-        updateLightboxNavButtons();
+        lightbox.classList.add('active'); document.body.style.overflow = 'hidden'; updateLightboxNavButtons();
     }
-    function closeLightbox() {
-        if (!lightbox || !lightboxContent) return;
-        lightbox.classList.remove('active');
-        const video = lightboxContent.querySelector('video'); if(video) video.pause();
-        lightboxContent.innerHTML = '';
-        document.body.style.overflow = '';
-    }
-    function updateLightboxNavButtons() {
-        if (!lightboxPrevBtn || !lightboxNextBtn) return;
-        lightboxPrevBtn.style.display = galleryItemsData.length > 1 ? 'flex' : 'none';
-        lightboxNextBtn.style.display = galleryItemsData.length > 1 ? 'flex' : 'none';
-    }
-    function changeLightboxMedia(direction) {
-        if (galleryItemsData.length <= 1) return;
-        currentMediaIndexInLightbox = (currentMediaIndexInLightbox + direction + galleryItemsData.length) % galleryItemsData.length;
-        openLightbox(currentMediaIndexInLightbox);
-    }
+    function closeLightbox() { if (!lightbox || !lightboxContent) return; lightbox.classList.remove('active'); const video = lightboxContent.querySelector('video'); if(video) video.pause(); lightboxContent.innerHTML = ''; document.body.style.overflow = ''; }
+    function updateLightboxNavButtons() { if (!lightboxPrevBtn || !lightboxNextBtn) return; lightboxPrevBtn.style.display = galleryItemsData.length > 1 ? 'flex' : 'none'; lightboxNextBtn.style.display = galleryItemsData.length > 1 ? 'flex' : 'none'; }
+    function changeLightboxMedia(direction) { if (galleryItemsData.length <= 1) return; currentMediaIndexInLightbox = (currentMediaIndexInLightbox + direction + galleryItemsData.length) % galleryItemsData.length; openLightbox(currentMediaIndexInLightbox); }
     if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
     if (lightboxPrevBtn) lightboxPrevBtn.addEventListener('click', () => changeLightboxMedia(-1));
     if (lightboxNextBtn) lightboxNextBtn.addEventListener('click', () => changeLightboxMedia(1));
     if (lightbox) {
-        document.addEventListener('keydown', (e) => {
-            if (lightbox.classList.contains('active')) {
-                if (e.key === 'Escape') closeLightbox();
-                if (e.key === 'ArrowLeft' && galleryItemsData.length > 1) changeLightboxMedia(-1);
-                if (e.key === 'ArrowRight' && galleryItemsData.length > 1) changeLightboxMedia(1);
-            }
-        });
+        document.addEventListener('keydown', (e) => { if (lightbox.classList.contains('active')) { if (e.key === 'Escape') closeLightbox(); if (e.key === 'ArrowLeft' && galleryItemsData.length > 1) changeLightboxMedia(-1); if (e.key === 'ArrowRight' && galleryItemsData.length > 1) changeLightboxMedia(1); } });
         lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
     }
 
-    function sanitizeTextForHTML(str) {
-        if (typeof str !== 'string') str = String(str || '');
-        const temp = document.createElement('div');
-        temp.textContent = str;
-        return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');
-    }
+    function sanitizeTextForHTML(str) { if (typeof str !== 'string') str = String(str || ''); const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>'); }
 
     function displayErrorMessageOnPage(message, errorDetails = "") {
-        const errorDisplayEl = document.getElementById('eventLoadingError');
-        const titleHeaderEl = document.getElementById('eventTitleHeader');
-        let fullMessage = message;
-        if (errorDetails) fullMessage += " Dettaglio: " + String(errorDetails).substring(0, 300);
+        const errorDisplayEl = document.getElementById('eventLoadingError'); const titleHeaderEl = document.getElementById('eventTitleHeader');
+        let fullMessage = message; if (errorDetails) fullMessage += " Dettaglio: " + String(errorDetails).substring(0, 300);
         const sanitizedFullMessage = sanitizeTextForHTML(fullMessage);
-
-        if (errorDisplayEl) {
-            errorDisplayEl.innerHTML = sanitizedFullMessage;
-            errorDisplayEl.style.display = 'block';
-        } else if (titleHeaderEl) {
-            titleHeaderEl.innerHTML = `<p class='no-content-message form-message error' style='display:block;'>${sanitizedFullMessage}</p>`;
-        }
-        const pageLoadingEl = document.getElementById('pageLoadingIndicator');
-        if(pageLoadingEl) pageLoadingEl.style.display = 'none';
+        if (errorDisplayEl) { errorDisplayEl.innerHTML = sanitizedFullMessage; errorDisplayEl.style.display = 'block'; }
+        else if (titleHeaderEl) { titleHeaderEl.innerHTML = `<p class='no-content-message form-message error' style='display:block;'>${sanitizedFullMessage}</p>`; }
+        const pageLoadingEl = document.getElementById('pageLoadingIndicator'); if(pageLoadingEl) pageLoadingEl.style.display = 'none';
     }
 
     async function fetchEventDetails(eventId) {
-        const pageLoadingEl = document.getElementById('pageLoadingIndicator');
-        const errorDisplayEl = document.getElementById('eventLoadingError');
-        const eventTitleHeaderEl = document.getElementById('eventTitleHeader');
-        const eventCoverImageEl = document.getElementById('eventCoverImage');
-        const eventMetaInfoEl = document.getElementById('eventMetaInfo');
-        const eventDescriptionFullEl = document.getElementById('eventDescriptionFull');
-        const eventVolantinoContainerEl = document.getElementById('eventVolantinoContainer');
-        const gallerySectionEl = document.getElementById('event-gallery');
-        const galleryGridEl = document.getElementById('galleryGrid');
-        const noMediaMessageEl = document.getElementById('no-media-message');
-        const commentsSectionEl = document.getElementById('event-comments');
-        const commentsListULEL = document.getElementById('commentsListUL');
+        const pageLoadingEl = document.getElementById('pageLoadingIndicator'); const errorDisplayEl = document.getElementById('eventLoadingError');
+        const eventTitleHeaderEl = document.getElementById('eventTitleHeader'); const eventCoverImageEl = document.getElementById('eventCoverImage');
+        const eventMetaInfoEl = document.getElementById('eventMetaInfo'); const eventDescriptionFullEl = document.getElementById('eventDescriptionFull');
+        const eventVolantinoContainerEl = document.getElementById('eventVolantinoContainer'); const gallerySectionEl = document.getElementById('event-gallery');
+        const galleryGridEl = document.getElementById('galleryGrid'); const noMediaMessageEl = document.getElementById('no-media-message');
+        const commentsSectionEl = document.getElementById('event-comments'); const commentsListULEL = document.getElementById('commentsListUL');
         const noCommentsMessageEl = document.getElementById('no-comments-message');
-
-        if(errorDisplayEl) errorDisplayEl.style.display = 'none';
-        if (pageLoadingEl) pageLoadingEl.style.display = 'flex';
-
+        if(errorDisplayEl) errorDisplayEl.style.display = 'none'; if (pageLoadingEl) pageLoadingEl.style.display = 'flex';
         [gallerySectionEl, commentsSectionEl, eventCoverImageEl, eventMetaInfoEl, eventDescriptionFullEl, eventVolantinoContainerEl].forEach(el => { if(el) el.style.display = 'none'; });
-
         try {
-            // NOTA: Assicurati che 'get_event_details.php' includa 'is_liked_by_current_user' per ogni commento.
             const result = await callApi('get_event_details.php?id=' + encodeURIComponent(eventId));
             if (result.success && result.data) {
-                const event = result.data.details;
-                const mediaItems = result.data.media || [];
-                const fetchedComments = result.data.comments || [];
-
-                // Popola dettagli evento
-                if (eventTitleHeaderEl && event?.Titolo) {
-                    eventTitleHeaderEl.textContent = event.Titolo;
-                    document.title = event.Titolo + ' - Eremo Frate Francesco';
-                } else if (eventTitleHeaderEl) {
-                    eventTitleHeaderEl.textContent = "Dettaglio Evento";
-                }
+                const event = result.data.details; const mediaItems = result.data.media || []; const fetchedComments = result.data.comments || [];
+                if (eventTitleHeaderEl && event?.Titolo) { eventTitleHeaderEl.textContent = event.Titolo; document.title = event.Titolo + ' - Eremo Frate Francesco'; }
+                else if (eventTitleHeaderEl) { eventTitleHeaderEl.textContent = "Dettaglio Evento"; }
                 if (event) {
-                    if(event.FotoCopertina && eventCoverImageEl){
-                        eventCoverImageEl.src = event.FotoCopertina;
-                        eventCoverImageEl.alt = "Copertina " + (event.Titolo || "evento");
-                        eventCoverImageEl.style.display = 'block';
-                    }
+                    if(event.FotoCopertina && eventCoverImageEl){ eventCoverImageEl.src = event.FotoCopertina; eventCoverImageEl.alt = "Copertina " + (event.Titolo || "evento"); eventCoverImageEl.style.display = 'block'; }
                     if(eventMetaInfoEl){
                         let metaHTML = '';
-                        if (event.Data) {
-                            try {
-                                const dateObj = new Date(event.Data.replace(/-/g, '/'));
-                                if (!isNaN(dateObj.getTime())) {
-                                    metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${dateObj.toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric', timeZone: 'Europe/Rome'})}</span>`;
-                                } else {
-                                    metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${sanitizeTextForHTML(event.Data)}</span>`;
-                                }
-                            } catch (e) {
-                                metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${sanitizeTextForHTML(event.Data)}</span>`;
-                            }
-                        }
+                        if (event.Data) { try { const dateObj = new Date(event.Data.replace(/-/g, '/')); if (!isNaN(dateObj.getTime())) metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${dateObj.toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric', timeZone: 'Europe/Rome'})}</span>`; else metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${sanitizeTextForHTML(event.Data)}</span>`; } catch (e) { metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${sanitizeTextForHTML(event.Data)}</span>`; } }
                         if (event.Durata) metaHTML += `<span><i class="fas fa-clock"></i> ${sanitizeTextForHTML(event.Durata)}</span>`;
                         if (event.Relatore) metaHTML += `<span><i class="fas fa-user"></i> ${sanitizeTextForHTML(event.PrefissoRelatore || 'Relatore')}: ${sanitizeTextForHTML(event.Relatore)}</span>`;
                         if (event.Associazione) metaHTML += `<span><i class="fas fa-users"></i> ${sanitizeTextForHTML(event.Associazione)}</span>`;
-                        eventMetaInfoEl.innerHTML = metaHTML;
-                        if (metaHTML) eventMetaInfoEl.style.display = 'flex';
+                        eventMetaInfoEl.innerHTML = metaHTML; if (metaHTML) eventMetaInfoEl.style.display = 'flex';
                     }
-                    if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){
-                        eventDescriptionFullEl.innerHTML = sanitizeTextForHTML(event.DescrizioneEstesa || event.Descrizione);
-                        eventDescriptionFullEl.style.display = 'block';
-                    }
-                    if(eventVolantinoContainerEl && event.VolantinoUrl){
-                        eventVolantinoContainerEl.innerHTML = `<h4>Volantino</h4><a href="${encodeURI(event.VolantinoUrl)}" target="_blank" title="Visualizza volantino per ${sanitizeTextForHTML(event.Titolo || '')}" class="btn-volantino"><i class="fas fa-file-pdf"></i> Visualizza Volantino</a>`;
-                        eventVolantinoContainerEl.style.display = 'block';
-                    }
-                } else {
-                    displayErrorMessageOnPage("Dettagli dell'evento non disponibili o evento non trovato.");
-                }
-
-                // Galleria
-                galleryItemsData = [];
-                if (galleryGridEl) galleryGridEl.innerHTML = '';
+                    if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){ eventDescriptionFullEl.innerHTML = sanitizeTextForHTML(event.DescrizioneEstesa || event.Descrizione); eventDescriptionFullEl.style.display = 'block'; }
+                    if(eventVolantinoContainerEl && event.VolantinoUrl){ eventVolantinoContainerEl.innerHTML = `<h4>Volantino</h4><a href="${encodeURI(event.VolantinoUrl)}" target="_blank" title="Visualizza volantino per ${sanitizeTextForHTML(event.Titolo || '')}" class="btn-volantino"><i class="fas fa-file-pdf"></i> Visualizza Volantino</a>`; eventVolantinoContainerEl.style.display = 'block'; }
+                } else { displayErrorMessageOnPage("Dettagli evento non disponibili."); }
+                galleryItemsData = []; if (galleryGridEl) galleryGridEl.innerHTML = '';
                 if (mediaItems.length > 0 && galleryGridEl) {
-                    if (gallerySectionEl) gallerySectionEl.style.display = 'block';
-                    if (noMediaMessageEl) noMediaMessageEl.style.display = 'none';
+                    if (gallerySectionEl) gallerySectionEl.style.display = 'block'; if (noMediaMessageEl) noMediaMessageEl.style.display = 'none';
                     mediaItems.forEach((item, index) => {
-                        const rawPath = item.Percorso || '';
-                        const desc = item.Descrizione || '';
-                        const title = sanitizeTextForHTML(desc || `Media ${index + 1}`);
+                        const rawPath = item.Percorso || ''; const desc = item.Descrizione || ''; const title = sanitizeTextForHTML(desc || `Media ${index + 1}`);
                         let type = 'image', thumb = rawPath, href = rawPath;
                         if (rawPath.match(/\.(mp4|webm|ogv)$/i)) { type = 'video'; thumb = 'images/video_placeholder.png';}
                         else if (rawPath.match(/\.(pdf)$/i)) { type = 'document'; thumb = 'images/pdf_placeholder.png'; }
                         else if (!rawPath.match(/\.(jpeg|jpg|gif|png|webp)$/i)) { type = 'document'; thumb = 'images/file_placeholder.png';}
-                        galleryItemsData.push({ href: encodeURI(href), title, type });
-                        const div = document.createElement('div'); div.className = 'gallery-item';
+                        galleryItemsData.push({ href: encodeURI(href), title, type }); const div = document.createElement('div'); div.className = 'gallery-item';
                         let itemHTML = `<a href="${type === 'document' ? encodeURI(href) : '#'}" ${type !== 'document' ? `data-index="${index}"` : 'target="_blank" rel="noopener noreferrer"'} title="${title}">`;
                         itemHTML += `<img src="${thumb}" alt="${title}" loading="lazy" onerror="this.onerror=null; this.src='images/file_placeholder.png';">`;
                         if (type === 'video') itemHTML += '<div class="media-overlay"><i class="fas fa-play media-play-icon"></i></div>';
-                        itemHTML += '</a>';
-                        div.innerHTML = itemHTML;
-                        galleryGridEl.appendChild(div);
+                        itemHTML += '</a>'; div.innerHTML = itemHTML; galleryGridEl.appendChild(div);
                     });
                     document.querySelectorAll('#galleryGrid .gallery-item a[data-index]').forEach(a => a.addEventListener('click', function(e) { e.preventDefault(); openLightbox(parseInt(this.dataset.index)); }));
-                } else {
-                    if (gallerySectionEl) gallerySectionEl.style.display = 'block';
-                    if (noMediaMessageEl) noMediaMessageEl.style.display = 'block';
-                }
-
-                // Commenti
-                const commentFormCont = document.getElementById('commentFormContainer');
-                const loginMsg = document.getElementById('login-to-comment-message');
+                } else { if (gallerySectionEl) gallerySectionEl.style.display = 'block'; if (noMediaMessageEl) noMediaMessageEl.style.display = 'block'; }
+                const commentFormCont = document.getElementById('commentFormContainer'); const loginMsg = document.getElementById('login-to-comment-message');
                 if (commentsSectionEl) commentsSectionEl.style.display = 'block';
-                if (currentUser?.email) {
-                    if(commentFormCont) commentFormCont.style.display = 'block';
-                    if(loginMsg) loginMsg.style.display = 'none';
-                } else {
-                    if(commentFormCont) commentFormCont.style.display = 'none';
-                    if(loginMsg) loginMsg.style.display = 'block';
-                }
+                if (currentUser?.email) { if(commentFormCont) commentFormCont.style.display = 'block'; if(loginMsg) loginMsg.style.display = 'none'; }
+                else { if(commentFormCont) commentFormCont.style.display = 'none'; if(loginMsg) loginMsg.style.display = 'block'; }
                 if (commentsListULEL) commentsListULEL.innerHTML = '';
-                if (fetchedComments.length > 0) {
-                    if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'none';
-                    displayComments(fetchedComments, commentsListULEL, 0, { isForPopup: false });
-                } else {
-                    if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'block';
-                }
-
-                if (window.location.hash) {
-                    const hash = window.location.hash;
-                    setTimeout(() => {
-                        try {
-                            const targetElement = document.querySelector(hash);
-                            if (targetElement) {
-                                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }
-                        } catch (e) { console.error("Errore nello scroll all'ancora:", e); }
-                    }, 250);
-                }
-
-            } else {
-                throw new Error(result.message || "I dati dell'evento non sono stati caricati correttamente.");
-            }
-        } catch (error) {
-            displayErrorMessageOnPage("Impossibile caricare i dettagli dell'evento.", error.message);
-            console.error("Dettaglio errore fetchEventDetails:", error);
-        }
-        finally {
-            if (pageLoadingEl) pageLoadingEl.style.display = 'none';
-        }
+                if (fetchedComments.length > 0) { if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'none'; displayComments(fetchedComments, commentsListULEL, 0, { isForPopup: false }); }
+                else { if (noCommentsMessageEl) noCommentsMessageEl.style.display = 'block'; }
+                if (window.location.hash) { const hash = window.location.hash; setTimeout(() => { try { const targetElement = document.querySelector(hash); if (targetElement) targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { console.error("Errore scroll ancora:", e); } }, 250); }
+            } else { throw new Error(result.message || "Dati evento non caricati."); }
+        } catch (error) { displayErrorMessageOnPage("Impossibile caricare dettagli evento.", error.message); console.error("Errore fetchEventDetails:", error); }
+        finally { if (pageLoadingEl) pageLoadingEl.style.display = 'none'; }
     }
 
-    function getAllRepliesFlat(repliesArray) {
-        let flatList = [];
-        if (!repliesArray) return flatList;
-        for (const reply of repliesArray) {
-            flatList.push(reply);
-            if (reply.replies && reply.replies.length > 0) {
-                flatList = flatList.concat(getAllRepliesFlat(reply.replies));
-            }
-        }
-        return flatList;
-    }
+    function getAllRepliesFlat(repliesArray) { let flatList = []; if (!repliesArray) return flatList; for (const reply of repliesArray) { flatList.push(reply); if (reply.replies && reply.replies.length > 0) flatList = flatList.concat(getAllRepliesFlat(reply.replies)); } return flatList; }
 
     function createCommentElement(commentData, isReply = false, options = { isForPopup: false }) {
         const commentDiv = document.createElement('div');
         commentDiv.className = isReply ? 'comment reply' : 'comment';
         commentDiv.id = (options.isForPopup ? 'popup-' : '') + 'comment-' + commentData.Progressivo;
-
         const isAdminComment = commentData.is_admin_comment === true || String(commentData.is_admin_comment) === '1';
         if (isAdminComment) commentDiv.classList.add('admin-comment-highlight');
-
         const avatarUrl = (commentData.CommenterIconPath && commentData.CommenterIconPath.trim() !== '') ? commentData.CommenterIconPath : defaultUserIconPath;
         const commenterDisplayName = sanitizeTextForHTML(commentData.CommenterNomeCompleto || 'Anonimo');
         let staffBadgeHTML = isAdminComment ? `<span class="badge-staff">${options.isForPopup ? 'Staff' : 'Staff'}</span>` : '';
-
         const commentDate = sanitizeTextForHTML(commentData.DataVisualizzata || 'Data non disponibile');
         const commentDescription = sanitizeTextForHTML(commentData.Descrizione);
         const likeCount = commentData.NumLike !== null ? parseInt(commentData.NumLike) : 0;
-        // **IMPORTANTE**: Assicurati che 'get_event_details.php' ti fornisca questo dato!
         const isLikedByCurrentUser = commentData.is_liked_by_current_user === true || commentData.is_liked_by_current_user === 1;
-
         let userActionsHTML = '';
         if (currentUser && currentUser.email === commentData.Contatto) {
             userActionsHTML = `
-                <button class="btn-edit-comment" data-comment-id="${commentData.Progressivo}" data-event-id="${commentData.IDEvento}" aria-label="Modifica commento">
-                    <i class="fas fa-edit"></i> Modifica
-                </button>
-                <button class="btn-delete-comment" data-comment-id="${commentData.Progressivo}" data-event-id="${commentData.IDEvento}" aria-label="Elimina commento">
-                    <i class="fas fa-trash-alt"></i> Elimina
-                </button>
-            `;
+                <button class="btn-edit-comment" data-comment-id="${commentData.Progressivo}" data-event-id="${commentData.IDEvento}" aria-label="Modifica commento"><i class="fas fa-edit"></i> <span class="btn-action-text">Modifica</span></button>
+                <button class="btn-delete-comment" data-comment-id="${commentData.Progressivo}" data-event-id="${commentData.IDEvento}" aria-label="Elimina commento"><i class="fas fa-trash-alt"></i> <span class="btn-action-text">Elimina</span></button>`;
         }
-
         commentDiv.innerHTML = `
-            <div class="comment-header">
-                <img src="${avatarUrl}" alt="Avatar di ${commenterDisplayName}" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';">
-                <div class="comment-meta">
-                    <div class="author-line">
-                        <strong>${commenterDisplayName}</strong>
-                        ${staffBadgeHTML}
-                    </div>
-                    <small>${commentDate}</small>
-                </div>
-            </div>
-            <div class="comment-text-content">
-                <p>${commentDescription}</p>
-            </div>
-            <div class="comment-edit-form-placeholder"></div>
+            <div class="comment-header"> <img src="${avatarUrl}" alt="Avatar di ${commenterDisplayName}" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';"> <div class="comment-meta"> <div class="author-line"> <strong>${commenterDisplayName}</strong> ${staffBadgeHTML} </div> <small>${commentDate}</small> </div> </div>
+            <div class="comment-text-content"> <p>${commentDescription}</p> </div> <div class="comment-edit-form-placeholder"></div>
             <div class="comment-actions">
-                <button class="like-btn ${isLikedByCurrentUser ? 'active' : ''}" data-comment-id="${commentData.Progressivo}" aria-pressed="${isLikedByCurrentUser}" aria-label="Mi piace a questo commento">
-                    <i class="${isLikedByCurrentUser ? 'fas fa-heart' : 'far fa-heart'}"></i>
-                    <span class="like-count" data-comment-id="${commentData.Progressivo}" title="Vedi chi ha messo Mi Piace">${likeCount}</span>
-                </button>
-                <button class="btn-reply" data-comment-id="${commentData.Progressivo}" aria-label="Rispondi a questo commento"><i class="fas fa-reply"></i> Rispondi</button>
-                ${userActionsHTML}
+                <button class="like-btn ${isLikedByCurrentUser ? 'active' : ''}" data-comment-id="${commentData.Progressivo}" aria-pressed="${isLikedByCurrentUser}" aria-label="Mi piace"> <i class="${isLikedByCurrentUser ? 'fas fa-heart' : 'far fa-heart'}"></i> <span class="like-count" data-comment-id="${commentData.Progressivo}" title="Vedi chi ha messo Mi Piace">${likeCount}</span> </button>
+                <button class="btn-reply" data-comment-id="${commentData.Progressivo}" aria-label="Rispondi"><i class="fas fa-reply"></i> Rispondi</button> ${userActionsHTML}
             </div>
-            <div class="reply-form" id="${(options.isForPopup ? 'popup-' : '')}reply-form-${commentData.Progressivo}" style="display:none;">
-                <form data-parent-comment-id="${commentData.Progressivo}" data-event-id="${commentData.IDEvento}">
-                    <textarea name="Descrizione" placeholder="Rispondi a ${commenterDisplayName}..." rows="2" required aria-label="Testo della risposta"></textarea>
-                    <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia</button>
-                    <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em; display:none;"></div>
-                </form>
-            </div>
+            <div class="reply-form" id="${(options.isForPopup ? 'popup-' : '')}reply-form-${commentData.Progressivo}" style="display:none;"> <form data-parent-comment-id="${commentData.Progressivo}" data-event-id="${commentData.IDEvento}"> <textarea name="Descrizione" placeholder="Rispondi a ${commenterDisplayName}..." rows="2" required aria-label="Testo risposta"></textarea> <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia</button> <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em; display:none;"></div> </form> </div>
             <div class="replies"></div>`;
-
         attachCommentInteractionListeners(commentDiv, commentData, options);
-        // Aggiungi listener per il click sul numero di like
-        commentDiv.querySelector('.like-count')?.addEventListener('click', function(e){
-            e.stopPropagation(); // Previene il trigger del click sul bottone padre
-            const currentCount = parseInt(this.textContent);
-            if (currentCount > 0) {
-                openLikersPopup(this.dataset.commentId);
-            } else {
-                // Opzionale: mostra un messaggio se nessuno ha messo like
-                // console.log("Nessun like da mostrare.");
-            }
-        });
-        // Aggiungi listener per il click sull'icona del cuore
-        commentDiv.querySelector('.like-btn > i')?.addEventListener('click', function(e){
-            e.stopPropagation();
-            handleLikeAction(this.closest('.like-btn'), options);
-        });
-
+        commentDiv.querySelector('.like-count')?.addEventListener('click', function(e){ e.stopPropagation(); const currentCount = parseInt(this.textContent); if (currentCount > 0) openLikersPopup(this.dataset.commentId); });
+        commentDiv.querySelector('.like-btn > i')?.addEventListener('click', function(e){ e.stopPropagation(); handleLikeAction(this.closest('.like-btn'), options); });
         return commentDiv;
     }
 
-
     function displayComments(commentsData, parentUlElement, depth = 0, options = { isForPopup: false }) {
-        const commentsContainer = document.getElementById('commentsListUL');
-        const visibilityControlsContainer = document.getElementById('comments-visibility-controls');
+        const commentsContainer = document.getElementById('commentsListUL'); const visibilityControlsContainer = document.getElementById('comments-visibility-controls');
         const noCommentsMsgEl = document.getElementById('no-comments-message');
-
         if (depth === 0) {
-            commentsContainer.innerHTML = '';
-            visibilityControlsContainer.innerHTML = '';
-            if (!commentsData || commentsData.length === 0) {
-                if (noCommentsMsgEl) noCommentsMsgEl.style.display = 'block'; return;
-            } else {
-                if (noCommentsMsgEl) noCommentsMsgEl.style.display = 'none';
-            }
+            commentsContainer.innerHTML = ''; visibilityControlsContainer.innerHTML = '';
+            if (!commentsData || commentsData.length === 0) { if (noCommentsMsgEl) noCommentsMsgEl.style.display = 'block'; return; }
+            else { if (noCommentsMsgEl) noCommentsMsgEl.style.display = 'none'; }
             commentsData.forEach((commentData, index) => {
-                const commentLi = document.createElement('li');
-                commentLi.className = 'top-level-comment-item';
-                if (index >= MAX_MESSAGES_VISIBLE_MAIN_PAGE && !options.isForPopup) {
-                    commentLi.style.display = 'none';
-                    commentLi.classList.add('hidden-comment');
-                }
-                const commentElement = createCommentElement(commentData, false, options);
-                commentLi.appendChild(commentElement);
-                parentUlElement.appendChild(commentLi);
-                const repliesDiv = commentElement.querySelector('.replies');
-                const actualUlForReplies = document.createElement('ul');
-                actualUlForReplies.className = 'comments-list-ul nested';
-                repliesDiv.appendChild(actualUlForReplies);
-                if (options.isForPopup) {
-                    if (commentData.replies && commentData.replies.length > 0) {
-                        displayFullRepliesRecursive(commentData.replies, actualUlForReplies, 1, options);
-                    }
-                } else {
-                    const allRepliesFlat = getAllRepliesFlat(commentData.replies || []);
-                    const totalMessagesInThread = 1 + allRepliesFlat.length;
+                const commentLi = document.createElement('li'); commentLi.className = 'top-level-comment-item';
+                if (index >= MAX_MESSAGES_VISIBLE_MAIN_PAGE && !options.isForPopup) { commentLi.style.display = 'none'; commentLi.classList.add('hidden-comment'); }
+                const commentElement = createCommentElement(commentData, false, options); commentLi.appendChild(commentElement); parentUlElement.appendChild(commentLi);
+                const repliesDiv = commentElement.querySelector('.replies'); const actualUlForReplies = document.createElement('ul');
+                actualUlForReplies.className = 'comments-list-ul nested'; repliesDiv.appendChild(actualUlForReplies);
+                if (options.isForPopup) { if (commentData.replies && commentData.replies.length > 0) displayFullRepliesRecursive(commentData.replies, actualUlForReplies, 1, options); }
+                else {
+                    const allRepliesFlat = getAllRepliesFlat(commentData.replies || []); const totalMessagesInThread = 1 + allRepliesFlat.length;
                     if (totalMessagesInThread > MAX_REPLIES_SHOWN_INITIALLY_MAIN_PAGE +1) {
                         displayLimitedReplies(commentData.replies || [], actualUlForReplies, 1, MAX_REPLIES_SHOWN_INITIALLY_MAIN_PAGE, options);
-                        const expandBtn = document.createElement('button');
-                        expandBtn.className = 'btn-expand-conversation';
-                        expandBtn.innerHTML = `<i class="fas fa-comments"></i> Mostra tutta la conversazione (${totalMessagesInThread} messaggi)`;
-                        expandBtn.onclick = () => openConversationPopup(commentData);
-                        repliesDiv.appendChild(expandBtn);
-                    } else if (commentData.replies && commentData.replies.length > 0) {
-                        displayFullRepliesRecursive(commentData.replies, actualUlForReplies, 1, options);
-                    }
+                        const expandBtn = document.createElement('button'); expandBtn.className = 'btn-expand-conversation';
+                        expandBtn.innerHTML = `<i class="fas fa-comments"></i> Mostra conversazione (${totalMessagesInThread} messaggi)`;
+                        expandBtn.onclick = () => openConversationPopup(commentData); repliesDiv.appendChild(expandBtn);
+                    } else if (commentData.replies && commentData.replies.length > 0) displayFullRepliesRecursive(commentData.replies, actualUlForReplies, 1, options);
                 }
             });
             if (!options.isForPopup && commentsData.length > MAX_MESSAGES_VISIBLE_MAIN_PAGE) {
-                const showMoreButton = document.createElement('button');
-                showMoreButton.id = 'show-more-comments-btn';
-                showMoreButton.className = 'btn-comment';
-                showMoreButton.innerHTML = `<i class="fas fa-chevron-down"></i> Mostra Altri Commenti (${commentsData.length - MAX_MESSAGES_VISIBLE_MAIN_PAGE} nascosti)`;
-                showMoreButton.onclick = () => toggleHiddenComments(true, commentsData.length);
-                visibilityControlsContainer.appendChild(showMoreButton);
-                const showLessButton = document.createElement('button');
-                showLessButton.id = 'show-less-comments-btn';
-                showLessButton.className = 'btn-secondary-style';
-                showLessButton.innerHTML = `<i class="fas fa-chevron-up"></i> Mostra Meno Commenti`;
-                showLessButton.style.display = 'none';
-                showLessButton.onclick = () => toggleHiddenComments(false, commentsData.length);
-                visibilityControlsContainer.appendChild(showLessButton);
+                const showMoreButton = document.createElement('button'); showMoreButton.id = 'show-more-comments-btn'; showMoreButton.className = 'btn-comment';
+                showMoreButton.innerHTML = `<i class="fas fa-chevron-down"></i> Mostra Altri (${commentsData.length - MAX_MESSAGES_VISIBLE_MAIN_PAGE} nascosti)`;
+                showMoreButton.onclick = () => toggleHiddenComments(true, commentsData.length); visibilityControlsContainer.appendChild(showMoreButton);
+                const showLessButton = document.createElement('button'); showLessButton.id = 'show-less-comments-btn'; showLessButton.className = 'btn-secondary-style';
+                showLessButton.innerHTML = `<i class="fas fa-chevron-up"></i> Mostra Meno`; showLessButton.style.display = 'none';
+                showLessButton.onclick = () => toggleHiddenComments(false, commentsData.length); visibilityControlsContainer.appendChild(showLessButton);
             }
         } else {
             commentsData.forEach(commentData => {
-                const commentLi = document.createElement('li');
-                commentLi.className = 'reply-item';
-                const commentElement = createCommentElement(commentData, true, options);
-                commentLi.appendChild(commentElement);
-                parentUlElement.appendChild(commentLi);
+                const commentLi = document.createElement('li'); commentLi.className = 'reply-item';
+                const commentElement = createCommentElement(commentData, true, options); commentLi.appendChild(commentElement); parentUlElement.appendChild(commentLi);
                 if (commentData.replies && commentData.replies.length > 0) {
-                    const repliesDiv = commentElement.querySelector('.replies');
-                    const actualUlForReplies = document.createElement('ul');
-                    actualUlForReplies.className = 'comments-list-ul nested';
-                    repliesDiv.appendChild(actualUlForReplies);
+                    const repliesDiv = commentElement.querySelector('.replies'); const actualUlForReplies = document.createElement('ul');
+                    actualUlForReplies.className = 'comments-list-ul nested'; repliesDiv.appendChild(actualUlForReplies);
                     displayComments(commentData.replies, actualUlForReplies, depth + 1, options);
                 }
             });
@@ -772,25 +515,12 @@
     }
 
     function toggleHiddenComments(showMore, totalComments) {
-        const hiddenComments = document.querySelectorAll('#commentsListUL > li.hidden-comment');
-        const showMoreBtn = document.getElementById('show-more-comments-btn');
-        const showLessBtn = document.getElementById('show-less-comments-btn');
-        if (showMore) {
-            hiddenComments.forEach(comment => comment.style.display = 'block');
-            if(showMoreBtn) showMoreBtn.style.display = 'none';
-            if(showLessBtn) showLessBtn.style.display = 'inline-block';
-        } else {
+        const hiddenComments = document.querySelectorAll('#commentsListUL > li.hidden-comment'); const showMoreBtn = document.getElementById('show-more-comments-btn'); const showLessBtn = document.getElementById('show-less-comments-btn');
+        if (showMore) { hiddenComments.forEach(comment => comment.style.display = 'block'); if(showMoreBtn) showMoreBtn.style.display = 'none'; if(showLessBtn) showLessBtn.style.display = 'inline-block'; }
+        else {
             const allTopLevelComments = document.querySelectorAll('#commentsListUL > li.top-level-comment-item');
-            allTopLevelComments.forEach((comment, index) => {
-                if (index >= MAX_MESSAGES_VISIBLE_MAIN_PAGE) {
-                    comment.style.display = 'none';
-                    comment.classList.add('hidden-comment');
-                }
-            });
-            if(showMoreBtn) {
-                showMoreBtn.style.display = 'inline-block';
-                showMoreBtn.innerHTML = `<i class="fas fa-chevron-down"></i> Mostra Altri Commenti (${totalComments - MAX_MESSAGES_VISIBLE_MAIN_PAGE} nascosti)`;
-            }
+            allTopLevelComments.forEach((comment, index) => { if (index >= MAX_MESSAGES_VISIBLE_MAIN_PAGE) { comment.style.display = 'none'; comment.classList.add('hidden-comment'); } });
+            if(showMoreBtn) { showMoreBtn.style.display = 'inline-block'; showMoreBtn.innerHTML = `<i class="fas fa-chevron-down"></i> Mostra Altri (${totalComments - MAX_MESSAGES_VISIBLE_MAIN_PAGE} nascosti)`; }
             if(showLessBtn) showLessBtn.style.display = 'none';
         }
     }
@@ -798,186 +528,105 @@
     function displayLimitedReplies(replies, parentUlElement, currentDepth, messagesLeftToDisplay, options) {
         let messagesDisplayedInThisCall = 0;
         for (const reply of replies) {
-            if (messagesLeftToDisplay <= 0) break;
-            const replyLi = document.createElement('li');
-            replyLi.className = 'reply-item';
-            const replyElement = createCommentElement(reply, true, options);
-            replyLi.appendChild(replyElement);
-            parentUlElement.appendChild(replyLi);
+            if (messagesLeftToDisplay <= 0) break; const replyLi = document.createElement('li'); replyLi.className = 'reply-item';
+            const replyElement = createCommentElement(reply, true, options); replyLi.appendChild(replyElement); parentUlElement.appendChild(replyLi);
             messagesLeftToDisplay--; messagesDisplayedInThisCall++;
             if (reply.replies && reply.replies.length > 0 && messagesLeftToDisplay > 0) {
-                const nestedRepliesDiv = replyElement.querySelector('.replies');
-                const nestedUl = document.createElement('ul');
-                nestedUl.className = 'comments-list-ul nested';
-                nestedRepliesDiv.appendChild(nestedUl);
+                const nestedRepliesDiv = replyElement.querySelector('.replies'); const nestedUl = document.createElement('ul');
+                nestedUl.className = 'comments-list-ul nested'; nestedRepliesDiv.appendChild(nestedUl);
                 const displayedInNested = displayLimitedReplies(reply.replies, nestedUl, currentDepth + 1, messagesLeftToDisplay, options);
                 messagesLeftToDisplay -= displayedInNested; messagesDisplayedInThisCall += displayedInNested;
             }
-        }
-        return messagesDisplayedInThisCall;
+        } return messagesDisplayedInThisCall;
     }
 
     function displayFullRepliesRecursive(replies, parentUlElement, currentDepth, options) {
         replies.forEach(reply => {
-            const replyLi = document.createElement('li');
-            replyLi.className = 'reply-item';
-            const replyElement = createCommentElement(reply, true, options);
-            replyLi.appendChild(replyElement);
-            parentUlElement.appendChild(replyLi);
+            const replyLi = document.createElement('li'); replyLi.className = 'reply-item';
+            const replyElement = createCommentElement(reply, true, options); replyLi.appendChild(replyElement); parentUlElement.appendChild(replyLi);
             if (reply.replies && reply.replies.length > 0) {
-                const nestedRepliesDiv = replyElement.querySelector('.replies');
-                const nestedUl = document.createElement('ul');
-                nestedUl.className = 'comments-list-ul nested';
-                nestedRepliesDiv.appendChild(nestedUl);
+                const nestedRepliesDiv = replyElement.querySelector('.replies'); const nestedUl = document.createElement('ul');
+                nestedUl.className = 'comments-list-ul nested'; nestedRepliesDiv.appendChild(nestedUl);
                 displayFullRepliesRecursive(reply.replies, nestedUl, currentDepth + 1, options);
             }
         });
     }
 
     function openConversationPopup(rootCommentData) {
-        const overlay = document.getElementById('conversationPopupOverlay');
-        const popupElement = document.getElementById('conversationPopup');
-        const titleEl = document.getElementById('conversationPopupTitle');
-        const contentUl = document.getElementById('conversationPopupUL');
+        const overlay = document.getElementById('conversationPopupOverlay'); const popupElement = document.getElementById('conversationPopup');
+        const titleEl = document.getElementById('conversationPopupTitle'); const contentUl = document.getElementById('conversationPopupUL');
         if (!overlay || !popupElement || !titleEl || !contentUl) return;
         popupElement.dataset.currentRootCommentId = rootCommentData.Progressivo;
         titleEl.textContent = 'Conversazione su: "' + sanitizeTextForHTML(rootCommentData.Descrizione.substring(0,30) + (rootCommentData.Descrizione.length > 30 ? '...' : '')) + '"';
-        contentUl.innerHTML = '';
-        const rootCommentLi = document.createElement('li');
-        rootCommentLi.className = 'top-level-comment-item';
-        const rootCommentElement = createCommentElement(rootCommentData, false, { isForPopup: true });
-        rootCommentLi.appendChild(rootCommentElement);
-        contentUl.appendChild(rootCommentLi);
+        contentUl.innerHTML = ''; const rootCommentLi = document.createElement('li'); rootCommentLi.className = 'top-level-comment-item';
+        const rootCommentElement = createCommentElement(rootCommentData, false, { isForPopup: true }); rootCommentLi.appendChild(rootCommentElement); contentUl.appendChild(rootCommentLi);
         if (rootCommentData.replies && rootCommentData.replies.length > 0) {
-            const repliesDivInPopup = rootCommentElement.querySelector('.replies');
-            const actualUlForPopupReplies = document.createElement('ul');
-            actualUlForPopupReplies.className = 'comments-list-ul nested';
-            repliesDivInPopup.appendChild(actualUlForPopupReplies);
+            const repliesDivInPopup = rootCommentElement.querySelector('.replies'); const actualUlForPopupReplies = document.createElement('ul');
+            actualUlForPopupReplies.className = 'comments-list-ul nested'; repliesDivInPopup.appendChild(actualUlForPopupReplies);
             displayFullRepliesRecursive(rootCommentData.replies, actualUlForPopupReplies, 1, { isForPopup: true });
         }
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        overlay.classList.add('active'); document.body.style.overflow = 'hidden';
     }
+    function closeConversationPopup() { const overlay = document.getElementById('conversationPopupOverlay'); if (overlay) { overlay.classList.remove('active'); const popupElement = document.getElementById('conversationPopup'); if (popupElement) delete popupElement.dataset.currentRootCommentId; } document.body.style.overflow = ''; }
 
-    function closeConversationPopup() {
-        const overlay = document.getElementById('conversationPopupOverlay');
-        if (overlay) {
-            overlay.classList.remove('active');
-            const popupElement = document.getElementById('conversationPopup');
-            if (popupElement) delete popupElement.dataset.currentRootCommentId;
-        }
-        document.body.style.overflow = '';
-    }
-
-    // NUOVA: Funzione per aprire il popup dei "Mi piace"
     async function openLikersPopup(commentId) {
-        const overlay = document.getElementById('likersPopupOverlay');
-        const contentUl = document.getElementById('likersPopupUL');
-        const loading = document.getElementById('likersLoadingIndicator');
-        const noLikersMsg = document.getElementById('noLikersMessage');
-
+        const overlay = document.getElementById('likersPopupOverlay'); const contentUl = document.getElementById('likersPopupUL');
+        const loading = document.getElementById('likersLoadingIndicator'); const noLikersMsg = document.getElementById('noLikersMessage');
         if (!overlay || !contentUl || !loading || !noLikersMsg) return;
-
-        contentUl.innerHTML = ''; // Pulisci lista precedente
-        noLikersMsg.style.display = 'none';
-        loading.style.display = 'flex';
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-
+        contentUl.innerHTML = ''; noLikersMsg.style.display = 'none'; loading.style.display = 'flex';
+        overlay.classList.add('active'); document.body.style.overflow = 'hidden';
         try {
-            const result = await callApi('get_likers.php?commentId=' + commentId);
-            loading.style.display = 'none';
+            const result = await callApi('get_likers.php?commentId=' + commentId); loading.style.display = 'none';
             if (result.success && result.likers.length > 0) {
-                result.likers.forEach(user => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <img src="${user.icon || defaultUserIconPath}" alt="Avatar" class="liker-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';">
-                        <span class="liker-name">${sanitizeTextForHTML(user.nomeCompleto)}</span>
-                    `;
-                    contentUl.appendChild(li);
-                });
-            } else if (result.success) {
-                noLikersMsg.style.display = 'block';
-            } else {
-                noLikersMsg.textContent = result.message || "Errore nel caricare la lista.";
-                noLikersMsg.style.display = 'block';
-            }
-        } catch (error) {
-            loading.style.display = 'none';
-            noLikersMsg.textContent = "Errore di connessione: " + error.message;
-            noLikersMsg.style.display = 'block';
-        }
+                result.likers.forEach(user => { const li = document.createElement('li'); li.innerHTML = `<img src="${user.icon || defaultUserIconPath}" alt="Avatar" class="liker-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';"> <span class="liker-name">${sanitizeTextForHTML(user.nomeCompleto)}</span>`; contentUl.appendChild(li); });
+            } else if (result.success) { noLikersMsg.style.display = 'block'; }
+            else { noLikersMsg.textContent = result.message || "Errore caricamento."; noLikersMsg.style.display = 'block'; }
+        } catch (error) { loading.style.display = 'none'; noLikersMsg.textContent = "Errore: " + error.message; noLikersMsg.style.display = 'block'; }
     }
-
-    // NUOVA: Funzione per chiudere il popup dei "Mi piace"
-    function closeLikersPopup() {
-        const overlay = document.getElementById('likersPopupOverlay');
-        if (overlay) overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
+    function closeLikersPopup() { const overlay = document.getElementById('likersPopupOverlay'); if (overlay) overlay.classList.remove('active'); document.body.style.overflow = ''; }
 
     function attachCommentInteractionListeners(commentElement, commentData, options = { isForPopup: false }) {
-        // !! Rimossi i listener dai bottoni, aggiunti a cuore e numero.
         commentElement.querySelector('.btn-reply')?.addEventListener('click', function(){ toggleReplyFormAction(this, commentElement, options); });
-        const editBtn = commentElement.querySelector('.btn-edit-comment');
-        const deleteBtn = commentElement.querySelector('.btn-delete-comment');
+        const editBtn = commentElement.querySelector('.btn-edit-comment'); const deleteBtn = commentElement.querySelector('.btn-delete-comment');
         if (editBtn) editBtn.addEventListener('click', function() { handleEditComment(this, commentElement, commentData.Descrizione); });
         if (deleteBtn) deleteBtn.addEventListener('click', function() { handleDeleteComment(this); });
-        const form = commentElement.querySelector('.reply-form form');
-        if (form) form.addEventListener('submit', function(e) { handleReplySubmit(e, options); });
+        const form = commentElement.querySelector('.reply-form form'); if (form) form.addEventListener('submit', function(e) { handleReplySubmit(e, options); });
     }
 
     async function handleLikeAction(button, options = { isForPopup: false }) {
         if (!currentUser?.email) { alert("Devi essere loggato per mettere 'Mi piace'."); return; }
-        const commentId = button.dataset.commentId;
-        const action = button.classList.contains('active') ? 'unlike' : 'like';
+        const commentId = button.dataset.commentId; const action = button.classList.contains('active') ? 'unlike' : 'like';
         button.disabled = true;
-
         try {
             const result = await callApi('like_comment.php', 'POST', { commentId, action });
             if (result.success) {
-                // Aggiorna sia il bottone cliccato che l'eventuale controparte (popup vs pagina)
-                updateLikeButtonState(commentId, result.newLikeCount, result.liked, false); // Aggiorna pagina principale
-                updateLikeButtonState(commentId, result.newLikeCount, result.liked, true);  // Aggiorna popup conversazione
-            } else { alert(result.message || "Errore durante l'azione Mi piace."); }
-        } catch (error) { alert("Errore di connessione o server: " + error.message); }
-        finally {
-            // Riabilita entrambi i bottoni dopo un breve ritardo
-            setTimeout(() => {
-                document.querySelectorAll(`.like-btn[data-comment-id="${commentId}"]`).forEach(btn => btn.disabled = false);
-            }, 300);
-        }
+                updateLikeButtonState(commentId, result.newLikeCount, result.liked, false);
+                updateLikeButtonState(commentId, result.newLikeCount, result.liked, true);
+            } else { alert(result.message || "Errore azione Mi piace.");}
+        } catch (error) { alert("Errore connessione: " + error.message); }
+        finally { setTimeout(() => { document.querySelectorAll(`.like-btn[data-comment-id="${commentId}"]`).forEach(btn => btn.disabled = false); }, 300); }
     }
 
-    // NUOVA: Funzione helper per aggiornare i bottoni like
     function updateLikeButtonState(commentId, newLikeCount, isLiked, isForPopup) {
-        const prefix = isForPopup ? '#popup-' : '#';
-        const commentElement = document.querySelector(`${prefix}comment-${commentId}`);
+        const prefix = isForPopup ? '#popup-' : '#'; const commentElement = document.querySelector(`${prefix}comment-${commentId}`);
         if (commentElement) {
             const likeBtn = commentElement.querySelector(`.like-btn[data-comment-id="${commentId}"]`);
             if (likeBtn) {
-                const icon = likeBtn.querySelector('i');
-                const countSpan = likeBtn.querySelector('.like-count');
+                const icon = likeBtn.querySelector('i'); const countSpan = likeBtn.querySelector('.like-count');
                 if (countSpan) countSpan.textContent = newLikeCount;
-                likeBtn.classList.toggle('active', isLiked);
-                likeBtn.setAttribute('aria-pressed', isLiked.toString());
-                if (icon) icon.className = isLiked ? 'fas fa-heart' : 'far fa-heart';
-                likeBtn.disabled = false; // Riabilita subito il bottone aggiornato
+                likeBtn.classList.toggle('active', isLiked); likeBtn.setAttribute('aria-pressed', isLiked.toString());
+                if (icon) icon.className = isLiked ? 'fas fa-heart' : 'far fa-heart'; likeBtn.disabled = false;
             }
         }
     }
 
     function toggleReplyFormAction(button, commentElementContext, options = { isForPopup: false }) {
         if (!currentUser?.email) { alert("Devi essere loggato per rispondere."); return; }
-        const commentId = button.dataset.commentId;
-        const formDiv = commentElementContext.querySelector(`#${(options.isForPopup ? 'popup-' : '')}reply-form-${commentId}`);
+        const commentId = button.dataset.commentId; const formDiv = commentElementContext.querySelector(`#${(options.isForPopup ? 'popup-' : '')}reply-form-${commentId}`);
         if(formDiv){
-            const isActive = formDiv.style.display === 'block';
-            formDiv.style.display = isActive ? 'none' : 'block';
+            const isActive = formDiv.style.display === 'block'; formDiv.style.display = isActive ? 'none' : 'block';
             if(!isActive && formDiv.querySelector('textarea')) formDiv.querySelector('textarea').focus();
-            const localMsg = formDiv.querySelector('.form-message-local');
-            if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }
+            const localMsg = formDiv.querySelector('.form-message-local'); if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }
         }
     }
 
@@ -988,20 +637,11 @@
         const description = descriptionTextarea.value.trim();
         let msgEl = formElement.querySelector('.form-message-local');
         if (!isReply && !options.isForPopup) msgEl = document.getElementById('comment-form-message');
-        const showMsg = (txt, type) => {
-            if (msgEl) {
-                msgEl.textContent = txt;
-                msgEl.className = msgEl.classList.contains('form-message-local') ? `form-message-local ${type}` : `form-message ${type}`;
-                msgEl.style.display = 'block';
-                setTimeout(() => { if (msgEl) msgEl.style.display = 'none'; }, 3500);
-            }
-        };
+        const showMsg = (txt, type) => { if (msgEl) { msgEl.textContent = txt; msgEl.className = msgEl.classList.contains('form-message-local') ? `form-message-local ${type}` : `form-message ${type}`; msgEl.style.display = 'block'; setTimeout(() => { if (msgEl) msgEl.style.display = 'none'; }, 3500); } };
         if (!description) { showMsg(`Il testo non può essere vuoto.`, 'error'); return; }
         if (description.length > 2000) { showMsg(`Testo troppo lungo (max 2000).`, 'error'); return; }
-        const dataToSend = { IDEvento: eventId, Descrizione: description };
-        if (isReply && parentCommentId) dataToSend.CodRisposta = parentCommentId;
-        const submitBtn = formElement.querySelector('button[type="submit"]');
-        const originalBtnHTML = submitBtn ? submitBtn.innerHTML : '';
+        const dataToSend = { IDEvento: eventId, Descrizione: description }; if (isReply && parentCommentId) dataToSend.CodRisposta = parentCommentId;
+        const submitBtn = formElement.querySelector('button[type="submit"]'); const originalBtnHTML = submitBtn ? submitBtn.innerHTML : '';
         if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-mini"></span> Invio...'; }
         if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
         try {
@@ -1011,44 +651,47 @@
                 if (isReply && formElement.closest('.reply-form')) formElement.closest('.reply-form').style.display = 'none';
                 if (!isReply && !options.isForPopup) showMsg(result.message || 'Inviato!', 'success');
                 const currentEventId = document.getElementById('commentEventId').value;
-                await fetchEventDetails(currentEventId); // Ricarica sempre i commenti
-                // Se era in un popup, tenta di riaprirlo o chiudilo se fallisce
-                if (options.isForPopup) {
-                    closeConversationPopup(); // Simplificato: chiudi il popup e ricarica
+                await fetchEventDetails(currentEventId);
+
+                // MODIFICA: Scroll alla sezione commenti
+                const commentsSectionElement = document.getElementById('event-comments');
+                if (commentsSectionElement) {
+                    setTimeout(() => { // Timeout per permettere al DOM di aggiornarsi completamente
+                        commentsSectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // NOTA: Se 'submit_comment.php' restituisse result.newCommentId, potresti scrollare
+                        // al commento specifico:
+                        // if (result.newCommentId) {
+                        //   const newCommentEl = document.getElementById((options.isForPopup ? 'popup-' : '') + 'comment-' + result.newCommentId);
+                        //   if (newCommentEl) newCommentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // } else {
+                        //    commentsSectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // }
+                    }, 250); // Aumentato leggermente il timeout
                 }
+
+                if (options.isForPopup) { closeConversationPopup(); }
             } else { throw new Error(result.message || 'Errore invio.'); }
-        } catch (error) {
-            showMsg(`Errore: ${sanitizeTextForHTML(error.message)}`, 'error');
-            console.error(`Errore invio:`, error);
-        } finally {
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
-        }
+        } catch (error) { showMsg(`Errore: ${sanitizeTextForHTML(error.message)}`, 'error'); console.error(`Errore invio:`, error); }
+        finally { if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; } }
     }
 
     async function handleReplySubmit(e, options = { isForPopup: false }) {
-        e.preventDefault();
-        const form = e.target;
-        const eventIdFromForm = form.dataset.eventId;
-        const parentCommentIdFromForm = form.dataset.parentCommentId;
-        if (!eventIdFromForm || !parentCommentIdFromForm) {
-            const localMsg = form.querySelector('.form-message-local');
-            if(localMsg) { localMsg.textContent = 'Errore: dati mancanti.'; localMsg.className='form-message-local error'; localMsg.style.display='block';}
-            return;
-        }
+        e.preventDefault(); const form = e.target;
+        const eventIdFromForm = form.dataset.eventId; const parentCommentIdFromForm = form.dataset.parentCommentId;
+        if (!eventIdFromForm || !parentCommentIdFromForm) { const localMsg = form.querySelector('.form-message-local'); if(localMsg) { localMsg.textContent = 'Errore: dati mancanti.'; localMsg.className='form-message-local error'; localMsg.style.display='block';} return; }
         await _submitCommentOrReplyLogic(form, eventIdFromForm, true, parentCommentIdFromForm, options);
     }
 
     async function handleDeleteComment(button) {
         if (!currentUser?.email) { alert("Devi essere loggato."); return; }
-        const commentId = button.dataset.commentId;
-        const eventId = button.dataset.eventId;
+        const commentId = button.dataset.commentId; const eventId = button.dataset.eventId;
         if (confirm("Sei sicuro? Eliminerà anche le risposte.")) {
             button.disabled = true; button.innerHTML = '<span class="spinner-mini"></span>';
             try {
                 const result = await callApi('api/api_delete_comment.php', 'POST', { commentId });
                 if (result.success) { alert(result.message || "Eliminato."); await fetchEventDetails(eventId); }
-                else { alert(result.message || "Errore."); button.innerHTML = '<i class="fas fa-trash-alt"></i> Elimina'; button.disabled = false; }
-            } catch (error) { alert("Errore: " + error.message); button.innerHTML = '<i class="fas fa-trash-alt"></i> Elimina'; button.disabled = false; }
+                else { alert(result.message || "Errore."); button.innerHTML = '<i class="fas fa-trash-alt"></i> <span class="btn-action-text">Elimina</span>'; button.disabled = false; }
+            } catch (error) { alert("Errore: " + error.message); button.innerHTML = '<i class="fas fa-trash-alt"></i> <span class="btn-action-text">Elimina</span>'; button.disabled = false; }
         }
     }
 
@@ -1059,21 +702,12 @@
         if (!commentTextContentDiv || !editFormPlaceholder || commentElement.classList.contains('comment-editing')) return;
         commentElement.classList.add('comment-editing');
         const commentId = button.dataset.commentId; const eventId = button.dataset.eventId;
-        commentTextContentDiv.style.display = 'none';
-        const replyForm = commentElement.querySelector('.reply-form'); if(replyForm) replyForm.style.display = 'none';
+        commentTextContentDiv.style.display = 'none'; const replyForm = commentElement.querySelector('.reply-form'); if(replyForm) replyForm.style.display = 'none';
         const editFormHTML = `
-            <div class="comment-edit-form">
-                <textarea name="editDescription" rows="3" required>${originalText.replace(/<br\s*\/?>/ig, "\n")}</textarea>
-                <div class="comment-edit-actions"> <button type="button" class="btn-cancel-edit">Annulla</button> <button type="button" class="btn-save-edit">Salva</button> </div>
-                <div class="form-message-local" style="display:none;"></div>
-            </div>`;
-        editFormPlaceholder.innerHTML = editFormHTML;
-        const newTextarea = editFormPlaceholder.querySelector('textarea[name="editDescription"]'); newTextarea.focus();
-        const saveButton = editFormPlaceholder.querySelector('.btn-save-edit');
-        const localMsgEl = editFormPlaceholder.querySelector('.form-message-local');
-        const showLocalMsg = (txt, type) => {
-            if(localMsgEl){ localMsgEl.textContent = txt; localMsgEl.className = `form-message-local ${type}`; localMsgEl.style.display = 'block'; setTimeout(()=>localMsgEl.style.display='none', 3000);}
-        };
+            <div class="comment-edit-form"> <textarea name="editDescription" rows="3" required>${originalText.replace(/<br\s*\/?>/ig, "\n")}</textarea> <div class="comment-edit-actions"> <button type="button" class="btn-cancel-edit">Annulla</button> <button type="button" class="btn-save-edit">Salva</button> </div> <div class="form-message-local" style="display:none;"></div> </div>`;
+        editFormPlaceholder.innerHTML = editFormHTML; const newTextarea = editFormPlaceholder.querySelector('textarea[name="editDescription"]'); newTextarea.focus();
+        const saveButton = editFormPlaceholder.querySelector('.btn-save-edit'); const localMsgEl = editFormPlaceholder.querySelector('.form-message-local');
+        const showLocalMsg = (txt, type) => { if(localMsgEl){ localMsgEl.textContent = txt; localMsgEl.className = `form-message-local ${type}`; localMsgEl.style.display = 'block'; setTimeout(()=>localMsgEl.style.display='none', 3000);} };
         saveButton.addEventListener('click', async function(e) {
             const newDescription = newTextarea.value.trim();
             if (!newDescription) { showLocalMsg("Il commento non può essere vuoto.", 'error'); return; }
@@ -1086,62 +720,37 @@
             } catch (error) { showLocalMsg("Errore: " + error.message, 'error'); saveButton.disabled = false; saveButton.innerHTML = 'Salva'; }
         });
         editFormPlaceholder.querySelector('.btn-cancel-edit').addEventListener('click', exitEditMode);
-        function exitEditMode() {
-            commentTextContentDiv.style.display = 'block';
-            editFormPlaceholder.innerHTML = '';
-            commentElement.classList.remove('comment-editing');
-        }
+        function exitEditMode() { commentTextContentDiv.style.display = 'block'; editFormPlaceholder.innerHTML = ''; commentElement.classList.remove('comment-editing'); }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-        const currentYearEl = document.getElementById('currentYear');
-        if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
-        setupUserSessionAndNavbar();
-        if (currentUser?.email) await fetchAndUpdateUserDisplayData();
-        const urlParams = new URLSearchParams(window.location.search);
-        const eventId = urlParams.get('id');
-        const commentEventIdInput = document.getElementById('commentEventId');
-        if (commentEventIdInput && eventId) commentEventIdInput.value = eventId;
-        if (eventId) await fetchEventDetails(eventId);
-        else displayErrorMessageOnPage("ID evento non specificato.");
+        const currentYearEl = document.getElementById('currentYear'); if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
+        setupUserSessionAndNavbar(); if (currentUser?.email) await fetchAndUpdateUserDisplayData();
+        const urlParams = new URLSearchParams(window.location.search); const eventId = urlParams.get('id');
+        const commentEventIdInput = document.getElementById('commentEventId'); if (commentEventIdInput && eventId) commentEventIdInput.value = eventId;
+        if (eventId) await fetchEventDetails(eventId); else displayErrorMessageOnPage("ID evento non specificato.");
         const newCommentForm = document.getElementById('new-comment-form');
-        if (newCommentForm && eventId) {
-            newCommentForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await _submitCommentOrReplyLogic(this, eventId, false, null, { isForPopup: false });
-            });
-        }
+        if (newCommentForm && eventId) { newCommentForm.addEventListener('submit', async function(e) { e.preventDefault(); await _submitCommentOrReplyLogic(this, eventId, false, null, { isForPopup: false }); }); }
         const loginLink = document.getElementById('loginLinkFromEventPage');
         if(loginLink){
-            const commentFormContainerEl = document.getElementById('commentFormContainer');
-            const loginToCommentMessageEl = document.getElementById('login-to-comment-message');
-            if(currentUser?.email) {
-                if(commentFormContainerEl) commentFormContainerEl.style.display = 'block';
-                if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'none';
-            } else {
-                if(commentFormContainerEl) commentFormContainerEl.style.display = 'none';
-                if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'block';
-                loginLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const loginPopupOverlay = document.querySelector('.login-popup-overlay');
-                    const loginPopup = document.querySelector('.login-popup');
-                    if (loginPopupOverlay && loginPopup) {
-                        loginPopupOverlay.classList.add('active'); loginPopup.classList.add('active');
-                    } else { alert("Per favore, accedi. (Popup non trovato)"); }
-                });
+            const commentFormContainerEl = document.getElementById('commentFormContainer'); const loginToCommentMessageEl = document.getElementById('login-to-comment-message');
+            if(currentUser?.email) { if(commentFormContainerEl) commentFormContainerEl.style.display = 'block'; if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'none'; }
+            else {
+                if(commentFormContainerEl) commentFormContainerEl.style.display = 'none'; if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'block';
+                loginLink.addEventListener('click', (e) => { e.preventDefault(); const loginPopupOverlay = document.querySelector('.login-popup-overlay'); const loginPopup = document.querySelector('.login-popup'); if (loginPopupOverlay && loginPopup) { loginPopupOverlay.classList.add('active'); loginPopup.classList.add('active'); } else { alert("Per favore, accedi. (Popup non trovato)"); } });
             }
         }
         document.addEventListener('keydown', function(event) {
             if (event.key === "Escape") {
                 if (document.getElementById('conversationPopupOverlay')?.classList.contains('active')) closeConversationPopup();
-                if (document.getElementById('likersPopupOverlay')?.classList.contains('active')) closeLikersPopup(); // Chiudi popup likers
+                if (document.getElementById('likersPopupOverlay')?.classList.contains('active')) closeLikersPopup();
                 if (document.getElementById('lightbox')?.classList.contains('active')) closeLightbox();
-                const activeLoginPopup = document.querySelector('.login-popup-overlay.active');
-                if (activeLoginPopup) activeLoginPopup.classList.remove('active');
+                const activeLoginPopup = document.querySelector('.login-popup-overlay.active'); if (activeLoginPopup) { activeLoginPopup.classList.remove('active'); document.querySelector('.login-popup.active')?.classList.remove('active'); }
             }
         });
         document.getElementById('conversationPopupOverlay')?.addEventListener('click', (e) => { if(e.target === e.currentTarget) closeConversationPopup(); });
-        document.getElementById('likersPopupOverlay')?.addEventListener('click', (e) => { if(e.target === e.currentTarget) closeLikersPopup(); }); // Chiudi popup likers
+        document.getElementById('likersPopupOverlay')?.addEventListener('click', (e) => { if(e.target === e.currentTarget) closeLikersPopup(); });
+        const loginPopupOverlayGlobal = document.querySelector('.login-popup-overlay'); if(loginPopupOverlayGlobal){ loginPopupOverlayGlobal.addEventListener('click', (e) => { if(e.target === loginPopupOverlayGlobal) {loginPopupOverlayGlobal.classList.remove('active'); document.querySelector('.login-popup.active')?.classList.remove('active');} });}
     });
 </script>
 </body>
