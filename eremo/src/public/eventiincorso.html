@@ -147,8 +147,8 @@
         <div class="dropdown-menu" id="userDropdownMenu">
           <a href="areapersonale.html" id="nav-profilo">Il mio profilo</a>
           <a href="areapersonale.html#prenotazioni" id="nav-mie-prenotazioni">Le mie prenotazioni</a>
-          <a href="dashboard.html" id="nav-dashboard" style="display: none;">Dashboard Admin</a>
-          <a href="eventiincorsoAdmin.html" id="nav-gestione-eventi-admin" style="display: none;">Gestione Eventi</a>
+          <a href="dashboard.html" id="nav-dashboard" style="/*display: block;*/">Dashboard Admin</a>
+          <a href="eventiincorsoAdmin.html" id="nav-gestione-eventi-admin" style="/*display: block;*/">Gestione Eventi</a>
           <a href="#" id="logout-link-desktop">Esci</a>
         </div>
       </div>
@@ -250,7 +250,7 @@
 </div>
 
 <footer>
-  <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
+  <p>© <span id="currentYear"></span> Eremo Frate Francesco ODV. Tutti i diritti riservati.</p>
 </footer>
 
 <script>
@@ -379,8 +379,8 @@
     const postiDispEv = parseInt(event.posti_disponibili) || 0; const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
     const inCodaPerP = parseInt(event.in_coda_per_posti) || 0; const flagPrenDB = parseInt(event.flagprenotabile) === 1;
     let primaryBtnHTML = ''; let volantinoBtnHTML = "";
-    if (event.volantino_url?.trim()) { volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${event.volantino_url}">Volantino</button>`; } else { volantinoBtnHTML = `<a href="evento_dettaglio.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a>`; }
-    if (!flagPrenDB) { primaryBtnHTML = `<a href="evento_dettaglio.html?id=${event.idevento}" class="card-btn card-btn-primary">Dettagli (Pren. Chiuse)</a>`; }
+    if (event.volantino_url?.trim()) { volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${event.volantino_url}">Volantino</button>`; } else { volantinoBtnHTML = `<a  class="card-btn card-btn-secondary">Dettagli</a>`; }
+    if (!flagPrenDB) { primaryBtnHTML = `<a class="card-btn card-btn-primary">(Pren. Chiuse)</a>`; }
     else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti Raggiunti (${pGiaPrenUt})</button>`; }
     else if (inCodaPerP > 0) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`; }
     else if (postiDispEv > 0) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`; }
