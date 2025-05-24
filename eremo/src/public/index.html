@@ -77,8 +77,8 @@
         <div class="dropdown-menu" id="userDropdownMenu">
           <a href="areapersonale.html" id="nav-profilo">Il mio profilo</a>
           <a href="areapersonale.html#prenotazioni" id="nav-mie-prenotazioni">Le mie prenotazioni</a>
-          <a href="dashboard.html" id="nav-dashboard" style="display: none;">Dashboard Admin</a>
-          <a href="eventiincorsoAdmin.html" id="nav-gestione-eventi-admin" style="display: block;">Gestione Eventi</a>
+          <a href="dashboard.html" id="nav-dashboard" style="display: block;">Dashboard Admin</a>
+          <a href="eventiincorso.html" id="nav-gestione-eventi-admin" style="display: block;">Gestione Eventi</a>
           <a href="#" id="logout-link-desktop">Esci</a>
         </div>
       </div>
@@ -96,7 +96,7 @@
 </header>
 
 <main>
-  <section class="hero-section" id="heroSection" style="background-image: url('images/eremo.png');">
+  <section class="hero-section" id="heroSection" style="background-image: url('images/eremo.jpg');">
     <div class="hero-content">
       <div class="editable-text-wrapper">
         <h1 class="hero-title" id="content-heroTitle" data-content-key="heroTitle">Eremo Frate Francesco</h1>
@@ -213,7 +213,7 @@
 </div>
 
 <footer>
-  <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
+  <p>© <span id="currentYear"></span> Eremo Frate Francesco ODV. Tutti i diritti riservati.</p>
 </footer>
 
 <script>
@@ -268,7 +268,7 @@
   async function loadPageContentsFromServer(){showPageStatus("Caricamento contenuti...","info",1500);try{const r=await fetch(`api_get_page_content.php?page=${PAGE_NAME_FOR_CONTENT}`);if(!r.ok)throw new Error(`Errore server: ${r.status}`);const d=await r.json();if(d.success&&d.contents&&Object.keys(d.contents).length>0){currentPageDbContents=d.contents;}else{console.warn("Nessun contenuto custom dal DB o errore API, uso i default.",d.message||'');currentPageDbContents={...defaultPageContents};}}catch(err){console.error("Errore caricamento contenuti:",err);currentPageDbContents={...defaultPageContents};showPageStatus("Errore caricamento. Usati valori predefiniti.","error");}applyContentsToPage(currentPageDbContents);originalPageContentsForCancel={...currentPageDbContents};}
 
   function applyContentsToPage(contents){document.querySelectorAll('[data-content-key]').forEach(el=>{const key=el.dataset.contentKey; const contentValue = contents[key] !== undefined ? contents[key] : defaultPageContents[key];
-    if(contentValue !== undefined){if(el.tagName==='IMG'){el.src=contentValue;el.onerror=function(){this.src=defaultPageContents[key]||`https://placehold.co/600x400/eee/ccc?text=Img Default (${key})`;this.onerror=null;};}else{el.innerHTML=sanitizeTextForHTML(contentValue);}}else{if(el.tagName!=='IMG')el.innerHTML=`[${key} mancante]`;else el.src=`https://placehold.co/600x400/eee/ccc?text=${key}+mancante`;}}); const heroSection=document.getElementById('heroSection');if(heroSection&&contents.heroBackgroundImage)heroSection.style.backgroundImage=`linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${contents.heroBackgroundImage}')`;else if(heroSection)heroSection.style.backgroundImage=`linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('images/eremo.png')`;}
+    if(contentValue !== undefined){if(el.tagName==='IMG'){el.src=contentValue;el.onerror=function(){this.src=defaultPageContents[key]||`https://placehold.co/600x400/eee/ccc?text=Img Default (${key})`;this.onerror=null;};}else{el.innerHTML=sanitizeTextForHTML(contentValue);}}else{if(el.tagName!=='IMG')el.innerHTML=`[${key} mancante]`;else el.src=`https://placehold.co/600x400/eee/ccc?text=${key}+mancante`;}}); const heroSection=document.getElementById('heroSection');if(heroSection&&contents.heroBackgroundImage)heroSection.style.backgroundImage=`linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${contents.heroBackgroundImage}')`;else if(heroSection)heroSection.style.backgroundImage=`linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('images/eremo.jpg')`;}
 
   function toggleEditMode(enable){isEditModeActive=enable;document.querySelectorAll('.edit-icon-text,.edit-icon-image').forEach(icon=>icon.style.display=(currentUserData?.isAdmin&&enable)?'inline-flex':'none');document.querySelectorAll('img.chi-siamo-image').forEach(img=>{ (currentUserData?.isAdmin&&enable)?img.classList.add('editable-image-target'):img.classList.remove('editable-image-target');});const editContainer=document.getElementById('editPageBtnContainer');const editBtn=document.getElementById('editPageBtn');const saveBtn=document.getElementById('savePageChangesBtn');const cancelBtn=document.getElementById('cancelPageChangesBtn');if(editContainer&&currentUserData?.isAdmin)editContainer.style.display='flex';else if(editContainer)editContainer.style.display='none';if(editBtn)editBtn.style.display=enable?'none':(currentUserData?.isAdmin?'inline-block':'none');if(saveBtn)saveBtn.style.display=enable?'inline-block':'none';if(cancelBtn)cancelBtn.style.display=enable?'inline-block':'none';if(enable){originalPageContentsForCancel={...currentPageDbContents};}}
 
