@@ -89,16 +89,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
              die(json_encode(['success' => false, 'message' => "ID evento non valido per l'aggiornamento."]));
         }
 
-        $titolo = $conn->real_escape_string(trim($_POST['event-title']));
-        $data = $conn->real_escape_string(trim($_POST['event-date']));
-        $orario = $conn->real_escape_string(trim($_POST['event-time'] ?? ''));
-        $descrizione = $conn->real_escape_string(trim($_POST['event-short-desc']));
-        $descrizione_estesa = $conn->real_escape_string(trim($_POST['event-long-desc'] ?? ''));
-        $prefisso_relatore = $conn->real_escape_string(trim($_POST['event-prefix'] ?? 'Relatore'));
-        $relatore = $conn->real_escape_string(trim($_POST['event-speaker'])); // Questo è il campo corretto
-        $associazione = $conn->real_escape_string(trim($_POST['event-association'] ?? ''));
+        // === MODIFICA: Rimozione di $conn->real_escape_string() ===
+        $titolo = trim($_POST['event-title']);
+        $data = trim($_POST['event-date']);
+        $orario = trim($_POST['event-time'] ?? '');
+        $descrizione = trim($_POST['event-short-desc']);
+        $descrizione_estesa = trim($_POST['event-long-desc'] ?? '');
+        $prefisso_relatore = trim($_POST['event-prefix'] ?? 'Relatore');
+        $relatore = trim($_POST['event-speaker']);
+        $associazione = trim($_POST['event-association'] ?? '');
+        // ==========================================================
+
         $posti_disponibili = intval($_POST['event-seats']);
-        $prenotabile = isset($_POST['event-booking']) && $_POST['event-booking'] === 'on' ? 1 : 0; // Corretto per checkbox
+        $prenotabile = isset($_POST['event-booking']) && $_POST['event-booking'] === 'on' ? 1 : 0;
         $costo = (isset($_POST['event-voluntary']) && $_POST['event-voluntary'] === 'on') ? 0.00 : floatval($_POST['event-price'] ?? 0.00);
 
         $percorso_foto_copertina_db = null;
@@ -131,11 +134,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 error_log("Errore prepare INSERT: " . $conn->error);
                 die(json_encode(['success' => false, 'message' => 'Errore server (DB Insert).']));
             }
-            // CORREZIONE STRINGA TIPI: ssssssiidssss (13 tipi)
-            // Titolo(s), Data(s), Durata(s), Descrizione(s), DescrizioneEstesa(s), Associazione(s),
-            // FlagPrenotabile(i), PostiDisponibili(i), Costo(d),
-            // PrefissoRelatore(s), Relatore(s),
-            // FotoCopertina(s), VolantinoUrl(s)
             $stmt->bind_param("ssssssiidssss",
                 $titolo, $data, $orario, $descrizione, $descrizione_estesa, $associazione,
                 $prenotabile, $posti_disponibili, $costo,
@@ -150,7 +148,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 error_log("Errore prepare UPDATE: " . $conn->error);
                 die(json_encode(['success' => false, 'message' => 'Errore server (DB Update).']));
             }
-            // CORREZIONE STRINGA TIPI: ssssssiidssssi (14 tipi, l'ultimo è IDEvento(i))
             $stmt->bind_param("ssssssiidssssi",
                 $titolo, $data, $orario, $descrizione, $descrizione_estesa, $associazione,
                 $prenotabile, $posti_disponibili, $costo,
