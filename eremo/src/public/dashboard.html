@@ -116,15 +116,6 @@
             box-sizing: border-box; /* padding e border inclusi nella width */
             border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
         }
-        /* Se il pannello dovesse comunque "scappare" a destra, potresti provare ad ancorarlo forzatamente a sinistra del pulsante
-           ma questo avrebbe senso solo se il pulsante non è all'estrema destra della pagina.
-           Esempio alternativo (da testare con cautela, potrebbe non essere ciò che vuoi se il bottone è largo):
-        .filter-panel {
-            left: 0; // Allinea il bordo SINISTRO del pannello con il bordo SINISTRO del contenitore
-            right: auto;
-            border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium); // O tutti gli angoli se si apre diversamente
-        }
-        */
 
         .filter-panel.active {
             display: block;
@@ -183,6 +174,85 @@
             box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25);
             outline: none;
         }
+
+        /* Stili per la sezione Opzioni Avanzate */
+        .advanced-options-content {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border: 1px solid var(--gray-medium);
+            border-radius: var(--border-radius-medium);
+            box-shadow: var(--shadow-light);
+            margin-top: 1.5rem; /* Spazio sopra la sezione */
+            margin-bottom: 1.5rem; /* Spazio sotto la sezione */
+        }
+        .advanced-options-content .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .advanced-options-content label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        .advanced-options-content select.form-control {
+            width: 100%;
+            max-width: 500px; /* Allargato per leggibilità */
+            padding: 0.75rem 1rem; /* Coerenza con altri form control */
+            border: 1px solid var(--gray-medium);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--white);
+        }
+        .advanced-options-content select.form-control:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25);
+            outline: none;
+        }
+        .advanced-options-content .form-actions {
+            text-align: left;
+            margin-top: 1rem;
+        }
+        /* Stili per i messaggi di feedback (utilizzati anche dal form eventi) */
+        .form-message {
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: var(--border-radius-small, .25rem);
+            font-size: 0.95rem;
+        }
+        .form-message.success {
+            color: var(--success-dark, #155724);
+            background-color: var(--success-light, #d4edda);
+            border-color: var(--success, #c3e6cb);
+        }
+        .form-message.error {
+            color: var(--danger-dark, #721c24);
+            background-color: var(--danger-light, #f8d7da);
+            border-color: var(--danger, #f5c6cb);
+        }
+        /* Spinner per bottoni (utilizzato anche dal form eventi) */
+        .spinner-mini {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-infinite;
+            margin-right: 0.5em;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn-admin .spinner-mini { /* Colore per spinner su bottoni con sfondo scuro */
+            border-top-color: var(--primary-dark, #2c4a43); /* Adatta se necessario */
+        }
+        button:disabled .spinner-mini { /* Per bottoni generici disabilitati */
+            border-top-color: #ccc;
+        }
+        .btn-popup .spinner-mini { /* Specifico per spinner in popup con testo bianco */
+            border-top-color: #fff;
+        }
+
 
         .event-form-and-preview-container {
             display: flex;
@@ -347,6 +417,9 @@
                 margin-top: 1rem;
                 border: 1px solid var(--gray-medium);
             }
+            .advanced-options-content select.form-control {
+                max-width: 100%; /* Full width on mobile */
+            }
             #eventManagementContent {
                 border-radius: var(--border-radius-medium);
                 margin-top: 1rem;
@@ -454,6 +527,26 @@
                 <option value="relatore">Relatore</option>
                 <option value="nessuno">Nessun raggruppamento</option>
             </select>
+        </div>
+    </div>
+
+    <div class="dashboard-section" id="advancedOptionsSection">
+        <h2><i class="fas fa-cogs"></i> Opzioni Avanzate</h2>
+        <div class="advanced-options-content">
+            <div class="form-group">
+                <label for="commentModerationLevel">Livello Moderazione Commenti</label>
+                <select id="commentModerationLevel" class="form-control">
+                    <option value="0">Nessuna Moderazione (commenti sempre pubblicati)</option>
+                    <option value="1">Moderazione Leggera (più tollerante, soglia Groq: 6)</option>
+                    <option value="2" selected>Moderazione Standard (raccomandato, soglia Groq: 4)</option>
+                    <option value="3">Moderazione Rigorosa (meno tollerante, soglia Groq: 2)</option>
+                </select>
+                <small>Questa impostazione influenza il filtro automatico dei commenti basato sull'offensività. Si applica globalmente a tutti gli eventi. La soglia indica il punteggio massimo (da 1 a 10) consentito affinché un commento passi la moderazione automatica.</small>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-admin btn-admin-primary" id="saveAdvancedSettingsBtn">Salva Impostazioni Avanzate</button>
+            </div>
+            <div id="advancedSettingsMessage" class="form-message" style="display:none; margin-top: 1rem;"></div>
         </div>
     </div>
 
@@ -898,7 +991,7 @@
             previewImageEl.style.display = 'block';
             if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
         } else {
-            previewImageEl.src = 'images/default-event.jpg';
+            previewImageEl.src = 'images/default-event.jpg'; // Default se nessun'altra immagine
             previewImageEl.style.display = 'block';
             if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
         }
@@ -1061,7 +1154,7 @@
     const tabContents = document.querySelectorAll('#eventManagementContent .event-tab-content');
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
-            if (!button.id || !button.id.startsWith('filterToggle')) {
+            if (!button.id || !button.id.startsWith('filterToggle')) { // Non agire sul bottone filtri
                 tabButtons.forEach(btn => {
                     if (!btn.id || !btn.id.startsWith('filterToggle')) btn.classList.remove('active');
                 });
@@ -1191,19 +1284,21 @@
                     if (valA < valB) comparison = -1;
                     if (valA > valB) comparison = 1;
                     break;
-                default:
+                default: // Default to sorting by date if sortBy is unrecognized
                     valA = new Date(a.Data);
                     valB = new Date(b.Data);
                     if (valA < valB) comparison = -1;
                     if (valA > valB) comparison = 1;
             }
 
+            // Secondary sort by date if primary sort results in a tie (and primary is not date)
             if (comparison === 0 && sortBy !== 'mese') {
                 let dateA = new Date(a.Data);
                 let dateB = new Date(b.Data);
                 if (dateA < dateB) comparison = -1;
                 if (dateA > dateB) comparison = 1;
             }
+            // Tertiary sort by ID to ensure stable sort order
             if (comparison === 0) {
                 comparison = (parseInt(a.IDEvento) || 0) < (parseInt(b.IDEvento) || 0) ? -1 : 1;
             }
@@ -1217,15 +1312,15 @@
         renderEventsSection(filteredPast, 'pastEventsGrid', false, groupBy, sortDirection);
     }
 
-    function getWeekStartDate(dInput) {
+    function getWeekStartDate(dInput) { // dInput in YYYY-MM-DD format
         const parts = dInput.split('-');
         const d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
-        const day = d.getUTCDay();
-        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1);
+        const day = d.getUTCDay(); // 0 for Sunday, 1 for Monday, etc.
+        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday as start of week
         return new Date(d.setUTCDate(diff));
     }
 
-    function getWeekRangeString(dateStr) {
+    function getWeekRangeString(dateStr) { // dateStr in YYYY-MM-DD
         if (!dateStr || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return 'Data non valida';
         try {
             const weekStart = getWeekStartDate(dateStr);
@@ -1233,7 +1328,7 @@
             weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
 
             const options = { day: '2-digit', month: 'short', timeZone: 'UTC' };
-            const year = weekStart.getUTCFullYear();
+            const year = weekStart.getUTCFullYear(); // Get year from weekStart
             return `Sett. ${weekStart.toLocaleDateString('it-IT', options)} - ${weekEnd.toLocaleDateString('it-IT', options)} ${year}`;
         } catch (e) {
             console.warn("Errore getWeekRangeString:", dateStr, e);
@@ -1255,6 +1350,7 @@
         }
 
         if (events.length === 0) {
+            // Only add "no events" message if it's not the upcoming grid with only the "Add Event" bar
             if (!(isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar'))) {
                 gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'} trovato con i filtri applicati.</p>`;
             }
@@ -1273,9 +1369,9 @@
                     case 'giorno': groupKey = event.Data ? formatDbDate(event.Data) : 'Data sconosciuta'; break;
                     case 'settimana': groupKey = event.Data ? getWeekRangeString(event.Data) : 'Data sconosciuta'; break;
                     case 'mese': groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta'; break;
-                    case 'anno': groupKey = event.Data ? new Date(event.Data.replace(/-/g,'/')).getFullYear().toString() : 'Anno sconosciuto'; break;
+                    case 'anno': groupKey = event.Data ? new Date(event.Data.replace(/-/g,'/')).getUTCFullYear().toString() : 'Anno sconosciuto'; break;
                     case 'relatore': groupKey = sanitizeText(event.relatore || 'Senza Relatore'); break;
-                    default: groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta';
+                    default: groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta'; // Default to month
                 }
             } catch(e) { console.warn("Errore calcolo groupKey per evento:", event, e); }
             if (!acc[groupKey]) acc[groupKey] = [];
@@ -1285,45 +1381,46 @@
 
         let sortedGroupKeys = Object.keys(groupedEvents);
 
+        // Sort group keys based on type and direction
         if (groupBy === 'giorno' || groupBy === 'settimana' || groupBy === 'mese' || groupBy === 'anno') {
             sortedGroupKeys.sort((a, b) => {
                 let dateA, dateB;
                 try {
-                    if (groupBy === 'giorno') {
+                    if (groupBy === 'giorno') { // Format: GG/MM/YYYY
                         const pA = a.split('/'); dateA = new Date(Date.UTC(pA[2], pA[1]-1, pA[0]));
                         const pB = b.split('/'); dateB = new Date(Date.UTC(pB[2], pB[1]-1, pB[0]));
-                    } else if (groupBy === 'settimana') {
-                        const matchA = a.match(/Sett\. (\d{2}) (\w+)/);
-                        const yearA = parseInt(a.substring(a.lastIndexOf(' ') + 1));
-                        if (matchA) dateA = new Date(Date.UTC(yearA, getMonthIndexFromString(matchA[2]), parseInt(matchA[1])));
-
-                        const matchB = b.match(/Sett\. (\d{2}) (\w+)/);
-                        const yearB = parseInt(b.substring(b.lastIndexOf(' ') + 1));
-                        if (matchB) dateB = new Date(Date.UTC(yearB, getMonthIndexFromString(matchB[2]), parseInt(matchB[1])));
-
-                    } else if (groupBy === 'mese') {
+                    } else if (groupBy === 'settimana') { // Format: "Sett. DD Mmm - DD Mmm YYYY"
+                        // Extract start date for sorting: "Sett. 01 gen - 07 gen 2023" -> "01 gen 2023"
+                        const matchA = a.match(/Sett\. (\d{2}) (\w+) .* (\d{4})/);
+                        if (matchA) dateA = new Date(Date.UTC(parseInt(matchA[3]), getMonthIndexFromString(matchA[2]), parseInt(matchA[1])));
+                        const matchB = b.match(/Sett\. (\d{2}) (\w+) .* (\d{4})/);
+                        if (matchB) dateB = new Date(Date.UTC(parseInt(matchB[3]), getMonthIndexFromString(matchB[2]), parseInt(matchB[1])));
+                    } else if (groupBy === 'mese') { // Format: Mese Anno (e.g., "Maggio 2023")
                         const pA = a.split(' '); dateA = new Date(Date.UTC(pA[1], getMonthIndexFromString(pA[0]), 1));
                         const pB = b.split(' '); dateB = new Date(Date.UTC(pB[1], getMonthIndexFromString(pB[0]), 1));
-                    } else if (groupBy === 'anno') {
+                    } else if (groupBy === 'anno') { // Format: YYYY
                         dateA = new Date(Date.UTC(a, 0, 1));
                         dateB = new Date(Date.UTC(b, 0, 1));
                     }
-                } catch(e) {
+                } catch(e) { // Fallback to string sort if date parsing fails
+                    console.warn("Errore parsing date per group key sort:", a, b, e);
                     return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
                 }
 
                 if (dateA && dateB && !isNaN(dateA) && !isNaN(dateB)) {
                     return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
                 }
+                // Fallback for invalid dates or parsing errors
                 return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
             });
         } else if (groupBy === 'relatore') {
             sortedGroupKeys.sort((a,b) => sortDirection === 'asc' ? a.localeCompare(b,'it',{sensitivity:'base'}) : b.localeCompare(a,'it',{sensitivity:'base'}));
         }
 
+
         for (const groupKey of sortedGroupKeys) {
             const headerEl = document.createElement('h3');
-            headerEl.className = 'month-year-header';
+            headerEl.className = 'month-year-header'; // Consider a more generic class name if groupBy is not always date-related
             headerEl.textContent = groupKey;
             gridContainer.appendChild(headerEl);
             groupedEvents[groupKey].forEach(event => gridContainer.appendChild(createAdminEventCard(event)));
@@ -1445,13 +1542,13 @@
             if (feedbackEl) {
                 if (result.success) {
                     feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`;
-                    await fetchDashboardData();
+                    await fetchDashboardData(); // Ricarica i dati della dashboard per aggiornare i conteggi
                     const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === String(eventIdForModalReload));
                     if(updatedEventData) {
                         const bookingsContainerEl = document.getElementById('bookingsListContainerModal');
                         if(bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(updatedEventData.elenco_prenotazioni || [], updatedEventData.IDEvento);
                     } else {
-                        closeModal('manageBookingsModal');
+                        closeModal('manageBookingsModal'); // Chiudi se l'evento non è più trovato (improbabile)
                     }
                 } else {
                     feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare la prenotazione.')}</p>`;
@@ -1505,7 +1602,7 @@
                 mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Visualizza: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><img src="${sanitizeForAttribute(item.url_media)}" alt="${itemDesc || filename}" loading="lazy" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;" title="Immagine: ${sanitizeForAttribute(filename)}"><i class="fas fa-image"></i></div>`;
             } else if (item.tipo_media === 'video') {
                 mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Guarda: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`;
-            } else {
+            } else { // pdf or other
                 mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Apri: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`;
             }
 
@@ -1541,8 +1638,8 @@
 
             if (result.success) {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento");
-                fetchDashboardData();
+                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); // Ricarica i media nel modal
+                fetchDashboardData(); // Ricarica i dati della dashboard per aggiornare il conteggio media
             } else {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore eliminazione: ${sanitizeText(result.message)}</p>`;
             }
@@ -1566,8 +1663,8 @@
         if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media in corso...</p>';
 
         const formData = new FormData(this);
-        formData.set('action', 'upload_media');
-        formData.set('event_id', eventId);
+        formData.set('action', 'upload_media'); // Assicurati che l'action sia corretta
+        formData.set('event_id', eventId); // event_id invece di eventId per coerenza con altri form
 
         try {
             const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
@@ -1575,9 +1672,9 @@
 
             if (result.success) {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                this.reset();
-                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento");
-                fetchDashboardData();
+                this.reset(); // Resetta il form dopo l'upload
+                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); // Ricarica i media nel modal
+                fetchDashboardData(); // Ricarica i dati della dashboard per aggiornare il conteggio media
             } else {
                 if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore upload: ${sanitizeText(result.message)}</p>`;
             }
@@ -1587,21 +1684,22 @@
         }
         setTimeout(() => { if(feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 5000);
     });
-    let currentEventIdForCommentsGl = null;
+    let currentEventIdForCommentsGl = null; // Variabile globale per ID evento nel modal commenti
     async function openManageCommentsModal(eventId, eventTitle) {
-        currentEventIdForCommentsGl = eventId;
+        currentEventIdForCommentsGl = eventId; // Salva l'ID evento corrente
         const titleEl = document.getElementById('commentsEventTitle');
-        let listContainerEl = document.getElementById('commentsListContainer');
+        let listContainerEl = document.getElementById('commentsListContainer'); // Riassegna se clonato
         const feedbackEl = document.getElementById('commentsManagementFeedback');
 
         if(titleEl) titleEl.textContent = sanitizeText(eventTitle);
         if(feedbackEl) feedbackEl.innerHTML = '';
 
+        // Clona e sostituisci il contenitore per resettare gli event listener precedenti
         if (listContainerEl && listContainerEl.parentNode) {
-            const newClonedListContainer = listContainerEl.cloneNode(false);
+            const newClonedListContainer = listContainerEl.cloneNode(false); // false per non clonare i figli
             listContainerEl.parentNode.replaceChild(newClonedListContainer, listContainerEl);
-            listContainerEl = newClonedListContainer;
-            attachAdminCommentListeners(listContainerEl);
+            listContainerEl = newClonedListContainer; // Aggiorna il riferimento
+            attachAdminCommentListeners(listContainerEl); // Riattacca i listener al nuovo elemento
         } else {
             console.error("Elemento commentsListContainer non trovato o senza genitore.");
             if(feedbackEl) feedbackEl.innerHTML = '<p class="error-message">Errore UI: impossibile inizializzare la lista commenti.</p>';
@@ -1621,7 +1719,7 @@
             }
             const result = await response.json();
             if (result.success && result.comments) {
-                renderCommentsForAdminThreaded(result.comments, eventId, listContainerEl);
+                renderCommentsForAdminThreaded(result.comments, eventId, listContainerEl); // Passa eventId
             } else {
                 listContainerEl.innerHTML = `<li><p>${sanitizeText(result.message || 'Nessun commento trovato o errore nel recupero.')}</p></li>`;
             }
@@ -1631,7 +1729,7 @@
         }
     }
     function renderCommentsForAdminThreaded(comments, eventId, parentUlElement, depth = 0) {
-        if (depth === 0) {
+        if (depth === 0) { // Solo al primo livello svuota e controlla se ci sono commenti
             parentUlElement.innerHTML = '';
             if (!comments || comments.length === 0) {
                 parentUlElement.innerHTML = '<li style="list-style-type:none;text-align:center;margin:1rem 0;"><p>Nessun commento per questo evento.</p></li>';
@@ -1643,15 +1741,17 @@
             const commentItemLi = document.createElement('li');
             commentItemLi.className = 'comment-item-admin-styled';
             commentItemLi.id = `admin-comment-${comment.Progressivo}`;
-            if (comment.is_admin_reply) {
-                commentItemLi.classList.add('commento-admin-generale');
+            if (comment.is_admin_reply) { // Assumendo che is_admin_reply venga dal backend
+                commentItemLi.classList.add('commento-admin-generale'); // Classe per risposte admin
             }
 
-            const commenterAvatar = comment.commenter_icon_path || defaultUserIconPath;
+            // Utilizza l'icona specifica del commentatore, altrimenti default
+            const commenterAvatar = comment.commenter_icon_path || defaultUserIconPath; // Usa defaultUserIconPath
             const commenterName = sanitizeText(comment.utente_display_name || 'Utente Anonimo');
             const commentDate = sanitizeText(comment.data_creazione_formattata || 'Data non disponibile');
-            const commentText = sanitizeTextForHTML(comment.Descrizione);
+            const commentText = sanitizeTextForHTML(comment.Descrizione); // Sanifica HTML per il testo
             let adminBadgeHTML = comment.is_admin_reply ? '<span class="badge-admin-dashboard">(Admin)</span>' : '';
+
 
             commentItemLi.innerHTML = `
                 <div class="comment-header">
@@ -1680,22 +1780,23 @@
 
             if (comment.replies && comment.replies.length > 0) {
                 const repliesUl = document.createElement('ul');
-                repliesUl.className = 'comment-replies-list-styled';
+                repliesUl.className = 'comment-replies-list-styled'; // Classe per indentare risposte
                 commentItemLi.appendChild(repliesUl);
-                renderCommentsForAdminThreaded(comment.replies, eventId, repliesUl, depth + 1);
+                renderCommentsForAdminThreaded(comment.replies, eventId, repliesUl, depth + 1); // Passa eventId
             }
         });
     }
     function attachAdminCommentListeners(commentsListContainerUL) {
         if (!commentsListContainerUL) return;
+        // Usa event delegation per gestire click e submit
         commentsListContainerUL.addEventListener('click', handleCommentActionClick);
         commentsListContainerUL.addEventListener('submit', handleCommentFormSubmit);
     }
-    async function handleCommentActionClick(event) {
+    async function handleCommentActionClick(event) { // Gestore unificato per click
         const target = event.target;
         const replyButton = target.closest('.btn-admin-reply');
         if (replyButton) {
-            event.preventDefault();
+            event.preventDefault(); // Evita submit se il bottone è in un form
             const commentId = replyButton.dataset.commentId;
             const replyFormDiv = document.getElementById(`reply-form-admin-${commentId}`);
             if (replyFormDiv) {
@@ -1712,7 +1813,7 @@
         if (deleteButton) {
             event.preventDefault();
             const commentId = deleteButton.dataset.commentId;
-            if (currentEventIdForCommentsGl) {
+            if (currentEventIdForCommentsGl) { // Usa la variabile globale per eventId
                 deleteAdminComment(commentId, currentEventIdForCommentsGl);
             } else {
                 alert("Errore: ID evento non specificato per l'eliminazione del commento.");
@@ -1720,11 +1821,11 @@
             return;
         }
     }
-    async function handleCommentFormSubmit(event) {
+    async function handleCommentFormSubmit(event) { // Gestore unificato per submit
         const targetForm = event.target.closest('.reply-form-admin form');
         if (targetForm) {
             event.preventDefault();
-            const eventId = targetForm.dataset.eventId;
+            const eventId = targetForm.dataset.eventId; // Prendi eventId dal form
             await handleAdminReplySubmit(targetForm, eventId);
         }
     }
@@ -1737,7 +1838,7 @@
         if (!replyText) {
             if (feedbackEl) {
                 feedbackEl.textContent = 'La risposta non può essere vuota.';
-                feedbackEl.className = 'form-message-local error-message';
+                feedbackEl.className = 'form-message-local error-message'; // Usa classi per stile
                 feedbackEl.style.display = 'block';
             }
             return;
@@ -1751,10 +1852,10 @@
             const formData = new FormData();
             formData.append('action', 'submit_admin_reply');
             formData.append('event_id', eventId);
-            formData.append('comment_id', parentCommentId);
+            formData.append('comment_id', parentCommentId); // ID del commento a cui si risponde
             formData.append('reply_text', replyText);
             const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
-            if (!response.ok) {
+            if (!response.ok) { // Gestione errori HTTP
                 let errData = { message: `Errore HTTP ${response.status}` };
                 try { errData = await response.json(); } catch (e) { /* ignora */ }
                 throw new Error(errData.message || `Errore server sconosciuto.`);
@@ -1767,11 +1868,12 @@
                     feedbackEl.style.display = 'block';
                     setTimeout(() => { if (feedbackEl) { feedbackEl.style.display = 'none'; feedbackEl.textContent = ''; } }, 3000);
                 }
-                formElement.reset();
+                formElement.reset(); // Resetta il form
                 const replyFormDiv = formElement.closest('.reply-form-admin');
-                if (replyFormDiv) replyFormDiv.style.display = 'none';
+                if (replyFormDiv) replyFormDiv.style.display = 'none'; // Nascondi il form
+                // Ricarica i commenti nel modal per vedere la nuova risposta
                 await openManageCommentsModal(eventId, document.getElementById('commentsEventTitle')?.textContent || "Evento");
-                fetchDashboardData();
+                fetchDashboardData(); // Aggiorna conteggio commenti su card evento
             } else {
                 throw new Error(result.message || 'Errore durante l\'invio della risposta.');
             }
@@ -1797,7 +1899,7 @@
             formData.append('action', 'delete_comment');
             formData.append('comment_id', commentId);
             const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
-            if (!response.ok) {
+            if (!response.ok) { // Gestione errori HTTP
                 let errData = { message: `Errore HTTP ${response.status}` };
                 try { errData = await response.json(); } catch (e) { /* ignora */ }
                 throw new Error(errData.message || `Errore server sconosciuto.`);
@@ -1805,8 +1907,9 @@
             const result = await response.json();
             if (result.success) {
                 if (feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
+                // Ricarica i commenti nel modal
                 await openManageCommentsModal(eventIdForReload, document.getElementById('commentsEventTitle')?.textContent || "Evento");
-                fetchDashboardData();
+                fetchDashboardData(); // Aggiorna conteggio commenti su card evento
             } else {
                 throw new Error(result.message || "Errore durante l'eliminazione del commento.");
             }
@@ -1820,26 +1923,110 @@
         if (!confirm(`ATTENZIONE: Sei sicuro di voler eliminare l'evento "${sanitizeText(eventTitle)}" (ID: ${eventId}) e tutti i dati ad esso associati (prenotazioni, media, commenti)? L'azione è irreversibile.`)) return;
 
         const cardEl = document.getElementById(`admin-event-${eventId}`);
-        if (cardEl) cardEl.style.opacity = '0.5';
+        if (cardEl) cardEl.style.opacity = '0.5'; // Feedback visivo
 
         try {
             const formData = new FormData();
             formData.append('action', 'delete_event');
             formData.append('event_id', eventId);
             const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
-            const result = await response.json();
-            alert(sanitizeText(result.message));
+            const result = await response.json(); // Assumendo che ritorni JSON
+            alert(sanitizeText(result.message)); // Mostra messaggio dall'API
             if (result.success) {
-                fetchDashboardData();
+                fetchDashboardData(); // Ricarica i dati per aggiornare la UI
             } else {
-                if (cardEl) cardEl.style.opacity = '1';
+                if (cardEl) cardEl.style.opacity = '1'; // Ripristina opacità se fallisce
             }
         } catch(error) {
             console.error('Errore deleteEvent:', error);
             alert(`Errore durante l'eliminazione dell'evento: ${sanitizeText(error.message)}`);
-            if (cardEl) cardEl.style.opacity = '1';
+            if (cardEl) cardEl.style.opacity = '1'; // Ripristina opacità in caso di errore
         }
     }
+
+    // Funzioni per Opzioni Avanzate
+    const commentModerationLevelSelect = document.getElementById('commentModerationLevel');
+    const saveAdvancedSettingsBtn = document.getElementById('saveAdvancedSettingsBtn');
+    const advancedSettingsMessage = document.getElementById('advancedSettingsMessage');
+
+    async function loadAdvancedSettings() {
+        if (!commentModerationLevelSelect) return;
+        try {
+            const response = await fetch('manage_global_settings.php?action=get_setting&key=comment_moderation_level');
+            if (!response.ok) throw new Error(`Errore HTTP! status: ${response.status}`);
+            const result = await response.json();
+
+            if (result.success && result.value !== null) {
+                commentModerationLevelSelect.value = result.value;
+            } else if (result.value === null) {
+                console.log("Livello moderazione non trovato nel DB, si usa il default 'Standard'.");
+                commentModerationLevelSelect.value = '2'; // Default a standard se non trovato
+            } else if(!result.success) { // Errore esplicito dal backend
+                console.error('Errore caricamento impostazioni avanzate:', result.message);
+                if(advancedSettingsMessage){
+                    advancedSettingsMessage.textContent = `Errore caricamento: ${result.message}`;
+                    advancedSettingsMessage.className = 'form-message error';
+                    advancedSettingsMessage.style.display = 'block';
+                }
+            }
+        } catch (error) {
+            console.error('Fallimento fetch impostazioni avanzate:', error);
+            if(advancedSettingsMessage){
+                advancedSettingsMessage.textContent = `Errore di connessione caricando impostazioni: ${error.message}`;
+                advancedSettingsMessage.className = 'form-message error';
+                advancedSettingsMessage.style.display = 'block';
+            }
+        }
+    }
+
+    async function saveAdvancedSettings() {
+        if (!commentModerationLevelSelect || !saveAdvancedSettingsBtn || !advancedSettingsMessage) return;
+
+        const selectedLevel = commentModerationLevelSelect.value;
+        saveAdvancedSettingsBtn.disabled = true;
+        saveAdvancedSettingsBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
+        advancedSettingsMessage.style.display = 'none';
+        advancedSettingsMessage.className = 'form-message'; // Resetta classi
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'update_setting');
+            formData.append('key', 'comment_moderation_level');
+            formData.append('value', selectedLevel);
+
+            const response = await fetch('manage_global_settings.php', {
+                method: 'POST',
+                body: formData
+            });
+            if (!response.ok) throw new Error(`Errore HTTP! status: ${response.status}`);
+            const result = await response.json();
+
+            if (result.success) {
+                advancedSettingsMessage.textContent = result.message || 'Impostazioni salvate!';
+                advancedSettingsMessage.classList.add('success');
+            } else {
+                throw new Error(result.message || 'Errore durante il salvataggio.');
+            }
+        } catch (error) {
+            console.error('Errore salvataggio impostazioni avanzate:', error);
+            advancedSettingsMessage.textContent = `Errore: ${error.message}`;
+            advancedSettingsMessage.classList.add('error');
+        } finally {
+            advancedSettingsMessage.style.display = 'block';
+            saveAdvancedSettingsBtn.disabled = false;
+            saveAdvancedSettingsBtn.innerHTML = 'Salva Impostazioni Avanzate';
+            setTimeout(() => { // Nascondi messaggio dopo qualche secondo se è di successo
+                if(advancedSettingsMessage.classList.contains('success')) {
+                    advancedSettingsMessage.style.display = 'none';
+                }
+            }, 3000);
+        }
+    }
+
+    if (saveAdvancedSettingsBtn) {
+        saveAdvancedSettingsBtn.addEventListener('click', saveAdvancedSettings);
+    }
+
 
     document.addEventListener('DOMContentLoaded', () => {
         const adminUserString = localStorage.getItem('adminUserEFF');
@@ -1860,7 +2047,7 @@
                 const navAvatarImgEl = document.querySelector('#navbar-avatar img');
                 if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
             }
-        } else {
+        } else { // Se non c'è adminUserEFF in localStorage
             const navUsernameEl = document.getElementById('navbar-username');
             if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
             const navAvatarImgEl = document.querySelector('#navbar-avatar img');
@@ -1874,15 +2061,16 @@
         const sortDirectionSelect = document.getElementById('sortDirection');
         const groupCriteriaSelect = document.getElementById('groupCriteria');
 
-        if(sortDirectionSelect) sortDirectionSelect.value = 'asc';
-        if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese';
-        if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese';
+        if(sortDirectionSelect) sortDirectionSelect.value = 'asc'; // Default
+        if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese'; // Default
+        if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese'; // Default
 
         if(sortCriteriaSelect) sortCriteriaSelect.addEventListener('change', applyFiltersAndRender);
         if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender);
         if(groupCriteriaSelect) groupCriteriaSelect.addEventListener('change', applyFiltersAndRender);
 
         fetchDashboardData();
+        loadAdvancedSettings(); // Carica impostazioni avanzate
     });
 </script>
 </body>

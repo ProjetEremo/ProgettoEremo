@@ -107,6 +107,19 @@
         .form-message-local.info {
             color: #0050b3; font-style: italic;
         }
+        .spinner-mini {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            border: 2px solid rgba(0,0,0,.1);
+            border-radius: 50%;
+            border-top-color: currentColor; /* Usa il colore del testo del genitore */
+            animation: spin 0.6s linear infinite;
+            margin-right: 0.3em;
+            vertical-align: -0.125em; /* Allinea meglio con il testo */
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
 
     </style>
 </head>
@@ -244,7 +257,17 @@
     // Variabili per la moderazione Groq
     let groqApiKey = null;
     let groqDecryptionKey = null; // La chiave XOR
-    const GROQ_OFFENSIVENESS_THRESHOLD = 4; // Permetti commenti con punteggio < 4 (cioè 1, 2, 3)
+
+    // NUOVE VARIABILI PER MODERAZIONE DINAMICA
+    let globalGroqOffensivenessThreshold = 4; // Default a Standard (valore DB '2')
+    const MODERATION_LEVEL_THRESHOLDS = {
+        '0': 10, // Nessuna Moderazione (Groq score < 10 passa, quindi quasi tutto)
+        '1': 6,  // Moderazione Leggera (Groq score < 6 passa)
+        '2': 4,  // Moderazione Standard (Groq score < 4 passa)
+        '3': 2   // Moderazione Rigorosa (Groq score < 2 passa)
+    };
+    // const GROQ_OFFENSIVENESS_THRESHOLD = 4; // RIMOSSA - ora si usa globalGroqOffensivenessThreshold
+
 
     async function callApi(url, method = 'GET', data = null) {
         const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
@@ -457,47 +480,55 @@
     }
 
     // --- INIZIO FUNZIONI MODERAZIONE GROQ ---
-    // "Decifra" la API key usando XOR (DEVE corrispondere alla logica PHP di offuscamento)
     function simpleXorDecryptClient(base64String, key) {
         try {
-            const encryptedText = atob(base64String); // Decodifica da base64
+            const encryptedText = atob(base64String);
             let outText = '';
             for(let i = 0; i < encryptedText.length; i++) {
                 outText += String.fromCharCode(encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
             }
             return outText;
-        } catch (e) {
-            console.error("Fallimento decifratura API key:", e);
-            return null;
-        }
+        } catch (e) { console.error("Fallimento decifratura API key:", e); return null; }
     }
 
     async function fetchAndPrepareGroqApiKey() {
-        if (groqApiKey) return true; // Già recuperata
+        if (groqApiKey) return true;
         try {
-            const result = await callApi('api/get_groq_config.php'); // Chiama il nuovo endpoint PHP
+            const result = await callApi('api/get_groq_config.php');
             if (result.success && result.obfuscatedApiKey && result.decryptionKey) {
                 const decryptedKey = simpleXorDecryptClient(result.obfuscatedApiKey, result.decryptionKey);
                 if (decryptedKey) {
-                    groqApiKey = decryptedKey; // Memorizza la chiave "decifrata" globalmente
-                    // console.log("API Key Groq recuperata e 'decifrata' per uso client-side.");
-                    return true;
+                    groqApiKey = decryptedKey; return true;
+                } else { console.error("Fallimento decifratura API Key Groq."); displayErrorMessageOnPage("Errore: impossibile decifrare la chiave API per la moderazione."); return false; }
+            } else { console.error('Fallimento recupero componenti API key:', result.message); displayErrorMessageOnPage("Errore: " + (result.message || "impossibile recuperare chiave API moderazione.")); return false; }
+        } catch (error) { console.error('Errore recupero API key Groq:', error); displayErrorMessageOnPage("Errore recupero configurazione moderazione."); return false; }
+    }
+
+    // NUOVA FUNZIONE PER CARICARE IMPOSTAZIONE LIVELLO MODERAZIONE
+    async function fetchGlobalModerationSettings() {
+        try {
+            // Assumendo che manage_global_settings.php sia nella root o accessibile da questo percorso
+            const response = await callApi('manage_global_settings.php?action=get_setting&key=comment_moderation_level');
+            if (response.success && response.value !== null) {
+                const dbLevel = String(response.value);
+                if (MODERATION_LEVEL_THRESHOLDS.hasOwnProperty(dbLevel)) {
+                    globalGroqOffensivenessThreshold = MODERATION_LEVEL_THRESHOLDS[dbLevel];
+                    console.log(`Livello moderazione caricato: ${dbLevel}, Soglia Groq impostata a: ${globalGroqOffensivenessThreshold}`);
                 } else {
-                    console.error("Fallimento decifratura API Key Groq.");
-                    displayErrorMessageOnPage("Errore di configurazione: impossibile decifrare la chiave API per la moderazione.");
-                    return false;
+                    console.warn(`Livello moderazione non riconosciuto dal DB: ${dbLevel}. Uso default Standard (soglia 4).`);
+                    globalGroqOffensivenessThreshold = MODERATION_LEVEL_THRESHOLDS['2']; // Default a standard
                 }
             } else {
-                console.error('Fallimento recupero componenti API key:', result.message);
-                displayErrorMessageOnPage("Errore di configurazione: " + (result.message || "impossibile recuperare la chiave API di moderazione."));
-                return false;
+                // Se 'value' è null, significa che l'impostazione non è nel DB. Usiamo il default.
+                console.warn('Impostazione livello moderazione non trovata nel DB o errore. Uso default Standard (soglia 4). Message:', response.message || 'Nessun messaggio.');
+                globalGroqOffensivenessThreshold = MODERATION_LEVEL_THRESHOLDS['2']; // Default a standard
             }
         } catch (error) {
-            console.error('Errore recupero API key Groq:', error);
-            displayErrorMessageOnPage("Errore nel recupero della configurazione per la moderazione dei commenti.");
-            return false;
+            console.error("Errore nel caricamento delle impostazioni di moderazione:", error);
+            globalGroqOffensivenessThreshold = MODERATION_LEVEL_THRESHOLDS['2']; // Default a standard in caso di errore fetch
         }
     }
+
 
     async function getCommentOffensivenessScore(commentText) {
         if (!groqApiKey) {
@@ -507,60 +538,27 @@
                 return { score: null, error: "Chiave API per la moderazione non disponibile." };
             }
         }
-
         const groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
         const payload = {
             "messages": [
-                {
-                    "role": "system",
-                    "content": "Sei un AI che analizza l'offensività dei commenti per un sito di una fraternità. Riceverai un commento e dovrai restituire un numero da 1 (per nulla offensivo) a 10 (estremamente offensivo). Rispondi SOLO con il numero. Commento da analizzare:"
-                },
-                {
-                    "role": "user",
-                    "content": commentText
-                }
-            ],
-            "model": "gemma2-9b-it",
-            "temperature": 0.2, // Più basso per risposte più consistenti/deterministiche
-            "max_tokens": 10,   // Il punteggio è un numero breve
-            "top_p": 1,
-            "stream": false // Non-streaming è più facile da gestire per una singola risposta breve
+                { "role": "system", "content": "Sei un AI che analizza l'offensività dei commenti per un sito di una fraternità. Riceverai un commento e dovrai restituire un numero da 1 (per nulla offensivo) a 10 (estremamente offensivo). Rispondi SOLO con il numero. Commento da analizzare:" },
+                { "role": "user", "content": commentText }
+            ], "model": "gemma2-9b-it", "temperature": 0.2, "max_tokens": 10, "top_p": 1, "stream": false
         };
-
         try {
-            const response = await fetch(groqApiUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${groqApiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
+            const response = await fetch(groqApiUrl, { method: 'POST', headers: { 'Authorization': `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({ error: { message: response.statusText } }));
                 console.error("Errore API Groq:", response.status, errorData);
                 return { score: null, error: `Errore Groq (${response.status}): ${errorData.error?.message || 'Servizio non raggiungibile'}` };
             }
-
             const data = await response.json();
             if (data.choices && data.choices.length > 0 && data.choices[0].message) {
-                const assistantResponse = data.choices[0].message.content.trim();
-                const score = parseInt(assistantResponse, 10);
-                if (!isNaN(score) && score >= 1 && score <= 10) {
-                    return { score: score, error: null };
-                } else {
-                    console.warn("Risposta Groq non interpretabile come punteggio valido:", assistantResponse);
-                    return { score: null, error: "Risposta AI per moderazione non valida (atteso numero 1-10)." };
-                }
-            } else {
-                console.warn("Struttura risposta Groq non valida:", data);
-                return { score: null, error: "Struttura risposta AI per moderazione non valida." };
-            }
-        } catch (error) {
-            console.error('Errore chiamata API Groq:', error);
-            return { score: null, error: "Errore di comunicazione con il servizio AI di moderazione." };
-        }
+                const assistantResponse = data.choices[0].message.content.trim(); const score = parseInt(assistantResponse, 10);
+                if (!isNaN(score) && score >= 1 && score <= 10) { return { score: score, error: null }; }
+                else { console.warn("Risposta Groq non interpretabile:", assistantResponse); return { score: null, error: "Risposta AI non valida." }; }
+            } else { console.warn("Struttura risposta Groq non valida:", data); return { score: null, error: "Struttura risposta AI non valida." }; }
+        } catch (error) { console.error('Errore chiamata API Groq:', error); return { score: null, error: "Errore comunicazione con servizio AI." }; }
     }
     // --- FINE FUNZIONI MODERAZIONE GROQ ---
 
@@ -633,14 +631,13 @@
                 showLessButton.innerHTML = `<i class="fas fa-chevron-up"></i> Mostra Meno`; showLessButton.style.display = 'none';
                 showLessButton.onclick = () => toggleHiddenComments(false, commentsData.length); visibilityControlsContainer.appendChild(showLessButton);
             }
-        } else { // Questo blocco else gestisce le risposte nidificate ricorsivamente quando si mostrano tutte.
+        } else {
             commentsData.forEach(commentData => {
                 const commentLi = document.createElement('li'); commentLi.className = 'reply-item';
                 const commentElement = createCommentElement(commentData, true, options); commentLi.appendChild(commentElement); parentUlElement.appendChild(commentLi);
                 if (commentData.replies && commentData.replies.length > 0) {
                     const repliesDiv = commentElement.querySelector('.replies'); const actualUlForReplies = document.createElement('ul');
                     actualUlForReplies.className = 'comments-list-ul nested'; repliesDiv.appendChild(actualUlForReplies);
-                    // Per le risposte nidificate, mostrale sempre completamente se il genitore è visibile
                     displayFullRepliesRecursive(commentData.replies, actualUlForReplies, depth + 1, options);
                 }
             });
@@ -722,7 +719,7 @@
     function attachCommentInteractionListeners(commentElement, commentData, options = { isForPopup: false }) {
         commentElement.querySelector('.btn-reply')?.addEventListener('click', function(){ toggleReplyFormAction(this, commentElement, options); });
         const editBtn = commentElement.querySelector('.btn-edit-comment'); const deleteBtn = commentElement.querySelector('.btn-delete-comment');
-        if (editBtn) editBtn.addEventListener('click', function() { handleEditComment(this, commentElement, commentData.Descrizione, commentData.IDEvento, commentData.Progressivo); }); // Passati ID evento e commento
+        if (editBtn) editBtn.addEventListener('click', function() { handleEditComment(this, commentElement, commentData.Descrizione, commentData.IDEvento, commentData.Progressivo); });
         if (deleteBtn) deleteBtn.addEventListener('click', function() { handleDeleteComment(this); });
         const form = commentElement.querySelector('.reply-form form'); if (form) form.addEventListener('submit', function(e) { handleReplySubmit(e, options); });
     }
@@ -735,8 +732,8 @@
         try {
             const result = await callApi('like_comment.php', 'POST', { commentId, action });
             if (result.success) {
-                updateLikeButtonState(commentId, result.newLikeCount, result.liked, false); // Aggiorna commento principale
-                updateLikeButtonState(commentId, result.newLikeCount, result.liked, true); // Aggiorna commento nel popup (se aperto)
+                updateLikeButtonState(commentId, result.newLikeCount, result.liked, false);
+                updateLikeButtonState(commentId, result.newLikeCount, result.liked, true);
             } else { alert(result.message || "Errore azione Mi piace.");}
         } catch (error) { alert("Errore connessione: " + error.message); }
         finally { setTimeout(() => { document.querySelectorAll(`.like-btn[data-comment-id="${commentId}"]`).forEach(btn => btn.disabled = false); }, 300); }
@@ -773,16 +770,16 @@
         if (!descriptionTextarea) { console.error("Textarea non trovata:", formElement); return; }
         const description = descriptionTextarea.value.trim();
 
-        let msgEl = formElement.querySelector('.form-message-local'); // Per risposte o popup
-        if (!isReply && !options.isForPopup) { // Form commento principale
+        let msgEl = formElement.querySelector('.form-message-local');
+        if (!isReply && !options.isForPopup) {
             msgEl = document.getElementById('comment-form-message');
         }
 
         const showMsg = (txt, type, isSticky = false) => {
             if (msgEl) {
-                msgEl.textContent = sanitizeTextForHTML(txt).replace(/<br>/g, '\n'); // Sanifica ma mantieni i "br" come newline per textarea/testo semplice
-                msgEl.className = `form-message ${type}`; // Classe base per messaggi
-                if (formElement.querySelector('.form-message-local')) { // Se è un messaggio locale, aggiungi classe specifica
+                msgEl.textContent = sanitizeTextForHTML(txt).replace(/<br>/g, '\n');
+                msgEl.className = `form-message ${type}`;
+                if (formElement.querySelector('.form-message-local')) {
                     msgEl.classList.add('form-message-local');
                 }
                 msgEl.style.display = 'block';
@@ -792,7 +789,6 @@
             }
         };
 
-
         if (!description) { showMsg("Il testo del commento non può essere vuoto.", 'error'); return; }
         if (description.length > 2000) { showMsg("Il commento è troppo lungo (max 2000 caratteri).", 'error'); return; }
 
@@ -801,41 +797,41 @@
         if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-mini"></span> Verifico...'; }
         if (msgEl) { msgEl.textContent = ''; msgEl.style.display = 'none'; }
 
-
         // --- INIZIO MODERAZIONE COMMENTO ---
-        showMsg("Analisi del commento in corso...", 'info', true); // Messaggio "Analisi in corso..."
-        const moderationResult = await getCommentOffensivenessScore(description);
+        // globalGroqOffensivenessThreshold == 10 significa "Nessuna Moderazione"
+        if (globalGroqOffensivenessThreshold < 10) {
+            showMsg("Analisi del commento in corso...", 'info', true);
+            const moderationResult = await getCommentOffensivenessScore(description);
 
-        if (moderationResult.error) {
-            showMsg(`Errore durante la moderazione: ${moderationResult.error} Il commento non può essere inviato. Riprova o contatta l'assistenza se il problema persiste.`, 'error', true);
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
-            return;
-        }
+            if (moderationResult.error) {
+                showMsg(`Errore durante la moderazione: ${moderationResult.error} Il commento non può essere inviato. Riprova o contatta l'assistenza se il problema persiste.`, 'error', true);
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
+                return;
+            }
 
-        if (moderationResult.score !== null && moderationResult.score >= GROQ_OFFENSIVENESS_THRESHOLD) {
-            showMsg(`Il tuo commento (punteggio offensività: ${moderationResult.score}/${10}) è stato ritenuto non appropriato e non sarà pubblicato. Per favore, modifica il testo e riprova.`, 'error', true);
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
-            return; // Blocca l'invio del commento
-        }
-        // Se moderationResult.score è null ma non c'è errore (es. AI non ha dato un numero),
-        // per ora lo lasciamo passare. Si potrebbe aggiungere un controllo più stretto.
-        if (moderationResult.score !== null) {
-            console.log(`Commento approvato dalla moderazione AI con punteggio: ${moderationResult.score}`);
+            if (moderationResult.score !== null && moderationResult.score >= globalGroqOffensivenessThreshold) {
+                showMsg(`Il tuo commento (punteggio offensività: ${moderationResult.score}/10) è stato ritenuto non appropriato per la soglia attuale (${globalGroqOffensivenessThreshold}) e non sarà pubblicato. Per favore, modifica il testo e riprova.`, 'error', true);
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
+                return;
+            }
+            if (moderationResult.score !== null) {
+                console.log(`Commento approvato dalla moderazione AI con punteggio: ${moderationResult.score} (soglia: ${globalGroqOffensivenessThreshold})`);
+            } else {
+                console.warn("Moderazione AI non ha restituito un punteggio numerico, il commento verrà inviato.");
+            }
         } else {
-            // Potrebbe essere un caso limite (es. AI non ha risposto con un numero)
-            // Decidi se bloccare o far passare con un warning. Per ora, passa.
-            console.warn("Moderazione AI non ha restituito un punteggio numerico, il commento verrà inviato.");
+            console.log("Moderazione commenti disabilitata (Nessuna Moderazione). Invio diretto.");
         }
         // --- FINE MODERAZIONE COMMENTO ---
 
         if (submitBtn) { submitBtn.innerHTML = '<span class="spinner-mini"></span> Invio...'; }
-        showMsg("Invio del commento in corso...", 'info', true); // Sovrascrive "Analisi..."
+        showMsg("Invio del commento in corso...", 'info', true);
 
         const dataToSend = { IDEvento: eventId, Descrizione: description };
         if (isReply && parentCommentId) dataToSend.CodRisposta = parentCommentId;
 
         try {
-            const result = await callApi('submit_comment.php', 'POST', dataToSend); // Chiamata al tuo backend PHP
+            const result = await callApi('submit_comment.php', 'POST', dataToSend);
             if (result.success) {
                 formElement.reset();
                 if (isReply && formElement.closest('.reply-form')) {
@@ -844,9 +840,8 @@
                 showMsg(result.message || 'Commento inviato con successo!', 'success');
 
                 const currentEventIdFromPage = document.getElementById('commentEventId').value;
-                await fetchEventDetails(currentEventIdFromPage); // Ricarica tutti i commenti e dettagli evento
+                await fetchEventDetails(currentEventIdFromPage);
 
-                // Scroll al nuovo commento (se l'ID è disponibile)
                 setTimeout(() => {
                     if (result.new_comment_id) {
                         const newCommentElId = (options.isForPopup ? 'popup-' : '') + 'comment-' + result.new_comment_id;
@@ -855,20 +850,13 @@
                             newCommentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             newCommentEl.classList.add('new-comment-highlight');
                             setTimeout(() => newCommentEl.classList.remove('new-comment-highlight'), 3000);
-                        } else { // Fallback: scrolla alla sezione commenti
+                        } else {
                             document.getElementById('event-comments')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
                     } else {
                         document.getElementById('event-comments')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 }, 250);
-
-
-                if (options.isForPopup) {
-                    // Se siamo in un popup di conversazione, potremmo volerlo chiudere o aggiornarlo.
-                    // Per semplicità, la ricarica generale dei commenti dovrebbe bastare.
-                    // closeConversationPopup(); // Opzionale
-                }
 
             } else { throw new Error(result.message || 'Errore durante l\'invio del commento al server.'); }
         } catch (error) {
@@ -893,16 +881,16 @@
 
     async function handleDeleteComment(button) {
         if (!currentUser?.email) { alert("Devi essere loggato per eliminare un commento."); return; }
-        const commentId = button.dataset.commentId; const eventId = button.dataset.eventId; // Assicurati che eventId sia nel dataset del bottone
+        const commentId = button.dataset.commentId; const eventId = button.dataset.eventId;
         if (!eventId) { alert("Errore: ID evento mancante per l'eliminazione."); console.error("Delete error: EventID missing from button dataset for comment " + commentId); return; }
 
         if (confirm("Sei sicuro di voler eliminare questo commento? L'azione è irreversibile e cancellerà anche tutte le risposte associate.")) {
             button.disabled = true; button.innerHTML = '<span class="spinner-mini"></span>';
             try {
-                const result = await callApi('api/api_delete_comment.php', 'POST', { commentId }); // (simile, ma per delete)
+                const result = await callApi('api/api_delete_comment.php', 'POST', { commentId });
                 if (result.success) {
                     alert(result.message || "Commento eliminato con successo.");
-                    await fetchEventDetails(eventId); // Ricarica i commenti per l'evento corrente
+                    await fetchEventDetails(eventId);
                 } else {
                     alert(result.message || "Errore durante l'eliminazione del commento.");
                     button.innerHTML = '<i class="fas fa-trash-alt"></i> <span class="btn-action-text">Elimina</span>'; button.disabled = false;
@@ -915,17 +903,14 @@
     }
 
 
-    function handleEditComment(button, commentElement, originalText, eventId, commentId) { // Aggiunti eventId e commentId
+    function handleEditComment(button, commentElement, originalText, eventId, commentId) {
         if (!currentUser?.email) { alert("Devi essere loggato per modificare un commento."); return; }
 
         const commentTextContentDiv = commentElement.querySelector('.comment-text-content');
         const editFormPlaceholder = commentElement.querySelector('.comment-edit-form-placeholder');
         if (!commentTextContentDiv || !editFormPlaceholder || commentElement.classList.contains('comment-editing')) return;
 
-        commentElement.classList.add('comment-editing'); // Nasconde i bottoni like/reply/edit/delete
-        // const commentId = button.dataset.commentId; // Già passato come argomento
-        // const eventId = button.dataset.eventId; // Già passato come argomento
-
+        commentElement.classList.add('comment-editing');
         commentTextContentDiv.style.display = 'none';
         const replyForm = commentElement.querySelector('.reply-form'); if(replyForm) replyForm.style.display = 'none';
 
@@ -961,41 +946,47 @@
             if (newDescription.length > 2000) { showLocalMsg("Testo del commento troppo lungo (max 2000 caratteri).", 'error'); return; }
 
             saveButton.disabled = true; saveButton.innerHTML = '<span class="spinner-mini"></span> Verifico...';
-            showLocalMsg('Analisi del commento modificato in corso...', 'info', true);
 
+            const originalNormalizedText = originalText.replace(/<br\s*\/?>/ig, "\n");
+            let proceedWithSave = true;
 
-            // --- INIZIO MODERAZIONE COMMENTO MODIFICATO ---
-            // Modera solo se il testo è effettivamente cambiato
-            if (newDescription !== originalText.replace(/<br\s*\/?>/ig, "\n")) {
-                const moderationResult = await getCommentOffensivenessScore(newDescription);
-                if (moderationResult.error) {
-                    showLocalMsg(`Errore moderazione: ${moderationResult.error} Modifiche non salvate.`, 'error', true);
-                    saveButton.disabled = false; saveButton.innerHTML = 'Salva Modifiche';
-                    return;
-                }
-                if (moderationResult.score !== null && moderationResult.score >= GROQ_OFFENSIVENESS_THRESHOLD) {
-                    showLocalMsg(`Testo modificato non appropriato (punteggio: ${moderationResult.score}/${10}). Modifiche non salvate.`, 'error', true);
-                    saveButton.disabled = false; saveButton.innerHTML = 'Salva Modifiche';
-                    return;
-                }
-                if (moderationResult.score !== null) {
-                    console.log(`Modifica approvata da AI con punteggio: ${moderationResult.score}`);
+            if (newDescription !== originalNormalizedText) {
+                if (globalGroqOffensivenessThreshold < 10) {
+                    showLocalMsg('Analisi del commento modificato in corso...', 'info', true);
+                    const moderationResult = await getCommentOffensivenessScore(newDescription);
+
+                    if (moderationResult.error) {
+                        showLocalMsg(`Errore durante la moderazione: ${moderationResult.error} Le modifiche non possono essere salvate.`, 'error', true);
+                        proceedWithSave = false;
+                    } else if (moderationResult.score !== null && moderationResult.score >= globalGroqOffensivenessThreshold) {
+                        showLocalMsg(`Il testo modificato (punteggio: ${moderationResult.score}/10) è stato ritenuto non appropriato per la soglia attuale (${globalGroqOffensivenessThreshold}) e non sarà salvato. Modifica il testo e riprova.`, 'error', true);
+                        proceedWithSave = false;
+                    } else if (moderationResult.score !== null) {
+                        console.log(`Modifica approvata dalla moderazione AI con punteggio: ${moderationResult.score} (soglia: ${globalGroqOffensivenessThreshold})`);
+                    } else {
+                        console.warn("Moderazione AI per modifica non ha restituito un punteggio numerico, la modifica verrà salvata.");
+                    }
+                } else {
+                    console.log("Moderazione commenti disabilitata. Modifica permessa.");
                 }
             } else {
-                console.log("Il testo del commento non è stato modificato, nessuna nuova moderazione necessaria.");
+                console.log("Il testo del commento non è stato modificato.");
             }
-            // --- FINE MODERAZIONE COMMENTO MODIFICATO ---
+
+            if (!proceedWithSave) {
+                saveButton.disabled = false; saveButton.innerHTML = 'Salva Modifiche';
+                return;
+            }
 
             saveButton.innerHTML = '<span class="spinner-mini"></span> Salvo...';
             showLocalMsg('Salvataggio modifiche in corso...', 'info', true);
 
             try {
-                // Chiama api_update_comment.php SOLO se la moderazione (se necessaria) è passata
                 const result = await callApi('api/api_update_comment.php', 'POST', { commentId, newDescription });
                 if (result.success) {
                     exitEditMode();
-                    await fetchEventDetails(eventId); // Ricarica i commenti
-                    setTimeout(() => { // Scroll e highlight dopo ricarica
+                    await fetchEventDetails(eventId);
+                    setTimeout(() => {
                         const updatedCommentElId = (commentElement.closest('.conversation-popup-main') ? 'popup-' : '') + 'comment-' + commentId;
                         const updatedCommentEl = document.getElementById(updatedCommentElId);
                         if (updatedCommentEl) {
@@ -1028,14 +1019,14 @@
         const currentYearEl = document.getElementById('currentYear'); if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
         setupUserSessionAndNavbar(); if (currentUser?.email) await fetchAndUpdateUserDisplayData();
 
-        // Recupera la API key di Groq all'avvio della pagina (o prima se preferisci)
-        // Non blocca il rendering, ma la moderazione non funzionerà finché non è pronta.
+        // CARICA IMPOSTAZIONI GLOBALI DI MODERAZIONE E POI LA CHIAVE GROQ
+        await fetchGlobalModerationSettings();
+
         fetchAndPrepareGroqApiKey().then(ready => {
             if (ready) {
-                console.log("Sistema di moderazione commenti pronto.");
+                console.log("Sistema di moderazione commenti (chiave Groq) pronto.");
             } else {
-                console.warn("Sistema di moderazione commenti non inizializzato correttamente. I commenti potrebbero non essere moderati.");
-                // Potresti voler mostrare un avviso generico all'utente o disabilitare i commenti se la chiave non è caricabile.
+                console.warn("Sistema di moderazione commenti (chiave Groq) non inizializzato. I commenti potrebbero non essere moderati via AI.");
             }
         });
 
@@ -1065,22 +1056,18 @@
                 if(commentFormContainerEl) commentFormContainerEl.style.display = 'none'; if(loginToCommentMessageEl) loginToCommentMessageEl.style.display = 'block';
                 loginLink.addEventListener('click', (e) => {
                     e.preventDefault();
-                    // Assumendo che tu abbia un popup di login con queste classi
                     const loginPopupOverlay = document.querySelector('.login-popup-overlay');
                     const loginPopup = document.querySelector('.login-popup');
                     if (loginPopupOverlay && loginPopup) {
                         loginPopupOverlay.classList.add('active');
                         loginPopup.classList.add('active');
                     } else {
-                        // Fallback se il popup di login non è definito come previsto
-                        alert("Per favore, accedi per commentare. (Funzionalità popup di login non trovata)");
-                        // Potresti reindirizzare a una pagina di login: window.location.href = 'login.html';
+                        alert("Per favore, accedi per commentare. (Popup di login non trovato)");
                     }
                 });
             }
         }
 
-        // Gestori per chiudere i vari popup con il tasto Escape
         document.addEventListener('keydown', function(event) {
             if (event.key === "Escape") {
                 if (document.getElementById('conversationPopupOverlay')?.classList.contains('active')) closeConversationPopup();
@@ -1094,11 +1081,9 @@
             }
         });
 
-        // Gestori per chiudere i popup cliccando sull'overlay
         document.getElementById('conversationPopupOverlay')?.addEventListener('click', (e) => { if(e.target === e.currentTarget) closeConversationPopup(); });
         document.getElementById('likersPopupOverlay')?.addEventListener('click', (e) => { if(e.target === e.currentTarget) closeLikersPopup(); });
 
-        // Assumendo che il popup di login abbia un overlay con classe 'login-popup-overlay'
         const loginPopupOverlayGlobal = document.querySelector('.login-popup-overlay');
         if(loginPopupOverlayGlobal){
             loginPopupOverlayGlobal.addEventListener('click', (e) => {
