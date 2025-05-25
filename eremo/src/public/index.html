@@ -354,7 +354,7 @@
   // === FINE FUNZIONALITÀ RECUPERO PASSWORD ===
 
 
-  function handleLogout(){localStorage.removeItem('userDataEFF');currentUserData=null;isEditModeActive=false;updateNavbarUI();loadPageContentsFromServer();const editContainer=document.getElementById('editPageBtnContainer');if(editContainer)editContainer.style.display='none';showPageStatus('Logout effettuato.','info');}
+  function handleLogout(){localStorage.removeItem('userDataEFF'); localStorage.removeItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`); /* Rimuovi cache al logout */ currentUserData=null;isEditModeActive=false;updateNavbarUI();loadPageContentsFromServer();const editContainer=document.getElementById('editPageBtnContainer');if(editContainer)editContainer.style.display='none';showPageStatus('Logout effettuato.','info');}
   document.getElementById('logout-link-desktop')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();});
   document.getElementById('mobile-logout-link')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenuOnLinkClick();});
 
@@ -363,7 +363,70 @@
 
   function showPageStatus(message,type='info',duration=3000){if(!pageOverallStatus)return;pageOverallStatus.textContent=message;pageOverallStatus.className='form-message';if(type==='success')pageOverallStatus.classList.add('success');else if(type==='error')pageOverallStatus.classList.add('error');else{pageOverallStatus.style.backgroundColor='var(--primary)';pageOverallStatus.classList.remove('success','error');} pageOverallStatus.style.color='white';pageOverallStatus.style.display='block';setTimeout(()=>{pageOverallStatus.style.display='none';},duration);}
 
-  async function loadPageContentsFromServer(){showPageStatus("Caricamento contenuti...","info",1500);try{const r=await fetch(`api_get_page_content.php?page=${PAGE_NAME_FOR_CONTENT}`);if(!r.ok)throw new Error(`Errore server: ${r.status}`);const d=await r.json();if(d.success&&d.contents&&Object.keys(d.contents).length>0){currentPageDbContents=d.contents;}else{console.warn("Nessun contenuto custom dal DB o errore API, uso i default.",d.message||'');currentPageDbContents={...defaultPageContents};}}catch(err){console.error("Errore caricamento contenuti:",err);currentPageDbContents={...defaultPageContents};showPageStatus("Errore caricamento. Usati valori predefiniti.","error");}applyContentsToPage(currentPageDbContents);originalPageContentsForCancel={...currentPageDbContents};}
+  // === MODIFIED: loadPageContentsFromServer START ===
+  async function loadPageContentsFromServer() {
+    showPageStatus("Caricamento contenuti...", "info", 1500);
+    const cacheKey = `pageContent_${PAGE_NAME_FOR_CONTENT}`;
+    let cachedContents = null;
+    let appliedFromCache = false;
+
+    // 1. Try loading from cache
+    try {
+      const cachedData = localStorage.getItem(cacheKey);
+      if (cachedData) {
+        cachedContents = JSON.parse(cachedData);
+        applyContentsToPage(cachedContents);
+        console.log("Contenuti caricati dalla cache.");
+        originalPageContentsForCancel = { ...cachedContents }; // Use cached as initial 'original'
+        appliedFromCache = true;
+      }
+    } catch (e) {
+      console.error("Errore caricamento cache:", e);
+      localStorage.removeItem(cacheKey); // Clear bad cache
+    }
+
+    // 2. Fetch from server
+    try {
+      const r = await fetch(`api_get_page_content.php?page=${PAGE_NAME_FOR_CONTENT}`);
+      if (!r.ok) throw new Error(`Errore server: ${r.status}`);
+      const d = await r.json();
+      let serverContents;
+
+      if (d.success && d.contents && Object.keys(d.contents).length > 0) {
+        serverContents = d.contents;
+      } else {
+        console.warn("Nessun contenuto custom dal DB o errore API, uso i default.", d.message || '');
+        serverContents = { ...defaultPageContents };
+      }
+
+      // 3. Compare and update if needed (or if no cache existed)
+      if (!cachedContents || JSON.stringify(cachedContents) !== JSON.stringify(serverContents)) {
+        currentPageDbContents = serverContents;
+        applyContentsToPage(currentPageDbContents); // Apply server content
+        localStorage.setItem(cacheKey, JSON.stringify(currentPageDbContents)); // Save new content to cache
+        console.log("Contenuti aggiornati dal server e cache salvata.");
+        if (cachedContents) { // Only show 'updated' if there was a cache before
+          showPageStatus("Contenuti aggiornati.", "info", 2000);
+        }
+      } else {
+        console.log("Contenuti dal server identici alla cache. Nessun aggiornamento visivo.");
+      }
+      currentPageDbContents = serverContents; // Ensure current is always server/default
+      originalPageContentsForCancel = { ...currentPageDbContents }; // Set 'original' to the latest
+
+    } catch (err) {
+      console.error("Errore caricamento contenuti dal server:", err);
+      // If fetch fails but we have cache, we keep it.
+      // If no cache and fetch fails, use defaults.
+      if (!appliedFromCache) {
+        currentPageDbContents = { ...defaultPageContents };
+        applyContentsToPage(currentPageDbContents);
+        originalPageContentsForCancel = { ...currentPageDbContents };
+      }
+      showPageStatus("Errore caricamento server. Usati valori locali/predefiniti.", "error");
+    }
+  }
+  // === MODIFIED: loadPageContentsFromServer END ===
 
   function applyContentsToPage(contents){document.querySelectorAll('[data-content-key]').forEach(el=>{const key=el.dataset.contentKey; const contentValue = contents[key] !== undefined ? contents[key] : defaultPageContents[key];
     if(contentValue !== undefined){if(el.tagName==='IMG'){el.src=contentValue;el.onerror=function(){this.src=defaultPageContents[key]||`https://placehold.co/600x400/eee/ccc?text=Img Default (${key})`;this.onerror=null;};}else{el.innerHTML=sanitizeTextForHTML(contentValue);}}else{if(el.tagName!=='IMG')el.innerHTML=`[${key} mancante]`;else el.src=`https://placehold.co/600x400/eee/ccc?text=${key}+mancante`;}}); const heroSection=document.getElementById('heroSection');if(heroSection&&contents.heroBackgroundImage)heroSection.style.backgroundImage=`linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${contents.heroBackgroundImage}')`;else if(heroSection)heroSection.style.backgroundImage=`linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('images/eremo.jpg')`;}
@@ -378,7 +441,39 @@
   function closeEditContentModal(){if(editContentModal)editContentModal.style.display='none';currentEditingKey=null;}
 
   if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
-  if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{const contentsToSave={};document.querySelectorAll('[data-content-key]').forEach(el=>{const key=el.dataset.contentKey;contentsToSave[key]=el.tagName==='IMG'?el.src:el.innerHTML;});const btn=savePageChangesBtn;const oldHtml=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';try{const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");currentPageDbContents={...contentsToSave};originalPageContentsForCancel={...currentPageDbContents};showPageStatus(j.message||'Modifiche salvate!','success');toggleEditMode(false);}catch(err){console.error("Errore salvataggio:",err);showPageStatus(`Errore: ${err.message}`,'error');}finally{btn.disabled=false;btn.innerHTML=oldHtml;}});
+  // === MODIFIED: savePageChangesBtn START ===
+  if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{
+    const contentsToSave={};
+    document.querySelectorAll('[data-content-key]').forEach(el=>{
+      const key=el.dataset.contentKey;
+      // Check if the element exists before accessing tagName/src
+      if (el) {
+        contentsToSave[key] = el.tagName === 'IMG' ? el.src : (el.innerHTML || ''); // Use innerHTML and handle potential null
+      }
+    });
+    const btn=savePageChangesBtn;
+    const oldHtml=btn.innerHTML;
+    btn.disabled=true;
+    btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
+    try{
+      const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});
+      const j=await r.json();
+      if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");
+      currentPageDbContents={...contentsToSave};
+      originalPageContentsForCancel={...currentPageDbContents};
+      // *** ADD THIS LINE TO UPDATE CACHE ON SAVE ***
+      localStorage.setItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`, JSON.stringify(currentPageDbContents));
+      showPageStatus(j.message||'Modifiche salvate!','success');
+      toggleEditMode(false);
+    }catch(err){
+      console.error("Errore salvataggio:",err);
+      showPageStatus(`Errore: ${err.message}`,'error');
+    }finally{
+      btn.disabled=false;
+      btn.innerHTML=oldHtml;
+    }
+  });
+  // === MODIFIED: savePageChangesBtn END ===
   if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{applyContentsToPage(originalPageContentsForCancel);toggleEditMode(false);showPageStatus('Modifiche annullate.','info');});
   document.addEventListener('click',function(e){if(!isEditModeActive||!currentUserData?.isAdmin)return;const editIcon=e.target.closest('.edit-icon-text,.edit-icon-image');const imageTarget=e.target.closest('img.editable-image-target');let elToEdit,key,type,currentVal;
     if(editIcon){key=editIcon.dataset.key;type=editIcon.dataset.type;elToEdit=document.getElementById(`content-${key}`);if(!elToEdit){console.error(`Elemento con id content-${key} non trovato`);return;}currentVal=elToEdit.tagName==='IMG'?elToEdit.src:elToEdit.innerHTML;openEditModal(key,type,currentVal);}
