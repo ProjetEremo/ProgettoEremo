@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    /* Stili popup login/registrazione */
+    /* Stili popup login/registrazione (da eventiincorso.html) */
     .login-popup input.form-control {
       transition: border-color 0.3s ease;
       border: 1px solid #ced4da;
@@ -20,11 +20,7 @@
       box-shadow: none !important;
       outline: none !important;
     }
-
-    .login-popup input.error-border {
-      border-color: var(--danger, red) !important;
-    }
-
+    .login-popup input.error-border { border-color: var(--danger, red) !important; }
     .login-popup input:-webkit-autofill,
     .login-popup input:-webkit-autofill:hover,
     .login-popup input:-webkit-autofill:focus {
@@ -32,95 +28,83 @@
       -webkit-text-fill-color: var(--dark, #333) !important;
     }
 
-    .form-message {
-      display: none;
-      padding: 0.75rem;
-      border-radius: 8px;
-      font-size: 0.9em;
-      margin-top: 0.5em;
-      text-align: left;
-    }
+    /* Stili per form message, spinner, avatar (da eventiincorso.html) */
+    .form-message { display: none; padding: 0.75rem; border-radius: 8px; font-size: 0.9em; margin-top: 0.5em; text-align: left; }
+    .form-message.error { color: var(--danger, red); background-color: rgba(var(--danger-rgb, 231, 76, 60), 0.1); border: 1px solid rgba(var(--danger-rgb, 231, 76, 60), 0.3); }
+    .form-message.success { color: var(--success, green); background-color: rgba(var(--success-rgb, 46, 204, 113), 0.1); border: 1px solid rgba(var(--success-rgb, 46, 204, 113), 0.3); }
+    .spinner-mini-light, .spinner-mini { display: inline-block; width: 1em; height: 1em; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; }
+    .spinner-mini-light { border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: #fff; margin-left: 5px; }
+    .spinner-mini { border: 2px solid rgba(0, 0, 0, 0.2); border-top-color: var(--primary); margin-right: 5px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .user-avatar img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
+    .terms-checkbox { text-align: left; font-size: 0.9em; margin-top: 0.5rem; margin-bottom: 1rem; color: var(--gray-dark); }
+    .terms-checkbox input[type="checkbox"] { margin-right: 0.5rem; vertical-align: middle; }
+    .terms-checkbox label { font-weight: normal; color: var(--gray-dark); }
+    .terms-checkbox a { color: var(--primary); text-decoration: underline; }
+    #eventiGridContainer .no-events, #eventiGridContainer .error-message { grid-column: 1 / -1; text-align: center; padding: 2rem; font-size: 1.1rem; }
 
-    .form-message.error {
-      color: var(--danger, red);
-      background-color: rgba(var(--danger-rgb, 231, 76, 60), 0.1);
-      border: 1px solid rgba(var(--danger-rgb, 231, 76, 60), 0.3);
+    /* Stili per il popup evento (ispirati da dashboard.html e admin) */
+    .event-popup-overlay { /* Già presente in admin, assicurarsi sia in style.css */ }
+    .event-popup { /* Già presente in admin, assicurarsi sia in style.css */ }
+    .event-popup .form-control { /* Stile per coerenza */
+      width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-medium, #ccc);
+      border-radius: 8px; font-size: 1rem; background-color: var(--white, #fff);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
+    .event-popup .form-control:focus {
+      border-color: var(--secondary, #8DB187);
+      box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25);
+      outline: none;
+    }
+    .event-popup textarea.form-control { min-height: 80px; resize: vertical; }
+    .event-popup .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+    .event-popup .form-group { margin-bottom: 1.2rem; }
+    .event-popup .form-group label { display: block; margin-bottom: 0.4rem; color: var(--primary, #365e51); font-weight: 500; font-size: 0.95rem; }
+    .event-popup .form-check-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+    .event-popup .form-check-group input[type="checkbox"] { width: auto; margin-right: 0.3rem; transform: scale(1.1); }
+    .event-popup .form-check-group label { font-weight: normal; font-size: 0.95rem; margin-bottom: 0; }
+    .event-popup .form-actions { margin-top: 1.5rem; text-align: right; }
+    .event-popup .btn-popup { padding: 0.8rem 1.5rem; }
+    .event-popup small { font-size: 0.8rem; color: var(--gray-dark, #555); display: block; margin-top: 0.3rem; }
 
-    .form-message.success {
-      color: var(--success, green);
-      background-color: rgba(var(--success-rgb, 46, 204, 113), 0.1);
-      border: 1px solid rgba(var(--success-rgb, 46, 204, 113), 0.3);
+    /* Stili per il contenitore form e preview (da dashboard.html) */
+    .event-form-and-preview-container { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1rem; }
+    #eventFormUnified { flex: 2; min-width: 300px; /* background-color: #f9f9f9; padding: 1.5rem; border-radius: var(--border-radius-medium); border: 1px solid var(--gray-light); */ }
+    #eventCardPreviewContainer {
+      flex: 1; min-width: 280px; padding: 1rem; border: 1px dashed var(--gray-medium, #ccc);
+      border-radius: var(--border-radius-medium, 8px); background-color: #fdfdfd; height: fit-content;
     }
+    #eventCardPreviewContainer h4 {
+      text-align: center; color: var(--primary, #365e51); margin-top: 0; margin-bottom: 1rem;
+      font-size: 1.1rem; border-bottom: 1px solid var(--gray-light, #eee); padding-bottom: 0.5rem;
+    }
+    .preview-card { background: var(--white, #fff); border-radius: var(--border-radius-medium, 8px); box-shadow: var(--shadow-light, 0 2px 8px rgba(0,0,0,0.1)); overflow: hidden; border: 1px solid var(--gray-light, #eee); }
+    .preview-card-image-container { height: 160px; background-color: var(--gray-light, #f0f0f0); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .preview-card-image-container img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-card-image-container .no-image-placeholder { font-size: 0.9rem; color: var(--gray-dark, #555); }
+    .preview-card-content { padding: 1rem; }
+    .preview-card-content h5 { font-size: 1.2rem; color: var(--primary, #365e51); margin: 0 0 0.5rem 0; font-weight: 600; min-height: 1.2em; word-break: break-word; }
+    .preview-card-content p { font-size: 0.85rem; color: var(--gray-dark, #555); line-height: 1.4; margin-bottom: 0.4rem; min-height: 1em; word-break: break-word; }
+    .preview-card-content .preview-relatore { font-style: italic; }
+    .preview-card-content .preview-posti, .preview-card-content .preview-costo { font-weight: bold; }
+    #current-event-image-preview, #current-event-flyer-preview-unified { margin-top: 0.5rem; max-width: 120px; border: 1px solid var(--gray-light, #eee); padding: 4px; border-radius: 6px; }
+    #current-event-flyer-preview-unified a { font-size: 0.85rem; }
 
-    .spinner-mini-light {
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 0.8s linear infinite;
-      vertical-align: middle;
-      margin-left: 5px;
+    /* Stile per il bottone "Nuovo Evento" admin */
+    .add-event-btn-container { text-align: center; margin-bottom: 2rem; }
+    .add-event-btn {
+      background-color: var(--primary); color: white; border: none; padding: 12px 25px;
+      border-radius: var(--border-radius-large); font-size: 1.1rem; cursor: pointer;
+      transition: background-color 0.3s ease; box-shadow: var(--shadow-medium);
+      display: inline-flex; align-items: center; gap: 0.5em;
     }
+    .add-event-btn:hover { background-color: var(--secondary); }
+    .add-event-btn .plus-icon { font-size: 1.3em; }
+    .loading-overlay .spinner { /* Stili per spinner caricamento eventi */ }
 
-    .spinner-mini {
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      border: 2px solid rgba(0, 0, 0, 0.2);
-      border-radius: 50%;
-      border-top-color: var(--primary);
-      animation: spin .6s linear infinite;
-      vertical-align: middle;
-      margin-right: 5px;
-    }
+    .card-info.admin-flyer-info a { color: var(--primary); text-decoration: underline;}
+    .card-info.admin-flyer-info a:hover { color: var(--secondary); }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .user-avatar img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      object-fit: cover;
-      vertical-align: middle;
-    }
-
-    .terms-checkbox {
-      text-align: left;
-      font-size: 0.9em;
-      margin-top: 0.5rem;
-      margin-bottom: 1rem;
-      color: var(--gray-dark);
-    }
-
-    .terms-checkbox input[type="checkbox"] {
-      margin-right: 0.5rem;
-      vertical-align: middle;
-    }
-
-    .terms-checkbox label {
-      font-weight: normal;
-      color: var(--gray-dark);
-    }
-
-    .terms-checkbox a {
-      color: var(--primary);
-      text-decoration: underline;
-    }
-
-    #eventiGridContainer .no-events,
-    #eventiGridContainer .error-message {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 2rem;
-      font-size: 1.1rem;
-    }
   </style>
 </head>
 
@@ -144,11 +128,11 @@
           <span class="user-avatar" id="navbar-avatar"><img src="uploads/icons/default_user.png" alt="User Icon"></span>
           <span class="user-name" id="navbar-username">Utente</span><span class="dropdown-arrow">▼</span>
         </button>
-        <div class="dropdown-menu" id="userDropdownMenu">
+        <div class="dropdown-menu" id="userDropdownMenu" style="display: block;">
           <a href="areapersonale.html" id="nav-profilo">Il mio profilo</a>
           <a href="areapersonale.html#prenotazioni" id="nav-mie-prenotazioni">Le mie prenotazioni</a>
-          <a href="dashboard.html" id="nav-dashboard" style="/*display: block;*/">Dashboard Admin</a>
-          <a href="eventiincorsoAdmin.html" id="nav-gestione-eventi-admin" style="/*display: block;*/">Gestione Eventi</a>
+          <a href="dashboard.html" id="nav-dashboard" style="display: block;">Dashboard Admin</a>
+          <a href="eventiincorso.html" id="nav-gestione-eventi-admin" style="display: block;">Gestione Eventi</a>
           <a href="#" id="logout-link-desktop">Esci</a>
         </div>
       </div>
@@ -166,7 +150,6 @@
     <a href="areapersonale.html" id="mobile-nav-profilo" style="display: none;">Il mio profilo</a>
     <a href="areapersonale.html#prenotazioni" id="mobile-nav-mie-prenotazioni" style="display: none;">Le mie prenotazioni</a>
     <a href="dashboard.html" id="mobile-nav-dashboard" style="display: none;">Dashboard Admin</a>
-    <a href="eventiincorsoAdmin.html" id="mobile-nav-gestione-eventi-admin" style="display: none;">Gestione Eventi</a>
     <a href="#" id="mobile-logout-link" style="display: none;">Esci</a>
   </div>
 </header>
@@ -174,12 +157,18 @@
 <main>
   <div class="container section-padding">
     <h1>Calendario Attività</h1>
+
+    <div class="add-event-btn-container" id="addEventBtnContainerAdmin" style="display:none;">
+      <button class="add-event-btn" id="addEventBtnAdmin">
+        <span class="plus-icon">+</span>
+        <span class="btn-label">Nuovo Evento</span>
+      </button>
+    </div>
+
     <div id="eventiGridContainer">
       <div id="loadingIndicator" class="loading-overlay visible">
         <div class="spinner">
-          <div class="bounce1"></div>
-          <div class="bounce2"></div>
-          <div class="bounce3"></div>
+          <div class="bounce1"></div> <div class="bounce2"></div> <div class="bounce3"></div>
         </div>
         <p>Sto caricando gli eventi...</p>
       </div>
@@ -249,6 +238,124 @@
   </form>
 </div>
 
+<div class="event-popup-overlay" id="eventPopupOverlayUnified"></div>
+<div class="event-popup" id="eventPopupUnified">
+  <button class="close-popup" id="closeEventPopupBtnUnified" aria-label="Chiudi popup">&times;</button>
+  <h2 id="eventPopupTitleUnified">Aggiungi Nuovo Evento</h2>
+
+  <div class="event-form-and-preview-container">
+    <form id="eventFormUnified" method="POST" enctype="multipart/form-data">
+      <input type="hidden" id="event-id-unified" name="event-id">
+
+      <div class="form-group">
+        <label for="event-title-unified">Titolo Evento*</label>
+        <input type="text" id="event-title-unified" name="event-title" class="form-control" required>
+      </div>
+
+      <div class="form-group"> <label for="event-date-unified">Data Inizio*</label>
+        <input type="date" id="event-date-unified" name="event-date" class="form-control" required>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="event-start-time-unified">Orario Inizio (HH:MM)</label>
+          <input type="time" id="event-start-time-unified" name="event-start-time" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="event-end-time-unified">Orario Fine (HH:MM)</label>
+          <input type="time" id="event-end-time-unified" name="event-end-time" class="form-control">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="event-short-desc-unified">Descrizione Breve* (max 255 caratteri)</label>
+        <textarea id="event-short-desc-unified" name="event-short-desc" class="form-control" rows="2" required maxlength="255"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="event-long-desc-unified">Descrizione Estesa</label>
+        <textarea id="event-long-desc-unified" name="event-long-desc" class="form-control" rows="4"></textarea>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="event-prefix-unified">Prefisso Relatore</label>
+          <input type="text" id="event-prefix-unified" name="event-prefix" class="form-control" placeholder="Default: Relatore">
+        </div>
+        <div class="form-group">
+          <label for="event-speaker-unified">Nome Relatore*</label>
+          <input type="text" id="event-speaker-unified" name="event-speaker" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="event-association-unified">Associazione</label>
+          <input type="text" id="event-association-unified" name="event-association" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="event-seats-unified">Posti Disponibili Iniziali*</label>
+          <input type="number" id="event-seats-unified" name="event-seats" class="form-control" required min="0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="event-image-unified">Immagine Copertina</label>
+        <input type="file" id="event-image-unified" name="event-image" class="form-control" accept="image/*">
+        <small>Lascia vuoto se non vuoi modificare l'immagine.</small>
+        <img id="current-event-image-preview" src="#" alt="Anteprima copertina" style="max-width:120px; max-height:100px; display:none; margin-top:5px; border-radius: 4px;">
+      </div>
+
+      <div class="form-group">
+        <label for="event-flyer-unified">Volantino (PDF/Immagine)</label>
+        <input type="file" id="event-flyer-unified" name="event-flyer" class="form-control" accept="image/*,application/pdf">
+        <small>Lascia vuoto se non vuoi modificare il volantino.</small>
+        <div id="current-event-flyer-preview-unified" style="margin-top:5px;"></div>
+      </div>
+
+      <div class="form-check-group">
+        <input type="checkbox" id="event-booking-unified" name="event-booking">
+        <label for="event-booking-unified">Prenotazioni aperte</label>
+      </div>
+
+      <div class="form-check-group">
+        <input type="checkbox" id="event-voluntary-unified" name="event-voluntary">
+        <label for="event-voluntary-unified">Offerta libera</label>
+      </div>
+
+      <div class="form-group" id="event-price-container-unified" style="display: block;">
+        <label for="event-price-unified">Prezzo (€)</label>
+        <input type="number" id="event-price-unified" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00">
+      </div>
+
+      <div id="eventFormMessageUnified" class="form-message" style="display:none;"></div>
+      <div class="form-actions">
+        <button type="submit" class="btn-popup">Salva Evento</button>
+      </div>
+    </form>
+
+    <div id="eventCardPreviewContainer">
+      <h4>Anteprima Card Evento</h4>
+      <div class="preview-card">
+        <div class="preview-card-image-container">
+          <img id="previewImageUnified" src="images/default-event.jpg" alt="Anteprima copertina evento">
+          <span class="no-image-placeholder" style="display:none;">Nessuna immagine</span>
+        </div>
+        <div class="preview-card-content">
+          <h5 id="previewTitleUnified">Titolo Evento</h5>
+          <p id="previewDateUnifiedCont"><b>Data:</b> <span class="value">Seleziona data</span></p>
+          <p id="previewTimeUnifiedCont" style="display:none;"><b>Orario:</b> <span class="value"></span></p>
+          <p id="previewSpeakerUnifiedCont" class="preview-relatore"><b>Relatore:</b> <span class="value">Nome Relatore</span></p>
+          <p id="previewShortDescUnified">Descrizione breve...</p>
+          <p id="previewSeatsUnifiedCont" class="preview-posti"><b>Posti:</b> <span class="value">0</span></p>
+          <p id="previewPriceUnifiedCont" class="preview-costo"><b>Costo:</b> <span class="value">€ 0.00</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <footer>
   <p>© <span id="currentYear"></span> Eremo Frate Francesco ODV. Tutti i diritti riservati.</p>
 </footer>
@@ -256,12 +363,34 @@
 <script>
   // === INIZIO SCRIPT UNIFICATO PER EVENTIINCORSO.HTML ===
   const defaultUserIconPath = 'uploads/icons/default_user.png';
-  let currentUserData = null;
+  let currentUserData = null; // { email, nome, iconPath, isAdmin }
+  let currentEventsDataFromPHP = []; // Cache per i dati completi degli eventi per l'admin
+
   let volantinoMorphOverlay = null;
   let morphingCard = null;
 
   function gebi(id) { return document.getElementById(id); }
 
+  // --- Funzioni di Sanitizzazione (da dashboard.html) ---
+  function sanitizeText(text) {
+    if (text === null || typeof text === 'undefined') return '';
+    const element = document.createElement('div');
+    element.innerText = String(text);
+    return element.innerHTML;
+  }
+  function sanitizeTextForHTML(str) { // Usato per la descrizione nell'anteprima
+    if (typeof str !== 'string') str = String(str || '');
+    const temp = document.createElement('div');
+    temp.textContent = str;
+    return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');
+  }
+  function sanitizeForAttribute(str) {
+    if (typeof str !== 'string' || str === null) return '';
+    return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+  }
+
+
+  // --- Logica Utente e Navbar (da eventiincorso.html) ---
   function loadUserData() {
     const uds = localStorage.getItem('userDataEFF');
     if (uds) {
@@ -287,7 +416,9 @@
       mobileNavDashboard: gebi('mobile-nav-dashboard'), mobileNavProfilo: gebi('mobile-nav-profilo'),
       mobileNavMiePrenotazioni: gebi('mobile-nav-mie-prenotazioni'), mobileLogoutLink: gebi('mobile-logout-link'),
       mobileMenuSeparator: gebi('mobile-menu-separator'), navbarTitle: gebi('navbar-title'),
-      navGestioneEventiAdmin: gebi('nav-gestione-eventi-admin'), mobileNavGestioneEventiAdmin: gebi('mobile-nav-gestione-eventi-admin')
+      // Nav Gestione Eventi Admin non più necessaria se questa pagina la sostituisce
+      // navGestioneEventiAdmin: gebi('nav-gestione-eventi-admin'), mobileNavGestioneEventiAdmin: gebi('mobile-nav-gestione-eventi-admin'),
+      addEventBtnContainerAdmin: gebi('addEventBtnContainerAdmin') // Nuovo bottone admin
     };
 
     if (currentUserData) {
@@ -309,15 +440,17 @@
       if (currentUserData.isAdmin) {
         if (el.navDashboard) el.navDashboard.style.display = 'block';
         if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
-        if (el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'block'; // Mostra per admin
-        if (el.mobileNavGestioneEventiAdmin) el.mobileNavGestioneEventiAdmin.style.display = 'block'; // Mostra per admin
+        // if (el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'block';
+        // if (el.mobileNavGestioneEventiAdmin) el.mobileNavGestioneEventiAdmin.style.display = 'block';
         if (el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
+        if (el.addEventBtnContainerAdmin) el.addEventBtnContainerAdmin.style.display = 'block'; // Mostra bottone Admin
       } else {
         if (el.navDashboard) el.navDashboard.style.display = 'none';
         if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
-        if (el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none'; // Nascondi se non admin
-        if (el.mobileNavGestioneEventiAdmin) el.mobileNavGestioneEventiAdmin.style.display = 'none'; // Nascondi se non admin
+        // if (el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
+        // if (el.mobileNavGestioneEventiAdmin) el.mobileNavGestioneEventiAdmin.style.display = 'none';
         if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
+        if (el.addEventBtnContainerAdmin) el.addEventBtnContainerAdmin.style.display = 'none'; // Nascondi bottone Admin
       }
     } else { // Utente non loggato
       if (el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'inline-block';
@@ -325,19 +458,23 @@
       if (el.userDropdownContainer) el.userDropdownContainer.style.display = 'none';
       if (el.navDashboard) el.navDashboard.style.display = 'none';
       if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
-      if (el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
-      if (el.mobileNavGestioneEventiAdmin) el.mobileNavGestioneEventiAdmin.style.display = 'none';
+      // if (el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
+      // if (el.mobileNavGestioneEventiAdmin) el.mobileNavGestioneEventiAdmin.style.display = 'none';
       if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
       if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
       if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
       if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
       if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
+      if (el.addEventBtnContainerAdmin) el.addEventBtnContainerAdmin.style.display = 'none';
     }
   }
-
+  // ... (Logica navbar scroll, mobile menu, user dropdown: copiata da eventiincorso.html)
   let lastScrollNav = 0; const navbarContainerEl = gebi("navbarContainer"); if (navbarContainerEl) { window.addEventListener("scroll", function () { const cS = window.pageYOffset || document.documentElement.scrollTop; if (cS <= 50) { navbarContainerEl.classList.remove("hidden"); lastScrollNav = 0; return; } if (cS > lastScrollNav && !navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.add("hidden"); else if (cS < lastScrollNav && navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.remove("hidden"); lastScrollNav = cS <= 0 ? 0 : cS; }, false); }
-  const mobileMenuEl = gebi("mobileMenu"); const hamburgerButton = gebi("hamburgerBtn"); function toggleMobileMenu() { if (mobileMenuEl && hamburgerButton) { const iO = mobileMenuEl.classList.toggle("open"); hamburgerButton.setAttribute("aria-expanded", String(iO)); document.body.style.overflow = iO ? "hidden" : ""; } } function closeMobileMenuOnLinkClick() { if (mobileMenuEl && hamburgerButton && mobileMenuEl.classList.contains("open")) { mobileMenuEl.classList.remove("open"); hamburgerButton.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; } } if (hamburgerButton) hamburgerButton.addEventListener("click", toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobile-logout-link' && l.id !== 'mobile-nav-gestione-eventi-admin') l.addEventListener("click", closeMobileMenuOnLinkClick); }); document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) toggleMobileMenu(); });
-  const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iO = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iO ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iO)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl.style.display === 'block' && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
+  const mobileMenuEl = gebi("mobileMenu"); const hamburgerButton = gebi("hamburgerBtn"); function toggleMobileMenu() { if (mobileMenuEl && hamburgerButton) { const iO = mobileMenuEl.classList.toggle("open"); hamburgerButton.setAttribute("aria-expanded", String(iO)); document.body.style.overflow = iO ? "hidden" : ""; } } function closeMobileMenuOnLinkClick() { if (mobileMenuEl && hamburgerButton && mobileMenuEl.classList.contains("open")) { mobileMenuEl.classList.remove("open"); hamburgerButton.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; } } if (hamburgerButton) hamburgerButton.addEventListener("click", toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobile-logout-link' ) l.addEventListener("click", closeMobileMenuOnLinkClick); }); document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) toggleMobileMenu(); });
+  const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iO = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iO ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iO)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl && userDropdownMenuEl.style.display === 'block' && userBtnTriggerEl && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
+
+
+  // --- Logica Login/Registrazione Popup (da eventiincorso.html) ---
   const loginOverlayEl = gebi('loginOverlay'); const loginPopupEl = gebi('loginPopup'); const closeLoginPopupBtnEl = gebi('closeLoginPopupBtn'); const loginTabsEl = document.querySelectorAll('.login-tab'); const loginFormsEl = document.querySelectorAll('.login-popup .login-form'); const loginFormElement = gebi('loginForm'); const registerFormElement = gebi('registerForm'); const loginErrorMessageElement = gebi('login-error-message'); const registerErrorMessageElement = gebi('register-error-message');
   function openLoginPopup() { if (loginOverlayEl) loginOverlayEl.classList.add('active'); if (loginPopupEl) loginPopupEl.classList.add('active'); document.body.style.overflow = 'hidden'; resetFormErrorsAndMessages(); document.querySelector('.login-tab[data-tab="login"]')?.click(); gebi('login-email')?.focus(); }
   function closeLoginPopup() { if (loginOverlayEl) loginOverlayEl.classList.remove('active'); if (loginPopupEl) loginPopupEl.classList.remove('active'); document.body.style.overflow = ''; resetFormErrorsAndMessages(); }
@@ -348,60 +485,482 @@
   loginFormElement?.addEventListener('submit', async (e) => { e.preventDefault(); resetFormErrorsAndMessages(); const b = loginFormElement.querySelector('button[type="submit"]'); const o = b.innerHTML; b.disabled = true; b.innerHTML = 'Accesso...<div class="spinner-mini-light"></div>'; try { const r = await fetch('login.php', { method: 'POST', body: new FormData(loginFormElement) }); const j = await r.json(); if (!r.ok) throw new Error(j.message || `Errore ${r.status}`); if (j.success) { currentUserData = { email: j.email, nome: j.nome, iconPath: j.iconPath || defaultUserIconPath, isAdmin: j.is_admin === true || j.is_admin === 1 }; localStorage.setItem('userDataEFF', JSON.stringify(currentUserData)); updateNavbarUI(); closeLoginPopup(); loadEvents(); const pAction = localStorage.getItem("pending_action_eff"); if (pAction) { localStorage.removeItem("pending_action_eff"); const aD = JSON.parse(pAction); if (aD.action === 'book' && typeof window.openBookingPopup === 'function') window.openBookingPopup(aD.eventId, aD.eventTitle, aD.postiDisp, aD.postiGiaPren); else if (aD.action === 'waitlist' && typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(aD.eventId, aD.eventTitle, aD.postiGiaPren); } } else { loginFormElement.querySelectorAll('#login-email,#login-password').forEach(el => el.classList.add('error-border')); if (loginErrorMessageElement) { loginErrorMessageElement.textContent = j.message || "Credenziali errate."; loginErrorMessageElement.style.display = 'block'; } } } catch (err) { console.error("Errore login:", err); if (loginErrorMessageElement) { loginErrorMessageElement.textContent = "Errore connessione o server."; loginErrorMessageElement.style.display = 'block'; } } finally { b.disabled = false; b.innerHTML = o; } });
   registerFormElement?.addEventListener('submit', async (e) => { e.preventDefault(); resetFormErrorsAndMessages(); const b = registerFormElement.querySelector('button[type="submit"]'); const o = b.innerHTML; b.disabled = true; b.innerHTML = 'Registrazione...<div class="spinner-mini-light"></div>'; try { const r = await fetch('registrati.php', { method: 'POST', body: new FormData(registerFormElement) }); const j = await r.json(); if (!r.ok) throw new Error(j.message || `Errore ${r.status}`); if (j.success) { alert(j.message || "Registrazione completata! Ora puoi accedere."); document.querySelector('.login-tab[data-tab="login"]')?.click(); gebi('login-email').value = gebi('register-email').value; registerFormElement.reset(); } else { if (registerErrorMessageElement) { registerErrorMessageElement.textContent = j.message || "Errore registrazione."; registerErrorMessageElement.style.display = 'block'; } if (j.errors) { for (const f in j.errors) gebi(`register-${f}`)?.classList.add('error-border'); } } } catch (err) { console.error("Errore registrazione:", err); if (registerErrorMessageElement) { registerErrorMessageElement.textContent = "Errore connessione o server."; registerErrorMessageElement.style.display = 'block'; } } finally { b.disabled = false; b.innerHTML = o; } });
 
+  // --- Logica Logout (da eventiincorso.html) ---
   function handleLogout() { localStorage.removeItem('userDataEFF'); currentUserData = null; updateNavbarUI(); loadEvents(); alert('Logout effettuato.'); }
   gebi('logout-link-desktop')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
   gebi('mobile-logout-link')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenuOnLinkClick(); });
 
+  // --- Logica Volantino Morph (da eventiincorso.html) ---
   function showVolantinoWithMorph(volantinoUrl) { if (!volantinoMorphOverlay) return; if (morphingCard) cleanUpMorphingCard(); volantinoMorphOverlay.classList.add("active"); document.body.classList.add("volantino-morph-active"); morphingCard = document.createElement("article"); morphingCard.className = "card morph-active-card"; let flyerContentHTML = ''; if (volantinoUrl && volantinoUrl.trim() !== "") { if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) { flyerContentHTML = `<img src="${volantinoUrl}" alt="Volantino Evento">`; } else if (volantinoUrl.endsWith('.pdf')) { flyerContentHTML = `<iframe src="${volantinoUrl}" type="application/pdf" width="100%" height="100%" style="border:none; min-height: 80vh;"></iframe>`; } else { flyerContentHTML = `<div class="volantino-message-display"><p>Il volantino è disponibile come file esterno.</p><a href="${volantinoUrl}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`; } } else { flyerContentHTML = `<div class="volantino-message-display"><p>Volantino non disponibile.</p></div>`; } morphingCard.innerHTML = `<div class="morph-content-wrapper"><div class="volantino-image-container-morph">${flyerContentHTML}</div></div><button class="close-morph-volantino-btn" aria-label="Chiudi">&times;</button>`; volantinoMorphOverlay.appendChild(morphingCard); morphingCard.querySelector('.close-morph-volantino-btn').onclick = hideVolantinoWithMorph; requestAnimationFrame(() => { morphingCard.classList.add("zoomed-in", "volantino-visible"); }); }
   function hideVolantinoWithMorph() { if (morphingCard && volantinoMorphOverlay) { morphingCard.classList.remove("zoomed-in", "volantino-visible"); volantinoMorphOverlay.classList.remove("active"); document.body.classList.remove("volantino-morph-active"); setTimeout(cleanUpMorphingCard, 300); } }
   function cleanUpMorphingCard() { if (morphingCard) { morphingCard.remove(); morphingCard = null; } }
 
-  const MAX_SEATS_PER_BOOKING = 5; const MAX_TOTAL_SEATS_PER_USER = 5;
+
+  // --- Gestione Pop-up Nuovo/Modifica Evento (Unificato e aggiornato) ---
+  const addEventBtnAdminEl = gebi('addEventBtnAdmin'); // Bottone admin per nuovo evento
+  const eventPopupOverlayUnified = gebi('eventPopupOverlayUnified');
+  const eventPopupUnified = gebi('eventPopupUnified');
+  const closeEventPopupBtnUnified = gebi('closeEventPopupBtnUnified');
+  const eventFormUnified = gebi('eventFormUnified');
+  const eventPopupTitleUnified = gebi('eventPopupTitleUnified');
+  const eventIdInputUnified = gebi('event-id-unified');
+  const voluntaryCheckboxUnified = gebi('event-voluntary-unified');
+  const priceContainerUnified = gebi('event-price-container-unified');
+  const eventPriceInputUnified = gebi('event-price-unified');
+  const eventFormMessageUnified = gebi('eventFormMessageUnified');
+  const currentImagePreviewEl = gebi('current-event-image-preview'); // Preview nel form
+  const currentFlyerPreviewUnified = gebi('current-event-flyer-preview-unified');
+
+  // Elementi Anteprima Card nel Popup
+  const previewImageUnifiedEl = gebi('previewImageUnified');
+  const previewNoImagePlaceholderUnified = document.querySelector('#eventCardPreviewContainer .no-image-placeholder');
+  const previewTitleUnifiedEl = gebi('previewTitleUnified');
+  const previewDateUnifiedEl = document.querySelector('#previewDateUnifiedCont .value');
+  const previewTimeUnifiedEl = document.querySelector('#previewTimeUnifiedCont .value');
+  const previewTimeContainerUnifiedEl = gebi('previewTimeUnifiedCont');
+  const previewSpeakerUnifiedEl = document.querySelector('#previewSpeakerUnifiedCont .value');
+  const previewShortDescUnifiedEl = gebi('previewShortDescUnified');
+  const previewSeatsUnifiedEl = document.querySelector('#previewSeatsUnifiedCont .value');
+  const previewPriceUnifiedEl = document.querySelector('#previewPriceUnifiedCont .value');
+
+  function updatePriceFieldVisibilityUnified() {
+    if (voluntaryCheckboxUnified && priceContainerUnified && eventPriceInputUnified) {
+      const isVoluntary = voluntaryCheckboxUnified.checked;
+      priceContainerUnified.style.display = isVoluntary ? 'none' : 'block';
+      eventPriceInputUnified.required = !isVoluntary;
+      if (isVoluntary) eventPriceInputUnified.value = '';
+      updateEventPreviewUnified(); // Aggiorna l'anteprima
+    }
+  }
+  if (voluntaryCheckboxUnified) voluntaryCheckboxUnified.addEventListener('change', updatePriceFieldVisibilityUnified);
+
+  function updateEventPreviewUnified() {
+    if (!previewTitleUnifiedEl) return; // Se l'anteprima non è visibile/pronta
+
+    previewTitleUnifiedEl.textContent = gebi('event-title-unified').value || 'Titolo Evento';
+    const dateValue = gebi('event-date-unified').value;
+    previewDateUnifiedEl.textContent = dateValue ? formatDate(dateValue) : 'Seleziona data';
+
+    const startTimeValue = gebi('event-start-time-unified').value;
+    const endTimeValue = gebi('event-end-time-unified').value;
+    let timeString = '';
+    if (startTimeValue && endTimeValue) timeString = `${startTimeValue} - ${endTimeValue}`;
+    else if (startTimeValue) timeString = startTimeValue;
+
+    if (timeString && previewTimeContainerUnifiedEl && previewTimeUnifiedEl) {
+      previewTimeContainerUnifiedEl.style.display = 'block';
+      previewTimeUnifiedEl.textContent = timeString;
+    } else if (previewTimeContainerUnifiedEl && previewTimeUnifiedEl) {
+      previewTimeContainerUnifiedEl.style.display = 'none';
+      previewTimeUnifiedEl.textContent = '';
+    }
+
+    const speakerPrefix = gebi('event-prefix-unified').value || 'Relatore';
+    const speakerName = gebi('event-speaker-unified').value || 'Nome Relatore';
+    previewSpeakerUnifiedEl.textContent = `${sanitizeText(speakerPrefix)}: ${sanitizeText(speakerName)}`;
+
+    previewShortDescUnifiedEl.innerHTML = sanitizeTextForHTML(gebi('event-short-desc-unified').value) || 'Descrizione breve...';
+    previewSeatsUnifiedEl.textContent = gebi('event-seats-unified').value || '0';
+
+    const isVoluntary = voluntaryCheckboxUnified.checked;
+    if (isVoluntary) {
+      previewPriceUnifiedEl.textContent = 'Offerta libera';
+    } else {
+      const priceValue = parseFloat(gebi('event-price-unified').value);
+      previewPriceUnifiedEl.textContent = !isNaN(priceValue) && priceValue > 0 ? `€ ${priceValue.toFixed(2)}` : 'Costo non specificato';
+    }
+
+    const imageInput = gebi('event-image-unified');
+    if (imageInput.files && imageInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if(previewImageUnifiedEl) previewImageUnifiedEl.src = e.target.result;
+        if(previewImageUnifiedEl) previewImageUnifiedEl.style.display = 'block';
+        if(previewNoImagePlaceholderUnified) previewNoImagePlaceholderUnified.style.display = 'none';
+      }
+      reader.readAsDataURL(imageInput.files[0]);
+    } else if (currentImagePreviewEl && currentImagePreviewEl.src !== '#' && currentImagePreviewEl.style.display !== 'none') {
+      if(previewImageUnifiedEl) previewImageUnifiedEl.src = currentImagePreviewEl.src;
+      if(previewImageUnifiedEl) previewImageUnifiedEl.style.display = 'block';
+      if(previewNoImagePlaceholderUnified) previewNoImagePlaceholderUnified.style.display = 'none';
+    } else {
+      if(previewImageUnifiedEl) previewImageUnifiedEl.src = 'images/default-event.jpg';
+      if(previewImageUnifiedEl) previewImageUnifiedEl.style.display = 'block';
+      if(previewNoImagePlaceholderUnified) previewNoImagePlaceholderUnified.style.display = 'none'; // Potrebbe essere il placeholder di default
+    }
+  }
+
+  function attachPreviewListenersUnified() {
+    const formElementsToWatch = [
+      'event-title-unified', 'event-date-unified',
+      'event-start-time-unified', 'event-end-time-unified',
+      'event-short-desc-unified', 'event-prefix-unified', 'event-speaker-unified',
+      'event-seats-unified', 'event-price-unified', 'event-voluntary-unified',
+      'event-image-unified'
+    ];
+    formElementsToWatch.forEach(id => {
+      const element = gebi(id);
+      if (element) {
+        element.addEventListener('input', updateEventPreviewUnified);
+        if (element.type === 'checkbox' || element.type === 'file') {
+          element.addEventListener('change', updateEventPreviewUnified);
+        }
+      }
+    });
+  }
+
+  function openEventPopup(eventData = null) { // Funzione per admin
+    if (!eventFormUnified) return;
+    eventFormUnified.reset();
+    updatePriceFieldVisibilityUnified(); // Questo chiamerà anche updateEventPreviewUnified
+    if(eventFormMessageUnified) {
+      eventFormMessageUnified.style.display = 'none';
+      eventFormMessageUnified.className = 'form-message';
+    }
+    if(currentImagePreviewEl) {
+      currentImagePreviewEl.style.display = 'none'; currentImagePreviewEl.src = '#';
+    }
+    if(currentFlyerPreviewUnified) currentFlyerPreviewUnified.innerHTML = '';
+    gebi('event-start-time-unified').value = ''; // Pulisci specificamente i campi time
+    gebi('event-end-time-unified').value = '';
+
+    if (eventData) { // Modalità Modifica
+      if(eventPopupTitleUnified) eventPopupTitleUnified.textContent = 'Modifica Evento';
+      if(eventIdInputUnified) eventIdInputUnified.value = eventData.idevento || eventData.IDEvento; // Compatibilità con diverse fonti
+      gebi('event-title-unified').value = eventData.titolo || eventData.Titolo || '';
+
+      // Gestione Data (formato YYYY-MM-DD per input type="date")
+      let dateToSet = eventData.datainizio || eventData.Data || '';
+      if (dateToSet && !/^\d{4}-\d{2}-\d{2}$/.test(dateToSet)) { // Se non è già nel formato corretto
+        try {
+          const dateObj = new Date(dateToSet.replace(/-/g, '/')); // Prova a parsare
+          if (!isNaN(dateObj.getTime())) {
+            dateToSet = dateObj.toISOString().split('T')[0];
+          } else { dateToSet = ''; }
+        } catch (e) { dateToSet = ''; console.warn("Formato data non valido per modifica:", eventData.datainizio || eventData.Data); }
+      }
+      gebi('event-date-unified').value = dateToSet;
+
+
+      // Gestione Orario (da 'durata' a start/end time)
+      const durata = eventData.durata || eventData.Durata || '';
+      let startTime = '', endTime = '';
+      if (durata.includes('-')) {
+        const parts = durata.split('-');
+        startTime = parts[0].trim().match(/^\d{2}:\d{2}/) ? parts[0].trim().substring(0,5) : '';
+        endTime = parts[1].trim().match(/^\d{2}:\d{2}/) ? parts[1].trim().substring(0,5) : '';
+      } else if (durata.match(/^\d{2}:\d{2}/)) { // Solo ora inizio
+        startTime = durata.substring(0,5);
+      }
+      gebi('event-start-time-unified').value = startTime;
+      gebi('event-end-time-unified').value = endTime;
+
+      gebi('event-short-desc-unified').value = eventData.descrizione || eventData.descrizione || ''; // `descrizione` da entrambe le fonti
+      gebi('event-long-desc-unified').value = eventData.descrizione_estesa || '';
+      gebi('event-prefix-unified').value = eventData.prefisso_relatore || 'Relatore';
+      gebi('event-speaker-unified').value = eventData.relatore || '';
+      gebi('event-association-unified').value = eventData.associazione || '';
+      // `posti_configurati_totali` da dashboard, `posti_disponibili` da eventiAdmin (che in quel contesto erano i totali)
+      gebi('event-seats-unified').value = eventData.posti_configurati_totali !== undefined ? eventData.posti_configurati_totali : (eventData.posti_disponibili !== undefined ? eventData.posti_disponibili : '0');
+      gebi('event-booking-unified').checked = !!(eventData.flagprenotabile || eventData.FlagPrenotabile); // `flagprenotabile` da entrambe
+
+      const costoEvento = eventData.costo; // `costo` da entrambe
+      voluntaryCheckboxUnified.checked = costoEvento !== null && parseFloat(costoEvento) === 0;
+      updatePriceFieldVisibilityUnified(); // Richiama per visibilità e required
+      if (!voluntaryCheckboxUnified.checked && costoEvento !== null && parseFloat(costoEvento) > 0) {
+        eventPriceInputUnified.value = parseFloat(costoEvento).toFixed(2);
+      } else {
+        eventPriceInputUnified.value = '';
+      }
+
+      if (eventData.immagine_url) {
+        currentImagePreviewEl.src = eventData.immagine_url; currentImagePreviewEl.style.display = 'block';
+      }
+      if (eventData.volantino_url) {
+        const fileName = eventData.volantino_url.split('/').pop();
+        currentFlyerPreviewUnified.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank">Vedi (${sanitizeText(fileName)})</a>`;
+      }
+    } else { // Modalità Aggiungi Nuovo
+      if(eventPopupTitleUnified) eventPopupTitleUnified.textContent = 'Aggiungi Nuovo Evento';
+      if(eventIdInputUnified) eventIdInputUnified.value = '';
+      voluntaryCheckboxUnified.checked = false; // Default
+      gebi('event-booking-unified').checked = true; // Default
+      gebi('event-seats-unified').value = '50'; // Default
+      gebi('event-prefix-unified').value = 'Relatore'; // Default
+      updatePriceFieldVisibilityUnified(); // Per stato iniziale corretto
+    }
+
+    updateEventPreviewUnified(); // Aggiorna l'anteprima con i dati caricati o default
+
+    if(eventPopupOverlayUnified) eventPopupOverlayUnified.classList.add('active');
+    if(eventPopupUnified) eventPopupUnified.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    gebi('event-title-unified').focus();
+  }
+
+  function closeEventPopupHandlerUnified() {
+    if(eventPopupOverlayUnified) eventPopupOverlayUnified.classList.remove('active');
+    if(eventPopupUnified) eventPopupUnified.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if(addEventBtnAdminEl) addEventBtnAdminEl.addEventListener('click', () => openEventPopup(null));
+  if(closeEventPopupBtnUnified) closeEventPopupBtnUnified.addEventListener('click', closeEventPopupHandlerUnified);
+  if(eventPopupOverlayUnified) eventPopupOverlayUnified.addEventListener('click', (e) => { if (e.target === eventPopupOverlayUnified) closeEventPopupHandlerUnified(); });
+
+  eventFormUnified?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
+    if(eventFormMessageUnified) { eventFormMessageUnified.style.display = 'none'; eventFormMessageUnified.className = 'form-message'; }
+
+    try {
+      const formData = new FormData(this);
+      formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
+
+      // Gestione costo
+      if (formData.get('event-voluntary') === 'on') { // Checkbox 'on' if checked
+        formData.set('event-price', '0.00');
+      } else if (!formData.get('event-price') && !formData.get('event-voluntary')) { // Se prezzo vuoto e non volontario
+        formData.set('event-price', '0.00'); // O gestisci come errore se il prezzo è richiesto
+      }
+
+      // Combina orari per 'durata'
+      const startTime = formData.get('event-start-time');
+      const endTime = formData.get('event-end-time');
+      let durataString = '';
+      if (startTime && endTime) durataString = `${startTime}-${endTime}`;
+      else if (startTime) durataString = startTime;
+      formData.append('event-time-combined', durataString); // PHP userà questo per 'durata'
+
+
+      const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+      const responseText = await response.text();
+      let result;
+      try { result = JSON.parse(responseText); }
+      catch (jsonError) { throw new Error(`Risposta non JSON dal server: ${responseText.substring(0,200)}`); }
+
+      if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
+      if (result.success) {
+        if(eventFormMessageUnified) {
+          eventFormMessageUnified.textContent = result.message || 'Operazione completata con successo!';
+          eventFormMessageUnified.classList.remove('error'); eventFormMessageUnified.classList.add('success');
+        }
+        loadEvents(); // Ricarica gli eventi
+        setTimeout(closeEventPopupHandlerUnified, 1500);
+      } else { throw new Error(result.message || 'Errore durante il salvataggio dell\'evento.'); }
+    } catch (error) {
+      console.error('Errore invio form evento:', error);
+      if(eventFormMessageUnified) {
+        eventFormMessageUnified.textContent = `Errore: ${error.message}`;
+        eventFormMessageUnified.classList.remove('success'); eventFormMessageUnified.classList.add('error');
+      }
+    } finally {
+      if(eventFormMessageUnified) eventFormMessageUnified.style.display = 'block';
+      submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText;
+    }
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && eventPopupUnified?.classList.contains('active')) closeEventPopupHandlerUnified(); });
+
+
+  // --- Logica Caricamento e Creazione Card Eventi (Unificata) ---
+  const MAX_SEATS_PER_BOOKING = 5; const MAX_TOTAL_SEATS_PER_USER = 5; // Da eventiincorso.html
 
   async function loadEvents() {
-    const eventsGrid = gebi("eventiGrid"); const loadingIndicator = gebi("loadingIndicator");
-    if (loadingIndicator) loadingIndicator.style.display = 'flex'; if (eventsGrid) eventsGrid.innerHTML = "";
+    const eventsGrid = gebi("eventiGrid");
+    const loadingIndicator = gebi("loadingIndicator");
+    if (loadingIndicator) loadingIndicator.style.display = 'flex';
+    if (eventsGrid) eventsGrid.innerHTML = "";
+
     try {
-      let apiUrl = 'get_events.php'; if (currentUserData && currentUserData.email) apiUrl += `?user_email=${encodeURIComponent(currentUserData.email)}`;
-      const response = await fetch(apiUrl); const responseText = await response.text(); if (!response.ok) throw new Error(`Errore HTTP ${response.status}: ${responseText.substring(0, 100)}`);
-      let result; try { result = JSON.parse(responseText); } catch (e) { throw new Error("Risposta server non JSON."); }
-      if (!result.success) throw new Error(result.message || "Caricamento eventi fallito."); if (!eventsGrid) return;
-      if (result.data && result.data.length === 0) { eventsGrid.innerHTML = '<p class="no-events">Nessun evento in programma al momento.</p>'; }
-      else if (result.data) { result.data.forEach((event) => eventsGrid.appendChild(createEventCard(event))); }
-      else { eventsGrid.innerHTML = '<p class="no-events">Nessun dato evento ricevuto.</p>'; }
-    } catch (error) { console.error("Errore loadEvents:", error); if (eventsGrid) eventsGrid.innerHTML = `<div class="error-message" style="width:100%;"><p><strong>Errore:</strong> ${error.message}</p><button onclick="loadEvents()" class="btn-popup">Riprova</button></div>`; }
-    finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
+      let apiUrl = 'get_events.php';
+      const params = new URLSearchParams();
+      if (currentUserData && currentUserData.email) {
+        params.append('user_email', currentUserData.email);
+      }
+      // Se l'admin è loggato, potremmo voler passare un flag per ottenere dati più dettagliati
+      // come posti_configurati_totali, posti_occupati, etc.
+      // La logica di `get_events.php` dovrebbe gestire questo.
+      // Se `admin_view=true` era usato da `eventiincorsoAdmin.html` per questo, lo aggiungiamo:
+      if (currentUserData && currentUserData.isAdmin) {
+        params.append('admin_view', 'true'); // Per ottenere dati completi per admin
+      }
+      if (params.toString()) apiUrl += `?${params.toString()}`;
+
+      const response = await fetch(apiUrl);
+      const responseText = await response.text();
+      if (!response.ok) throw new Error(`Errore HTTP ${response.status}: ${responseText.substring(0, 100)}`);
+
+      let result;
+      try { result = JSON.parse(responseText); }
+      catch (e) { throw new Error("Risposta server non JSON."); }
+
+      if (!result.success) throw new Error(result.message || "Caricamento eventi fallito.");
+      if (!eventsGrid) return;
+
+      currentEventsDataFromPHP = result.data || []; // Salva i dati per l'editing
+
+      if (currentEventsDataFromPHP.length === 0) {
+        eventsGrid.innerHTML = `<p class="no-events">${(currentUserData && currentUserData.isAdmin) ? 'Nessun evento. Aggiungine uno!' : 'Nessun evento in programma al momento.'}</p>`;
+      } else {
+        currentEventsDataFromPHP.forEach((event) => eventsGrid.appendChild(createEventCard(event)));
+      }
+    } catch (error) {
+      console.error("Errore loadEvents:", error);
+      if (eventsGrid) eventsGrid.innerHTML = `<div class="error-message" style="width:100%;"><p><strong>Errore:</strong> ${error.message}</p><button onclick="loadEvents()" class="btn-popup">Riprova</button></div>`;
+    } finally {
+      if (loadingIndicator) loadingIndicator.style.display = 'none';
+    }
   }
 
   function createEventCard(event) {
-    const card = document.createElement("article"); card.className = "card"; card.dataset.eventId = event.idevento;
+    const card = document.createElement("article");
+    card.className = "card";
+    card.dataset.eventId = event.idevento;
     let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event.jpg";
-    const postiDispEv = parseInt(event.posti_disponibili) || 0; const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
-    const inCodaPerP = parseInt(event.in_coda_per_posti) || 0; const flagPrenDB = parseInt(event.flagprenotabile) === 1;
-    let primaryBtnHTML = ''; let volantinoBtnHTML = "";
-    if (event.volantino_url?.trim()) { volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${event.volantino_url}">Volantino</button>`; } else { volantinoBtnHTML = `<a  class="card-btn card-btn-secondary">Dettagli</a>`; }
-    if (!flagPrenDB) { primaryBtnHTML = `<a class="card-btn card-btn-primary">(Pren. Chiuse)</a>`; }
-    else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti Raggiunti (${pGiaPrenUt})</button>`; }
-    else if (inCodaPerP > 0) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`; }
-    else if (postiDispEv > 0) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`; }
-    else { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Entra in Coda</button>`; }
-    card.innerHTML = `<div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div><div class="card-content"><h3>${event.titolo || "Titolo non disponibile"}</h3><p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario:</b> ${event.durata}` : ""}</p><p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ""}</p><p class="card-description">${event.descrizione || "Nessuna descrizione."}</p><p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">${postiDispEv > 0 ? postiDispEv : (flagPrenDB ? 'Esaurito' : 'Pren. Chiuse')}</span>${(currentUserData && pGiaPrenUt > 0) ? `<br><b>Tuoi posti:</b> <span class="posti-disponibili">${pGiaPrenUt}</span>` : ''}${(currentUserData && inCodaPerP > 0) ? `<br><b>In coda per:</b> <span class="posti-disponibili">${inCodaPerP} posti</span>` : ''}${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}</p><div class="card-actions">${volantinoBtnHTML}${primaryBtnHTML}</div></div>`;
-    const actionBtn = card.querySelector('.btn-prenota'); if (actionBtn && !actionBtn.disabled) { actionBtn.addEventListener('click', function () { const act = this.dataset.action; const eId = this.dataset.eventId; const eTitle = this.dataset.eventTitle; const pDisp = parseInt(this.dataset.postiDisponibiliEvento); const pGiaPren = parseInt(this.dataset.postiGiaPrenotatiUtente); if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: act, eventId: eId, eventTitle: eTitle, postiDisp: pDisp, postiGiaPren: pGiaPren })); return; } if (act === 'book') { if (typeof window.openBookingPopup === 'function') window.openBookingPopup(eId, eTitle, pDisp, pGiaPren); } else if (act === 'waitlist') { if (typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(eId, eTitle, pGiaPren); } }); }
-    card.querySelector(".btn-visualizza-volantino")?.addEventListener("click", function () { if (typeof showVolantinoWithMorph === 'function') showVolantinoWithMorph(this.dataset.volantinoUrl); });
+
+    // Variabili per logica utente standard
+    const postiDispEv = parseInt(event.posti_disponibili) || 0; // Per utenti normali
+    const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
+    const inCodaPerP = parseInt(event.in_coda_per_posti) || 0;
+    const flagPrenDB = parseInt(event.flagprenotabile) === 1;
+
+    // Variabili per admin (potrebbero avere nomi diversi nel JSON da get_events.php?admin_view=true)
+    // Assumiamo che 'event' contenga già i campi corretti se admin_view=true è stato usato
+    // E.g., event.posti_configurati_totali, event.posti_occupati
+    const postiTotaliAdmin = event.posti_configurati_totali !== undefined ? event.posti_configurati_totali : event.posti_disponibili; // Fallback se non c'è campo specifico per admin
+    const postiOccupatiAdmin = event.posti_occupati || 0;
+
+
+    let cardActionButtonsHTML = '';
+    let cardVolantinoInfoHTML = ""; // Per admin, mostrato come info, non bottone primario
+
+    if (currentUserData && currentUserData.isAdmin) {
+      cardActionButtonsHTML = `
+            <button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
+            <button class="card-btn btn-delete card-btn-primary" data-event-id="${event.idevento}" style="background-color: var(--danger, #e74c3c);">Elimina</button>
+        `;
+      if (event.volantino_url?.trim()) {
+        const volantinoName = event.volantino_url.split('/').pop();
+        cardVolantinoInfoHTML = `<p class="card-info admin-flyer-info" style="margin-top: 0.5em;"><b>Volantino:</b> <a href="${sanitizeForAttribute(event.volantino_url)}" target="_blank" title="${sanitizeForAttribute(volantinoName)}">Visualizza (${sanitizeText(volantinoName)})</a></p>`;
+      }
+    } else { // Utente normale
+      if (event.volantino_url?.trim()) {
+        cardVolantinoInfoHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${event.volantino_url}">Volantino</button>`;
+      } else {
+        cardVolantinoInfoHTML = `<a href="#" class="card-btn card-btn-secondary card-btn-details" data-event-id="${event.idevento}">Dettagli</a>`;
+      }
+
+      if (!flagPrenDB) {
+        cardActionButtonsHTML = `<a class="card-btn card-btn-primary card-btn-disabled">(Pren. Chiuse)</a>`;
+      } else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) {
+        cardActionButtonsHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti (${pGiaPrenUt})</button>`;
+      } else if (inCodaPerP > 0) {
+        cardActionButtonsHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`;
+      } else if (postiDispEv > 0) {
+        cardActionButtonsHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`;
+      } else { // Posti esauriti, vai in coda
+        cardActionButtonsHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Entra in Coda</button>`;
+      }
+    }
+    const durataEvento = event.durata || event.Durata || ''; // Compatibilità
+    card.innerHTML = `
+        <div class="card-image-container">
+            <img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.titolo || "Evento")}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
+        </div>
+        <div class="card-content">
+            <h3>${sanitizeText(event.titolo || "Titolo non disponibile")}</h3>
+            <p class="card-info">
+                <b>Data:</b> ${formatDate(event.datainizio || event.Data)}
+                ${durataEvento ? `<br><b>Orario:</b> ${sanitizeText(durataEvento)}` : ""}
+            </p>
+            <p class="card-info">
+                <b>${sanitizeText(event.prefisso_relatore) || "Relatore"}:</b> ${sanitizeText(event.relatore) || "N/D"}
+                ${event.associazione ? `<br><b>Associazione:</b> ${sanitizeText(event.associazione)}` : ""}
+            </p>
+            <p class="card-description">${sanitizeText(event.descrizione_breve || event.descrizione || "Nessuna descrizione.")}</p> <p class="card-info">
+                ${currentUserData && currentUserData.isAdmin ?
+            `<b>Posti Config.:</b> <span class="posti-disponibili">${postiTotaliAdmin}</span><br><b>Occupati:</b> ${postiOccupatiAdmin}` :
+            `<b>Posti Disponibili:</b> <span class="posti-disponibili">${flagPrenDB ? (postiDispEv > 0 ? postiDispEv : 'Esaurito') : 'Pren. Chiuse'}</span>`
+    }
+                ${(currentUserData && !currentUserData.isAdmin && pGiaPrenUt > 0) ? `<br><b>Tuoi posti:</b> <span class="posti-disponibili">${pGiaPrenUt}</span>` : ''}
+                ${(currentUserData && !currentUserData.isAdmin && inCodaPerP > 0) ? `<br><b>In coda per:</b> <span class="posti-disponibili">${inCodaPerP} posti</span>` : ''}
+                ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}
+            </p>
+            ${(currentUserData && currentUserData.isAdmin) ? `<p class="card-info">Stato Prenotazioni: ${flagPrenDB ? '<span class="status-prenotabile" style="color:green;font-weight:bold;">Aperte</span>' : '<span class="status-non-prenotabile" style="color:red;font-weight:bold;">Chiuse</span>'}</p>` : ''}
+            ${(currentUserData && currentUserData.isAdmin) ? cardVolantinoInfoHTML : ''}
+            <div class="card-actions" style="margin-top: auto;">
+                ${!(currentUserData && currentUserData.isAdmin) ? cardVolantinoInfoHTML : ''}
+                ${cardActionButtonsHTML}
+            </div>
+        </div>`;
+
+    // Listeners per i bottoni
+    if (currentUserData && currentUserData.isAdmin) {
+      card.querySelector('.btn-edit')?.addEventListener('click', function() {
+        const eventIdToEdit = this.dataset.eventId;
+        const eventToEdit = currentEventsDataFromPHP.find(e => String(e.idevento) === String(eventIdToEdit));
+        if (eventToEdit) {
+          openEventPopup(eventToEdit);
+        } else {
+          console.error("Dati evento non trovati per modifica ID:", eventIdToEdit, currentEventsDataFromPHP);
+          alert("Dati evento non trovati per modifica.");
+        }
+      });
+      card.querySelector('.btn-delete')?.addEventListener('click', async function() {
+        const eventIdToDelete = this.dataset.eventId;
+        const eventObjectToDelete = currentEventsDataFromPHP.find(e => String(e.idevento) === String(eventIdToDelete));
+        const eventTitle = eventObjectToDelete ? eventObjectToDelete.titolo : "questo evento";
+        if (confirm(`Sei sicuro di voler eliminare l'evento "${sanitizeText(eventTitle)}"? L'azione è irreversibile.`)) {
+          try {
+            const formData = new FormData();
+            formData.append('action', 'delete_event');
+            formData.append('event_id', eventIdToDelete);
+            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+            const resText = await response.text();
+            let resJson; try { resJson = JSON.parse(resText); } catch(e){ throw new Error("Risposta non JSON (delete): " + resText.substring(0,100)); }
+            if (!response.ok) throw new Error(resJson.message || `Errore HTTP ${response.status}`);
+            if (resJson.success) { alert(resJson.message || 'Evento eliminato.'); loadEvents(); }
+            else { throw new Error(resJson.message || 'Eliminazione fallita.'); }
+          } catch (error) { console.error('Errore eliminazione evento:', error); alert(`Errore durante l'eliminazione: ${error.message}`); }
+        }
+      });
+    } else { // Utente normale
+      const userActionBtn = card.querySelector('.btn-prenota');
+      if (userActionBtn && !userActionBtn.disabled) {
+        userActionBtn.addEventListener('click', function () {
+          const act = this.dataset.action; const eId = this.dataset.eventId; const eTitle = this.dataset.eventTitle;
+          const pDisp = parseInt(this.dataset.postiDisponibiliEvento); const pGiaPren = parseInt(this.dataset.postiGiaPrenotatiUtente);
+          if (!currentUserData) {
+            openLoginPopup();
+            localStorage.setItem("pending_action_eff", JSON.stringify({ action: act, eventId: eId, eventTitle: eTitle, postiDisp: pDisp, postiGiaPren: pGiaPren }));
+            return;
+          }
+          if (act === 'book') { if (typeof window.openBookingPopup === 'function') window.openBookingPopup(eId, eTitle, pDisp, pGiaPren); }
+          else if (act === 'waitlist') { if (typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(eId, eTitle, pGiaPren); }
+        });
+      }
+      card.querySelector(".btn-visualizza-volantino")?.addEventListener("click", function () { if (typeof showVolantinoWithMorph === 'function') showVolantinoWithMorph(this.dataset.volantinoUrl); });
+      card.querySelector(".card-btn-details")?.addEventListener("click", function (e) {
+        e.preventDefault(); alert("Visualizzazione dettagli evento ID: " + this.dataset.eventId + " (da implementare se necessario).");
+      });
+    }
     return card;
   }
 
-  function formatDate(dateString) { // Corretta
+
+  function formatDate(dateString) {
     if (!dateString) return "N/D";
     try {
       let d;
-      if (/^\d{4}-\d{2}-\d{2}/.test(dateString)) {
+      if (/^\d{4}-\d{2}-\d{2}/.test(dateString)) { // Formato YYYY-MM-DD
         const p = dateString.substring(0, 10).split('-');
         d = new Date(Date.UTC(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2])));
-      } else {
+      } else { // Altri formati (es. timestamp completo)
         d = new Date(dateString);
       }
-      if (isNaN(d.getTime())) return dateString;
+      if (isNaN(d.getTime())) return dateString; // Se non valida, ritorna la stringa originale
       return d.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
     } catch (e) {
       console.error("Errore formattazione data:", dateString, e);
@@ -409,41 +968,66 @@
     }
   }
 
+  // --- Logica Popup Prenotazione e Lista d'Attesa (da eventiincorso.html) ---
+  // ... (initializeBookingPopupHandlers, generateParticipantFields, initializeWaitlistPopupHandlers)
+  // Queste funzioni rimangono invariate da eventiincorso.html
   function initializeBookingPopupHandlers() { const bO = gebi('bookingPopupOverlay'); const bP = gebi('bookingPopup'); const cB = gebi('closeBookingPopupBtn'); const bF = gebi('bookingForm'); const nPI = gebi('numeroPosti'); const pFC = gebi('participantFieldsContainer'); const bEII = gebi('bookingEventId'); const bPT = gebi('bookingPopupTitle'); const bRM = gebi('bookingResponseMessage'); const iPP = gebi('infoPostiPrenotabili'); const mSB = gebi('maxSeatsAllowedBooking');
     window.openBookingPopup = function (id, t, disp, giaP) { if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: 'book', eventId: id, eventTitle: t, postiDisp: disp, postiGiaPren: giaP })); return; } bEII.value = id; bPT.textContent = `Prenota: ${t}`; const pDN = parseInt(disp); const pGPN = parseInt(giaP) || 0; const maxPrUsrSTrx = Math.min(MAX_SEATS_PER_BOOKING, MAX_TOTAL_SEATS_PER_USER - pGPN); const maxE = Math.min(maxPrUsrSTrx, pDN); if (maxE < 1) { alert("Non puoi prenotare ulteriori posti."); return; }
       nPI.max = maxE; nPI.value = 1; if (mSB) mSB.textContent = maxE; if (iPP) iPP.textContent = `Puoi prenotare da 1 a ${maxE} posti. (Già prenotati: ${pGPN}/${MAX_TOTAL_SEATS_PER_USER})`; generateParticipantFields(1, pFC, 'bp', maxE); if (bRM) { bRM.style.display = 'none'; bRM.className = 'form-message'; } if (bO) bO.classList.add('active'); if (bP) bP.classList.add('active'); document.body.style.overflow = 'hidden'; }; function cBP() { if (bO) bO.classList.remove('active'); if (bP) bP.classList.remove('active'); document.body.style.overflow = ''; if (pFC) pFC.innerHTML = ''; if (bF) bF.reset(); if (iPP) iPP.textContent = ''; } if (cB) cB.addEventListener('click', cBP); if (bO) bO.addEventListener('click', (e) => { if (e.target === bO) cBP(); });
     if (nPI && pFC) nPI.addEventListener('input', (e) => generateParticipantFields(e.target.value, pFC, 'bp', parseInt(nPI.max)));
     if (bF) bF.addEventListener('submit', async function (e) { e.preventDefault(); if (!currentUserData || !currentUserData.email) { alert("Sessione scaduta."); window.location.href = 'index.html'; return; } const btn = this.querySelector('button[type="submit"]'); const oT = btn.textContent; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini"></div> Elaboro...'; if (bRM) bRM.style.display = 'none'; const fd = new FormData(); fd.append('eventId', bEII.value); fd.append('numeroPosti', nPI.value); fd.append('contatto', currentUserData.email); const N = pFC.querySelectorAll('input[name="participant_nome[]"]'); const C = pFC.querySelectorAll('input[name="participant_cognome[]"]'); let v = true; if (N.length !== parseInt(nPI.value)) { v = false; if (bRM) bRM.textContent = 'Num. partecipanti non corrisponde.'; } else { for (let i = 0; i < N.length; i++) { if (N[i].value.trim() === '' || C[i].value.trim() === '') { v = false; if (bRM) bRM.textContent = 'Nome e cognome obbligatori.'; break; } fd.append('partecipanti_nomi[]', N[i].value.trim()); fd.append('partecipanti_cognomi[]', C[i].value.trim()); } } if (!v) { if (bRM) { bRM.className = 'form-message error'; bRM.style.display = 'block'; } btn.disabled = false; btn.textContent = oT; return; }
-      try { const r = await fetch('prenota_evento.php', { method: 'POST', body: fd }); const rt = await r.text(); let j; try { j = JSON.parse(rt); } catch (err) { throw new Error("Risposta non valida: " + rt.substring(0, 100)); } if (j.success) { if (bRM) { bRM.textContent = j.message || 'Prenotazione confermata!'; bRM.className = 'form-message success'; } loadEvents(); } else { throw new Error(j.message || 'Errore prenotazione.'); } } catch (err) { if (bRM) { bRM.textContent = `Errore: ${err.message}`; bRM.className = 'form-message error'; } } finally { if (bRM) bRM.style.display = 'block'; btn.disabled = false; btn.textContent = oT; } });
+      try { const r = await fetch('prenota_evento.php', { method: 'POST', body: fd }); const rt = await r.text(); let j; try { j = JSON.parse(rt); } catch (err) { throw new Error("Risposta non valida: " + rt.substring(0, 100)); } if (j.success) { if (bRM) { bRM.textContent = j.message || 'Prenotazione confermata!'; bRM.className = 'form-message success'; } loadEvents(); setTimeout(cBP, 2000); } else { throw new Error(j.message || 'Errore prenotazione.'); } } catch (err) { if (bRM) { bRM.textContent = `Errore: ${err.message}`; bRM.className = 'form-message error'; } } finally { if (bRM) bRM.style.display = 'block'; btn.disabled = false; btn.textContent = oT; } });
   }
-  function generateParticipantFields(c, cont, bId, maxA) { if (!cont) return; cont.innerHTML = ''; let vC = parseInt(c); if (isNaN(vC) || vC < 1) vC = 1; if (isNaN(maxA) || maxA < 1) maxA = MAX_SEATS_PER_BOOKING; if (vC > maxA) vC = maxA; const nI = cont.closest('form')?.querySelector('input[type="number"]'); if (nI && parseInt(nI.value) !== vC) nI.value = vC; if (vC > 0) { for (let i = 1; i <= vC; i++) { const fS = document.createElement('div'); fS.className = 'participant-entry'; fS.innerHTML = `<p style="margin-bottom:0.5rem;font-weight:500;color:var(--dark);">Partecipante ${i}:</p><div class="form-grid"><div><label for="${bId}_nome_${i}">Nome*</label><input type="text" id="${bId}_nome_${i}" name="participant_nome[]" class="form-control" required></div><div><label for="${bId}_cognome_${i}">Cognome*</label><input type="text" id="${bId}_cognome_${i}" name="participant_cognome[]" class="form-control" required></div></div>`; cont.appendChild(fS); } } }
+  function generateParticipantFields(c, cont, bId, maxA) { if (!cont) return; cont.innerHTML = ''; let vC = parseInt(c); if (isNaN(vC) || vC < 1) vC = 1; if (isNaN(maxA) || maxA < 1) maxA = MAX_SEATS_PER_BOOKING; if (vC > maxA) vC = maxA; const nI = cont.closest('form')?.querySelector('input[type="number"]'); if (nI && parseInt(nI.value) !== vC) nI.value = vC; if (vC > 0) { for (let i = 1; i <= vC; i++) { const fS = document.createElement('div'); fS.className = 'participant-entry'; fS.innerHTML = `<p style="margin-bottom:0.5rem;font-weight:500;color:var(--dark);">Partecipante ${i}:</p><div class="form-grid" style="gap:0.5rem;"><div><label for="${bId}_nome_${i}" style="font-size:0.9em">Nome*</label><input type="text" id="${bId}_nome_${i}" name="participant_nome[]" class="form-control" required></div><div><label for="${bId}_cognome_${i}" style="font-size:0.9em">Cognome*</label><input type="text" id="${bId}_cognome_${i}" name="participant_cognome[]" class="form-control" required></div></div>`; cont.appendChild(fS); } } }
   function initializeWaitlistPopupHandlers() { const wO = gebi('waitlistPopupOverlay'); const wP = gebi('waitlistPopup'); const cB = gebi('closeWaitlistPopupBtn'); const wF = gebi('waitlistForm'); const wNPI = gebi('waitlistNumeroPosti'); const wEII = gebi('waitlistEventId'); const wPT = gebi('waitlistPopupTitle'); const wEI = gebi('waitlistEventInfo'); const wRM = gebi('waitlistResponseMessage'); const mSEW = gebi('maxSeatsAllowedWaitlist');
     window.openWaitlistPopup = function (id, t, pGiaP) { if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: 'waitlist', eventId: id, eventTitle: t, postiGiaPren: pGiaP })); return; } if (wEII) wEII.value = id; if (wPT) wPT.textContent = `Entra in Lista d'Attesa`; if (wEI) wEI.textContent = `Evento: ${t}`; const pGPN = parseInt(pGiaP) || 0; const maxPC = Math.min(MAX_SEATS_PER_BOOKING, MAX_TOTAL_SEATS_PER_USER - pGPN); if (maxPC < 1) { alert("Limite posti raggiunto."); return; } if (wNPI) { wNPI.max = maxPC; wNPI.value = 1; } if (mSEW) mSEW.textContent = maxPC; const iCEl = gebi('infoPostiCoda'); if (iCEl) iCEl.textContent = `Puoi richiedere da 1 a ${maxPC} posti. (Già prenotati/in coda: ${pGPN}/${MAX_TOTAL_SEATS_PER_USER})`; if (wRM) { wRM.style.display = 'none'; wRM.className = 'form-message'; } if (wO) wO.classList.add('active'); if (wP) wP.classList.add('active'); document.body.style.overflow = 'hidden'; };
     function cWP() { if (wO) wO.classList.remove('active'); if (wP) wP.classList.remove('active'); document.body.style.overflow = ''; if (wF) wF.reset(); }
     if (cB) cB.addEventListener('click', cWP); if (wO) wO.addEventListener('click', (e) => { if (e.target === wO) cWP(); });
     if (wF) wF.addEventListener('submit', async function (e) { e.preventDefault(); if (!currentUserData || !currentUserData.email) { alert("Sessione scaduta."); window.location.href = 'index.html'; return; } const btn = this.querySelector('button[type="submit"]'); const oT = btn.textContent; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini"></div> Elaboro...'; if (wRM) wRM.style.display = 'none'; const fd = new FormData(); fd.append('eventId', wEII.value); fd.append('numeroPosti', wNPI.value); fd.append('contatto', currentUserData.email);
-      try { const r = await fetch('gestisci_coda.php', { method: 'POST', body: fd }); const rt = await r.text(); let j; try { j = JSON.parse(rt); } catch (err) { throw new Error("Risposta non valida: " + rt.substring(0, 100)); } if (j.success) { if (wRM) { wRM.textContent = j.message || "Richiesta coda inviata!"; wRM.className = 'form-message success'; } loadEvents(); } else { throw new Error(j.message || "Errore richiesta coda."); } } catch (err) { if (wRM) { wRM.textContent = `Errore: ${err.message}`; wRM.className = 'form-message error'; } } finally { if (wRM) wRM.style.display = 'block'; btn.disabled = false; btn.textContent = oT; } });
+      try { const r = await fetch('gestisci_coda.php', { method: 'POST', body: fd }); const rt = await r.text(); let j; try { j = JSON.parse(rt); } catch (err) { throw new Error("Risposta non valida: " + rt.substring(0, 100)); } if (j.success) { if (wRM) { wRM.textContent = j.message || "Richiesta coda inviata!"; wRM.className = 'form-message success'; } loadEvents(); setTimeout(cWP, 2000); } else { throw new Error(j.message || "Errore richiesta coda."); } } catch (err) { if (wRM) { wRM.textContent = `Errore: ${err.message}`; wRM.className = 'form-message error'; } } finally { if (wRM) wRM.style.display = 'block'; btn.disabled = false; btn.textContent = oT; } });
   }
 
+
+  // --- Inizializzazione Pagina ---
   document.addEventListener('DOMContentLoaded', async () => {
     const cY = gebi("currentYear"); if (cY) cY.textContent = new Date().getFullYear();
-    volantinoMorphOverlay = gebi('volantinoMorphOverlay'); if (volantinoMorphOverlay) volantinoMorphOverlay.addEventListener("click", (e) => { if (e.target === volantinoMorphOverlay && morphingCard) hideVolantinoWithMorph(); });
-    loadUserData(); updateNavbarUI(); await loadEvents();
-    initializeBookingPopupHandlers(); initializeWaitlistPopupHandlers();
+    volantinoMorphOverlay = gebi('volantinoMorphOverlay');
+    if (volantinoMorphOverlay) volantinoMorphOverlay.addEventListener("click", (e) => { if (e.target === volantinoMorphOverlay && morphingCard) hideVolantinoWithMorph(); });
+
+    loadUserData();
+    updateNavbarUI(); // Aggiorna UI navbar e visibilità bottone admin
+    attachPreviewListenersUnified(); // Listener per l'anteprima del form evento
+    await loadEvents();
+
+    // Inizializza i gestori dei popup per utenti normali
+    initializeBookingPopupHandlers();
+    initializeWaitlistPopupHandlers();
+
+    // Gestione azione pendente dopo login
     const pAction = localStorage.getItem("pending_action_eff");
-    if (pAction && currentUserData) { // Controlla che l'utente sia loggato per processare l'azione
+    if (pAction && currentUserData && !currentUserData.isAdmin) { // Solo se utente normale
       const aD = JSON.parse(pAction);
       if (aD.action === 'book' && typeof window.openBookingPopup === 'function') window.openBookingPopup(aD.eventId, aD.eventTitle, aD.postiDisp, aD.postiGiaPren);
       else if (aD.action === 'waitlist' && typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(aD.eventId, aD.eventTitle, aD.postiGiaPren);
-      localStorage.removeItem("pending_action_eff"); // Rimuovi dopo aver tentato di processare
-    } else if (pAction && !currentUserData) {
-      // L'utente non è loggato, ma c'era un'azione. Potrebbe essere che il login sia fallito
-      // o l'utente ha chiuso il popup di login. Lascia l'azione pendente.
+      localStorage.removeItem("pending_action_eff");
+    } else if (pAction && (!currentUserData || currentUserData.isAdmin)) {
+      // Se l'utente non è loggato, o è admin, non processare azioni pendenti di prenotazione utente
+      // L'admin non dovrebbe avere azioni pendenti di questo tipo.
+      localStorage.removeItem("pending_action_eff"); // Rimuovi comunque per evitare loop
     }
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") { if (gebi('bookingPopup')?.classList.contains("active")) gebi('closeBookingPopupBtn')?.click(); if (gebi('waitlistPopup')?.classList.contains("active")) gebi('closeWaitlistPopupBtn')?.click(); if (volantinoMorphOverlay?.classList.contains("active")) hideVolantinoWithMorph(); } });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (gebi('bookingPopup')?.classList.contains("active")) gebi('closeBookingPopupBtn')?.click();
+        if (gebi('waitlistPopup')?.classList.contains("active")) gebi('closeWaitlistPopupBtn')?.click();
+        if (volantinoMorphOverlay?.classList.contains("active")) hideVolantinoWithMorph();
+        if (eventPopupUnified?.classList.contains("active")) closeEventPopupHandlerUnified();
+        // Aggiungere chiusura login popup se necessario, anche se già presente in `closeLoginPopup`
+        if (loginPopupEl?.classList.contains('active')) closeLoginPopup();
+      }
+    });
   });
   // === FINE SCRIPT UNIFICATO ===
 </script>
 </body>
-
 </html>
