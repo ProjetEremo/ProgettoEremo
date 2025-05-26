@@ -115,6 +115,7 @@
     </div>
 
     <div class="contatti-grid">
+      <!-- Modifica alla sezione contatto-card nel file contatti.html -->
       <div class="contatto-card">
         <div class="contatto-icon"><i class="fas fa-mobile-alt fa-2x" style="color: var(--secondary)"></i></div>
         <div class="editable-text-wrapper">
@@ -125,13 +126,34 @@
           <p id="content-card1Description" data-content-key="card1Description"></p>
           <span class="edit-icon-text" data-key="card1Description" data-type="textarea" title="Modifica Descrizione Card">✎</span>
         </div>
+
         <div class="editable-text-wrapper">
-          <p class="contatto-valore" id="content-card1PhoneNumber" data-content-key="card1PhoneNumber"></p>
-          <span class="edit-icon-text" data-key="card1PhoneNumber" data-type="tel" title="Modifica Numero Telefono">✎</span>
+          <p class="contatto-valore">
+            <span id="content-card1PhoneNumber1" data-content-key="card1PhoneNumber1">+39 347 1900434</span>
+            (<span id="content-card1PhoneName1" data-content-key="card1PhoneName1">Mario Rossi</span>)
+          </p>
+          <span class="edit-icon-text" data-key="card1PhoneNumber1" data-type="tel" title="Modifica Numero Telefono">✎</span>
+          <span class="edit-icon-text" data-key="card1PhoneName1" data-type="text" title="Modifica Nome Possessore">✎</span>
         </div>
-        <button class="btn-contatto" id="copyPhoneBtnCard1">
-          <i class="fas fa-copy" style="margin-right: 5px"></i> Copia Numero
-        </button>
+
+        <div class="editable-text-wrapper">
+          <p class="contatto-valore">
+            <span id="content-card1PhoneNumber2" data-content-key="card1PhoneNumber2">+39 329 2142414</span>
+            (<span id="content-card1PhoneName2" data-content-key="card1PhoneName2">Giulia Verdi</span>)
+          </p>
+          <span class="edit-icon-text" data-key="card1PhoneNumber2" data-type="tel" title="Modifica Numero Telefono">✎</span>
+          <span class="edit-icon-text" data-key="card1PhoneName2" data-type="text" title="Modifica Nome Possessore">✎</span>
+        </div>
+
+
+        <div class="phone-buttons-group">
+          <button class="btn-contatto half-btn" id="copyPhoneBtnCard1_1">
+            <i class="fas fa-copy"></i> Copia Numero 1
+          </button>
+          <button class="btn-contatto half-btn" id="copyPhoneBtnCard1_2">
+            <i class="fas fa-copy"></i> Copia Numero 2
+          </button>
+        </div>
       </div>
 
       <div class="contatto-card">
@@ -235,7 +257,10 @@
     pageIntroText: "Siamo a disposizione per informazioni sulle nostre attività, sull'ospitalità o per qualsiasi altra domanda. Non esitare a contattarci!",
     card1Title: "Referente Ospitalità",
     card1Description: "Per informazioni specifiche sui ritiri e l'accoglienza.",
-    card1PhoneNumber: "+39 098 765432",
+    card1PhoneNumber: "+39 347 1900434",
+    card1PhoneName1: "Antonella",
+    card1PhoneNumber: "+39 329 2142414",
+    card1PhoneName2: "Marina",
     card2Title: "Indirizzo Email",
     card2Description: "Per richieste scritte e invio documentazione.",
     card2Email: "info.eremofrancesco@email.it",
@@ -480,7 +505,7 @@
       navigator.clipboard.writeText(phoneNumber).then(() => {
         const originalText = button.innerHTML;
         button.innerHTML = '<i class="fas fa-check" style="margin-right: 5px;"></i> Copiato!';
-        button.style.backgroundColor = 'var(--success, green)';
+        //button.style.backgroundColor = 'var(--success, green)';
         setTimeout(() => {
           button.innerHTML = originalText;
           button.style.backgroundColor = '';
@@ -491,10 +516,19 @@
       });
     }
   }
-  const copyPhoneBtn1 = gebi('copyPhoneBtnCard1');
-  if(copyPhoneBtn1) {
-    copyPhoneBtn1.addEventListener('click', function() {
-      copyDisplayedPhoneNumber('content-card1PhoneNumber', this);
+
+  // New event listeners for the specific buttons
+  const copyPhoneBtn1_1 = gebi('copyPhoneBtnCard1_1');
+  if(copyPhoneBtn1_1) {
+    copyPhoneBtn1_1.addEventListener('click', function() {
+      copyDisplayedPhoneNumber('content-card1PhoneNumber1', this);
+    });
+  }
+
+  const copyPhoneBtn1_2 = gebi('copyPhoneBtnCard1_2');
+  if(copyPhoneBtn1_2) {
+    copyPhoneBtn1_2.addEventListener('click', function() {
+      copyDisplayedPhoneNumber('content-card1PhoneNumber2', this);
     });
   }
 
