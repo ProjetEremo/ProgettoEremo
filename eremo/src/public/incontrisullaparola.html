@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Add this for red logout link */
+        #logout-link-desktop, #mobileLogoutLink {
+            /* color: red !important; */ /* Rimosso stile rosso per coerenza con altre pagine */
+        }
         /* Stili popup login/registrazione */
         .login-popup input.form-control { transition: border-color 0.3s ease; border: 1px solid #ced4da; background-color: white !important; box-shadow: none !important; outline: none !important; }
         .login-popup input.error-border { border-color: var(--danger, red) !important; }
@@ -36,9 +40,9 @@
         .edit-icon-text, .edit-icon-image { display: none; position: absolute; top: -5px; right: -5px; background: var(--accent); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 0.75em; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-align: center; line-height: 22px; z-index:5; }
         /* Posizionamento icona edit per H1 centrato */
         .main-title-editable-wrapper > h1 + .edit-icon-text {
-            top: 50%; /* Allinea verticalmente al centro dell'H1 */
-            right: -5px; /* Leggermente fuori a destra */
-            transform: translateY(-50%); /* Centra verticalmente preciso */
+            top: 50%;
+            right: -5px;
+            transform: translateY(-50%);
         }
         .editable-text-wrapper h2 + .edit-icon-text,
         .editable-text-wrapper h3 + .edit-icon-text { top: 5px; right: -25px; }
@@ -74,7 +78,7 @@
             <a href="eventiincorso.html" id="navCalendarioAttivita">Calendario attività</a>
             <a href="eventipassati.html" id="navArchivioAttivita">Archivio attività</a>
             <span class="separator">|</span>
-            <a href="incontrisullaparola_unificato.html" class="active" id="navIncontriParola">Incontri sulla parola</a>
+            <a href="incontrisullaparola.html" class="active" id="navIncontriParola">Incontri sulla parola</a>
             <span class="separator">|</span>
             <a href="dovesiamo.html" id="navDoveSiamo">Dove siamo</a>
             <a href="contatti.html" id="navContatti">Contatti</a>
@@ -88,9 +92,11 @@
                     <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="dropdown-menu" id="userDropdownMenu">
-                    <a href="areapersonale.html" id="dropdownProfilo" style="display: none;">Il mio profilo</a>
-                    <a href="areapersonale.html#prenotazioni" id="dropdownPrenotazioni" style="display: none;">Le mie prenotazioni</a>
-                    <a href="#" id="dropdownLogout">Esci</a>
+                    <a href="areapersonale.html" id="nav-profilo">Il mio profilo</a>
+                    <a href="areapersonale.html#prenotazioni" id="nav-mie-prenotazioni">Le mie prenotazioni</a>
+                    <a href="dashboard.html" id="nav-dashboard" style="display: none;">Dashboard Admin</a>
+                    <a href="eventiincorsoAdmin.html" id="nav-gestione-eventi-admin" style="display: none;">Gestione Eventi</a>
+                    <a href="#" id="logout-link-desktop">Esci</a>
                 </div>
             </div>
             <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
@@ -99,13 +105,15 @@
     <div class="mobile-menu" id="mobileMenu">
         <a href="eventiincorso.html" id="mobileNavCalendarioAttivita">Calendario attività</a>
         <a href="eventipassati.html" id="mobileNavArchivioAttivita">Archivio attività</a>
-        <a href="incontrisullaparola_unificato.html" id="mobileNavIncontriParola">Incontri sulla parola</a>
+        <a href="incontrisullaparola.html" id="mobileNavIncontriParola">Incontri sulla parola</a>
         <a href="dovesiamo.html" id="mobileNavDoveSiamo">Dove siamo</a>
         <a href="contatti.html" id="mobileNavContatti">Contatti</a>
         <hr id="mobileMenuSeparator" style="border-color: rgba(255,255,255,0.1); display:none;">
         <a href="#" id="login-btn-mobile" style="display: none;">Accedi</a>
         <a href="areapersonale.html" id="mobileNavProfilo" style="display: none;">Il mio profilo</a>
         <a href="areapersonale.html#prenotazioni" id="mobileNavPrenotazioni" style="display: none;">Le mie prenotazioni</a>
+        <a href="dashboard.html" id="mobileNavDashboard" style="display: none;">Dashboard Admin</a>
+        <a href="eventiincorsoAdmin.html" id="mobileNavGestioneEventiAdmin" style="display: none;">Gestione Eventi</a>
         <a href="#" id="mobileLogoutLink" style="display: none;">Esci</a>
     </div>
 </header>
@@ -153,6 +161,7 @@
                         <div class="editable-text-wrapper">
                             <p id="content-infoQuandoText" data-content-key="infoQuandoText"></p>
                             <span class="edit-icon-text" data-key="infoQuandoText" data-type="quando" title="Modifica Info Quando">&#9998;</span>
+                            <p style="margin-top: 1rem; font-size: 1rem;">Prossimo incontro: <strong id="next-meeting-date"></strong></p>
                         </div>
                     </div>
                 </div>
@@ -256,6 +265,9 @@
     <form class="login-form active" id="loginForm" method="POST">
         <div class="form-group mb-3"><label for="login-email">Email</label><input type="email" id="login-email" name="login-email" class="form-control" required autocomplete="email"></div>
         <div class="form-group mb-3"><label for="login-password">Password</label><input type="password" id="login-password" name="login-password" class="form-control" required autocomplete="current-password"></div>
+        <div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
+            <a href="#" id="forgotPasswordLink" style="font-size: 0.9em; color: var(--primary);">Password dimenticata?</a>
+        </div>
         <div id="login-error-message" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
         <div class="form-actions"><button type="submit" class="btn-popup">Accedi</button></div>
     </form>
@@ -270,6 +282,22 @@
     </form>
 </div>
 
+<div class="login-popup-overlay" id="forgotPasswordOverlay"></div>
+<div class="login-popup" id="forgotPasswordPopup">
+    <button class="close-popup" id="closeForgotPasswordPopupBtn" aria-label="Chiudi popup">&times;</button>
+    <h3 style="text-align:center; margin-bottom: 1rem; color: var(--primary);">Recupera Password</h3>
+    <p style="font-size:0.95em; color:var(--gray-dark); margin-bottom:1.5rem; text-align:left;">Inserisci l'indirizzo email associato al tuo account. Se presente nel nostro sistema, ti invieremo un link per reimpostare la password.</p>
+    <form id="forgotPasswordForm" method="POST">
+        <div class="form-group mb-3">
+            <label for="forgot-email">Email</label>
+            <input type="email" id="forgot-email" name="forgot-email" class="form-control" required autocomplete="email">
+        </div>
+        <div id="forgot-password-message" class="form-message" style="text-align:left;"></div>
+        <div class="form-actions">
+            <button type="submit" class="btn-popup">Invia link di recupero</button>
+        </div>
+    </form>
+</div>
 <div id="editPageBtnContainer">
     <button id="editPageBtn"><i class="fas fa-pencil-alt"></i> Attiva Modifiche</button>
     <button id="savePageChangesBtn" style="display:none;"><i class="fas fa-save"></i> Salva Modifiche Pagina</button>
@@ -332,7 +360,7 @@
 
 
 <footer>
-    <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
+    <p>© <span id="currentYear"></span> Eremo Frate Francesco ODV. Tutti i diritti riservati.</p>
 </footer>
 
 <script>
@@ -350,7 +378,7 @@
         cosaSonoText1: "Gli Incontri sulla Parola sono un appuntamento settimanale dedicato all'ascolto, alla meditazione e alla condivisione della Parola di Dio, secondo il metodo della <strong>Lectio Divina</strong>. È un'opportunità per nutrire la propria fede, approfondire la comprensione delle Scritture e crescere insieme come comunità.",
         cosaSonoText2: "Non si tratta di uno studio accademico, ma di un'esperienza spirituale che cerca di far risuonare la Parola nella vita di ciascuno, in un clima di ascolto reciproco e di preghiera.",
         infoPraticheHeading: "Informazioni Pratiche",
-        infoQuandoText: { dayOfWeek: 3, startTime: "20:30", endTime: "22:00" },
+        infoQuandoText: { dayOfWeek: 3, startTime: "20:30", endTime: "22:00" }, // Default come oggetto
         infoDoveText: "Presso la sala incontri dell'Eremo Frate Francesco<br>Via San Vito, Nembro (BG)",
         infoRivoltoText: "L'invito è aperto a tutti: giovani, adulti, famiglie. Non è richiesta alcuna preparazione teologica specifica, solo il desiderio di mettersi in ascolto della Parola.",
         approccioImage: "https://picsum.photos/600/400?random=community,prayer,circle",
@@ -373,25 +401,17 @@
         return str.replace(/\r\n|\r|\n/g, '<br>');
     }
 
-    function formatQuandoTextDisplay(quandoDataObj) {
-        let dataToParse = quandoDataObj;
+    function formatQuandoTextDisplay(quandoDataObjOrString) {
+        let dataToParse = quandoDataObjOrString;
         if (typeof dataToParse === 'string') {
             try { dataToParse = JSON.parse(dataToParse); }
-            catch (e) {
-                dataToParse = defaultPageContents.infoQuandoText;
-                if (typeof dataToParse === 'string') {
-                    try { dataToParse = JSON.parse(dataToParse); } catch { return defaultPageContents.infoQuandoText || "Dati incontro non disponibili.";}
-                }
-            }
+            catch (e) { dataToParse = defaultPageContents.infoQuandoText; }
         }
         if (typeof dataToParse !== 'object' || dataToParse === null ||
-            typeof dataToParse.dayOfWeek !== 'number' ||
+            typeof dataToParse.dayOfWeek === 'undefined' || // undefined check for numbers
             typeof dataToParse.startTime !== 'string' ||
             typeof dataToParse.endTime !== 'string') {
-            dataToParse = defaultPageContents.infoQuandoText;
-            if (typeof dataToParse === 'string') {
-                try { dataToParse = JSON.parse(dataToParse); } catch { return defaultPageContents.infoQuandoText || "Dati incontro non disponibili.";}
-            }
+            dataToParse = defaultPageContents.infoQuandoText; // Fallback a default object
         }
         const days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
         const dayName = days[dataToParse.dayOfWeek] || "Giorno non specificato";
@@ -402,8 +422,7 @@
 
     async function fetchAndUpdateUserDisplayDataFromApi() {
         if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
-            updateNavbarUI();
-            return;
+            updateNavbarUI(); return;
         }
         try {
             const response = await fetch(`api/api_get_user_profile.php?email=${encodeURIComponent(currentUserData.email)}`);
@@ -416,32 +435,54 @@
                 currentUserData.cognome = freshData.cognome || (currentUserData.cognome || '');
                 localStorage.setItem('userDataEFF', JSON.stringify(currentUserData));
             }
-        } catch (error) {
-            console.warn("IncontriParola: Errore fetch profilo aggiornato per navbar:", error.message);
-        }
+        } catch (error) { console.warn("IncontriParola: Errore fetch profilo aggiornato:", error.message); }
         updateNavbarUI();
     }
 
     function updateNavbarUI() {
         const logoLink = gebi('logoLink'); if (logoLink) logoLink.href = "index.html";
-        const navbarTitle = gebi('navbarTitle'); const loginBtnDesktop = gebi('login-btn-desktop'); const userDropdownContainer = gebi('userDropdownContainer'); const navbarAvatarSpan = gebi('navbar-avatar'); const navbarUsername = gebi('navbar-username'); const dropdownProfilo = gebi('dropdownProfilo'); const dropdownPrenotazioni = gebi('dropdownPrenotazioni'); const dropdownLogout = gebi('dropdownLogout'); const loginBtnMobile = gebi('login-btn-mobile'); const mobileNavProfilo = gebi('mobileNavProfilo'); const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni'); const mobileLogoutLink = gebi('mobileLogoutLink'); const mobileMenuSeparator = gebi('mobileMenuSeparator'); const userDropdownMenu = gebi('userDropdownMenu'); const mobileMenu = gebi('mobileMenu'); const editPageBtnContainer = gebi('editPageBtnContainer');
-        let dropdownDashboard = gebi('dropdownDashboard'); if (userDropdownMenu && !dropdownDashboard) { dropdownDashboard = document.createElement('a'); dropdownDashboard.id = 'dropdownDashboard'; dropdownDashboard.href = 'dashboard.html'; dropdownDashboard.textContent = 'Dashboard Admin'; userDropdownMenu.insertBefore(dropdownDashboard, dropdownLogout); }
-        let dropdownGestioneEventi = gebi('dropdownGestioneEventi'); if (userDropdownMenu && !dropdownGestioneEventi) { dropdownGestioneEventi = document.createElement('a'); dropdownGestioneEventi.id = 'dropdownGestioneEventi'; dropdownGestioneEventi.href = 'eventiincorsoAdmin.html'; dropdownGestioneEventi.textContent = 'Gestione Eventi'; userDropdownMenu.insertBefore(dropdownGestioneEventi, dropdownLogout); }
-        let mobileNavDashboard = gebi('mobileNavDashboard'); if (mobileMenu && !mobileNavDashboard) { mobileNavDashboard = document.createElement('a'); mobileNavDashboard.id = 'mobileNavDashboard'; mobileNavDashboard.href = 'dashboard.html'; mobileNavDashboard.textContent = 'Dashboard Admin'; mobileMenu.insertBefore(mobileNavDashboard, mobileLogoutLink); }
-        let mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); if (mobileMenu && !mobileNavGestioneEventiAdmin) { mobileNavGestioneEventiAdmin = document.createElement('a'); mobileNavGestioneEventiAdmin.id = 'mobileNavGestioneEventiAdmin'; mobileNavGestioneEventiAdmin.href = 'eventiincorsoAdmin.html'; mobileNavGestioneEventiAdmin.textContent = 'Gestione Eventi'; mobileMenu.insertBefore(mobileNavGestioneEventiAdmin, mobileLogoutLink); }
-        if (loginBtnDesktop) loginBtnDesktop.style.display = 'none'; if (userDropdownContainer) userDropdownContainer.style.display = 'none'; if (dropdownProfilo) dropdownProfilo.style.display = 'none'; if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none'; if (dropdownDashboard) dropdownDashboard.style.display = 'none'; if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none'; if (loginBtnMobile) loginBtnMobile.style.display = 'none'; if (mobileNavProfilo) mobileNavProfilo.style.display = 'none'; if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none'; if (mobileNavDashboard) mobileNavDashboard.style.display = 'none'; if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none'; if (mobileLogoutLink) mobileLogoutLink.style.display = 'none'; if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'none'; if (editPageBtnContainer) editPageBtnContainer.style.display = 'none';
+        const navbarTitle = gebi('navbarTitle');
+        const loginBtnDesktop = gebi('login-btn-desktop');
+        const userDropdownContainer = gebi('userDropdownContainer');
+        const navbarAvatarSpan = gebi('navbar-avatar');
+        const navbarUsername = gebi('navbar-username');
+        const mobileMenuSeparator = gebi('mobileMenuSeparator');
+        const editPageBtnContainer = gebi('editPageBtnContainer');
+        const navProfilo = gebi('nav-profilo');
+        const navMiePrenotazioni = gebi('nav-mie-prenotazioni');
+        const navDashboard = gebi('nav-dashboard');
+        const navGestioneEventiAdmin = gebi('nav-gestione-eventi-admin');
+        const logoutLinkDesktop = gebi('logout-link-desktop');
+        const loginBtnMobile = gebi('login-btn-mobile');
+        const mobileNavProfiloEl = gebi('mobileNavProfilo');
+        const mobileNavPrenotazioniEl = gebi('mobileNavPrenotazioni');
+        const mobileNavDashboardEl = gebi('mobileNavDashboard');
+        const mobileNavGestioneEventiAdminEl = gebi('mobileNavGestioneEventiAdmin');
+        const mobileLogoutLinkEl = gebi('mobileLogoutLink');
+
+        [loginBtnDesktop, userDropdownContainer, navProfilo, navMiePrenotazioni, navDashboard, navGestioneEventiAdmin, logoutLinkDesktop, loginBtnMobile, mobileNavProfiloEl, mobileNavPrenotazioniEl, mobileNavDashboardEl, mobileNavGestioneEventiAdminEl, mobileLogoutLinkEl, mobileMenuSeparator, editPageBtnContainer].forEach(el => { if (el) el.style.display = 'none'; });
+
         if (currentUserData) {
-            if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block'; if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
-            const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null; if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
-            if (mobileLogoutLink) mobileLogoutLink.style.display = 'block'; if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
+            if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
+            if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
+            const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
+            if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; }; }
+            if (logoutLinkDesktop) logoutLinkDesktop.style.display = 'block';
+            if (mobileLogoutLinkEl) mobileLogoutLinkEl.style.display = 'block';
+            if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
+
             if (currentUserData.isAdmin) {
-                if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)"; if (dropdownDashboard) dropdownDashboard.style.display = 'block'; if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'block'; if (mobileNavDashboard) mobileNavDashboard.style.display = 'block'; if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'block';
-                if (editPageBtnContainer) { editPageBtnContainer.style.display = 'flex'; gebi('editPageBtn').style.display = isEditModeActive ? 'none' : 'inline-block'; gebi('savePageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; gebi('cancelPageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none';}
+                if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
+                [navProfilo, navMiePrenotazioni, navDashboard, navGestioneEventiAdmin, mobileNavProfiloEl, mobileNavPrenotazioniEl, mobileNavDashboardEl, mobileNavGestioneEventiAdminEl].forEach(el => { if(el) el.style.display = 'block'; });
+                if (editPageBtnContainer) { editPageBtnContainer.style.display = 'flex'; gebi('editPageBtn').style.display = isEditModeActive ? 'none' : 'inline-block'; gebi('savePageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; gebi('cancelPageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; }
             } else {
-                if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco"; if (dropdownProfilo) dropdownProfilo.style.display = 'block'; if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block'; if (mobileNavProfilo) mobileNavProfilo.style.display = 'block'; if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
+                if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+                [navProfilo, navMiePrenotazioni, mobileNavProfiloEl, mobileNavPrenotazioniEl].forEach(el => { if(el) el.style.display = 'block'; });
             }
         } else {
-            if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block'; if (loginBtnMobile) loginBtnMobile.style.display = 'block'; if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+            if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
+            if (loginBtnMobile) loginBtnMobile.style.display = 'block';
+            if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
         }
     }
 
@@ -449,7 +490,7 @@
     let lastScroll = 0; const navbarContainer = gebi("navbarContainer"); if (navbarContainer) { window.addEventListener("scroll", function () { const cS = window.pageYOffset||document.documentElement.scrollTop; if(cS<=50){navbarContainer.classList.remove("hidden");lastScroll=0;return;} if(cS>lastScroll&&!navbarContainer.classList.contains("hidden"))navbarContainer.classList.add("hidden"); else if(cS<lastScroll&&navbarContainer.classList.contains("hidden"))navbarContainer.classList.remove("hidden"); lastScroll=cS<=0?0:cS;}, false);}
     const mobileMenu = gebi("mobileMenu"); const hamburgerBtn = gebi("hamburgerBtn"); function toggleMobileMenu(){if(mobileMenu&&hamburgerBtn){const iO=mobileMenu.classList.toggle("open");hamburgerBtn.classList.toggle("open"); hamburgerBtn.setAttribute("aria-expanded",String(iO));document.body.style.overflow=iO?"hidden":"";}} function closeMobileMenu(){if(mobileMenu&&hamburgerBtn&&mobileMenu.classList.contains("open")){mobileMenu.classList.remove("open");hamburgerBtn.classList.remove("open");hamburgerBtn.setAttribute("aria-expanded","false");document.body.style.overflow="";}} if(hamburgerBtn)hamburgerBtn.addEventListener("click",toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l=>{if(l.id!=='login-btn-mobile'&&l.id!=='mobileLogoutLink')l.addEventListener("click",closeMobileMenu);}); document.addEventListener("click",function(e){if(mobileMenu&&mobileMenu.classList.contains("open")&&hamburgerBtn&&!mobileMenu.contains(e.target)&&!hamburgerBtn.contains(e.target))closeMobileMenu();});
     const userBtnTrigger = gebi('userBtnTrigger'); const userDropdownMenu = gebi('userDropdownMenu'); if(userBtnTrigger&&userDropdownMenu){userBtnTrigger.addEventListener('click',function(e){e.stopPropagation();const iS=userDropdownMenu.style.display==='block';userDropdownMenu.style.display=iS?'none':'block';this.setAttribute('aria-expanded',String(!iS));}); document.addEventListener('click',function(e){if(userDropdownMenu&&userDropdownMenu.style.display==='block'&&!userBtnTrigger.contains(e.target)&&!userDropdownMenu.contains(e.target)){userDropdownMenu.style.display='none';userBtnTrigger.setAttribute('aria-expanded','false');}});}
-    const loginOverlay = gebi('loginOverlay'); const loginPopup = gebi('loginPopup'); const closeLoginPopupBtn = gebi('closeLoginPopupBtn'); const loginTabs = document.querySelectorAll('.login-tab'); const loginForms = document.querySelectorAll('.login-popup .login-form'); const loginFormEl = gebi('loginForm'); const registerFormEl = gebi('registerForm'); const loginErrorMessageEl = gebi('login-error-message'); const registerErrorMessageEl = gebi('register-error-message');
+    const loginOverlay = gebi('loginOverlay'); const loginPopup = gebi('loginPopup'); const closeLoginPopupBtn = gebi('closeLoginPopupBtn'); const loginTabs = document.querySelectorAll('.login-tab'); const loginForms = document.querySelectorAll('#loginPopup .login-form'); const loginFormEl = gebi('loginForm'); const registerFormEl = gebi('registerForm'); const loginErrorMessageEl = gebi('login-error-message'); const registerErrorMessageEl = gebi('register-error-message');
     function openLoginPopup(){if(loginOverlay)loginOverlay.classList.add('active');if(loginPopup)loginPopup.classList.add('active');document.body.style.overflow='hidden';resetFormErrorsAndMessages();const loginTabToActivate = loginPopup.querySelector('.login-tab[data-tab="login"]'); if(loginTabToActivate) loginTabToActivate.click(); gebi('login-email')?.focus();}
     function closeLoginPopup(){if(loginOverlay)loginOverlay.classList.remove('active');if(loginPopup)loginPopup.classList.remove('active');document.body.style.overflow='';resetFormErrorsAndMessages();}
     function resetFormErrorsAndMessages(){loginForms.forEach(f=>f.querySelectorAll('.form-control.error-border').forEach(i=>i.classList.remove('error-border')));if(loginErrorMessageEl)loginErrorMessageEl.style.display='none';if(registerErrorMessageEl)registerErrorMessageEl.style.display='none';}
@@ -458,7 +499,91 @@
     loginTabs.forEach(t=>t.addEventListener('click',()=>{const id=t.dataset.tab;loginTabs.forEach(tb=>tb.classList.remove('active'));t.classList.add('active');loginForms.forEach(f=>{f.classList.remove('active');if(f.id===`${id}Form`){f.classList.add('active');f.querySelector('input:not([type="hidden"])')?.focus();}});resetFormErrorsAndMessages();}));
     loginFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=loginFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';try{const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath,isAdmin:j.is_admin===true||j.is_admin===1};localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));await fetchAndUpdateUserDisplayDataFromApi();closeLoginPopup();await loadPageContentsFromServer();showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");}else{loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}}}catch(err){console.error("Errore login:",err);if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
     registerFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=registerFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Registrazione...<div class="spinner-mini-light"></div>';try{const r=await fetch('registrati.php',{method:'POST',body:new FormData(registerFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){alert(j.message||"Registrazione completata! Ora puoi accedere.");const loginTabButton=document.querySelector('.login-tab[data-tab="login"]');if(loginTabButton)loginTabButton.click();const loginEmailInput=gebi('login-email');const registerEmailInput=gebi('register-email');if(loginEmailInput&&registerEmailInput)loginEmailInput.value=registerEmailInput.value;e.target.reset();}else{if(registerErrorMessageEl){registerErrorMessageEl.textContent=j.message||"Errore registrazione.";registerErrorMessageEl.style.display='block';}if(j.errors){for(const f in j.errors)gebi(`register-${f}`)?.classList.add('error-border');}}}catch(err){console.error("Errore registrazione:",err);if(registerErrorMessageEl){registerErrorMessageEl.textContent="Errore connessione o server.";registerErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
-    gebi('dropdownLogout')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();}); gebi('mobileLogoutLink')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenu();});
+    gebi('logout-link-desktop')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();}); gebi('mobileLogoutLink')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenu();});
+
+    // === INIZIO FUNZIONALITÀ RECUPERO PASSWORD (per incontrisullaparola.html) ===
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
+    const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
+    const closeForgotPasswordPopupBtn = document.getElementById('closeForgotPasswordPopupBtn');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    const forgotPasswordMessage = document.getElementById('forgot-password-message');
+
+    function openForgotPasswordPopup() {
+        if (typeof closeLoginPopup === 'function' && loginPopup?.classList.contains('active')) {
+            closeLoginPopup();
+        }
+        if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active');
+        if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
+        const forgotEmailInput = document.getElementById('forgot-email');
+        if(forgotEmailInput) forgotEmailInput.focus();
+    }
+
+    function closeForgotPasswordPopup() {
+        if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active');
+        if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active');
+
+        // Controlla se ALTRI popup (es. login, editContentModal, editQuandoModal) sono attivi
+        let anyOtherPagePopupActive = document.querySelector('#loginPopup.active, #editContentModal.active, #editQuandoModal.active');
+        if (!anyOtherPagePopupActive) {
+            document.body.style.overflow = '';
+        }
+        if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
+        if(forgotPasswordForm) forgotPasswordForm.reset();
+    }
+
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openForgotPasswordPopup();
+        });
+    }
+    if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
+    if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
+
+    if (forgotPasswordForm) {
+        forgotPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (forgotPasswordMessage) {
+                forgotPasswordMessage.style.display = 'none';
+                forgotPasswordMessage.className = 'form-message';
+            }
+            const emailInput = document.getElementById('forgot-email');
+            const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Invio...<div class="spinner-mini-light"></div>';
+
+            try {
+                const formData = new FormData(forgotPasswordForm);
+                const response = await fetch('richiesta_recupero_password.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    forgotPasswordMessage.textContent = result.message;
+                    forgotPasswordMessage.classList.add('success');
+                    if(emailInput) emailInput.value = '';
+                } else {
+                    forgotPasswordMessage.textContent = result.message || "Si è verificato un errore.";
+                    forgotPasswordMessage.classList.add('error');
+                }
+            } catch (error) {
+                console.error('Errore richiesta recupero password:', error);
+                forgotPasswordMessage.textContent = "Errore di connessione o del server.";
+                forgotPasswordMessage.classList.add('error');
+            } finally {
+                if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+    }
+    // === FINE FUNZIONALITÀ RECUPERO PASSWORD (per incontrisullaparola.html) ===
 
     const editPageBtn=gebi('editPageBtn');const savePageChangesBtn=gebi('savePageChangesBtn'); const cancelPageChangesBtn=gebi('cancelPageChangesBtn');
     const editContentModal=gebi('editContentModal'); const closeEditContentModalBtn=gebi('closeEditContentModalBtn');const editModalTitle=gebi('editModalTitle'); const editModalTextarea=gebi('editModalTextarea');const editModalInputText=gebi('editModalInputText'); const editModalInputImage=gebi('editModalInputImage');const editModalFieldLabelText=gebi('editModalFieldLabelText'); const saveEditModalBtn=gebi('saveEditModalBtn');const cancelEditModalBtn=gebi('cancelEditModalBtn'); const editModalMessage=gebi('editModalMessage');const pageOverallStatus=gebi('pageOverallStatus'); const editModalInputFile=gebi('editModalInputFile'); const editModalFileLabel=gebi('editModalFileLabel'); const editModalFileNote = gebi('editModalFileNote');
@@ -487,6 +612,8 @@
                 if (typeof currentPageDbContents.infoQuandoText === 'string') {
                     try { currentPageDbContents.infoQuandoText = JSON.parse(currentPageDbContents.infoQuandoText); }
                     catch (e) { currentPageDbContents.infoQuandoText = defaultPageContents.infoQuandoText; }
+                } else if (currentPageDbContents.infoQuandoText === undefined || currentPageDbContents.infoQuandoText === null) {
+                    currentPageDbContents.infoQuandoText = defaultPageContents.infoQuandoText;
                 }
             } else {
                 currentPageDbContents=JSON.parse(JSON.stringify(defaultPageContents)); // Deep copy defaults
@@ -509,7 +636,7 @@
                 el.innerHTML = formatQuandoTextDisplay(contentValue);
             } else if (contentValue !== undefined) {
                 if (el.tagName === 'IMG') {
-                    el.src = contentValue;
+                    el.src = String(contentValue); // Assicura che sia una stringa
                     el.onerror = function() {
                         this.src = defaultPageContents[key] || `https://placehold.co/600x400/eee/ccc?text=Img Default (${key})`;
                         this.onerror = null;
@@ -563,15 +690,11 @@
         currentEditingType = 'quando';
         if (!editQuandoModal || !editQuandoModalMessage) return;
         editQuandoModalMessage.style.display = 'none'; editQuandoModalMessage.textContent = '';
-        let quandoData = currentPageDbContents.infoQuandoText;
-        if (typeof quandoData === 'string') {
-            try { quandoData = JSON.parse(quandoData); }
-            catch(e) { quandoData = defaultPageContents.infoQuandoText; }
-        }
+        let quandoData = currentPageDbContents.infoQuandoText; // Questo dovrebbe essere un oggetto ora
         if (typeof quandoData !== 'object' || quandoData === null) {
-            quandoData = defaultPageContents.infoQuandoText;
+            quandoData = defaultPageContents.infoQuandoText; // Fallback a default se non è un oggetto
         }
-        editQuandoDayOfWeekEl.value = quandoData.dayOfWeek !== undefined ? quandoData.dayOfWeek : 3;
+        editQuandoDayOfWeekEl.value = quandoData.dayOfWeek !== undefined ? String(quandoData.dayOfWeek) : "5"; // Venerdì di default
         editQuandoStartTimeEl.value = quandoData.startTime || "20:30";
         editQuandoEndTimeEl.value = quandoData.endTime || "22:00";
         editQuandoModal.style.display = 'flex';
@@ -583,34 +706,34 @@
 
     if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
     if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{
-        const contentsToSave = { ...currentPageDbContents };
+        const contentsToSave = { ...currentPageDbContents }; // Inizia con i contenuti correnti (che sono oggetti)
         document.querySelectorAll('[data-content-key]').forEach(el => {
             const key = el.dataset.contentKey;
-            if (key !== 'infoQuandoText') {
+            if (key !== 'infoQuandoText') { // 'infoQuandoText' è già un oggetto in currentPageDbContents
                 if (el.tagName === 'IMG') {
                     contentsToSave[key] = el.src;
                 } else {
+                    // Salva l'innerHTML, che include i <br>
                     contentsToSave[key] = el.innerHTML;
                 }
             }
         });
+        // Assicurati che infoQuandoText sia una stringa JSON prima di inviare
         if (typeof contentsToSave.infoQuandoText === 'object' && contentsToSave.infoQuandoText !== null) {
             contentsToSave.infoQuandoText = JSON.stringify(contentsToSave.infoQuandoText);
         } else if (contentsToSave.infoQuandoText === undefined || contentsToSave.infoQuandoText === null) {
-            // Se per qualche motivo è null o undefined, serializza il default come stringa JSON
             contentsToSave.infoQuandoText = JSON.stringify(defaultPageContents.infoQuandoText);
         }
-        // Se è già una stringa JSON (es. non modificato), va bene così.
 
         const btn=savePageChangesBtn;const oldHtml=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
         try{
             const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});
             const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");
-            // Dopo il salvataggio, assicurati che currentPageDbContents.infoQuandoText sia un oggetto se era stato stringifizzato
+            // Riconverti infoQuandoText in oggetto dopo averlo salvato (o ricarica i contenuti)
             if (typeof currentPageDbContents.infoQuandoText === 'string') {
-                try { currentPageDbContents.infoQuandoText = JSON.parse(currentPageDbContents.infoQuandoText); } catch(e){ /* gestisci errore o fallback */ }
+                try { currentPageDbContents.infoQuandoText = JSON.parse(currentPageDbContents.infoQuandoText); } catch(e){ currentPageDbContents.infoQuandoText = defaultPageContents.infoQuandoText; }
             }
-            originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents));
+            originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents)); // Aggiorna backup
             showPageStatus(j.message||'Modifiche salvate!','success');toggleEditMode(false);
         }catch(err){console.error("Errore salvataggio:",err);showPageStatus(`Errore: ${err.message}`,'error');}
         finally{btn.disabled=false;btn.innerHTML=oldHtml;}
@@ -668,10 +791,10 @@
             currentPageDbContents[currentEditingKey] = newValue;
         } else if(currentEditingType==='textarea'){
             newValue = editModalTextarea.value; targetElement.innerHTML = formatHTMLContent(newValue);
-            currentPageDbContents[currentEditingKey] = targetElement.innerHTML;
+            currentPageDbContents[currentEditingKey] = targetElement.innerHTML; // Salva con <br>
         } else { // type 'text'
             newValue = editModalInputText.value; targetElement.innerHTML = formatHTMLContent(newValue);
-            currentPageDbContents[currentEditingKey] = targetElement.innerHTML;
+            currentPageDbContents[currentEditingKey] = targetElement.innerHTML; // Salva con <br>
         }
         if(closeTheModal)closeEditContentModal();
     });
@@ -682,8 +805,8 @@
             startTime: editQuandoStartTimeEl.value,
             endTime: editQuandoEndTimeEl.value
         };
-        currentPageDbContents.infoQuandoText = newQuandoData;
-        applyContentsToPage(currentPageDbContents);
+        currentPageDbContents.infoQuandoText = newQuandoData; // Salva come oggetto
+        applyContentsToPage(currentPageDbContents); // Questo formatterà per la visualizzazione
         closeEditQuandoModal();
         showPageStatus("Dettagli 'Quando' aggiornati localmente. Ricorda di salvare la pagina.", "info");
     });
@@ -703,6 +826,7 @@
         const nextMeetingDateElement = gebi('next-meeting-date');
         if (nextMeetingDateElement) {
             let quandoData = currentPageDbContents.infoQuandoText;
+            // Assicurati che quandoData sia un oggetto
             if (typeof quandoData === 'string') {
                 try { quandoData = JSON.parse(quandoData); }
                 catch(e) { quandoData = defaultPageContents.infoQuandoText; }
@@ -710,9 +834,10 @@
             if (typeof quandoData !== 'object' || quandoData === null) {
                 quandoData = defaultPageContents.infoQuandoText;
             }
-            const targetDay = quandoData.dayOfWeek !== undefined ? quandoData.dayOfWeek : 3;
+
+            const targetDay = (quandoData && typeof quandoData.dayOfWeek === 'number') ? quandoData.dayOfWeek : 5; // Default a Venerdì se non specificato
             let triggerHour = 22, triggerMinute = 0;
-            if (quandoData.endTime) {
+            if (quandoData && quandoData.endTime) {
                 const timeParts = quandoData.endTime.split(':');
                 if (timeParts.length === 2) {
                     triggerHour = parseInt(timeParts[0]);
@@ -726,10 +851,20 @@
     document.addEventListener('DOMContentLoaded',async()=>{
         const c=gebi('currentYear');if(c)c.textContent=new Date().getFullYear();
         loadUserData();
-        await loadPageContentsFromServer();
-        await fetchAndUpdateUserDisplayDataFromApi();
+        await loadPageContentsFromServer(); // Carica contenuti, poi aggiorna navbar
+        await fetchAndUpdateUserDisplayDataFromApi(); // Chiamato dopo il caricamento dei dati per avere currentUserData
         if(!isEditModeActive||!currentUserData?.isAdmin){document.querySelectorAll('.edit-icon-text,.edit-icon-image').forEach(i=>i.style.display='none');document.querySelectorAll('img.chi-siamo-image, img.page-header-image').forEach(img=>img.classList.remove('editable-image-target'));} else { toggleEditMode(false); }
-        document.addEventListener('keydown',(e)=>{if(e.key==='Escape'){if(loginPopup?.classList.contains('active'))closeLoginPopup(); if(editContentModal?.style.display==='flex')closeEditContentModal(); if(editQuandoModal?.style.display==='flex')closeEditQuandoModal();}});
+
+        // INIZIO MODIFICA: Event listener per ESC aggiornato
+        document.addEventListener('keydown',(e)=>{
+            if(e.key==='Escape'){
+                if(loginPopup?.classList.contains('active')) closeLoginPopup();
+                if(gebi('forgotPasswordPopup')?.classList.contains('active')) closeForgotPasswordPopup(); // NUOVA RIGA
+                if(editContentModal?.style.display==='flex') closeEditContentModal();
+                if(editQuandoModal?.style.display==='flex') closeEditQuandoModal();
+            }
+        });
+        // FINE MODIFICA: Event listener per ESC aggiornato
     });
 </script>
 
