@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Add this for red logout link */
+        #logout-link-desktop, #mobileLogoutLink {
+            color: red !important;
+        }
         /* Stili popup login/registrazione */
         .login-popup input.form-control { transition: border-color 0.3s ease; border: 1px solid #ced4da; background-color: white !important; box-shadow: none !important; outline: none !important; }
         .login-popup input.error-border { border-color: var(--danger, red) !important; }
@@ -74,7 +78,7 @@
             <a href="eventiincorso.html" id="navCalendarioAttivita">Calendario attività</a>
             <a href="eventipassati.html" id="navArchivioAttivita">Archivio attività</a>
             <span class="separator">|</span>
-            <a href="incontrisullaparola_unificato.html" class="active" id="navIncontriParola">Incontri sulla parola</a>
+            <a href="incontri sulla parola_unificato.html" class="active" id="navIncontriParola">Incontri sulla parola</a>
             <span class="separator">|</span>
             <a href="dovesiamo.html" id="navDoveSiamo">Dove siamo</a>
             <a href="contatti.html" id="navContatti">Contatti</a>
@@ -88,9 +92,11 @@
                     <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="dropdown-menu" id="userDropdownMenu">
-                    <a href="areapersonale.html" id="dropdownProfilo" style="display: none;">Il mio profilo</a>
-                    <a href="areapersonale.html#prenotazioni" id="dropdownPrenotazioni" style="display: none;">Le mie prenotazioni</a>
-                    <a href="#" id="dropdownLogout">Esci</a>
+                    <a href="areapersonale.html" id="nav-profilo">Il mio profilo</a>
+                    <a href="areapersonale.html#prenotazioni" id="nav-mie-prenotazioni">Le mie prenotazioni</a>
+                    <a href="dashboard.html" id="nav-dashboard" style="display: none;">Dashboard Admin</a>
+                    <a href="eventiincorsoAdmin.html" id="nav-gestione-eventi-admin" style="display: none;">Gestione Eventi</a>
+                    <a href="#" id="logout-link-desktop">Esci</a>
                 </div>
             </div>
             <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
@@ -99,13 +105,15 @@
     <div class="mobile-menu" id="mobileMenu">
         <a href="eventiincorso.html" id="mobileNavCalendarioAttivita">Calendario attività</a>
         <a href="eventipassati.html" id="mobileNavArchivioAttivita">Archivio attività</a>
-        <a href="incontrisullaparola_unificato.html" id="mobileNavIncontriParola">Incontri sulla parola</a>
+        <a href="incontri sulla parola_unificato.html" id="mobileNavIncontriParola">Incontri sulla parola</a>
         <a href="dovesiamo.html" id="mobileNavDoveSiamo">Dove siamo</a>
         <a href="contatti.html" id="mobileNavContatti">Contatti</a>
         <hr id="mobileMenuSeparator" style="border-color: rgba(255,255,255,0.1); display:none;">
         <a href="#" id="login-btn-mobile" style="display: none;">Accedi</a>
         <a href="areapersonale.html" id="mobileNavProfilo" style="display: none;">Il mio profilo</a>
         <a href="areapersonale.html#prenotazioni" id="mobileNavPrenotazioni" style="display: none;">Le mie prenotazioni</a>
+        <a href="dashboard.html" id="mobileNavDashboard" style="display: none;">Dashboard Admin</a>
+        <a href="eventiincorsoAdmin.html" id="mobileNavGestioneEventiAdmin" style="display: none;">Gestione Eventi</a>
         <a href="#" id="mobileLogoutLink" style="display: none;">Esci</a>
     </div>
 </header>
@@ -153,6 +161,7 @@
                         <div class="editable-text-wrapper">
                             <p id="content-infoQuandoText" data-content-key="infoQuandoText"></p>
                             <span class="edit-icon-text" data-key="infoQuandoText" data-type="quando" title="Modifica Info Quando">&#9998;</span>
+                            <br><br>
                         </div>
                     </div>
                 </div>
@@ -424,24 +433,90 @@
 
     function updateNavbarUI() {
         const logoLink = gebi('logoLink'); if (logoLink) logoLink.href = "index.html";
-        const navbarTitle = gebi('navbarTitle'); const loginBtnDesktop = gebi('login-btn-desktop'); const userDropdownContainer = gebi('userDropdownContainer'); const navbarAvatarSpan = gebi('navbar-avatar'); const navbarUsername = gebi('navbar-username'); const dropdownProfilo = gebi('dropdownProfilo'); const dropdownPrenotazioni = gebi('dropdownPrenotazioni'); const dropdownLogout = gebi('dropdownLogout'); const loginBtnMobile = gebi('login-btn-mobile'); const mobileNavProfilo = gebi('mobileNavProfilo'); const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni'); const mobileLogoutLink = gebi('mobileLogoutLink'); const mobileMenuSeparator = gebi('mobileMenuSeparator'); const userDropdownMenu = gebi('userDropdownMenu'); const mobileMenu = gebi('mobileMenu'); const editPageBtnContainer = gebi('editPageBtnContainer');
-        let dropdownDashboard = gebi('dropdownDashboard'); if (userDropdownMenu && !dropdownDashboard) { dropdownDashboard = document.createElement('a'); dropdownDashboard.id = 'dropdownDashboard'; dropdownDashboard.href = 'dashboard.html'; dropdownDashboard.textContent = 'Dashboard Admin'; userDropdownMenu.insertBefore(dropdownDashboard, dropdownLogout); }
-        let dropdownGestioneEventi = gebi('dropdownGestioneEventi'); if (userDropdownMenu && !dropdownGestioneEventi) { dropdownGestioneEventi = document.createElement('a'); dropdownGestioneEventi.id = 'dropdownGestioneEventi'; dropdownGestioneEventi.href = 'eventiincorsoAdmin.html'; dropdownGestioneEventi.textContent = 'Gestione Eventi'; userDropdownMenu.insertBefore(dropdownGestioneEventi, dropdownLogout); }
-        let mobileNavDashboard = gebi('mobileNavDashboard'); if (mobileMenu && !mobileNavDashboard) { mobileNavDashboard = document.createElement('a'); mobileNavDashboard.id = 'mobileNavDashboard'; mobileNavDashboard.href = 'dashboard.html'; mobileNavDashboard.textContent = 'Dashboard Admin'; mobileMenu.insertBefore(mobileNavDashboard, mobileLogoutLink); }
-        let mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); if (mobileMenu && !mobileNavGestioneEventiAdmin) { mobileNavGestioneEventiAdmin = document.createElement('a'); mobileNavGestioneEventiAdmin.id = 'mobileNavGestioneEventiAdmin'; mobileNavGestioneEventiAdmin.href = 'eventiincorsoAdmin.html'; mobileNavGestioneEventiAdmin.textContent = 'Gestione Eventi'; mobileMenu.insertBefore(mobileNavGestioneEventiAdmin, mobileLogoutLink); }
-        if (loginBtnDesktop) loginBtnDesktop.style.display = 'none'; if (userDropdownContainer) userDropdownContainer.style.display = 'none'; if (dropdownProfilo) dropdownProfilo.style.display = 'none'; if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none'; if (dropdownDashboard) dropdownDashboard.style.display = 'none'; if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none'; if (loginBtnMobile) loginBtnMobile.style.display = 'none'; if (mobileNavProfilo) mobileNavProfilo.style.display = 'none'; if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none'; if (mobileNavDashboard) mobileNavDashboard.style.display = 'none'; if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none'; if (mobileLogoutLink) mobileLogoutLink.style.display = 'none'; if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'none'; if (editPageBtnContainer) editPageBtnContainer.style.display = 'none';
+        const navbarTitle = gebi('navbarTitle');
+        const loginBtnDesktop = gebi('login-btn-desktop');
+        const userDropdownContainer = gebi('userDropdownContainer');
+        const navbarAvatarSpan = gebi('navbar-avatar');
+        const navbarUsername = gebi('navbar-username');
+        const mobileMenuSeparator = gebi('mobileMenuSeparator');
+        const editPageBtnContainer = gebi('editPageBtnContainer');
+
+        // Desktop dropdown menu items
+        const navProfilo = gebi('nav-profilo');
+        const navMiePrenotazioni = gebi('nav-mie-prenotazioni');
+        const navDashboard = gebi('nav-dashboard');
+        const navGestioneEventiAdmin = gebi('nav-gestione-eventi-admin');
+        const logoutLinkDesktop = gebi('logout-link-desktop');
+
+        // Mobile menu items
+        const loginBtnMobile = gebi('login-btn-mobile');
+        const mobileNavProfiloEl = gebi('mobileNavProfilo');
+        const mobileNavPrenotazioniEl = gebi('mobileNavPrenotazioni');
+        const mobileNavDashboardEl = gebi('mobileNavDashboard');
+        const mobileNavGestioneEventiAdminEl = gebi('mobileNavGestioneEventiAdmin');
+        const mobileLogoutLinkEl = gebi('mobileLogoutLink');
+
+        // Hide all user/admin specific links by default
+        if (loginBtnDesktop) loginBtnDesktop.style.display = 'none';
+        if (userDropdownContainer) userDropdownContainer.style.display = 'none';
+        if (navProfilo) navProfilo.style.display = 'none';
+        if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'none';
+        if (navDashboard) navDashboard.style.display = 'none';
+        if (navGestioneEventiAdmin) navGestioneEventiAdmin.style.display = 'none';
+        if (logoutLinkDesktop) logoutLinkDesktop.style.display = 'none';
+
+        if (loginBtnMobile) loginBtnMobile.style.display = 'none';
+        if (mobileNavProfiloEl) mobileNavProfiloEl.style.display = 'none';
+        if (mobileNavPrenotazioniEl) mobileNavPrenotazioniEl.style.display = 'none';
+        if (mobileNavDashboardEl) mobileNavDashboardEl.style.display = 'none';
+        if (mobileNavGestioneEventiAdminEl) mobileNavGestioneEventiAdminEl.style.display = 'none';
+        if (mobileLogoutLinkEl) mobileLogoutLinkEl.style.display = 'none';
+
+        if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'none';
+        if (editPageBtnContainer) editPageBtnContainer.style.display = 'none';
+
         if (currentUserData) {
-            if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block'; if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
-            const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null; if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
-            if (mobileLogoutLink) mobileLogoutLink.style.display = 'block'; if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
-            if (currentUserData.isAdmin) {
-                if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)"; if (dropdownDashboard) dropdownDashboard.style.display = 'block'; if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'block'; if (mobileNavDashboard) mobileNavDashboard.style.display = 'block'; if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'block';
-                if (editPageBtnContainer) { editPageBtnContainer.style.display = 'flex'; gebi('editPageBtn').style.display = isEditModeActive ? 'none' : 'inline-block'; gebi('savePageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; gebi('cancelPageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none';}
-            } else {
-                if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco"; if (dropdownProfilo) dropdownProfilo.style.display = 'block'; if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block'; if (mobileNavProfilo) mobileNavProfilo.style.display = 'block'; if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
+            if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
+            if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
+            const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
+            if (avatarImgEl) {
+                avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath;
+                avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`;
+                avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };
             }
-        } else {
-            if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block'; if (loginBtnMobile) loginBtnMobile.style.display = 'block'; if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+
+            // Always show logout for logged-in users
+            if (logoutLinkDesktop) logoutLinkDesktop.style.display = 'block';
+            if (mobileLogoutLinkEl) mobileLogoutLinkEl.style.display = 'block';
+            if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
+
+            if (currentUserData.isAdmin) {
+                if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
+                if (navProfilo) navProfilo.style.display = 'block';
+                if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'block';
+                if (navDashboard) navDashboard.style.display = 'block';
+                if (navGestioneEventiAdmin) navGestioneEventiAdmin.style.display = 'block';
+
+                if (mobileNavProfiloEl) mobileNavProfiloEl.style.display = 'block';
+                if (mobileNavPrenotazioniEl) mobileNavPrenotazioniEl.style.display = 'block';
+                if (mobileNavDashboardEl) mobileNavDashboardEl.style.display = 'block';
+                if (mobileNavGestioneEventiAdminEl) mobileNavGestioneEventiAdminEl.style.display = 'block';
+
+                if (editPageBtnContainer) {
+                    editPageBtnContainer.style.display = 'flex';
+                    gebi('editPageBtn').style.display = isEditModeActive ? 'none' : 'inline-block';
+                    gebi('savePageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none';
+                    gebi('cancelPageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none';
+                }
+            } else { // Regular user
+                if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+                if (navProfilo) navProfilo.style.display = 'block';
+                if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'block';
+            }
+        } else { // Not logged in
+            if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
+            if (loginBtnMobile) loginBtnMobile.style.display = 'block';
+            if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
         }
     }
 
@@ -458,7 +533,7 @@
     loginTabs.forEach(t=>t.addEventListener('click',()=>{const id=t.dataset.tab;loginTabs.forEach(tb=>tb.classList.remove('active'));t.classList.add('active');loginForms.forEach(f=>{f.classList.remove('active');if(f.id===`${id}Form`){f.classList.add('active');f.querySelector('input:not([type="hidden"])')?.focus();}});resetFormErrorsAndMessages();}));
     loginFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=loginFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';try{const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath,isAdmin:j.is_admin===true||j.is_admin===1};localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));await fetchAndUpdateUserDisplayDataFromApi();closeLoginPopup();await loadPageContentsFromServer();showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");}else{loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}}}catch(err){console.error("Errore login:",err);if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
     registerFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=registerFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Registrazione...<div class="spinner-mini-light"></div>';try{const r=await fetch('registrati.php',{method:'POST',body:new FormData(registerFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){alert(j.message||"Registrazione completata! Ora puoi accedere.");const loginTabButton=document.querySelector('.login-tab[data-tab="login"]');if(loginTabButton)loginTabButton.click();const loginEmailInput=gebi('login-email');const registerEmailInput=gebi('register-email');if(loginEmailInput&&registerEmailInput)loginEmailInput.value=registerEmailInput.value;e.target.reset();}else{if(registerErrorMessageEl){registerErrorMessageEl.textContent=j.message||"Errore registrazione.";registerErrorMessageEl.style.display='block';}if(j.errors){for(const f in j.errors)gebi(`register-${f}`)?.classList.add('error-border');}}}catch(err){console.error("Errore registrazione:",err);if(registerErrorMessageEl){registerErrorMessageEl.textContent="Errore connessione o server.";registerErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
-    gebi('dropdownLogout')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();}); gebi('mobileLogoutLink')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenu();});
+    gebi('logout-link-desktop')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();}); gebi('mobileLogoutLink')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenu();});
 
     const editPageBtn=gebi('editPageBtn');const savePageChangesBtn=gebi('savePageChangesBtn'); const cancelPageChangesBtn=gebi('cancelPageChangesBtn');
     const editContentModal=gebi('editContentModal'); const closeEditContentModalBtn=gebi('closeEditContentModalBtn');const editModalTitle=gebi('editModalTitle'); const editModalTextarea=gebi('editModalTextarea');const editModalInputText=gebi('editModalInputText'); const editModalInputImage=gebi('editModalInputImage');const editModalFieldLabelText=gebi('editModalFieldLabelText'); const saveEditModalBtn=gebi('saveEditModalBtn');const cancelEditModalBtn=gebi('cancelEditModalBtn'); const editModalMessage=gebi('editModalMessage');const pageOverallStatus=gebi('pageOverallStatus'); const editModalInputFile=gebi('editModalInputFile'); const editModalFileLabel=gebi('editModalFileLabel'); const editModalFileNote = gebi('editModalFileNote');
