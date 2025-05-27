@@ -137,11 +137,9 @@
             text-decoration: underline; /* Sottolinea il numero al hover */
         }
 
-        /* Styles for Moderation Feedback Bar */
-        #moderation-feedback-area {
+        /* Styles for Moderation Feedback Bar (Main and Reply) */
+        .moderation-feedback-area-common { /* Common styles for both main and reply bars */
             width: 100%;
-            margin-top: 10px;
-            margin-bottom: 10px;
             padding: 12px;
             border-radius: 12px;
             background-color: #f2f2f7;
@@ -151,32 +149,50 @@
             transform: translateY(10px);
             box-sizing: border-box;
         }
-        #moderation-feedback-area.visible {
+        .moderation-feedback-area-common.visible {
             display: block !important;
             opacity: 1;
             transform: translateY(0);
         }
-        #moderation-feedback-area.loading {
+        .moderation-feedback-area-common.loading {
             animation: pulseGlow 1.5s infinite alternate;
             box-shadow: 0 0 10px rgba(0, 122, 255, 0.2), 0 0 20px rgba(0, 122, 255, 0.1);
         }
+
+        #moderation-feedback-area { /* Specific for main comment form */
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .moderation-feedback-area-reply { /* Specific for reply forms */
+            margin-top: 8px;
+            margin-bottom: 8px;
+            padding: 10px; /* Slightly smaller padding */
+            font-size: 0.9em; /* Slightly smaller font for compactness */
+        }
+
+
         @keyframes pulseGlow {
             from { box-shadow: 0 0 8px rgba(0, 122, 255, 0.25), 0 0 15px rgba(0, 122, 255, 0.15); }
             to   { box-shadow: 0 0 15px rgba(0, 122, 255, 0.5), 0 0 25px rgba(0, 122, 255, 0.3); }
         }
 
-        #moderation-text-message {
+        .moderation-text-message-common { /* Common for text message p */
             margin-bottom: 10px;
             font-size: 0.9rem;
             color: #1c1c1e;
             line-height: 1.4;
         }
-        #moderation-text-message.type-error { color: #FF3B30; font-weight: 500; }
-        #moderation-text-message.type-success { color: #34C759; font-weight: 500; }
-        #moderation-text-message.type-info,
-        #moderation-text-message.type-info_sticky { color: #007AFF; }
+        .moderation-text-message-common.type-error { color: #FF3B30; font-weight: 500; }
+        .moderation-text-message-common.type-success { color: #34C759; font-weight: 500; }
+        .moderation-text-message-common.type-info,
+        .moderation-text-message-common.type-info_sticky { color: #007AFF; }
 
-        #offensiveness-meter-container {
+        .moderation-text-message-reply { /* Specific for reply text if needed, inherits common */
+            margin-bottom: 6px;
+        }
+
+
+        .offensiveness-meter-container-common { /* Common for meter container */
             background-color: #E5E5EA;
             border-radius: 25px;
             padding: 0px;
@@ -185,15 +201,25 @@
             overflow: hidden;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
         }
+        .offensiveness-meter-container-reply { /* Specific for reply meter */
+            height: 15px; /* Smaller height */
+        }
+        .offensiveness-meter-container-reply .offensiveness-bar-common {
+            border-radius: 15px; /* Match height */
+        }
+        .offensiveness-meter-container-reply .offensiveness-score-text-common {
+            font-size: 0.7em; /* Smaller text */
+        }
 
-        #offensiveness-bar {
+
+        .offensiveness-bar-common { /* Common for the bar itself */
             width: 0%;
             height: 100%;
             border-radius: 25px;
             transition: width 0.7s cubic-bezier(0.65, 0, 0.35, 1), background-color 0.7s ease-out;
         }
 
-        #offensiveness-score-text {
+        .offensiveness-score-text-common { /* Common for score text */
             position: absolute;
             width: 100%;
             height: 100%;
@@ -208,19 +234,29 @@
             text-shadow: 0 1px 1px rgba(0,0,0,0.2);
             transition: color 0.7s ease-out;
         }
-        .moderation-bar-label { /* New style for the label */
+
+        .moderation-bar-label-common { /* Common for bar label */
             font-size: 0.8rem;
-            color: #636366; /* iOS System Gray */
+            color: #636366;
             margin-bottom: 5px;
             display: block;
         }
+        .moderation-bar-label-reply { /* Specific for reply label */
+            font-size: 0.9em; /* Relative to parent reply area font-size */
+            margin-bottom: 3px;
+        }
 
-        #moderation-threshold-info {
+        .moderation-threshold-info-common { /* Common for threshold info */
             margin-top: 6px;
             font-size: 0.75em;
             color: #8e8e93;
             text-align: right;
         }
+        .moderation-threshold-info-reply { /* Specific for reply threshold */
+            margin-top: 4px;
+            font-size: 0.85em; /* Relative */
+        }
+
 
         .moderation-spinner {
             display: inline-block;
@@ -354,14 +390,14 @@
                             <textarea id="comment-text" name="Descrizione" aria-label="Testo del commento" placeholder="Scrivi qui il tuo commento..." rows="4" required></textarea>
                             <div id="comment-scanner-wave"></div>
                         </div>
-                        <div id="moderation-feedback-area" style="display:none;">
-                            <p id="moderation-text-message"></p>
-                            <span class="moderation-bar-label" style="display:none;">Grado di Offensività Rilevato:</span>
-                            <div id="offensiveness-meter-container" style="display:none;">
-                                <div id="offensiveness-bar"></div>
-                                <span id="offensiveness-score-text"></span>
+                        <div id="moderation-feedback-area" class="moderation-feedback-area-common" style="display:none;">
+                            <p id="moderation-text-message" class="moderation-text-message-common"></p>
+                            <span class="moderation-bar-label-common" style="display:none;">Grado di Offensività Rilevato:</span>
+                            <div id="offensiveness-meter-container" class="offensiveness-meter-container-common" style="display:none;">
+                                <div id="offensiveness-bar" class="offensiveness-bar-common"></div>
+                                <span id="offensiveness-score-text" class="offensiveness-score-text-common"></span>
                             </div>
-                            <p id="moderation-threshold-info"></p>
+                            <p id="moderation-threshold-info" class="moderation-threshold-info-common"></p>
                         </div>
                         <button type="submit" class="btn-comment"><i class="fas fa-paper-plane"></i> Invia</button>
                     </div>
@@ -611,15 +647,15 @@
         lightboxNavigating = true;
         currentMediaIndexInLightbox = (currentMediaIndexInLightbox + direction + galleryItemsData.length) % galleryItemsData.length;
         openLightbox(currentMediaIndexInLightbox);
-        setTimeout(() => { lightboxNavigating = false; }, 150); // Debounce for 150ms
+        setTimeout(() => { lightboxNavigating = false; }, 200); // Increased debounce to 200ms
     }
 
     if (lightboxPrevBtn) {
-        lightboxPrevBtn.removeEventListener('click', handleLightboxPrev); // Remove existing if any
+        lightboxPrevBtn.removeEventListener('click', handleLightboxPrev);
         lightboxPrevBtn.addEventListener('click', handleLightboxPrev);
     }
     if (lightboxNextBtn) {
-        lightboxNextBtn.removeEventListener('click', handleLightboxNext); // Remove existing if any
+        lightboxNextBtn.removeEventListener('click', handleLightboxNext);
         lightboxNextBtn.addEventListener('click', handleLightboxNext);
     }
 
@@ -635,7 +671,7 @@
     if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
 
     if (lightbox) {
-        document.removeEventListener('keydown', handleLightboxKeydown); // Remove existing if any
+        document.removeEventListener('keydown', handleLightboxKeydown);
         document.addEventListener('keydown', handleLightboxKeydown);
         lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
     }
@@ -645,11 +681,11 @@
             if (e.key === 'Escape') {
                 closeLightbox();
             } else if (e.key === 'ArrowLeft' && galleryItemsData.length > 1) {
-                e.preventDefault(); // Prevent default browser scroll
+                e.preventDefault();
                 e.stopPropagation();
                 changeLightboxMedia(-1);
             } else if (e.key === 'ArrowRight' && galleryItemsData.length > 1) {
-                e.preventDefault(); // Prevent default browser scroll
+                e.preventDefault();
                 e.stopPropagation();
                 changeLightboxMedia(1);
             }
@@ -808,25 +844,22 @@
     // --- FINE FUNZIONI MODERAZIONE GROQ ---
 
     // --- INIZIO FUNZIONE PER BARRA DI MODERAZIONE ---
-    function updateOffensivenessDisplay(score, textMessage, threshold, messageType, analysisInProgress = false) {
-        const feedbackArea = document.getElementById('moderation-feedback-area');
-        const barElement = document.getElementById('offensiveness-bar');
-        const scoreTextElement = document.getElementById('offensiveness-score-text');
-        const textMessageElement = document.getElementById('moderation-text-message');
-        const thresholdInfoElement = document.getElementById('moderation-threshold-info');
-        const meterContainer = document.getElementById('offensiveness-meter-container');
-        const commentTextarea = document.getElementById('comment-text');
-        const barLabel = feedbackArea.querySelector('.moderation-bar-label');
+    function updateOffensivenessDisplay(score, textMessage, threshold, messageType, analysisInProgress = false, elements) {
+        // Destructure elements for easier access, with fallbacks if any are missing
+        const {
+            feedbackArea, barElement, scoreTextElement, textMessageElement,
+            thresholdInfoElement, meterContainer, commentTextarea, barLabel
+        } = elements || {};
 
-        if (!feedbackArea || !barElement || !scoreTextElement || !textMessageElement || !thresholdInfoElement || !meterContainer || !commentTextarea || !barLabel) {
-            console.error("Elementi per il feedback di moderazione, textarea, o etichetta barra non trovati.");
+        if (!feedbackArea || !barElement || !scoreTextElement || !textMessageElement || !thresholdInfoElement || !meterContainer || !barLabel) {
+            console.error("Elementi UI per il feedback di moderazione mancanti nel set fornito:", elements);
             // Fallback to old message display if new elements are missing
-            const fallbackMsgEl = document.getElementById('comment-form-message');
+            const fallbackMsgEl = document.getElementById('comment-form-message'); // Or a more context-specific fallback
             if (fallbackMsgEl) {
                 let fullText = textMessage;
                 if (score !== null && !analysisInProgress) fullText += ` (Punteggio: ${score}/10)`;
-                if (analysisInProgress) fullText = `<span class="moderation-spinner"></span> ` + textMessage;
-                fallbackMsgEl.innerHTML = sanitizeTextForHTML(fullText);
+                if (analysisInProgress) fullText = `<span class="moderation-spinner"></span> ` + textMessage; // Use .moderation-spinner for consistency
+                fallbackMsgEl.innerHTML = sanitizeTextForHTML(fullText); // Ensure sanitizeTextForHTML is defined and handles HTML correctly
                 fallbackMsgEl.className = `form-message ${messageType.replace('_sticky', '')}`;
                 fallbackMsgEl.style.display = 'block';
                 if (messageType !== 'error' && !analysisInProgress && messageType !== 'info_sticky') {
@@ -837,27 +870,30 @@
         }
 
         feedbackArea.classList.add('visible');
-        feedbackArea.style.display = 'block';
+        // feedbackArea.style.display = 'block'; // .visible class should handle this
 
         if (analysisInProgress) {
             textMessageElement.innerHTML = `<span class="moderation-spinner"></span> ${sanitizeTextForHTML(textMessage)}`;
-            textMessageElement.className = `type-${messageType.replace('_sticky', '')}`;
+            textMessageElement.className = `moderation-text-message-common type-${messageType.replace('_sticky', '')}`;
             meterContainer.style.display = 'none';
             barLabel.style.display = 'none';
             thresholdInfoElement.style.display = 'none';
             feedbackArea.classList.add('loading');
-            commentTextarea.classList.add('scanning');
+            if (commentTextarea && commentTextarea.id === 'comment-text') { // Only apply scanning to main textarea for now
+                commentTextarea.classList.add('scanning');
+            }
         } else {
             let contextualMessage = textMessage;
-            if (score !== null) {
-                if (messageType === 'error') contextualMessage = `${textMessage} `;
-                else if (messageType === 'success') contextualMessage = `Commento Approvato (Grado Offensività: ${score}/10). ${textMessage}`;
-                // For generic info, just show the text message, score will be on bar
+            if (score !== null) { // Append score context to the main message
+                if (messageType === 'error') contextualMessage = `Commento Rifiutato (Grado Offensività: ${score}/10). ${textMessage}`;
+                else if (messageType === 'success') contextualMessage = `Commento Approvato. ${textMessage}`; // Score will be on bar
             }
             textMessageElement.innerHTML = sanitizeTextForHTML(contextualMessage).replace(/\n/g, '<br>');
-            textMessageElement.className = `type-${messageType.replace('_sticky', '')}`;
+            textMessageElement.className = `moderation-text-message-common type-${messageType.replace('_sticky', '')}`;
             feedbackArea.classList.remove('loading');
-            commentTextarea.classList.remove('scanning');
+            if (commentTextarea && commentTextarea.id === 'comment-text') {
+                commentTextarea.classList.remove('scanning');
+            }
         }
 
         if (score !== null && score >= 0 && score <= 10 && !analysisInProgress) {
@@ -898,7 +934,6 @@
 
         if (messageType !== 'error' && !analysisInProgress && messageType !== 'info_sticky') {
             setTimeout(() => {
-                // Check if it's still the same message before hiding
                 if (textMessageElement.innerHTML.includes(sanitizeTextForHTML(textMessage).split('<br>')[0])) {
                     feedbackArea.classList.remove('visible');
                     setTimeout(() => { feedbackArea.style.display = 'none';}, 400);
@@ -914,7 +949,9 @@
     function createCommentElement(commentData, isReply = false, options = { isForPopup: false }) {
         const commentDiv = document.createElement('div');
         commentDiv.className = isReply ? 'comment reply' : 'comment';
-        commentDiv.id = (options.isForPopup ? 'popup-' : '') + 'comment-' + commentData.Progressivo;
+        const uniqueIdSuffix = commentData.Progressivo;
+        commentDiv.id = (options.isForPopup ? 'popup-' : '') + 'comment-' + uniqueIdSuffix;
+
         const isAdminComment = commentData.is_admin_comment === true || String(commentData.is_admin_comment) === '1';
         if (isAdminComment) commentDiv.classList.add('admin-comment-highlight');
         const avatarUrl = (commentData.CommenterIconPath && commentData.CommenterIconPath.trim() !== '') ? commentData.CommenterIconPath : defaultUserIconPath;
@@ -927,17 +964,39 @@
         let userActionsHTML = '';
         if (currentUser && currentUser.email === commentData.Contatto) {
             userActionsHTML = `
-                <button class="btn-edit-comment" data-comment-id="${commentData.Progressivo}" data-event-id="${commentData.IDEvento}" aria-label="Modifica commento"><i class="fas fa-edit"></i> <span class="btn-action-text">Modifica</span></button>
-                <button class="btn-delete-comment" data-comment-id="${commentData.Progressivo}" data-event-id="${commentData.IDEvento}" aria-label="Elimina commento"><i class="fas fa-trash-alt"></i> <span class="btn-action-text">Elimina</span></button>`;
+                <button class="btn-edit-comment" data-comment-id="${uniqueIdSuffix}" data-event-id="${commentData.IDEvento}" aria-label="Modifica commento"><i class="fas fa-edit"></i> <span class="btn-action-text">Modifica</span></button>
+                <button class="btn-delete-comment" data-comment-id="${uniqueIdSuffix}" data-event-id="${commentData.IDEvento}" aria-label="Elimina commento"><i class="fas fa-trash-alt"></i> <span class="btn-action-text">Elimina</span></button>`;
         }
+
+        const replyFormId = `${(options.isForPopup ? 'popup-' : '')}reply-form-${uniqueIdSuffix}`;
+
+        // HTML for Mini Moderation Bar in Replies
+        const miniModBarHTML = `
+            <div id="reply-mod-feedback-area-${uniqueIdSuffix}" class="moderation-feedback-area-common moderation-feedback-area-reply" style="display:none;">
+                <p id="reply-mod-text-message-${uniqueIdSuffix}" class="moderation-text-message-common moderation-text-message-reply"></p>
+                <span id="reply-mod-bar-label-${uniqueIdSuffix}" class="moderation-bar-label-common moderation-bar-label-reply" style="display:none;">Grado di Offensività:</span>
+                <div id="reply-mod-meter-container-${uniqueIdSuffix}" class="offensiveness-meter-container-common offensiveness-meter-container-reply" style="display:none;">
+                    <div id="reply-mod-bar-${uniqueIdSuffix}" class="offensiveness-bar-common"></div>
+                    <span id="reply-mod-score-text-${uniqueIdSuffix}" class="offensiveness-score-text-common"></span>
+                </div>
+                <p id="reply-mod-threshold-info-${uniqueIdSuffix}" class="moderation-threshold-info-common moderation-threshold-info-reply"></p>
+            </div>`;
+
         commentDiv.innerHTML = `
             <div class="comment-header"> <img src="${avatarUrl}" alt="Avatar di ${commenterDisplayName}" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';"> <div class="comment-meta"> <div class="author-line"> <strong>${commenterDisplayName}</strong> ${staffBadgeHTML} </div> <small>${commentDate}</small> </div> </div>
             <div class="comment-text-content"> <p>${commentDescription}</p> </div> <div class="comment-edit-form-placeholder"></div>
             <div class="comment-actions">
-                <button class="like-btn ${isLikedByCurrentUser ? 'active' : ''}" data-comment-id="${commentData.Progressivo}" aria-pressed="${isLikedByCurrentUser}" aria-label="Mi piace"> <i class="${isLikedByCurrentUser ? 'fas fa-heart' : 'far fa-heart'}"></i> <span class="like-count" data-comment-id="${commentData.Progressivo}" title="Vedi chi ha messo Mi Piace">${likeCount}</span> </button>
-                <button class="btn-reply" data-comment-id="${commentData.Progressivo}" aria-label="Rispondi"><i class="fas fa-reply"></i> Rispondi</button> ${userActionsHTML}
+                <button class="like-btn ${isLikedByCurrentUser ? 'active' : ''}" data-comment-id="${uniqueIdSuffix}" aria-pressed="${isLikedByCurrentUser}" aria-label="Mi piace"> <i class="${isLikedByCurrentUser ? 'fas fa-heart' : 'far fa-heart'}"></i> <span class="like-count" data-comment-id="${uniqueIdSuffix}" title="Vedi chi ha messo Mi Piace">${likeCount}</span> </button>
+                <button class="btn-reply" data-comment-id="${uniqueIdSuffix}" aria-label="Rispondi"><i class="fas fa-reply"></i> Rispondi</button> ${userActionsHTML}
             </div>
-            <div class="reply-form" id="${(options.isForPopup ? 'popup-' : '')}reply-form-${commentData.Progressivo}" style="display:none;"> <form data-parent-comment-id="${commentData.Progressivo}" data-event-id="${commentData.IDEvento}"> <textarea name="Descrizione" placeholder="Rispondi a ${commenterDisplayName}..." rows="2" required aria-label="Testo risposta"></textarea> <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia</button> <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em; display:none;"></div> </form> </div>
+            <div class="reply-form" id="${replyFormId}" style="display:none;">
+                <form data-parent-comment-id="${uniqueIdSuffix}" data-event-id="${commentData.IDEvento}">
+                    <textarea name="Descrizione" placeholder="Rispondi a ${commenterDisplayName}..." rows="2" required aria-label="Testo risposta"></textarea>
+                    ${miniModBarHTML}
+                    <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia</button>
+                    <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em; display:none;"></div>
+                </form>
+            </div>
             <div class="replies"></div>`;
 
         attachCommentInteractionListeners(commentDiv, commentData, options);
@@ -1121,39 +1180,61 @@
         if (!descriptionTextarea) { console.error("Textarea non trovata:", formElement); return; }
         const description = descriptionTextarea.value.trim();
 
-        let msgEl = formElement.querySelector('.form-message-local');
-        let useModerationBar = false;
+        let msgEl = formElement.querySelector('.form-message-local'); // Default for replies / fallback
+        let useSpecificModerationDisplay = false;
+        let moderationElements = {};
+        let moderationResult; // To store moderation result for later use if needed
 
-        // Determine if this is the main comment form to use the moderation bar
-        if (!isReply && !options.isForPopup && formElement.id === 'new-comment-form') {
-            msgEl = document.getElementById('comment-form-message'); // Fallback if bar elements not found
-            useModerationBar = !!document.getElementById('moderation-feedback-area');
+        if (isReply) {
+            const uniqueSuffix = parentCommentId; // parentCommentId is the Progressivo of the comment being replied to
+            moderationElements.feedbackArea = formElement.querySelector(`#reply-mod-feedback-area-${uniqueSuffix}`);
+            if (moderationElements.feedbackArea) {
+                useSpecificModerationDisplay = true;
+                moderationElements.textMessageElement = formElement.querySelector(`#reply-mod-text-message-${uniqueSuffix}`);
+                moderationElements.barLabel = formElement.querySelector(`#reply-mod-bar-label-${uniqueSuffix}`);
+                moderationElements.meterContainer = formElement.querySelector(`#reply-mod-meter-container-${uniqueSuffix}`);
+                moderationElements.barElement = formElement.querySelector(`#reply-mod-bar-${uniqueSuffix}`);
+                moderationElements.scoreTextElement = formElement.querySelector(`#reply-mod-score-text-${uniqueSuffix}`);
+                moderationElements.thresholdInfoElement = formElement.querySelector(`#reply-mod-threshold-info-${uniqueSuffix}`);
+                moderationElements.commentTextarea = descriptionTextarea; // The reply's own textarea
+            }
+            // msgEl is already set to .form-message-local which is correct for replies if bar isn't used
+        } else if (!options.isForPopup && formElement.id === 'new-comment-form') { // Main comment form
+            moderationElements.feedbackArea = document.getElementById('moderation-feedback-area');
+            if (moderationElements.feedbackArea) {
+                useSpecificModerationDisplay = true;
+                moderationElements.textMessageElement = document.getElementById('moderation-text-message');
+                moderationElements.barLabel = document.querySelector('#moderation-feedback-area .moderation-bar-label-common'); // Use common class
+                moderationElements.meterContainer = document.getElementById('offensiveness-meter-container');
+                moderationElements.barElement = document.getElementById('offensiveness-bar');
+                moderationElements.scoreTextElement = document.getElementById('offensiveness-score-text');
+                moderationElements.thresholdInfoElement = document.getElementById('moderation-threshold-info');
+                moderationElements.commentTextarea = document.getElementById('comment-text');
+            }
+            msgEl = document.getElementById('comment-form-message'); // Fallback for main form
         }
+        // If not main form and not reply with bar, msgEl remains formElement.querySelector('.form-message-local')
 
         const showFeedback = (score, text, threshold, type, analysisInProgress = false) => {
-            if (useModerationBar) {
-                updateOffensivenessDisplay(score, text, threshold, type, analysisInProgress);
+            if (useSpecificModerationDisplay && moderationElements.feedbackArea) {
+                updateOffensivenessDisplay(score, text, threshold, type, analysisInProgress, moderationElements);
             } else {
-                // Fallback for replies or if moderation bar elements are not used/found
                 if(msgEl) {
-                    let fullText = text;
-                    if (score !== null && !analysisInProgress) {
-                        fullText += ` (Punteggio: ${score}/10)`;
-                    }
-                    // Ensure spinner is added for analysis in progress if not already there
-                    if (analysisInProgress && !fullText.includes('spinner-mini') && !fullText.includes('moderation-spinner')) {
-                        fullText = `<span class="spinner-mini"></span> ` + text;
-                    }
+                    let sanitizedText = sanitizeTextForHTML(text).replace(/<br>/g, '\n');
+                    let htmlContent = sanitizedText;
 
-                    msgEl.innerHTML = sanitizeTextForHTML(fullText).replace(/<br>/g, '\n');
+                    if (score !== null && !analysisInProgress) {
+                        htmlContent += ` (Punteggio: ${score}/10)`;
+                    }
+                    if (analysisInProgress) {
+                        htmlContent = `<span class="spinner-mini"></span> ` + sanitizedText;
+                    }
+                    msgEl.innerHTML = htmlContent;
                     msgEl.className = `form-message ${type.replace('_sticky', '')}`;
-                    if (msgEl.classList.contains('form-message-local') || formElement.querySelector('.form-message-local') === msgEl) {
-                        // Already has form-message-local or it's the designated local message element
-                    } else if (formElement.querySelector('.form-message-local')) {
-                        msgEl.classList.add('form-message-local'); // Add if it's a generic form-message being used locally
+                    if (formElement.querySelector('.form-message-local') === msgEl) {
+                        msgEl.classList.add('form-message-local');
                     }
                     msgEl.style.display = 'block';
-                    // Auto-hide for non-error, non-sticky, non-analysis messages
                     if (type !== 'error' && type !== 'info_sticky' && !analysisInProgress) {
                         setTimeout(() => { if (msgEl) msgEl.style.display = 'none'; }, 4500);
                     }
@@ -1168,19 +1249,17 @@
         const originalBtnHTML = submitBtn ? submitBtn.innerHTML : 'Invia';
         if (submitBtn) {
             submitBtn.disabled = true;
-            // Ensure spinner HTML is correctly applied
             submitBtn.innerHTML = `<span class="spinner-mini"></span> Verifico...`;
         }
 
-        // Hide old form message if using moderation bar
-        if (useModerationBar && document.getElementById('comment-form-message')?.style.display !== 'none') {
+        if (useSpecificModerationDisplay && moderationElements.feedbackArea && document.getElementById('comment-form-message')?.style.display !== 'none' && !isReply) {
             document.getElementById('comment-form-message').style.display = 'none';
         }
 
 
         if (globalGroqOffensivenessThreshold < 10) {
             showFeedback(null, "Analisi del commento in corso...", globalGroqOffensivenessThreshold, 'info_sticky', true);
-            const moderationResult = await getCommentOffensivenessScore(description);
+            moderationResult = await getCommentOffensivenessScore(description); // Store result
 
             if (moderationResult.error) {
                 showFeedback(null, `Errore durante la moderazione: ${moderationResult.error} Il commento non può essere inviato. Riprova o contatta l'assistenza se il problema persiste.`, globalGroqOffensivenessThreshold, 'error');
@@ -1193,14 +1272,13 @@
                 if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
                 return;
             }
-            // If approved or score is null (but no error), proceed to sending
             const scoreText = moderationResult.score !== null ? ` (Grado Offensività: ${moderationResult.score}/10)` : "";
-            showFeedback(moderationResult.score, `Analisi completata${scoreText}. Invio in corso...`, globalGroqOffensivenessThreshold, 'info_sticky');
+            showFeedback(moderationResult.score, `Analisi completata. Invio in corso...`, globalGroqOffensivenessThreshold, 'info_sticky'); // Removed scoreText from here as it's in updateOffensivenessDisplay
             if (submitBtn) { submitBtn.innerHTML = `<span class="spinner-mini"></span> Invio...`; }
 
         } else {
             console.log("Moderazione commenti disabilitata. Invio diretto.");
-            showFeedback(null, "Invio del commento in corso...", globalGroqOffensivenessThreshold, 'info_generic'); // Use info_generic for non-sticky
+            showFeedback(null, "Invio del commento in corso...", globalGroqOffensivenessThreshold, 'info_generic');
             if (submitBtn) { submitBtn.innerHTML = `<span class="spinner-mini"></span> Invio...`; }
         }
 
@@ -1214,8 +1292,7 @@
                 if (isReply && formElement.closest('.reply-form')) {
                     formElement.closest('.reply-form').style.display = 'none';
                 }
-                // For success, pass the score received from moderation if available, otherwise null
-                const finalScoreForDisplay = (globalGroqOffensivenessThreshold < 10 && typeof moderationResult !== 'undefined') ? moderationResult.score : null;
+                const finalScoreForDisplay = (globalGroqOffensivenessThreshold < 10 && moderationResult) ? moderationResult.score : null;
                 showFeedback(finalScoreForDisplay, result.message || 'Commento inviato con successo!', globalGroqOffensivenessThreshold, 'success');
 
                 const currentEventIdFromPage = document.getElementById('commentEventId').value;
@@ -1239,8 +1316,7 @@
 
             } else { throw new Error(result.message || 'Errore durante l\'invio del commento al server.'); }
         } catch (error) {
-            // For error, pass the score if available from a failed moderation, otherwise null
-            const scoreOnError = (typeof moderationResult !== 'undefined' && moderationResult && moderationResult.score !== null) ? moderationResult.score : null;
+            const scoreOnError = (moderationResult && moderationResult.score !== null) ? moderationResult.score : null;
             showFeedback(scoreOnError, `Errore invio: ${sanitizeTextForHTML(error.message)}`, globalGroqOffensivenessThreshold, 'error');
             console.error(`Errore invio commento al server:`, error);
         } finally {
@@ -1257,7 +1333,6 @@
             if(localMsg) { localMsg.textContent = 'Errore: dati mancanti per la risposta.'; localMsg.className='form-message-local error'; localMsg.style.display='block';}
             return;
         }
-        // Pass the form itself to _submitCommentOrReplyLogic
         await _submitCommentOrReplyLogic(form, eventIdFromForm, true, parentCommentIdFromForm, options);
     }
 
@@ -1318,10 +1393,11 @@
             if(localMsgEl){
                 let fullText = txt;
                 if (score !== null) fullText += ` (Punteggio: ${score}/10)`;
-                if (txt.toLowerCase().includes("analisi") && !fullText.includes("spinner-mini")) {
+                // Ensure spinner HTML is correctly prepended if "analisi" is in text
+                if (txt.toLowerCase().includes("analisi") && !fullText.startsWith('<span class="spinner-mini">')) {
                     fullText = `<span class="spinner-mini"></span> ` + fullText;
                 }
-                localMsgEl.innerHTML = sanitizeTextForHTML(fullText).replace(/<br>/g, '\n');
+                localMsgEl.innerHTML = fullText; // Set as innerHTML to render spinner
                 localMsgEl.className = `form-message-local ${type.replace('_sticky', '')}`;
                 localMsgEl.style.display = 'block';
                 if (!isSticky && type !== 'error') {
@@ -1340,7 +1416,7 @@
 
             const originalNormalizedText = originalText.replace(/<br\s*\/?>/ig, "\n");
             let proceedWithSave = true;
-            let moderationResultForEdit; // Store moderation result
+            let moderationResultForEdit;
 
             if (newDescription !== originalNormalizedText) {
                 if (globalGroqOffensivenessThreshold < 10) {
@@ -1366,16 +1442,12 @@
                 }
             } else {
                 console.log("Il testo del commento non è stato modificato.");
-                showEditMsg('Nessuna modifica rilevata.', 'info'); // Removed "Salvataggio annullato" to avoid confusion if user wants to cancel
+                showEditMsg('Nessuna modifica rilevata.', 'info');
                 proceedWithSave = false;
             }
 
             if (!proceedWithSave) {
                 saveButton.disabled = false; saveButton.innerHTML = 'Salva Modifiche';
-                // Do not automatically exit if only "Nessuna modifica rilevata"
-                // if (!newDescription.length > 0 && !originalNormalizedText.length > 0 && newDescription === originalNormalizedText) {
-                //      exitEditMode();
-                // }
                 return;
             }
 
@@ -1438,7 +1510,6 @@
         if (newCommentForm && eventId) {
             newCommentForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                // Pass the form itself to _submitCommentOrReplyLogic
                 await _submitCommentOrReplyLogic(this, eventId, false, null, { isForPopup: false });
             });
         }
@@ -1463,16 +1534,10 @@
             }
         }
 
-        // Initialize Lightbox event listeners (moved out of DOMContentLoaded if they were there before, ensure they are set up once)
-        // This part is already outside, which is good.
-        // The lightbox event listeners are now set up using named functions to allow removal if needed,
-        // and also include the lightboxNavigating flag and stopPropagation/preventDefault.
-
-        document.addEventListener('keydown', function(event) { // This is a general keydown listener, separate from lightbox specific one
+        document.addEventListener('keydown', function(event) {
             if (event.key === "Escape") {
                 if (document.getElementById('conversationPopupOverlay')?.classList.contains('active')) closeConversationPopup();
                 if (document.getElementById('likersPopupOverlay')?.classList.contains('active')) closeLikersPopup();
-                // Lightbox escape is handled by its own dedicated listener (handleLightboxKeydown)
                 const activeLoginPopupOverlay = document.querySelector('.login-popup-overlay.active');
                 if (activeLoginPopupOverlay) {
                     activeLoginPopupOverlay.classList.remove('active');
