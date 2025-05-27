@@ -228,7 +228,7 @@
     .booking-popup-overlay {
       opacity: 0;
       transition: opacity 0.3s ease-in-out;
-      pointer-events: none; /* Aggiunto per evitare click durante transizione */
+      pointer-events: none;
     }
     .booking-popup-overlay.active { opacity: 1; pointer-events: auto; }
     .booking-popup-overlay.fading-out { opacity: 0 !important; }
@@ -236,9 +236,9 @@
 
     .booking-popup {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.9); /* Inizia leggermente più piccolo e centrato */
+      transform: translate(-50%, -50%) scale(0.9);
       transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-      pointer-events: none; /* Aggiunto */
+      pointer-events: none;
     }
     .booking-popup.active {
       opacity: 1;
@@ -305,7 +305,7 @@
     /* === STILI PER VOLANTINO MORPH (MIGLIORATI) === */
     .volantino-morph-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.8); /* Sfondo più scuro per focus */
+      background-color: rgba(0,0,0,0.8);
       z-index: 2000;
       display: flex;
       align-items: center;
@@ -320,16 +320,16 @@
       transition-delay: 0s;
     }
     .morph-active-card {
-      background-color: var(--white, #fff);
+      background-color: var(--success-light, #d4edda); /* SFONDO VERDE CHIARO PER IL CARD */
       border-radius: var(--border-radius-large, 12px);
       box-shadow: 0 15px 50px rgba(0,0,0,0.4);
-      width: clamp(300px, 90vw, 1000px); /* Responsive width */
-      height: clamp(400px, 85vh, 800px); /* Responsive height */
+      width: clamp(320px, 90vw, 1100px); /* Larghezza responsive, max 1100px */
+      height: clamp(450px, 90vh, 800px); /* Altezza responsive, max 800px */
       display: flex;
       flex-direction: column;
       position: relative;
       opacity: 0;
-      transform: scale(0.9) translateY(20px); /* Inizia leggermente più piccolo e in basso */
+      transform: scale(0.9) translateY(20px);
       transition: opacity 0.3s ease-in-out 0.1s, transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
     }
     .volantino-morph-overlay.active .morph-active-card {
@@ -337,25 +337,26 @@
       transform: scale(1) translateY(0);
     }
     .morph-content-wrapper {
-      padding: 5px; /* Minimo padding per non tagliare i bordi del contenuto */
-      overflow: hidden; /* Nasconde lo scrollbar del wrapper, gestito dal contenuto */
+      padding: 10px;
+      overflow: hidden;
       flex-grow: 1;
       display: flex;
-      flex-direction: column; /* Per far sì che l'iframe occupi altezza */
+      flex-direction: column;
     }
     .volantino-image-container-morph {
       width: 100%;
-      height: 100%; /* Occupa tutto lo spazio del wrapper */
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden; /* Nasconde parti dell'immagine se non 'contain' */
+      overflow: hidden;
     }
     .volantino-image-container-morph img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
       border-radius: var(--border-radius-medium, 8px);
+      display: block;
     }
     .volantino-image-container-morph iframe {
       width: 100%;
@@ -364,21 +365,21 @@
       border-radius: var(--border-radius-medium, 8px);
     }
     .volantino-message-display {
-      text-align: center; padding: 2rem; font-size: 1.1rem;
+      text-align: center; padding: 2rem; font-size: 1.1rem; color: var(--dark);
     }
     .volantino-message-display a {
       color: var(--primary); text-decoration: underline; font-weight: 500;
     }
     .close-morph-volantino-btn {
       position: absolute;
-      top: -15px; right: -15px; /* Spostato leggermente fuori dal card */
-      font-size: 1.5rem;
+      top: -10px; right: -10px; /* Leggermente fuori, più visibile */
+      font-size: 1.8rem;
       color: var(--white, #fff);
-      background-color: rgba(var(--dark-rgb, 51, 51, 51), 0.8);
-      border: 2px solid var(--white, #fff);
+      background-color: var(--dark); /* Sfondo scuro per contrasto */
+      border: 2px solid var(--white);
       border-radius: 50%;
-      width: 40px; height: 40px;
-      line-height: 36px; /* Aggiustato per allineamento verticale */
+      width: 44px; height: 44px; /* Leggermente più grande */
+      line-height: 40px;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s ease-in-out;
@@ -386,8 +387,8 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
     .close-morph-volantino-btn:hover {
-      background-color: rgba(var(--dark-rgb, 0,0,0), 1);
-      transform: scale(1.1);
+      background-color: var(--danger); /* Rosso al hover per azione distruttiva */
+      transform: scale(1.1) rotate(90deg);
     }
     body.volantino-morph-active { overflow: hidden; }
 
@@ -865,7 +866,7 @@
     if (volantinoMorphOverlay) {
       volantinoMorphOverlay.classList.remove("active");
     }
-    setTimeout(cleanUpMorphingCard, 400);
+    setTimeout(cleanUpMorphingCard, 300); // Sincronizza con la transizione dell'overlay (0.3s)
     document.body.classList.remove("volantino-morph-active");
   }
   function cleanUpMorphingCard() {
@@ -1013,10 +1014,11 @@
       if (mSB) mSB.textContent = maxE;
       if (iPP) iPP.textContent = `Puoi prenotare da 1 a ${maxE} posti. (Già prenotati da te per questo evento: ${pGPN}. Max totale per utente: ${MAX_TOTAL_SEATS_PER_USER})`;
       generateParticipantFields(1, pFC, 'bp', maxE);
-      if (bO) bO.classList.add('active'); if (bP) bP.classList.add('active');
+      if (bO) { bO.classList.remove('fading-out'); bO.classList.add('active'); }
+      if (bP) { bP.classList.remove('fading-out'); bP.classList.add('active'); }
       document.body.style.overflow = 'hidden';
     };
-    function cBP_actualClose() { // Funzione che effettivamente chiude e resetta
+    function cBP_actualClose() {
       if (bO) bO.classList.remove('active', 'fading-out');
       if (bP) bP.classList.remove('active', 'fading-out');
       if (!isAnyPopupActive()) document.body.style.overflow = '';
@@ -1031,10 +1033,10 @@
       if (iPP) iPP.textContent = '';
       if (bRM) { bRM.style.display = 'none'; bRM.className = 'form-message';}
     }
-    function cBP_withAnimation() { // Funzione che avvia l'animazione di chiusura
+    function cBP_withAnimation() {
       if (bO) bO.classList.add('fading-out');
       if (bP) bP.classList.add('fading-out');
-      setTimeout(cBP_actualClose, 300); // Durata della transizione CSS
+      setTimeout(cBP_actualClose, 300);
     }
     if (cB) cB.addEventListener('click', cBP_withAnimation);
     if (bO) bO.addEventListener('click', (e) => { if (e.target === bO) cBP_withAnimation(); });
@@ -1090,7 +1092,7 @@
             }
           }
           loadEvents();
-          setTimeout(cBP_withAnimation, 3000); // Chiude popup con animazione dopo il successo
+          setTimeout(cBP_withAnimation, 3000); // Modificato per usare la nuova funzione di chiusura animata
         } else { throw new Error(j.message || 'Errore durante la prenotazione.'); }
       } catch (err) {
         if (bRM) { bRM.textContent = `Errore: ${err.message}`; bRM.className = 'form-message error'; }
@@ -1496,10 +1498,9 @@
       if (e.key === "Escape") {
         if (gebi('loginPopup')?.classList.contains("active")) closeLoginPopup();
         if (gebi('forgotPasswordPopup')?.classList.contains("active")) closeForgotPasswordPopup();
-        // Per il booking popup, ora chiamiamo cBP_withAnimation per la chiusura fluida
         if (gebi('bookingPopup')?.classList.contains("active")) {
           const closeBtn = gebi('closeBookingPopupBtn');
-          if (closeBtn) closeBtn.click(); // Simula click per triggerare cBP_withAnimation
+          if (closeBtn) closeBtn.click();
         }
         if (gebi('waitlistPopup')?.classList.contains("active")) gebi('closeWaitlistPopupBtn')?.click();
         if (volantinoMorphOverlay?.classList.contains("active")) hideVolantinoWithMorph();
