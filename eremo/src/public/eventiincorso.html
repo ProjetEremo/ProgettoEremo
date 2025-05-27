@@ -34,8 +34,8 @@
     .form-message.success { color: var(--success, green); background-color: rgba(var(--success-rgb, 46, 204, 113), 0.1); border: 1px solid rgba(var(--success-rgb, 46, 204, 113), 0.3); }
     .spinner-mini-light, .spinner-mini { display: inline-block; width: 1em; height: 1em; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; }
     .spinner-mini-light { border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: #fff; margin-left: 5px; }
-    .spinner-mini { border: 2px solid rgba(0,0,0,0.2); border-top-color: var(--primary); margin-right: 5px; } /* Usato nel popup admin */
-    .btn-popup .spinner-mini { border-top-color: #fff; } /* Per bottoni popup con sfondo scuro e testo bianco */
+    .spinner-mini { border: 2px solid rgba(0,0,0,0.2); border-top-color: var(--primary); margin-right: 5px; }
+    .btn-popup .spinner-mini { border-top-color: #fff; }
 
     @keyframes spin { to { transform: rotate(360deg); } }
     .user-avatar img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
@@ -61,101 +61,106 @@
     }
     .card-actions .btn-delete:hover { background-color: darkred !important; }
 
-    /* === NUOVO STILE PER FAB "AGGIUNGI EVENTO" === */
-    .add-event-btn-container {
-      position: fixed; bottom: 30px; right: 30px; z-index: 1000;
+    /* === STILE PER BOTTONE "AGGIUNGI EVENTO" (STILE DASHBOARD) === */
+    .add-event-btn-container-wrapper { /* Nuovo wrapper per centrare/allineare il bottone */
+      width: 100%;
+      padding: 1rem 0; /* Spazio sopra e sotto il bottone */
+      display: flex;
+      justify-content: center; /* Centra il bottone se non è a larghezza piena */
     }
-    #adminAddEventBtn { /* ID specifico per il bottone */
-      background-color: var(--primary, #007bff); color: white;
-      border: none; border-radius: 50%; width: 60px; height: 60px;
-      font-size: 28px; /* Leggermente più grande per il '+' */
-      display: flex; justify-content: center; align-items: center;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    #adminAddEventBtn { /* Stile ispirato a .add-event-bar della dashboard */
+      display: inline-flex; /* Permette di controllare la larghezza con padding */
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--success-dark, #155724); /* Colore testo verde scuro */
+      background-color: var(--white, #fff);
+      border: 2px dashed var(--success, #28a745); /* Bordo verde tratteggiato */
+      border-radius: var(--border-radius-large, 12px); /* Angoli più arrotondati */
       cursor: pointer;
-      transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-      outline: none;
+      transition: all 0.2s ease-in-out;
+      text-decoration: none;
+      width: auto; /* Larghezza basata sul contenuto */
+      max-width: 400px; /* Limite opzionale alla larghezza */
+      margin: 0 auto; /* Per centrare se il wrapper è a larghezza piena */
     }
     #adminAddEventBtn:hover, #adminAddEventBtn:focus {
-      background-color: var(--primary-dark, #0056b3); /* Assumendo var(--primary-dark) */
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      background-color: var(--success-light, #d4edda); /* Sfondo verde chiaro al hover */
+      border-color: var(--success-dark, #155724); /* Bordo più scuro al hover */
+      color: var(--success-dark, #155724);
+      box-shadow: 0 4px 12px rgba(var(--success-rgb, 40, 167, 69), 0.2);
+      transform: translateY(-2px);
     }
-    #adminAddEventBtn .plus-icon { line-height: 1; font-weight: 300; }
+    #adminAddEventBtn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(var(--success-rgb, 40, 167, 69), 0.15);
+    }
+    #adminAddEventBtn .plus-icon {
+      font-size: 1.3em; /* Icona leggermente più grande */
+      margin-right: 0.6em;
+      font-weight: bold; /* Rende il + più visibile */
+    }
+    #adminAddEventBtn .fab-text-label {
+      /* Il font-size è ereditato, il font-weight è già 500 */
+    }
 
 
     /* === STILI PER IL NUOVO POPUP ADMIN (stile Dashboard) === */
-    .dash-admin-event-popup-overlay { /* Overlay per il nuovo popup */
+    .dash-admin-event-popup-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.65); z-index: 1050; /* Alto z-index */
+      background-color: rgba(0,0,0,0.65); z-index: 1050;
       display: none; opacity: 0; transition: opacity 0.3s ease;
     }
     .dash-admin-event-popup-overlay.active { display: block; opacity: 1; }
 
-    .dash-admin-event-popup { /* Popup principale */
+    .dash-admin-event-popup {
       position: fixed; top: 50%; left: 50%;
       background-color: var(--white, #fff);
-      padding: 0; /* Padding sarà nel content */
+      padding: 0;
       border-radius: var(--border-radius-large, 12px);
       box-shadow: var(--shadow-strong, 0 10px 30px rgba(0,0,0,0.2));
       z-index: 1051;
-      width: 95%; max-width: 900px; /* Più largo per form e preview */
+      width: 95%; max-width: 900px;
       max-height: 90vh;
       display: none; opacity: 0;
       transform: translate(-50%, -48%) scale(0.95);
       transition: opacity 0.3s ease, transform 0.3s ease;
-      overflow: hidden; /* Per gestire lo scroll interno */
+      overflow: hidden;
     }
     .dash-admin-event-popup.active {
-      display: flex; /* Usare flex per struttura interna */
-      flex-direction: column;
+      display: flex; flex-direction: column;
       opacity: 1; transform: translate(-50%, -50%) scale(1);
     }
 
     .dash-admin-event-popup-header {
       padding: 1rem 1.5rem;
       border-bottom: 1px solid var(--gray-light, #eee);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .dash-admin-event-popup-header h2 {
-      margin: 0; color: var(--primary); font-size: 1.5rem;
-    }
-    .dash-admin-event-popup .close-popup { /* Pulsante chiusura */
+    .dash-admin-event-popup-header h2 { margin: 0; color: var(--primary); font-size: 1.5rem; }
+    .dash-admin-event-popup .close-popup {
       font-size: 1.8rem; color: var(--gray-dark, #777); background: none;
       border: none; cursor: pointer; padding: 0.5rem; line-height: 1;
     }
     .dash-admin-event-popup .close-popup:hover { color: var(--dark, #333); }
-
-    .dash-admin-event-popup-content { /* Contenitore scrollabile per form e preview */
-      overflow-y: auto;
-      padding: 1.5rem;
+    .dash-admin-event-popup-content { overflow-y: auto; padding: 1.5rem; }
+    .dash-admin-event-form-and-preview-container { display: flex; flex-wrap: wrap; gap: 2rem; }
+    #dashAdminEventForm { flex: 2; min-width: 320px; }
+    #dashAdminEventCardPreviewContainer {
+      flex: 1; min-width: 280px; padding: 1rem; border: 1px dashed var(--gray-medium, #ccc);
+      border-radius: var(--border-radius-medium, 8px); background-color: var(--background-light, #f8f9fa);
+      height: fit-content; position: sticky; top: 1.5rem;
     }
-
-    .dash-admin-event-form-and-preview-container {
-      display: flex; flex-wrap: wrap; gap: 2rem;
-    }
-    #dashAdminEventForm { /* Form effettivo */
-      flex: 2; min-width: 320px; /* Più spazio per il form */
-    }
-    #dashAdminEventCardPreviewContainer { /* Contenitore preview */
-      flex: 1; min-width: 280px; /* Meno spazio relativo per preview */
-      padding: 1rem; border: 1px dashed var(--gray-medium, #ccc);
-      border-radius: var(--border-radius-medium, 8px);
-      background-color: var(--background-light, #f8f9fa);
-      height: fit-content; position: sticky; top: 1.5rem; /* Sticky preview */
-    }
-    @media (max-width: 768px) { /* Su mobile, preview sopra */
+    @media (max-width: 768px) {
       .dash-admin-event-form-and-preview-container { flex-direction: column-reverse; }
       #dashAdminEventCardPreviewContainer { position: static; margin-bottom: 2rem;}
     }
-
-
     #dashAdminEventCardPreviewContainer h4 {
       text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 1rem;
       font-size: 1.1rem; border-bottom: 1px solid var(--gray-light, #eee); padding-bottom: 0.5rem;
     }
-    /* Stili per la card di anteprima */
     .dash-admin-preview-card {
       background: var(--white); border-radius: var(--border-radius-medium);
       box-shadow: var(--shadow-light); overflow: hidden; border: 1px solid var(--gray-light);
@@ -178,8 +183,6 @@
     .dash-admin-preview-card-content .dash-admin-preview-relatore { font-style: italic; }
     .dash-admin-preview-card-content .dash-admin-preview-posti,
     .dash-admin-preview-card-content .dash-admin-preview-costo { font-weight: bold; }
-
-    /* Stili per il form dentro il nuovo popup */
     #dashAdminEventForm .form-group { margin-bottom: 1rem; }
     #dashAdminEventForm .form-group label {
       display: block; margin-bottom: 0.3rem; color: var(--primary-dark, #333);
@@ -212,14 +215,69 @@
     #dashAdminEventForm small {
       font-size: 0.8rem; color: var(--gray-dark); display: block; margin-top: 0.2rem;
     }
-    #dashAdmin-current-event-image-preview, #dashAdmin-current-event-flyer-preview {
+    #dashAdmin-current-event-image-preview {
       margin-top: 0.5rem; max-width: 120px; border: 1px solid var(--gray-light, #eee);
-      padding: 4px; border-radius: 4px;
+      padding: 4px; border-radius: 4px; display:none;
     }
-    #dashAdmin-current-event-image-preview { display:none; } /* Nascosta di default */
-    #dashAdmin-current-event-flyer-preview a { font-size: 0.85rem; color: var(--primary); }
+    #dashAdmin-current-event-flyer-preview {
+      margin-top: 0.5rem; padding: 4px; font-size: 0.85rem;
+    }
+    #dashAdmin-current-event-flyer-preview a { color: var(--primary); text-decoration: underline; }
+    #dashAdmin-current-event-flyer-preview span { color: var(--gray-dark); }
     #dashAdminEventFormMessage.form-message { margin-top: 1rem; }
-    /* === FINE CSS AGGIUNTO === */
+
+    /* === ANIMAZIONE PRENOTAZIONE COMPLETATA (TICK BIANCO) === */
+    #bookingForm .form-content-wrapper.swept-away {
+      transition: opacity 0.4s ease-out, max-height 0.5s ease-in-out, transform 0.4s ease-out;
+      opacity: 0;
+      max-height: 0 !important;
+      transform: translateY(-30px);
+      overflow: hidden;
+      margin:0; padding:0; border:0;
+    }
+    #bookingSuccessAnimation { text-align: center; padding: 20px 0; }
+    .animated-check-icon {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      display: block;
+      stroke-width: 3; /* Spessore del tratto del cerchio esterno */
+      stroke: var(--success, #4CAF50); /* Colore del cerchio esterno */
+      stroke-miterlimit: 10;
+      margin: 20px auto;
+      box-shadow: inset 0px 0px 0px var(--success, #4CAF50); /* Riempimento iniziale */
+      animation: check_fill .4s ease-in-out .4s forwards, check_scale .3s ease-in-out .9s both;
+    }
+    .animated-check-icon__circle {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      stroke-width: 3; /* Spessore del tratto del cerchio animato */
+      stroke-miterlimit: 10;
+      stroke: var(--success, #4CAF50); /* Colore del cerchio animato */
+      fill: none; /* Nessun riempimento per il cerchio animato */
+      animation: check_stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+    .animated-check-icon__check {
+      transform-origin: 50% 50%;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      stroke-width: 4; /* Spessore del tratto della spunta */
+      stroke: #FFFFFF; /* MODIFICATO: Colore della spunta BIANCO */
+      animation: check_stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+    }
+    @keyframes check_stroke { 100% { stroke-dashoffset: 0; } }
+    @keyframes check_scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+    @keyframes check_fill { 100% { box-shadow: inset 0px 0px 0px 45px var(--success, #4CAF50); } } /* Riempie il cerchio */
+
+    #bookingSuccessAnimation p {
+      font-size: 1.3em;
+      color: var(--success-dark, #155724);
+      margin-top: 15px;
+      font-weight: 500;
+      animation: fadeInText 0.5s ease-in-out 1s forwards;
+      opacity: 0;
+    }
+    @keyframes fadeInText { to { opacity: 1; } }
+
   </style>
 </head>
 
@@ -273,6 +331,14 @@
 <main>
   <div class="container section-padding">
     <h1 id="mainPageTitle">Calendario Attività</h1>
+
+    <div class="add-event-btn-container-wrapper" id="addEventFabContainerWrapper" style="display:none;">
+      <button id="adminAddEventBtn" aria-label="Aggiungi Nuovo Evento">
+        <span class="plus-icon">+</span>
+        <span class="fab-text-label">Aggiungi Nuovo Evento</span>
+      </button>
+    </div>
+
     <div id="eventiGridContainer">
       <div id="loadingIndicator" class="loading-overlay visible">
         <div class="spinner">
@@ -285,11 +351,6 @@
       <div class="card-grid" id="eventiGrid">
       </div>
     </div>
-  </div>
-  <div class="add-event-btn-container" id="addEventFabContainer" style="display:none;">
-    <button id="adminAddEventBtn">
-      <span class="plus-icon">+</span>
-    </button>
   </div>
 </main>
 
@@ -344,15 +405,24 @@
   <button class="close-popup" id="closeBookingPopupBtn" aria-label="Chiudi popup">&times;</button>
   <h2 id="bookingPopupTitle">Prenota Evento</h2>
   <form id="bookingForm">
-    <input type="hidden" id="bookingEventId" name="eventId">
-    <div class="form-group">
-      <label for="numeroPosti">Numero Partecipanti (max <span id="maxSeatsAllowedBooking">5</span>)</label>
-      <input type="number" id="numeroPosti" name="numeroPosti" class="form-control" min="1" value="1" required>
-      <small id="infoPostiPrenotabili" style="display: block; margin-top: 0.3rem; font-size: 0.85rem;"></small>
+    <div class="form-content-wrapper">
+      <input type="hidden" id="bookingEventId" name="eventId">
+      <div class="form-group">
+        <label for="numeroPosti">Numero Partecipanti (max <span id="maxSeatsAllowedBooking">5</span>)</label>
+        <input type="number" id="numeroPosti" name="numeroPosti" class="form-control" min="1" value="1" required>
+        <small id="infoPostiPrenotabili" style="display: block; margin-top: 0.3rem; font-size: 0.85rem;"></small>
+      </div>
+      <div id="participantFieldsContainer" class="participant-fields-container"></div>
+      <div class="form-actions"><button type="submit" class="btn-popup">Conferma Prenotazione</button></div>
     </div>
-    <div id="participantFieldsContainer" class="participant-fields-container"></div>
     <div id="bookingResponseMessage" class="form-message"></div>
-    <div class="form-actions"><button type="submit" class="btn-popup">Conferma Prenotazione</button></div>
+    <div id="bookingSuccessAnimation" style="display: none;">
+      <svg class="animated-check-icon" viewBox="0 0 52 52">
+        <circle class="animated-check-icon__circle" cx="26" cy="26" r="25" fill="none"/>
+        <path class="animated-check-icon__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+      </svg>
+      <p>Prenotazione completata!</p>
+    </div>
   </form>
 </div>
 
@@ -444,6 +514,14 @@
           <img id="dashAdmin-current-event-image-preview" src="#" alt="Anteprima Immagine">
         </div>
 
+        <div class="form-group">
+          <label for="dashAdmin-event-flyer">Volantino (PDF/Immagine)</label>
+          <input type="file" id="dashAdmin-event-flyer" name="event-flyer" class="form-control" accept="image/*,application/pdf">
+          <small>Lascia vuoto se non vuoi modificare il volantino esistente.</small>
+          <div id="dashAdmin-current-event-flyer-preview">
+          </div>
+        </div>
+
         <div class="form-check-group">
           <input type="checkbox" id="dashAdmin-event-booking" name="event-booking" checked>
           <label for="dashAdmin-event-booking">Prenotazioni aperte</label>
@@ -501,21 +579,22 @@
   let currentEventsData = [];
 
   // Elementi DOM per Admin Event Popup (Stile Dashboard)
-  let adminAddEventBtnEl = null; // Rinominato per coerenza
+  let adminAddEventBtnEl = null;
   let dashAdminEventPopupOverlayEl = null;
   let dashAdminEventPopupEl = null;
   let closeDashAdminEventPopupBtnEl = null;
   let dashAdminEventFormEl = null;
   let dashAdminEventPopupTitleEl = null;
-  let dashAdminEventIdInputEl = null; /* ID evento nel form */
+  let dashAdminEventIdInputEl = null;
   /* Campi specifici del form */
   let dashAdminEventTitleEl, dashAdminEventDateEl, dashAdminEventStartTimeEl, dashAdminEventEndTimeEl,
           dashAdminEventShortDescEl, dashAdminEventLongDescEl, dashAdminEventPrefixEl, dashAdminEventSpeakerEl,
-          dashAdminEventAssociationEl, dashAdminEventSeatsEl, dashAdminEventImageEl,
+          dashAdminEventAssociationEl, dashAdminEventSeatsEl, dashAdminEventImageEl, dashAdminEventFlyerEl,
           dashAdminEventBookingCheckbox, dashAdminEventVoluntaryCheckbox,
           dashAdminEventPriceContainerEl, dashAdminEventPriceInputEl;
   let dashAdminEventFormMessageEl = null;
   let dashAdminCurrentImagePreviewEl = null;
+  let dashAdminCurrentFlyerPreviewEl = null;
   // Preview elements
   let dashAdminPreviewImageEl, dashAdminPreviewNoImagePlaceholderEl, dashAdminPreviewTitleEl,
           dashAdminPreviewDateFullEl, dashAdminPreviewTimeFullEl, dashAdminPreviewTimeValueEl,
@@ -553,7 +632,7 @@
       navGestioneEventiAdmin: gebi('nav-gestione-eventi-admin'),
       mobileNavGestioneEventiAdmin: gebi('mobile-nav-gestione-eventi-admin'),
       mainPageTitle: gebi('mainPageTitle'),
-      addEventFabContainer: gebi('addEventFabContainer')
+      addEventFabContainerWrapper: gebi('addEventFabContainerWrapper') // Wrapper del bottone
     };
 
     if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
@@ -574,7 +653,7 @@
         if (el.navDashboard) el.navDashboard.style.display = 'block';
         if (el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
         if (el.mainPageTitle) el.mainPageTitle.textContent = "Gestione Calendario Attività";
-        if (el.addEventFabContainer) el.addEventFabContainer.style.display = 'block';
+        if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'flex'; // Mostra il wrapper
         if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
         if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
         if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
@@ -586,7 +665,7 @@
         if (el.navDashboard) el.navDashboard.style.display = 'none';
         if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
         if (el.mainPageTitle) el.mainPageTitle.textContent = "Calendario Attività";
-        if (el.addEventFabContainer) el.addEventFabContainer.style.display = 'none';
+        if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none'; // Nascondi il wrapper
         if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
         if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
         if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
@@ -603,7 +682,7 @@
       if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
       if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
       if (el.mainPageTitle) el.mainPageTitle.textContent = "Calendario Attività";
-      if (el.addEventFabContainer) el.addEventFabContainer.style.display = 'none';
+      if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none'; // Nascondi il wrapper
       if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
       if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
       if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
@@ -666,7 +745,7 @@
       if (result.data) {
         currentEventsData = result.data;
         if (result.data.length === 0) {
-          eventsGrid.innerHTML = `<p class="no-events">Nessun evento ${(currentUserData && currentUserData.isAdmin) ? 'presente. Clicca il "+" per aggiungerne uno!' : 'in programma al momento.'}</p>`;
+          eventsGrid.innerHTML = `<p class="no-events">Nessun evento ${(currentUserData && currentUserData.isAdmin) ? 'presente. Clicca "Aggiungi Nuovo Evento" per crearne uno.' : 'in programma al momento.'}</p>`;
         } else {
           currentEventsData.forEach((event) => eventsGrid.appendChild(createEventCard(event)));
         }
@@ -687,8 +766,7 @@
       card.classList.add('admin-card');
       let volantinoAdminLinkHTML = '';
       if (event.volantino_url && event.volantino_url.trim() !== "") {
-        const volantinoName = event.volantino_url.split('/').pop();
-        volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em; margin-bottom: 0.5rem;"><b>Volantino:</b> <a href="${event.volantino_url}" target="_blank" title="${volantinoName}">Visualizza</a></p>`;
+        volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em; margin-bottom: 0.5rem;"><b>Volantino:</b> <a href="${event.volantino_url}" target="_blank" title="Visualizza il volantino dell'evento">Visualizza Volantino</a></p>`;
       }
       card.innerHTML = `
             <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
@@ -710,7 +788,7 @@
             </div>`;
       card.querySelector('.btn-edit').addEventListener('click', function() {
         const eventToEdit = currentEventsData.find(e => e.idevento == this.dataset.eventId);
-        if (eventToEdit) openDashAdminEventPopup(eventToEdit); // Usa nuovo popup
+        if (eventToEdit) openDashAdminEventPopup(eventToEdit);
         else alert("Dettagli evento non trovati per la modifica.");
       });
       card.querySelector('.btn-delete').addEventListener('click', function() {
@@ -725,9 +803,9 @@
       if (!flagPrenDB) { primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled title="Prenotazioni chiuse">(Pren. Chiuse)</button>`; }
       else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti (${pGiaPrenUt})</button>`; }
       else if (inCodaPerP > 0) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`; }
-      else if (postiDispEv > 0) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`; }
-      else { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Entra in Coda</button>`; }
-      card.innerHTML = `<div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div><div class="card-content"><h3>${event.titolo || "Titolo non disponibile"}</h3><p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario:</b> ${event.durata}` : ""}</p><p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ""}</p><p class="card-description">${event.descrizione || "Nessuna descrizione."}</p><p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">${postiDispEv > 0 ? postiDispEv : (flagPrenDB ? 'Esaurito' : 'Pren. Chiuse')}</span>${(currentUserData && pGiaPrenUt > 0) ? `<br><b>Tuoi posti:</b> <span class="posti-disponibili">${pGiaPrenUt}</span>` : ''}${(currentUserData && inCodaPerP > 0) ? `<br><b>In coda per:</b> <span class="posti-disponibili">${inCodaPerP} posti</span>` : ''}${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0.00 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}</p><div class="card-actions">${volantinoBtnHTML}${primaryBtnHTML}</div></div>`;
+      else if (postiDispEv > 0) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`; }
+      else { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Entra in Coda</button>`; }
+      card.innerHTML = `<div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo || "Evento")}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div><div class="card-content"><h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3><p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario:</b> ${sanitizeText(event.durata)}` : ""}</p><p class="card-info"><b>${sanitizeText(event.prefisso_relatore) || "Relatore"}:</b> ${sanitizeText(event.relatore) || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${sanitizeText(event.associazione)}` : ""}</p><p class="card-description">${sanitizeText(event.descrizione) || "Nessuna descrizione."}</p><p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">${postiDispEv > 0 ? postiDispEv : (flagPrenDB ? 'Esaurito' : 'Pren. Chiuse')}</span>${(currentUserData && pGiaPrenUt > 0) ? `<br><b>Tuoi posti:</b> <span class="posti-disponibili">${pGiaPrenUt}</span>` : ''}${(currentUserData && inCodaPerP > 0) ? `<br><b>In coda per:</b> <span class="posti-disponibili">${inCodaPerP} posti</span>` : ''}${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0.00 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}</p><div class="card-actions">${volantinoBtnHTML}${primaryBtnHTML}</div></div>`;
       const actionBtn = card.querySelector('.btn-prenota'); if (actionBtn && !actionBtn.disabled) { actionBtn.addEventListener('click', function () { const act = this.dataset.action; const eId = this.dataset.eventId; const eTitle = this.dataset.eventTitle; const pDisp = parseInt(this.dataset.postiDisponibiliEvento); const pGiaPren = parseInt(this.dataset.postiGiaPrenotatiUtente); if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: act, eventId: eId, eventTitle: eTitle, postiDisp: pDisp, postiGiaPren: pGiaPren })); return; } if (act === 'book') { if (typeof window.openBookingPopup === 'function') window.openBookingPopup(eId, eTitle, pDisp, pGiaPren); } else if (act === 'waitlist') { if (typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(eId, eTitle, pGiaPren); } }); }
       card.querySelector(".btn-visualizza-volantino")?.addEventListener("click", function () { if (typeof showVolantinoWithMorph === 'function') showVolantinoWithMorph(this.dataset.volantinoUrl); });
     }
@@ -749,25 +827,204 @@
       return date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
     } catch (e) { return dateString; }
   }
-  // Funzione per formattare la data come GG/MM/YYYY per il preview (usata da updateDashAdminEventPreview)
   function formatSimpleDateForPreview(dateString) {
     if (!dateString) return 'Seleziona data';
     try {
-      // Assumiamo che dateString sia in formato YYYY-MM-DD
       const parts = dateString.split('-');
       if (parts.length === 3) {
         return `${parts[2]}/${parts[1]}/${parts[0]}`;
       }
-      return dateString; // Fallback
+      return dateString;
     } catch (e) { return dateString; }
   }
 
+  function initializeBookingPopupHandlers() {
+    const bO = gebi('bookingPopupOverlay'); const bP = gebi('bookingPopup'); const cB = gebi('closeBookingPopupBtn'); const bF = gebi('bookingForm'); const nPI = gebi('numeroPosti'); const pFC = gebi('participantFieldsContainer'); const bEII = gebi('bookingEventId'); const bPT = gebi('bookingPopupTitle'); const bRM = gebi('bookingResponseMessage'); const iPP = gebi('infoPostiPrenotabili'); const mSB = gebi('maxSeatsAllowedBooking');
+    const formContentWrapper = bF ? bF.querySelector('.form-content-wrapper') : null;
+    const successAnimationContainer = gebi('bookingSuccessAnimation');
 
-  function initializeBookingPopupHandlers() { /* ... (codice esistente, non modificato) ... */ }
-  function generateParticipantFields(c, cont, bId, maxA) { /* ... (codice esistente, non modificato) ... */ }
-  function initializeWaitlistPopupHandlers() { /* ... (codice esistente, non modificato) ... */ }
+    window.openBookingPopup = function (id, t, disp, giaP) {
+      if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: 'book', eventId: id, eventTitle: t, postiDisp: disp, postiGiaPren: giaP })); return; }
+      if (formContentWrapper) {
+        formContentWrapper.classList.remove('swept-away');
+        formContentWrapper.style.display = 'block';
+      }
+      if (successAnimationContainer) successAnimationContainer.style.display = 'none';
+      if (bRM) { bRM.style.display = 'none'; bRM.className = 'form-message'; }
+      if (bF) bF.reset();
+      if (pFC) pFC.innerHTML = '';
+      if(bEII) bEII.value = id;
+      if(bPT) bPT.textContent = `Prenota: ${t}`;
+      const pDN = parseInt(disp); const pGPN = parseInt(giaP) || 0;
+      const maxPrUsrSTrx = Math.min(MAX_SEATS_PER_BOOKING, MAX_TOTAL_SEATS_PER_USER - pGPN);
+      const maxE = Math.min(maxPrUsrSTrx, pDN);
+      if (maxE < 1) { alert("Non puoi prenotare ulteriori posti per questo evento o hai raggiunto il limite massimo di prenotazioni."); return; }
+      if(nPI) { nPI.max = maxE; nPI.value = 1; }
+      if (mSB) mSB.textContent = maxE;
+      if (iPP) iPP.textContent = `Puoi prenotare da 1 a ${maxE} posti. (Già prenotati da te per questo evento: ${pGPN}. Max totale per utente: ${MAX_TOTAL_SEATS_PER_USER})`;
+      generateParticipantFields(1, pFC, 'bp', maxE);
+      if (bO) bO.classList.add('active'); if (bP) bP.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
+    function cBP() {
+      if (bO) bO.classList.remove('active'); if (bP) bP.classList.remove('active');
+      if (!isAnyPopupActive()) document.body.style.overflow = '';
+      if (formContentWrapper) {
+        formContentWrapper.classList.remove('swept-away');
+        formContentWrapper.style.display = 'block';
+      }
+      if (successAnimationContainer) successAnimationContainer.style.display = 'none';
+      if (bF) bF.reset();
+      if (pFC) pFC.innerHTML = '';
+      if (iPP) iPP.textContent = '';
+      if (bRM) { bRM.style.display = 'none'; bRM.className = 'form-message';}
+    }
+    if (cB) cB.addEventListener('click', cBP);
+    if (bO) bO.addEventListener('click', (e) => { if (e.target === bO) cBP(); });
+    if (nPI && pFC) nPI.addEventListener('input', (e) => {
+      const currentVal = parseInt(e.target.value);
+      const maxVal = parseInt(nPI.max);
+      if (currentVal > maxVal) { e.target.value = maxVal; }
+      if (currentVal < 1 && e.target.value !== "") { e.target.value = 1; }
+      generateParticipantFields(e.target.value, pFC, 'bp', maxVal);
+    });
+    if (bF) bF.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      if (!currentUserData || !currentUserData.email) { alert("Sessione scaduta o utente non valido. Effettua nuovamente il login."); handleLogout(); return; }
+      const btn = this.querySelector('button[type="submit"]'); const oT = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini-light" style="margin-right: 5px;"></div> Elaboro...';
+      if (bRM) { bRM.style.display = 'none'; bRM.className = 'form-message'; }
+      const fd = new FormData();
+      fd.append('eventId', bEII.value);
+      fd.append('numeroPosti', nPI.value);
+      fd.append('contatto', currentUserData.email);
+      const N = pFC.querySelectorAll('input[name="participant_nome[]"]');
+      const C = pFC.querySelectorAll('input[name="participant_cognome[]"]');
+      let v = true;
+      if (N.length !== parseInt(nPI.value)) { v = false; if (bRM) bRM.textContent = 'Il numero di partecipanti non corrisponde ai campi compilati.'; }
+      else {
+        for (let i = 0; i < N.length; i++) {
+          if (N[i].value.trim() === '' || C[i].value.trim() === '') { v = false; if (bRM) bRM.textContent = 'Nome e cognome sono obbligatori per tutti i partecipanti.'; break; }
+          fd.append('partecipanti_nomi[]', N[i].value.trim());
+          fd.append('partecipanti_cognomi[]', C[i].value.trim());
+        }
+      }
+      if (!v) { if (bRM) { bRM.className = 'form-message error'; bRM.style.display = 'block'; } btn.disabled = false; btn.innerHTML = oT; return; }
+      try {
+        const r = await fetch('prenota_evento.php', { method: 'POST', body: fd });
+        const rt = await r.text();
+        let j;
+        try { j = JSON.parse(rt); }
+        catch (err) { throw new Error("Risposta non valida dal server: " + rt.substring(0, 150)); }
+        if (j.success) {
+          if (formContentWrapper) formContentWrapper.classList.add('swept-away');
+          if (bRM) bRM.style.display = 'none';
+          if (successAnimationContainer) {
+            successAnimationContainer.style.display = 'block';
+            const checkMarkIcon = successAnimationContainer.querySelector('.animated-check-icon');
+            if(checkMarkIcon) {
+              const newCheckMark = checkMarkIcon.cloneNode(true);
+              checkMarkIcon.parentNode.replaceChild(newCheckMark, checkMarkIcon);
+            }
+          }
+          loadEvents();
+          setTimeout(cBP, 3500);
+        } else { throw new Error(j.message || 'Errore durante la prenotazione.'); }
+      } catch (err) {
+        if (bRM) { bRM.textContent = `Errore: ${err.message}`; bRM.className = 'form-message error'; }
+      } finally {
+        if (successAnimationContainer && successAnimationContainer.style.display === 'block') {
+          if (bRM) bRM.style.display = 'none';
+        } else if (bRM && !bRM.classList.contains('success')) {
+          bRM.style.display = 'block';
+        }
+        btn.disabled = false; btn.innerHTML = oT;
+      }
+    });
+  }
 
-  // === Funzioni Admin Event Popup (Stile Dashboard) ===
+  function generateParticipantFields(c, cont, bId, maxA) {
+    if (!cont) return; cont.innerHTML = '';
+    let vC = parseInt(c);
+    if (isNaN(vC) || vC < 1) vC = 1;
+    const maxAllowed = parseInt(maxA);
+    if (isNaN(maxAllowed) || maxAllowed < 1) maxAllowed = MAX_SEATS_PER_BOOKING;
+    if (vC > maxAllowed) vC = maxAllowed;
+    const nI = cont.closest('form')?.querySelector('input[type="number"]#numeroPosti');
+    if (nI && parseInt(nI.value) !== vC) nI.value = vC;
+    if (vC > 0) {
+      for (let i = 1; i <= vC; i++) {
+        const fS = document.createElement('div');
+        fS.className = 'participant-entry';
+        fS.innerHTML = `<p style="margin-bottom:0.5rem;font-weight:500;color:var(--dark); padding-top: ${i > 1 ? '1rem' : '0'};">Partecipante ${i}:</p>
+                            <div class="form-grid">
+                                <div><label for="${bId}_nome_${i}">Nome*</label><input type="text" id="${bId}_nome_${i}" name="participant_nome[]" class="form-control" required></div>
+                                <div><label for="${bId}_cognome_${i}">Cognome*</label><input type="text" id="${bId}_cognome_${i}" name="participant_cognome[]" class="form-control" required></div>
+                            </div>`;
+        cont.appendChild(fS);
+      }
+    }
+  }
+
+  function initializeWaitlistPopupHandlers() {
+    const wO = gebi('waitlistPopupOverlay'); const wP = gebi('waitlistPopup'); const cB = gebi('closeWaitlistPopupBtn'); const wF = gebi('waitlistForm'); const wNPI = gebi('waitlistNumeroPosti'); const wEII = gebi('waitlistEventId'); const wPT = gebi('waitlistPopupTitle'); const wEI = gebi('waitlistEventInfo'); const wRM = gebi('waitlistResponseMessage'); const mSEW = gebi('maxSeatsAllowedWaitlist'); const iCEl = gebi('infoPostiCoda');
+    window.openWaitlistPopup = function (id, t, pGiaP) {
+      if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: 'waitlist', eventId: id, eventTitle: t, postiGiaPren: pGiaP })); return; }
+      if(wEII) wEII.value = id;
+      if(wPT) wPT.textContent = `Entra in Lista d'Attesa`;
+      if(wEI) wEI.textContent = `Evento: ${t}`;
+      const pGPN = parseInt(pGiaP) || 0;
+      const maxPC = Math.min(MAX_SEATS_PER_BOOKING, MAX_TOTAL_SEATS_PER_USER - pGPN);
+      if (maxPC < 1) { alert("Hai raggiunto il limite massimo di posti prenotabili o richiedibili in coda."); return; }
+      if (wNPI) { wNPI.max = maxPC; wNPI.value = 1; }
+      if (mSEW) mSEW.textContent = maxPC;
+      if (iCEl) iCEl.textContent = `Puoi richiedere da 1 a ${maxPC} posti. (Già prenotati/in coda da te: ${pGPN}/${MAX_TOTAL_SEATS_PER_USER})`;
+      if (wRM) { wRM.style.display = 'none'; wRM.className = 'form-message'; }
+      if (wO) wO.classList.add('active'); if (wP) wP.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    };
+    function cWP() {
+      if (wO) wO.classList.remove('active'); if (wP) wP.classList.remove('active');
+      if (!isAnyPopupActive()) document.body.style.overflow = '';
+      if (wF) wF.reset();
+      if (iCEl) iCEl.textContent = '';
+    }
+    if (cB) cB.addEventListener('click', cWP);
+    if (wO) wO.addEventListener('click', (e) => { if (e.target === wO) cWP(); });
+    if (wNPI) wNPI.addEventListener('input', (e) => {
+      const currentVal = parseInt(e.target.value);
+      const maxVal = parseInt(wNPI.max);
+      if (currentVal > maxVal) { e.target.value = maxVal; }
+      if (currentVal < 1 && e.target.value !== "") { e.target.value = 1; }
+    });
+    if (wF) wF.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      if (!currentUserData || !currentUserData.email) { alert("Sessione scaduta o utente non valido. Effettua nuovamente il login."); handleLogout(); return; }
+      const btn = this.querySelector('button[type="submit"]'); const oT = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini-light" style="margin-right: 5px;"></div> Elaboro...';
+      if (wRM) wRM.style.display = 'none';
+      const fd = new FormData();
+      fd.append('eventId', wEII.value);
+      fd.append('numeroPosti', wNPI.value);
+      fd.append('contatto', currentUserData.email);
+      try {
+        const r = await fetch('gestisci_coda.php', { method: 'POST', body: fd });
+        const rt = await r.text();
+        let j;
+        try { j = JSON.parse(rt); }
+        catch (err) { throw new Error("Risposta non valida dal server: " + rt.substring(0, 150)); }
+        if (j.success) {
+          if (wRM) { wRM.textContent = j.message || "Richiesta di inserimento in coda inviata con successo!"; wRM.className = 'form-message success'; }
+          loadEvents();
+          setTimeout(cWP, 2000);
+        } else { throw new Error(j.message || "Errore durante la richiesta di inserimento in coda."); }
+      } catch (err) {
+        if (wRM) { wRM.textContent = `Errore: ${err.message}`; wRM.className = 'form-message error'; }
+      } finally {
+        if (wRM && !wRM.classList.contains('success')) wRM.style.display = 'block';
+        btn.disabled = false; btn.innerHTML = oT;
+      }
+    });
+  }
+
   function initializeDashAdminEventPopupHandlers() {
     adminAddEventBtnEl = gebi('adminAddEventBtn');
     dashAdminEventPopupOverlayEl = gebi('dashAdminEventPopupOverlay');
@@ -776,7 +1033,6 @@
     dashAdminEventFormEl = gebi('dashAdminEventForm');
     dashAdminEventPopupTitleEl = gebi('dashAdminEventPopupTitle');
     dashAdminEventIdInputEl = gebi('dashAdmin-event-id');
-    // Campi del form
     dashAdminEventTitleEl = gebi('dashAdmin-event-title');
     dashAdminEventDateEl = gebi('dashAdmin-event-date');
     dashAdminEventStartTimeEl = gebi('dashAdmin-event-start-time');
@@ -788,13 +1044,14 @@
     dashAdminEventAssociationEl = gebi('dashAdmin-event-association');
     dashAdminEventSeatsEl = gebi('dashAdmin-event-seats');
     dashAdminEventImageEl = gebi('dashAdmin-event-image');
+    dashAdminEventFlyerEl = gebi('dashAdmin-event-flyer');
     dashAdminEventBookingCheckbox = gebi('dashAdmin-event-booking');
     dashAdminEventVoluntaryCheckbox = gebi('dashAdmin-event-voluntary');
     dashAdminEventPriceContainerEl = gebi('dashAdmin-event-price-container');
     dashAdminEventPriceInputEl = gebi('dashAdmin-event-price');
     dashAdminEventFormMessageEl = gebi('dashAdminEventFormMessage');
     dashAdminCurrentImagePreviewEl = gebi('dashAdmin-current-event-image-preview');
-    // Elementi Preview
+    dashAdminCurrentFlyerPreviewEl = gebi('dashAdmin-current-event-flyer-preview');
     dashAdminPreviewImageEl = gebi('dashAdmin_previewImage');
     dashAdminPreviewNoImagePlaceholderEl = document.querySelector('#dashAdminEventCardPreviewContainer .dash-admin-no-image-placeholder');
     dashAdminPreviewTitleEl = gebi('dashAdmin_previewTitle');
@@ -808,26 +1065,20 @@
     dashAdminPreviewSeatsFullEl = gebi('dashAdmin_previewSeatsFull').querySelector('.value');
     dashAdminPreviewPriceFullEl = gebi('dashAdmin_previewPriceFull').querySelector('.value');
 
-
     if (adminAddEventBtnEl) adminAddEventBtnEl.addEventListener('click', () => openDashAdminEventPopup(null));
     if (closeDashAdminEventPopupBtnEl) closeDashAdminEventPopupBtnEl.addEventListener('click', closeDashAdminEventPopup);
     if (dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.addEventListener('click', (e) => { if (e.target === dashAdminEventPopupOverlayEl) closeDashAdminEventPopup(); });
     if (dashAdminEventVoluntaryCheckbox) dashAdminEventVoluntaryCheckbox.addEventListener('change', updateDashAdminPriceFieldVisibility);
-
-    attachDashAdminPreviewListeners(); // Attacca listener per la preview
-
+    attachDashAdminPreviewListeners();
     dashAdminEventFormEl?.addEventListener('submit', async function(e) {
       e.preventDefault();
       const submitBtn = this.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn.innerHTML;
       submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
       if(dashAdminEventFormMessageEl) { dashAdminEventFormMessageEl.style.display = 'none'; dashAdminEventFormMessageEl.className = 'form-message';}
-
       try {
         const formData = new FormData(this);
         formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
-
-        // Combina start e end time in 'event-time' (durata)
         const startTime = formData.get('event-start-time');
         const endTime = formData.get('event-end-time');
         let durataString = '';
@@ -836,23 +1087,19 @@
         } else if (startTime) {
           durataString = startTime;
         }
-        formData.append('event-time', durataString); // Chiave attesa da gestione_eventi.php
-        formData.delete('event-start-time'); // Rimuovi i campi singoli se non servono al backend
+        formData.append('event-time', durataString);
+        formData.delete('event-start-time');
         formData.delete('event-end-time');
-
         if (dashAdminEventVoluntaryCheckbox.checked) {
           formData.set('event-price', '0.00');
-        } else if (!formData.get('event-price')) { // Se non volontaria e prezzo vuoto, imposta a 0.00
+        } else if (!formData.get('event-price')) {
           formData.set('event-price', '0.00');
         }
-        // 'event-booking' è un checkbox, il suo valore "on" o l'assenza sono gestiti da PHP
-
         const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
         const responseText = await response.text();
         let result;
         try { result = JSON.parse(responseText); }
         catch (jsonError) { throw new Error(`Risposta non JSON dal server: ${responseText.substring(0,200)}`); }
-
         if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
         if (result.success) {
           if(dashAdminEventFormMessageEl) { dashAdminEventFormMessageEl.textContent = result.message || 'Operazione completata!'; dashAdminEventFormMessageEl.classList.add('success'); dashAdminEventFormMessageEl.style.display = 'block';}
@@ -874,7 +1121,7 @@
       dashAdminEventPriceContainerEl.style.display = isVoluntary ? 'none' : 'block';
       dashAdminEventPriceInputEl.required = !isVoluntary;
       if (isVoluntary) dashAdminEventPriceInputEl.value = '';
-      updateDashAdminEventPreview(); // Aggiorna preview quando cambia
+      updateDashAdminEventPreview();
     }
   }
 
@@ -887,23 +1134,16 @@
     const element = document.createElement('div'); element.innerText = String(text); return element.innerHTML;
   }
 
-
   function updateDashAdminEventPreview() {
-    if (!dashAdminPreviewTitleEl) return; // Esce se gli elementi di preview non sono pronti
-
+    if (!dashAdminPreviewTitleEl) return;
     dashAdminPreviewTitleEl.textContent = dashAdminEventTitleEl.value || 'Titolo Evento';
     const dateValue = dashAdminEventDateEl.value;
     dashAdminPreviewDateFullEl.textContent = dateValue ? formatSimpleDateForPreview(dateValue) : 'Seleziona data';
-
     const startTimeValue = dashAdminEventStartTimeEl.value;
     const endTimeValue = dashAdminEventEndTimeEl.value;
     let timeString = '';
-    if (startTimeValue && endTimeValue) {
-      timeString = `${startTimeValue} - ${endTimeValue}`;
-    } else if (startTimeValue) {
-      timeString = startTimeValue;
-    }
-
+    if (startTimeValue && endTimeValue) { timeString = `${startTimeValue} - ${endTimeValue}`; }
+    else if (startTimeValue) { timeString = startTimeValue; }
     if (timeString && dashAdminPreviewTimeFullEl && dashAdminPreviewTimeValueEl) {
       dashAdminPreviewTimeFullEl.style.display = 'block';
       dashAdminPreviewTimeValueEl.textContent = timeString;
@@ -911,12 +1151,10 @@
       dashAdminPreviewTimeFullEl.style.display = 'none';
       dashAdminPreviewTimeValueEl.textContent = '';
     }
-
     dashAdminPreviewSpeakerPrefixEl.textContent = dashAdminEventPrefixEl.value || 'Relatore';
     dashAdminPreviewSpeakerNameEl.textContent = dashAdminEventSpeakerEl.value || 'Nome Relatore';
     dashAdminPreviewShortDescEl.textContent = dashAdminEventShortDescEl.value || 'Descrizione breve dell\'evento qui...';
     dashAdminPreviewSeatsFullEl.textContent = dashAdminEventSeatsEl.value || '0';
-
     const isVoluntary = dashAdminEventVoluntaryCheckbox.checked;
     if (isVoluntary) {
       dashAdminPreviewPriceFullEl.textContent = 'Offerta libera';
@@ -924,7 +1162,6 @@
       const priceValue = parseFloat(dashAdminEventPriceInputEl.value);
       dashAdminPreviewPriceFullEl.textContent = !isNaN(priceValue) && priceValue > 0 ? `€ ${priceValue.toFixed(2)}` : '€ 0.00';
     }
-
     const imageInput = dashAdminEventImageEl;
     if (imageInput.files && imageInput.files[0]) {
       const reader = new FileReader();
@@ -964,39 +1201,33 @@
     });
   }
 
-
   function openDashAdminEventPopup(eventData = null) {
     if (!dashAdminEventFormEl) return;
-    dashAdminEventFormEl.reset(); // Resetta il form
-    updateDashAdminPriceFieldVisibility(); // Aggiorna visibilità campi prezzo e chiama preview
-
+    dashAdminEventFormEl.reset();
+    updateDashAdminPriceFieldVisibility();
     if(dashAdminEventFormMessageEl) { dashAdminEventFormMessageEl.style.display = 'none'; dashAdminEventFormMessageEl.className = 'form-message';}
     if(dashAdminCurrentImagePreviewEl) { dashAdminCurrentImagePreviewEl.style.display = 'none'; dashAdminCurrentImagePreviewEl.src = '#';}
-
-    // Resetta specificamente i campi orario perché .reset() non sempre li pulisce bene con type="time"
+    if(dashAdminCurrentFlyerPreviewEl) { dashAdminCurrentFlyerPreviewEl.innerHTML = ''; }
+    if(dashAdminEventFlyerEl) { dashAdminEventFlyerEl.value = ''; }
     if(dashAdminEventStartTimeEl) dashAdminEventStartTimeEl.value = '';
     if(dashAdminEventEndTimeEl) dashAdminEventEndTimeEl.value = '';
 
-
-    if (eventData) { // Modalità Modifica
+    if (eventData) {
       if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Modifica Evento';
       if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = eventData.idevento;
-
       dashAdminEventTitleEl.value = eventData.titolo || '';
       dashAdminEventDateEl.value = eventData.datainizio ? eventData.datainizio.substring(0,10) : '';
-
       let startTime = '', endTime = '';
       const durata = eventData.durata || '';
       if (durata.includes('-')) {
         const parts = durata.split('-');
         startTime = parts[0].trim().match(/^\d{2}:\d{2}/) ? parts[0].trim().substring(0,5) : '';
         endTime = parts[1].trim().match(/^\d{2}:\d{2}/) ? parts[1].trim().substring(0,5) : '';
-      } else if (durata.match(/^\d{2}:\d{2}/)) { // Solo ora inizio
+      } else if (durata.match(/^\d{2}:\d{2}/)) {
         startTime = durata.substring(0,5);
       }
       dashAdminEventStartTimeEl.value = startTime;
       dashAdminEventEndTimeEl.value = endTime;
-
       dashAdminEventShortDescEl.value = eventData.descrizione || '';
       dashAdminEventLongDescEl.value = eventData.descrizione_estesa || '';
       dashAdminEventPrefixEl.value = eventData.prefisso_relatore || 'Relatore';
@@ -1004,33 +1235,36 @@
       dashAdminEventAssociationEl.value = eventData.associazione || '';
       dashAdminEventSeatsEl.value = eventData.posti_disponibili !== null ? eventData.posti_disponibili : '0';
       dashAdminEventBookingCheckbox.checked = parseInt(eventData.flagprenotabile) === 1;
-
       dashAdminEventVoluntaryCheckbox.checked = parseFloat(eventData.costo) === 0.00;
-      updateDashAdminPriceFieldVisibility(); // Aggiorna visibilità e required per il prezzo
+      updateDashAdminPriceFieldVisibility();
       if (!dashAdminEventVoluntaryCheckbox.checked && eventData.costo && parseFloat(eventData.costo) > 0) {
         dashAdminEventPriceInputEl.value = parseFloat(eventData.costo).toFixed(2);
       } else {
         dashAdminEventPriceInputEl.value = '';
       }
-
       if (dashAdminCurrentImagePreviewEl && eventData.immagine_url) {
         dashAdminCurrentImagePreviewEl.src = eventData.immagine_url;
         dashAdminCurrentImagePreviewEl.style.display = 'block';
       }
-      // Non c'è campo per il volantino in questo form, quindi non si gestisce la preview del volantino qui.
-
-    } else { // Modalità Aggiungi
+      if (dashAdminCurrentFlyerPreviewEl && eventData.volantino_url) {
+        // MODIFICATO: Testo link volantino più pulito
+        dashAdminCurrentFlyerPreviewEl.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank" title="Visualizza il volantino attuale">Visualizza volantino attuale</a>`;
+      } else if (dashAdminCurrentFlyerPreviewEl) {
+        dashAdminCurrentFlyerPreviewEl.innerHTML = `<span>Nessun volantino caricato.</span>`;
+      }
+    } else {
       if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Aggiungi Nuovo Evento';
       if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = '';
       dashAdminEventBookingCheckbox.checked = true;
       dashAdminEventVoluntaryCheckbox.checked = false;
-      dashAdminEventSeatsEl.value = '50'; // Default
-      dashAdminEventPrefixEl.value = 'Relatore'; // Default
-      updateDashAdminPriceFieldVisibility(); // Aggiorna per default
+      dashAdminEventSeatsEl.value = '50';
+      dashAdminEventPrefixEl.value = 'Relatore';
+      updateDashAdminPriceFieldVisibility();
+      if (dashAdminCurrentFlyerPreviewEl) {
+        dashAdminCurrentFlyerPreviewEl.innerHTML = `<span>Nessun volantino selezionato.</span>`;
+      }
     }
-
-    updateDashAdminEventPreview(); // Chiamata finale per assicurare che la preview sia corretta all'apertura
-
+    updateDashAdminEventPreview();
     if(dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.classList.add('active');
     if(dashAdminEventPopupEl) dashAdminEventPopupEl.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -1048,7 +1282,7 @@
   async function handleDeleteEvent(eventId) {
     const eventToDelete = currentEventsData.find(e => e.idevento == eventId);
     const eventTitle = eventToDelete ? eventToDelete.titolo : "questo evento";
-    if (confirm(`Sei sicuro di voler eliminare l'evento "${eventTitle}"? L'azione è irreversibile.`)) {
+    if (confirm(`Sei sicuro di voler eliminare l'evento "${sanitizeForAttribute(eventTitle)}"? L'azione è irreversibile.`)) {
       try {
         const formData = new FormData();
         formData.append('action', 'delete_event');
@@ -1058,7 +1292,6 @@
         let result;
         try { result = JSON.parse(resText); }
         catch(e) { throw new Error("Risposta non JSON dal server (delete): "+resText.substring(0,100));}
-
         if (!response.ok) throw new Error(result.message || `Errore HTTP ${response.status}`);
         if (result.success) {
           alert(result.message || 'Evento eliminato con successo.');
@@ -1078,7 +1311,7 @@
             gebi('forgotPasswordPopup')?.classList.contains('active') ||
             gebi('bookingPopup')?.classList.contains('active') ||
             gebi('waitlistPopup')?.classList.contains('active') ||
-            gebi('dashAdminEventPopup')?.classList.contains('active') || // Controlla il nuovo popup
+            gebi('dashAdminEventPopup')?.classList.contains('active') ||
             volantinoMorphOverlay?.classList.contains('active');
   }
 
@@ -1086,15 +1319,10 @@
   document.addEventListener('DOMContentLoaded', async () => {
     const cY = gebi("currentYear"); if (cY) cY.textContent = new Date().getFullYear();
     volantinoMorphOverlay = gebi('volantinoMorphOverlay'); if (volantinoMorphOverlay) volantinoMorphOverlay.addEventListener("click", (e) => { if (e.target === volantinoMorphOverlay && morphingCard) hideVolantinoWithMorph(); });
-
-    loadUserData();
-    updateNavbarUI();
-    await loadEvents();
-
+    loadUserData(); updateNavbarUI(); await loadEvents();
     initializeBookingPopupHandlers();
     initializeWaitlistPopupHandlers();
-    initializeDashAdminEventPopupHandlers(); // Inizializza i gestori per il NUOVO popup admin
-
+    initializeDashAdminEventPopupHandlers();
     const pAction = localStorage.getItem("pending_action_eff");
     if (pAction && currentUserData) {
       const aD = JSON.parse(pAction);
@@ -1102,7 +1330,6 @@
       else if (aD.action === 'waitlist' && typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(aD.eventId, aD.eventTitle, aD.postiGiaPren);
       localStorage.removeItem("pending_action_eff");
     }
-
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         if (gebi('loginPopup')?.classList.contains("active")) closeLoginPopup();
@@ -1110,12 +1337,10 @@
         if (gebi('bookingPopup')?.classList.contains("active")) gebi('closeBookingPopupBtn')?.click();
         if (gebi('waitlistPopup')?.classList.contains("active")) gebi('closeWaitlistPopupBtn')?.click();
         if (volantinoMorphOverlay?.classList.contains("active")) hideVolantinoWithMorph();
-        if (gebi('dashAdminEventPopup')?.classList.contains("active")) closeDashAdminEventPopup(); // Chiude NUOVO popup admin
+        if (gebi('dashAdminEventPopup')?.classList.contains("active")) closeDashAdminEventPopup();
       }
     });
   });
-  // === FINE SCRIPT UNIFICATO ===
 </script>
 </body>
-
 </html>
