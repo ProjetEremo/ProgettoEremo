@@ -31,13 +31,13 @@
     #savePageChangesBtn { background-color: var(--success); } #cancelPageChangesBtn { background-color: var(--gray-dark); }
     #editPageBtn:hover { background-color: #c07b50; } #savePageChangesBtn:hover { background-color: #27ae60; } #cancelPageChangesBtn:hover { background-color: var(--dark); }
     .editable-text-wrapper { position: relative; display: block; width:100%; }
-    .editable-iframe-wrapper, .editable-href-wrapper { position: relative; display: block; } /* Wrapper per iframe e link */
+    .editable-iframe-wrapper, .editable-href-wrapper { position: relative; display: block; }
     .editable-text-wrapper:hover .edit-icon-text,
     .editable-iframe-wrapper:hover .edit-icon-iframe,
     .editable-href-wrapper:hover .edit-icon-href { display: inline-flex; align-items: center; justify-content: center; }
     .edit-icon-text, .edit-icon-iframe, .edit-icon-href { display: none; position: absolute; top: -5px; right: -5px; background: var(--accent); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 0.75em; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-align: center; line-height: 22px; z-index:5; }
     .main-title-editable-wrapper > h1 + .edit-icon-text { top: 50%; right: -5px; transform: translateY(-50%);}
-    .location-description .editable-text-wrapper h2 + .edit-icon-text { top: 0px; right: 0px; } /* Specifico per H2 dentro location-description */
+    .location-description .editable-text-wrapper h2 + .edit-icon-text { top: 0px; right: 0px; }
     .location-info-cards .editable-text-wrapper h2 + .edit-icon-text { top: 5px; right: -25px;}
 
 
@@ -64,7 +64,7 @@
       <a href="eventiincorso.html" id="navCalendarioAttivita">Calendario attività</a>
       <a href="eventipassati.html" id="navArchivioAttivita">Archivio attività</a>
       <span class="separator">|</span>
-      <a href="incontrisullaparola_unificato.html" id="navIncontriParola">Incontri sulla parola</a>
+      <a href="incontrisullaparola.html" id="navIncontriParola">Incontri sulla parola</a>
       <span class="separator">|</span>
       <a href="dovesiamo.html" class="active" id="navDoveSiamo">Dove siamo</a>
       <a href="contatti.html" id="navContatti">Contatti</a>
@@ -78,9 +78,11 @@
           <span class="dropdown-arrow">▼</span>
         </button>
         <div class="dropdown-menu" id="userDropdownMenu">
-          <a href="areapersonale.html" id="dropdownProfilo" style="display: none;">Il mio profilo</a>
-          <a href="areapersonale.html#prenotazioni" id="dropdownPrenotazioni" style="display: none;">Le mie prenotazioni</a>
-          <a href="#" id="dropdownLogout">Esci</a>
+          <a href="areapersonale.html" id="nav-profilo">Il mio profilo</a>
+          <a href="areapersonale.html#prenotazioni" id="nav-mie-prenotazioni">Le mie prenotazioni</a>
+          <a href="dashboard.html" id="nav-dashboard">Dashboard Admin</a>
+          <a href="eventiincorsoAdmin.html" id="nav-gestione-eventi-admin">Gestione Eventi</a>
+          <a href="#" id="logout-link-desktop">Esci</a>
         </div>
       </div>
       <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
@@ -89,13 +91,15 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="eventiincorso.html" id="mobileNavCalendarioAttivita">Calendario attività</a>
     <a href="eventipassati.html" id="mobileNavArchivioAttivita">Archivio attività</a>
-    <a href="incontrisullaparola_unificato.html" id="mobileNavIncontriParola">Incontri sulla parola</a>
+    <a href="incontrisullaparola.html" id="mobileNavIncontriParola">Incontri sulla parola</a>
     <a href="dovesiamo.html" id="mobileNavDoveSiamo">Dove siamo</a>
     <a href="contatti.html" id="mobileNavContatti">Contatti</a>
     <hr id="mobileMenuSeparator" style="border-color: rgba(255,255,255,0.1); display:none;">
     <a href="#" id="login-btn-mobile" style="display: none;">Accedi</a>
     <a href="areapersonale.html" id="mobileNavProfilo" style="display: none;">Il mio profilo</a>
     <a href="areapersonale.html#prenotazioni" id="mobileNavPrenotazioni" style="display: none;">Le mie prenotazioni</a>
+    <a href="dashboard.html" id="mobileNavDashboard" style="display: none;">Dashboard Admin</a>
+    <a href="eventiincorsoAdmin.html" id="mobileNavGestioneEventiAdmin" style="display: none;">Gestione Eventi</a>
     <a href="#" id="mobileLogoutLink" style="display: none;">Esci</a>
   </div>
 </header>
@@ -104,7 +108,7 @@
   <div class="container section-padding pb-0">
     <div class="editable-text-wrapper main-title-editable-wrapper" style="text-align: center;">
       <h1 id="content-pageTitle" data-content-key="pageTitle"></h1>
-      <span class="edit-icon-text" data-key="pageTitle" data-type="text" title="Modifica Titolo Pagina">&#9998;</span>
+      <span class="edit-icon-text" data-key="pageTitle" data-type="text" title="Modifica Titolo Pagina">✎</span>
     </div>
   </div>
 
@@ -112,35 +116,35 @@
     <section class="map-section">
       <div class="map-container editable-iframe-wrapper">
         <iframe class="iframe-map" id="content-mapIframeSrc" data-content-key="mapIframeSrc" src="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mappa Eremo Frate Francesco"></iframe>
-        <span class="edit-icon-iframe" data-key="mapIframeSrc" data-type="iframe_src" title="Modifica URL Mappa">&#9998;</span>
+        <span class="edit-icon-iframe" data-key="mapIframeSrc" data-type="iframe_src" title="Modifica URL Mappa">✎</span>
       </div>
       <div class="location-description">
         <div class="editable-text-wrapper">
           <h2 id="content-locationHeading" data-content-key="locationHeading"></h2>
-          <span class="edit-icon-text" data-key="locationHeading" data-type="text" title="Modifica Titolo Sezione">&#9998;</span>
+          <span class="edit-icon-text" data-key="locationHeading" data-type="text" title="Modifica Titolo Sezione">✎</span>
         </div>
         <div class="editable-text-wrapper">
           <p id="content-locationText1" data-content-key="locationText1"></p>
-          <span class="edit-icon-text" data-key="locationText1" data-type="textarea" title="Modifica Testo">&#9998;</span>
+          <span class="edit-icon-text" data-key="locationText1" data-type="textarea" title="Modifica Testo">✎</span>
         </div>
         <div class="editable-text-wrapper">
           <p id="content-locationAddress" data-content-key="locationAddress"></p>
-          <span class="edit-icon-text" data-key="locationAddress" data-type="textarea" title="Modifica Indirizzo">&#9998;</span>
+          <span class="edit-icon-text" data-key="locationAddress" data-type="textarea" title="Modifica Indirizzo">✎</span>
         </div>
         <div class="editable-text-wrapper">
           <p id="content-locationDirections" data-content-key="locationDirections"></p>
-          <span class="edit-icon-text" data-key="locationDirections" data-type="textarea" title="Modifica Indicazioni">&#9998;</span>
+          <span class="edit-icon-text" data-key="locationDirections" data-type="textarea" title="Modifica Indicazioni">✎</span>
         </div>
         <div class="editable-text-wrapper">
           <p id="content-locationParking" data-content-key="locationParking"></p>
-          <span class="edit-icon-text" data-key="locationParking" data-type="text" title="Modifica Info Parcheggio">&#9998;</span>
+          <span class="edit-icon-text" data-key="locationParking" data-type="text" title="Modifica Info Parcheggio">✎</span>
         </div>
         <div class="location-actions">
           <div class="editable-href-wrapper">
             <a id="content-locationDirectionsButtonHref" data-content-key="locationDirectionsButtonHref" href="" target="_blank" rel="noopener noreferrer" class="btn-primary">
               <i class="fas fa-directions"></i> Indicazioni Stradali
             </a>
-            <span class="edit-icon-href" data-key="locationDirectionsButtonHref" data-type="href" title="Modifica Link Indicazioni">&#9998;</span>
+            <span class="edit-icon-href" data-key="locationDirectionsButtonHref" data-type="href" title="Modifica Link Indicazioni">✎</span>
           </div>
           <a href="contatti.html" class="btn-secondary">
             <i class="fas fa-envelope"></i> Contattaci
@@ -152,7 +156,7 @@
     <section class="location-info-cards">
       <div class="editable-text-wrapper">
         <h2 class="text-center mb-4" id="content-infoUtiliHeading" data-content-key="infoUtiliHeading"></h2>
-        <span class="edit-icon-text" data-key="infoUtiliHeading" data-type="text" title="Modifica Titolo Sezione">&#9998;</span>
+        <span class="edit-icon-text" data-key="infoUtiliHeading" data-type="text" title="Modifica Titolo Sezione">✎</span>
       </div>
       <div class="card-grid">
         <div class="card">
@@ -160,11 +164,11 @@
             <h3><i class="fas fa-clock"></i> Orari</h3>
             <div class="editable-text-wrapper">
               <p id="content-orariCardText1" data-content-key="orariCardText1"></p>
-              <span class="edit-icon-text" data-key="orariCardText1" data-type="textarea" title="Modifica Testo Orari">&#9998;</span>
+              <span class="edit-icon-text" data-key="orariCardText1" data-type="textarea" title="Modifica Testo Orari">✎</span>
             </div>
             <div class="editable-text-wrapper">
               <p id="content-orariCardText2" data-content-key="orariCardText2"></p>
-              <span class="edit-icon-text" data-key="orariCardText2" data-type="textarea" title="Modifica Testo Orari (link)">&#9998;</span>
+              <span class="edit-icon-text" data-key="orariCardText2" data-type="textarea" title="Modifica Testo Orari (link)">✎</span>
             </div>
           </div>
         </div>
@@ -173,11 +177,11 @@
             <h3><i class="fas fa-phone-alt"></i> Contatti Rapidi</h3>
             <div class="editable-text-wrapper">
               <p id="content-contattiRapidiCardText1" data-content-key="contattiRapidiCardText1"></p>
-              <span class="edit-icon-text" data-key="contattiRapidiCardText1" data-type="text" title="Modifica Testo Contatti">&#9998;</span>
+              <span class="edit-icon-text" data-key="contattiRapidiCardText1" data-type="text" title="Modifica Testo Contatti">✎</span>
             </div>
             <div class="editable-text-wrapper">
               <p id="content-contattiRapidiCardText2" data-content-key="contattiRapidiCardText2"></p>
-              <span class="edit-icon-text" data-key="contattiRapidiCardText2" data-type="textarea" title="Modifica Dettagli Contatto">&#9998;</span>
+              <span class="edit-icon-text" data-key="contattiRapidiCardText2" data-type="textarea" title="Modifica Dettagli Contatto">✎</span>
             </div>
             <a href="contatti.html" class="card-btn card-btn-secondary" style="margin-top: 1rem">Vedi tutti i contatti</a>
           </div>
@@ -187,11 +191,11 @@
             <h3><i class="fas fa-wheelchair"></i> Accessibilità</h3>
             <div class="editable-text-wrapper">
               <p id="content-accessibilitaCardText1" data-content-key="accessibilitaCardText1"></p>
-              <span class="edit-icon-text" data-key="accessibilitaCardText1" data-type="textarea" title="Modifica Testo Accessibilità">&#9998;</span>
+              <span class="edit-icon-text" data-key="accessibilitaCardText1" data-type="textarea" title="Modifica Testo Accessibilità">✎</span>
             </div>
             <div class="editable-text-wrapper">
               <p id="content-accessibilitaCardText2" data-content-key="accessibilitaCardText2"></p>
-              <span class="edit-icon-text" data-key="accessibilitaCardText2" data-type="text" title="Modifica Testo Accessibilità">&#9998;</span>
+              <span class="edit-icon-text" data-key="accessibilitaCardText2" data-type="text" title="Modifica Testo Accessibilità">✎</span>
             </div>
           </div>
         </div>
@@ -207,6 +211,9 @@
   <form class="login-form active" id="loginForm" method="POST">
     <div class="form-group mb-3"><label for="login-email">Email</label><input type="email" id="login-email" name="login-email" class="form-control" required autocomplete="email"/></div>
     <div class="form-group mb-3"><label for="login-password">Password</label><input type="password" id="login-password" name="login-password" class="form-control" required autocomplete="current-password"/></div>
+    <div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
+      <a href="#" id="forgotPasswordLink" style="font-size: 0.9em; color: var(--primary);">Password dimenticata?</a>
+    </div>
     <div id="login-error-message" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
     <div class="form-actions"><button type="submit" class="btn-popup">Accedi</button></div>
   </form>
@@ -221,6 +228,22 @@
   </form>
 </div>
 
+<div class="login-popup-overlay" id="forgotPasswordOverlay"></div>
+<div class="login-popup" id="forgotPasswordPopup">
+  <button class="close-popup" id="closeForgotPasswordPopupBtn" aria-label="Chiudi popup">&times;</button>
+  <h3 style="text-align:center; margin-bottom: 1rem; color: var(--primary);">Recupera Password</h3>
+  <p style="font-size:0.95em; color:var(--gray-dark); margin-bottom:1.5rem; text-align:left;">Inserisci l'indirizzo email associato al tuo account. Se presente nel nostro sistema, ti invieremo un link per reimpostare la password.</p>
+  <form id="forgotPasswordForm" method="POST">
+    <div class="form-group mb-3">
+      <label for="forgot-email">Email</label>
+      <input type="email" id="forgot-email" name="forgot-email" class="form-control" required autocomplete="email">
+    </div>
+    <div id="forgot-password-message" class="form-message" style="text-align:left;"></div>
+    <div class="form-actions">
+      <button type="submit" class="btn-popup">Invia link di recupero</button>
+    </div>
+  </form>
+</div>
 <div id="editPageBtnContainer">
   <button id="editPageBtn"><i class="fas fa-pencil-alt"></i> Attiva Modifiche</button>
   <button id="savePageChangesBtn" style="display:none;"><i class="fas fa-save"></i> Salva Modifiche Pagina</button>
@@ -230,7 +253,7 @@
 
 <div id="editContentModal" class="edit-content-modal">
   <div class="edit-content-modal-content">
-    <button class="close-modal-btn" id="closeEditContentModalBtn" aria-label="Chiudi">&times;</button>
+    <button class="close-modal-btn" id="closeEditContentModalBtn" aria-label="Chiudi">×</button>
     <h3 id="editModalTitle">Modifica Contenuto</h3>
     <div class="form-group">
       <label id="editModalFieldLabelText">Testo:</label>
@@ -247,7 +270,7 @@
 </div>
 
 <footer>
-  <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
+  <p>© <span id="currentYear"></span> Eremo Frate Francesco ODV. Tutti i diritti riservati.</p>
 </footer>
 
 <script>
@@ -260,13 +283,13 @@
 
   const defaultPageContents = {
     pageTitle: "Dove Siamo",
-    mapIframeSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2789.347633945809!2d9.74881191550263!3d45.7459160791057!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47814f1262601e2b%3A0x501078d09910799b!2sSantuario%20Madonna%20dello%20Zuccarello%20-%20Nembro%20(BG)!5e0!3m2!1sit!2sit!4v1620050000000!5m2!1sit!2sit", // Sostituisci con un URL di default valido se necessario
+    mapIframeSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2791.778205780889!2d9.747583015500093!3d45.74087297910504!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47814f7b104783bf%3A0xde070acb563411c3!2sChiesa%20di%20San%20Vito!5e0!3m2!1sit!2sit!4v1620000000000!5m2!1sit!2sit", // Esempio URL Google Maps
     locationHeading: "Raggiungici a San Vito di Nembro",
     locationText1: "L'Eremo Frate Francesco si trova in una posizione tranquilla e suggestiva, ideale per il raccoglimento, nella frazione di San Vito a Nembro (BG).",
     locationAddress: "<strong>Indirizzo:</strong> Via San Vito, 24027 Nembro BG (Presso la Chiesa di San Vito)",
     locationDirections: "<strong>Indicazioni:</strong> Dalla SP35, seguire per Nembro centro e poi per San Vito. L'eremo si trova nella parte alta della frazione.",
     locationParking: "<strong>Parcheggio:</strong> Disponibile nelle vicinanze.",
-    locationDirectionsButtonHref: "https://maps.google.com/?q=Chiesa+di+San+Vito,+Nembro+BG",
+    locationDirectionsButtonHref: "https://maps.app.goo.gl/exampleLink",
     infoUtiliHeading: "Informazioni Utili",
     orariCardText1: "L'accesso all'Eremo è legato alle attività programmate. Per visite o ritiri personali, è necessario contattarci preventivamente.",
     orariCardText2: "Le celebrazioni seguono orari specifici (consultare <a href=\"eventiincorso.html\">calendario</a>).",
@@ -304,24 +327,40 @@
 
   function updateNavbarUI() {
     const logoLink = gebi('logoLink'); if (logoLink) logoLink.href = "index.html";
-    const navbarTitle = gebi('navbarTitle'); const loginBtnDesktop = gebi('login-btn-desktop'); const userDropdownContainer = gebi('userDropdownContainer'); const navbarAvatarSpan = gebi('navbar-avatar'); const navbarUsername = gebi('navbar-username'); const dropdownProfilo = gebi('dropdownProfilo'); const dropdownPrenotazioni = gebi('dropdownPrenotazioni'); const dropdownLogout = gebi('dropdownLogout'); const loginBtnMobile = gebi('login-btn-mobile'); const mobileNavProfilo = gebi('mobileNavProfilo'); const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni'); const mobileLogoutLink = gebi('mobileLogoutLink'); const mobileMenuSeparator = gebi('mobileMenuSeparator'); const userDropdownMenu = gebi('userDropdownMenu'); const mobileMenu = gebi('mobileMenu'); const editPageBtnContainer = gebi('editPageBtnContainer');
-    let dropdownDashboard = gebi('dropdownDashboard'); if (userDropdownMenu && !dropdownDashboard) { dropdownDashboard = document.createElement('a'); dropdownDashboard.id = 'dropdownDashboard'; dropdownDashboard.href = 'dashboard.html'; dropdownDashboard.textContent = 'Dashboard Admin'; userDropdownMenu.insertBefore(dropdownDashboard, dropdownLogout); }
-    let dropdownGestioneEventi = gebi('dropdownGestioneEventi'); if (userDropdownMenu && !dropdownGestioneEventi) { dropdownGestioneEventi = document.createElement('a'); dropdownGestioneEventi.id = 'dropdownGestioneEventi'; dropdownGestioneEventi.href = 'eventiincorsoAdmin.html'; dropdownGestioneEventi.textContent = 'Gestione Eventi'; userDropdownMenu.insertBefore(dropdownGestioneEventi, dropdownLogout); }
-    let mobileNavDashboard = gebi('mobileNavDashboard'); if (mobileMenu && !mobileNavDashboard) { mobileNavDashboard = document.createElement('a'); mobileNavDashboard.id = 'mobileNavDashboard'; mobileNavDashboard.href = 'dashboard.html'; mobileNavDashboard.textContent = 'Dashboard Admin'; mobileMenu.insertBefore(mobileNavDashboard, mobileLogoutLink); }
-    let mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); if (mobileMenu && !mobileNavGestioneEventiAdmin) { mobileNavGestioneEventiAdmin = document.createElement('a'); mobileNavGestioneEventiAdmin.id = 'mobileNavGestioneEventiAdmin'; mobileNavGestioneEventiAdmin.href = 'eventiincorsoAdmin.html'; mobileNavGestioneEventiAdmin.textContent = 'Gestione Eventi'; mobileMenu.insertBefore(mobileNavGestioneEventiAdmin, mobileLogoutLink); }
-    if (loginBtnDesktop) loginBtnDesktop.style.display = 'none'; if (userDropdownContainer) userDropdownContainer.style.display = 'none'; if (dropdownProfilo) dropdownProfilo.style.display = 'none'; if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none'; if (dropdownDashboard) dropdownDashboard.style.display = 'none'; if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none'; if (loginBtnMobile) loginBtnMobile.style.display = 'none'; if (mobileNavProfilo) mobileNavProfilo.style.display = 'none'; if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none'; if (mobileNavDashboard) mobileNavDashboard.style.display = 'none'; if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none'; if (mobileLogoutLink) mobileLogoutLink.style.display = 'none'; if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'none'; if (editPageBtnContainer) editPageBtnContainer.style.display = 'none';
+    const navbarTitle = gebi('navbarTitle'); const loginBtnDesktop = gebi('login-btn-desktop'); const userDropdownContainer = gebi('userDropdownContainer'); const navbarAvatarSpan = gebi('navbar-avatar'); const navbarUsername = gebi('navbar-username');
+    const navProfilo = gebi('nav-profilo');
+    const navMiePrenotazioni = gebi('nav-mie-prenotazioni');
+    const navDashboard = gebi('nav-dashboard');
+    const navGestioneEventiAdmin = gebi('nav-gestione-eventi-admin');
+    const logoutLinkDesktop = gebi('logout-link-desktop');
+    const mobileNavProfilo = gebi('mobileNavProfilo');
+    const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni');
+    const mobileNavDashboard = gebi('mobileNavDashboard');
+    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin');
+    const mobileLogoutLink = gebi('mobileLogoutLink');
+    const mobileMenuSeparator = gebi('mobileMenuSeparator');
+    const editPageBtnContainer = gebi('editPageBtnContainer');
+
+    [loginBtnDesktop, userDropdownContainer, navProfilo, navMiePrenotazioni, navDashboard, navGestioneEventiAdmin, logoutLinkDesktop, gebi('login-btn-mobile'), mobileNavProfilo, mobileNavPrenotazioni, mobileNavDashboard, mobileNavGestioneEventiAdmin, mobileLogoutLink, mobileMenuSeparator, editPageBtnContainer].forEach(el => { if (el) el.style.display = 'none'; });
+
     if (currentUserData) {
-      if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block'; if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
-      const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null; if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
-      if (mobileLogoutLink) mobileLogoutLink.style.display = 'block'; if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
+      if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
+      if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
+      const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
+      if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
+      [navProfilo, navMiePrenotazioni, logoutLinkDesktop, mobileNavProfilo, mobileNavPrenotazioni, mobileLogoutLink, mobileMenuSeparator].forEach(el => { if(el) el.style.display = 'block'; });
+
       if (currentUserData.isAdmin) {
-        if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)"; if (dropdownDashboard) dropdownDashboard.style.display = 'block'; if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'block'; if (mobileNavDashboard) mobileNavDashboard.style.display = 'block'; if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'block';
-        if (editPageBtnContainer) { editPageBtnContainer.style.display = 'flex'; gebi('editPageBtn').style.display = isEditModeActive ? 'none' : 'inline-block'; gebi('savePageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; gebi('cancelPageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none';}
+        if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
+        [navDashboard, navGestioneEventiAdmin, mobileNavDashboard, mobileNavGestioneEventiAdmin].forEach(el => { if(el) el.style.display = 'block'; });
+        if (editPageBtnContainer) { editPageBtnContainer.style.display = 'flex'; gebi('editPageBtn').style.display = isEditModeActive ? 'none' : 'inline-block'; gebi('savePageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; gebi('cancelPageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; }
       } else {
-        if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco"; if (dropdownProfilo) dropdownProfilo.style.display = 'block'; if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block'; if (mobileNavProfilo) mobileNavProfilo.style.display = 'block'; if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
+        if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
       }
     } else {
-      if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block'; if (loginBtnMobile) loginBtnMobile.style.display = 'block'; if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+      if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
+      if (gebi('login-btn-mobile')) gebi('login-btn-mobile').style.display = 'block';
+      if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
     }
   }
 
@@ -329,7 +368,7 @@
   let lastScroll = 0; const navbarContainer = gebi("navbarContainer"); if (navbarContainer) { window.addEventListener("scroll", function () { const cS = window.pageYOffset||document.documentElement.scrollTop; if(cS<=50){navbarContainer.classList.remove("hidden");lastScroll=0;return;} if(cS>lastScroll&&!navbarContainer.classList.contains("hidden"))navbarContainer.classList.add("hidden"); else if(cS<lastScroll&&navbarContainer.classList.contains("hidden"))navbarContainer.classList.remove("hidden"); lastScroll=cS<=0?0:cS;}, false);}
   const mobileMenu = gebi("mobileMenu"); const hamburgerBtn = gebi("hamburgerBtn"); function toggleMobileMenu(){if(mobileMenu&&hamburgerBtn){const iO=mobileMenu.classList.toggle("open");hamburgerBtn.classList.toggle("open"); hamburgerBtn.setAttribute("aria-expanded",String(iO));document.body.style.overflow=iO?"hidden":"";}} function closeMobileMenu(){if(mobileMenu&&hamburgerBtn&&mobileMenu.classList.contains("open")){mobileMenu.classList.remove("open");hamburgerBtn.classList.remove("open");hamburgerBtn.setAttribute("aria-expanded","false");document.body.style.overflow="";}} if(hamburgerBtn)hamburgerBtn.addEventListener("click",toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l=>{if(l.id!=='login-btn-mobile'&&l.id!=='mobileLogoutLink')l.addEventListener("click",closeMobileMenu);}); document.addEventListener("click",function(e){if(mobileMenu&&mobileMenu.classList.contains("open")&&hamburgerBtn&&!mobileMenu.contains(e.target)&&!hamburgerBtn.contains(e.target))closeMobileMenu();});
   const userBtnTrigger = gebi('userBtnTrigger'); const userDropdownMenu = gebi('userDropdownMenu'); if(userBtnTrigger&&userDropdownMenu){userBtnTrigger.addEventListener('click',function(e){e.stopPropagation();const iS=userDropdownMenu.style.display==='block';userDropdownMenu.style.display=iS?'none':'block';this.setAttribute('aria-expanded',String(!iS));}); document.addEventListener('click',function(e){if(userDropdownMenu&&userDropdownMenu.style.display==='block'&&!userBtnTrigger.contains(e.target)&&!userDropdownMenu.contains(e.target)){userDropdownMenu.style.display='none';userBtnTrigger.setAttribute('aria-expanded','false');}});}
-  const loginOverlay = gebi('loginOverlay'); const loginPopup = gebi('loginPopup'); const closeLoginPopupBtn = gebi('closeLoginPopupBtn'); const loginTabs = document.querySelectorAll('.login-tab'); const loginForms = document.querySelectorAll('.login-popup .login-form'); const loginFormEl = gebi('loginForm'); const registerFormEl = gebi('registerForm'); const loginErrorMessageEl = gebi('login-error-message'); const registerErrorMessageEl = gebi('register-error-message');
+  const loginOverlay = gebi('loginOverlay'); const loginPopup = gebi('loginPopup'); const closeLoginPopupBtn = gebi('closeLoginPopupBtn'); const loginTabs = document.querySelectorAll('#loginPopup .login-tab'); const loginForms = document.querySelectorAll('#loginPopup .login-form'); const loginFormEl = gebi('loginForm'); const registerFormEl = gebi('registerForm'); const loginErrorMessageEl = gebi('login-error-message'); const registerErrorMessageEl = gebi('register-error-message');
   function openLoginPopup(){if(loginOverlay)loginOverlay.classList.add('active');if(loginPopup)loginPopup.classList.add('active');document.body.style.overflow='hidden';resetFormErrorsAndMessages();const loginTabToActivate = loginPopup.querySelector('.login-tab[data-tab="login"]'); if(loginTabToActivate) loginTabToActivate.click(); gebi('login-email')?.focus();}
   function closeLoginPopup(){if(loginOverlay)loginOverlay.classList.remove('active');if(loginPopup)loginPopup.classList.remove('active');document.body.style.overflow='';resetFormErrorsAndMessages();}
   function resetFormErrorsAndMessages(){loginForms.forEach(f=>f.querySelectorAll('.form-control.error-border').forEach(i=>i.classList.remove('error-border')));if(loginErrorMessageEl)loginErrorMessageEl.style.display='none';if(registerErrorMessageEl)registerErrorMessageEl.style.display='none';}
@@ -338,7 +377,90 @@
   loginTabs.forEach(t=>t.addEventListener('click',()=>{const id=t.dataset.tab;loginTabs.forEach(tb=>tb.classList.remove('active'));t.classList.add('active');loginForms.forEach(f=>{f.classList.remove('active');if(f.id===`${id}Form`){f.classList.add('active');f.querySelector('input:not([type="hidden"])')?.focus();}});resetFormErrorsAndMessages();}));
   loginFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=loginFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';try{const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath,isAdmin:j.is_admin===true||j.is_admin===1};localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));await fetchAndUpdateUserDisplayDataFromApi();closeLoginPopup();await loadPageContentsFromServer();showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");}else{loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}}}catch(err){console.error("Errore login:",err);if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
   registerFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=registerFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Registrazione...<div class="spinner-mini-light"></div>';try{const r=await fetch('registrati.php',{method:'POST',body:new FormData(registerFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){alert(j.message||"Registrazione completata! Ora puoi accedere.");const loginTabButton=document.querySelector('.login-tab[data-tab="login"]');if(loginTabButton)loginTabButton.click();const loginEmailInput=gebi('login-email');const registerEmailInput=gebi('register-email');if(loginEmailInput&&registerEmailInput)loginEmailInput.value=registerEmailInput.value;e.target.reset();}else{if(registerErrorMessageEl){registerErrorMessageEl.textContent=j.message||"Errore registrazione.";registerErrorMessageEl.style.display='block';}if(j.errors){for(const f in j.errors)gebi(`register-${f}`)?.classList.add('error-border');}}}catch(err){console.error("Errore registrazione:",err);if(registerErrorMessageEl){registerErrorMessageEl.textContent="Errore connessione o server.";registerErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
-  gebi('dropdownLogout')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();}); gebi('mobileLogoutLink')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenu();});
+  gebi('logout-link-desktop')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();}); gebi('mobileLogoutLink')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenu();});
+
+  // === INIZIO FUNZIONALITÀ RECUPERO PASSWORD (per dovesiamo.html) ===
+  const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+  const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
+  const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
+  const closeForgotPasswordPopupBtn = document.getElementById('closeForgotPasswordPopupBtn');
+  const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+  const forgotPasswordMessage = document.getElementById('forgot-password-message');
+
+  function openForgotPasswordPopup() {
+    if (typeof closeLoginPopup === 'function' && loginPopup?.classList.contains('active')) {
+      closeLoginPopup();
+    }
+    if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active');
+    if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
+    const forgotEmailInput = document.getElementById('forgot-email');
+    if(forgotEmailInput) forgotEmailInput.focus();
+  }
+
+  function closeForgotPasswordPopup() {
+    if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active');
+    if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active');
+
+    let anyOtherPagePopupActive = document.querySelector('#loginPopup.active, #editContentModal.active'); // Popup specifici di questa pagina
+    if (!anyOtherPagePopupActive) {
+      document.body.style.overflow = '';
+    }
+    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
+    if(forgotPasswordForm) forgotPasswordForm.reset();
+  }
+
+  if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      openForgotPasswordPopup();
+    });
+  }
+  if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
+  if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
+
+  if (forgotPasswordForm) {
+    forgotPasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (forgotPasswordMessage) {
+        forgotPasswordMessage.style.display = 'none';
+        forgotPasswordMessage.className = 'form-message';
+      }
+      const emailInput = document.getElementById('forgot-email');
+      const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Invio...<div class="spinner-mini-light"></div>';
+
+      try {
+        const formData = new FormData(forgotPasswordForm);
+        const response = await fetch('richiesta_recupero_password.php', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          forgotPasswordMessage.textContent = result.message;
+          forgotPasswordMessage.classList.add('success');
+          if(emailInput) emailInput.value = '';
+        } else {
+          forgotPasswordMessage.textContent = result.message || "Si è verificato un errore.";
+          forgotPasswordMessage.classList.add('error');
+        }
+      } catch (error) {
+        console.error('Errore richiesta recupero password:', error);
+        forgotPasswordMessage.textContent = "Errore di connessione o del server.";
+        forgotPasswordMessage.classList.add('error');
+      } finally {
+        if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+      }
+    });
+  }
+  // === FINE FUNZIONALITÀ RECUPERO PASSWORD (per dovesiamo.html) ===
 
   const editPageBtn=gebi('editPageBtn');const savePageChangesBtn=gebi('savePageChangesBtn'); const cancelPageChangesBtn=gebi('cancelPageChangesBtn');
   const editContentModal=gebi('editContentModal'); const closeEditContentModalBtn=gebi('closeEditContentModalBtn');const editModalTitle=gebi('editModalTitle'); const editModalTextarea=gebi('editModalTextarea');const editModalInputText=gebi('editModalInputText'); const editModalInputUrl = gebi('editModalInputUrl'); const editModalFieldLabelText=gebi('editModalFieldLabelText'); const saveEditModalBtn=gebi('saveEditModalBtn');const cancelEditModalBtn=gebi('cancelEditModalBtn'); const editModalMessage=gebi('editModalMessage');const pageOverallStatus=gebi('pageOverallStatus');
@@ -403,7 +525,7 @@
     if (type === 'iframe_src' || type === 'href') {
       editModalFieldLabelText.textContent = (type === 'iframe_src' ? "URL Mappa (src iframe):" : "URL Link Indicazioni:");
       editModalInputUrl.value = valForInput;
-      editModalInputUrl.type = 'url'; // Assicurati che sia di tipo URL
+      editModalInputUrl.type = 'url';
       editModalInputUrl.style.display='block';
       editModalInputUrl.focus();
     } else if (type === 'textarea') {
@@ -440,7 +562,7 @@
     try{
       const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});
       const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");
-      currentPageDbContents = JSON.parse(JSON.stringify(contentsToSave)); // Aggiorna la cache locale con quello che è stato salvato
+      currentPageDbContents = JSON.parse(JSON.stringify(contentsToSave));
       originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents));
       showPageStatus(j.message||'Modifiche salvate!','success');toggleEditMode(false);
     }catch(err){console.error("Errore salvataggio:",err);showPageStatus(`Errore: ${err.message}`,'error');}
@@ -476,19 +598,33 @@
     let targetElement = gebi(`content-${currentEditingKey}`);
     if(!targetElement){if(editModalMessage){editModalMessage.textContent="Err: Elem. non trovato.";editModalMessage.className='form-message error';editModalMessage.style.display='block';}return;}
 
-    let newValue='';
+    let newValueFromModal = '';
     if(currentEditingType === 'iframe_src' || currentEditingType === 'href'){
-      newValue = editModalInputUrl.value.trim();
-      if(currentEditingType === 'iframe_src') targetElement.src = newValue;
-      else targetElement.href = newValue;
-      currentPageDbContents[currentEditingKey] = newValue;
+      newValueFromModal = editModalInputUrl.value.trim();
+      if(currentEditingType === 'iframe_src') targetElement.src = newValueFromModal;
+      else targetElement.href = newValueFromModal;
+      currentPageDbContents[currentEditingKey] = newValueFromModal;
     } else if(currentEditingType==='textarea'){
-      newValue = editModalTextarea.value;
-      targetElement.innerHTML = formatHTMLContent(newValue);
+      newValueFromModal = editModalTextarea.value;
+      let processedValue = newValueFromModal;
+      if (currentEditingKey === 'locationAddress' || currentEditingKey === 'locationDirections') {
+        const prefixText = currentEditingKey === 'locationAddress' ? 'Indirizzo:' : 'Indicazioni:';
+        if (processedValue.startsWith(prefixText) && !processedValue.startsWith('<strong>')) {
+          processedValue = `<strong>${prefixText}</strong>` + processedValue.substring(prefixText.length).trimStart();
+        }
+      }
+      targetElement.innerHTML = formatHTMLContent(processedValue);
       currentPageDbContents[currentEditingKey] = targetElement.innerHTML;
     } else { // type 'text'
-      newValue = editModalInputText.value;
-      targetElement.innerHTML = formatHTMLContent(newValue);
+      newValueFromModal = editModalInputText.value;
+      let processedValue = newValueFromModal;
+      if (currentEditingKey === 'locationParking') {
+        const prefixText = 'Parcheggio:';
+        if (processedValue.startsWith(prefixText) && !processedValue.startsWith('<strong>')) {
+          processedValue = `<strong>${prefixText}</strong>` + processedValue.substring(prefixText.length).trimStart();
+        }
+      }
+      targetElement.innerHTML = formatHTMLContent(processedValue);
       currentPageDbContents[currentEditingKey] = targetElement.innerHTML;
     }
     closeEditContentModal();
@@ -500,7 +636,16 @@
     await loadPageContentsFromServer();
     await fetchAndUpdateUserDisplayDataFromApi();
     if(!isEditModeActive||!currentUserData?.isAdmin){document.querySelectorAll('.edit-icon-text,.edit-icon-iframe,.edit-icon-href').forEach(i=>i.style.display='none');} else { toggleEditMode(false); }
-    document.addEventListener('keydown',(e)=>{if(e.key==='Escape'){if(loginPopup?.classList.contains('active'))closeLoginPopup(); if(editContentModal?.style.display==='flex')closeEditContentModal();}});
+
+    // INIZIO MODIFICA: Event listener per ESC aggiornato
+    document.addEventListener('keydown',(e)=>{
+      if(e.key==='Escape'){
+        if(loginPopup?.classList.contains('active')) closeLoginPopup();
+        if(gebi('forgotPasswordPopup')?.classList.contains('active')) closeForgotPasswordPopup(); // NUOVA RIGA
+        if(editContentModal?.style.display==='flex') closeEditContentModal();
+      }
+    });
+    // FINE MODIFICA: Event listener per ESC aggiornato
   });
 </script>
 
