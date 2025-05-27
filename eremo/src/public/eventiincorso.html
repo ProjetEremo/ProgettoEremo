@@ -302,95 +302,108 @@
     }
     @keyframes fadeInText { to { opacity: 1; } }
 
-    /* === STILI PER VOLANTINO MORPH (MIGLIORATI) === */
+    /* === STILI PER VOLANTINO MORPH (RINNOVATI v2) === */
     .volantino-morph-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.8);
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
+      background-color: rgba(var(--dark-rgb, 30, 59, 47), 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 2000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden; pointer-events: none;
       transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s;
     }
     .volantino-morph-overlay.active {
-      opacity: 1;
-      visibility: visible;
-      transition-delay: 0s;
+      opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s;
     }
+
     .morph-active-card {
-      background-color: var(--success-light, #d4edda); /* SFONDO VERDE CHIARO PER IL CARD */
-      border-radius: var(--border-radius-large, 12px);
-      box-shadow: 0 15px 50px rgba(0,0,0,0.4);
-      width: clamp(320px, 90vw, 1100px); /* Larghezza responsive, max 1100px */
-      height: clamp(450px, 90vh, 800px); /* Altezza responsive, max 800px */
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      opacity: 0;
-      transform: scale(0.9) translateY(20px);
+      background-color: var(--white);
+      border-radius: var(--border-radius-large, 12px); /* Main card radius */
+      box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+      width: clamp(320px, 92vw, 1150px); /* Slightly increased max width and vw */
+      height: clamp(450px, 88vh, 820px); /* Slightly increased max height and vh */
+      display: flex; flex-direction: column; position: relative;
+      opacity: 0; transform: scale(0.95) translateY(15px);
       transition: opacity 0.3s ease-in-out 0.1s, transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
+      overflow: hidden; /* Important for child radius to be visible */
     }
     .volantino-morph-overlay.active .morph-active-card {
-      opacity: 1;
-      transform: scale(1) translateY(0);
+      opacity: 1; transform: scale(1) translateY(0);
     }
+
     .morph-content-wrapper {
-      padding: 10px;
+      padding: 10px; /* Minimal padding around the content area */
+      padding-top: 45px; /* Space for close button (36px height + 9px margin) */
       overflow: hidden;
       flex-grow: 1;
       display: flex;
       flex-direction: column;
+      position: relative; /* For close button positioning */
     }
+
     .volantino-image-container-morph {
       width: 100%;
       height: 100%;
+      flex-grow: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      overflow: auto; /* Crucial for scrollable PDFs */
+      background-color: transparent; /* No background color here, card is white */
     }
+
     .volantino-image-container-morph img {
       max-width: 100%;
       max-height: 100%;
-      object-fit: contain;
-      border-radius: var(--border-radius-medium, 8px);
+      object-fit: contain; /* Ensures image is not cut and aspect ratio is maintained */
       display: block;
+      border-radius: var(--border-radius-medium, 8px); /* Rounded corners for the image itself */
     }
+
     .volantino-image-container-morph iframe {
       width: 100%;
-      height: 100%;
+      height: 100%; /* Iframe should try to fill its container */
       border: none;
-      border-radius: var(--border-radius-medium, 8px);
+      display: block;
+      border-radius: var(--border-radius-medium, 8px); /* Rounded corners for the iframe content */
     }
+
     .volantino-message-display {
-      text-align: center; padding: 2rem; font-size: 1.1rem; color: var(--dark);
+      text-align: center; padding: 3rem 1rem; font-size: 1.1rem; color: var(--dark);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 100%; height: 100%;
     }
+    .volantino-message-display p { margin-bottom: 1rem; }
     .volantino-message-display a {
       color: var(--primary); text-decoration: underline; font-weight: 500;
+      padding: 0.5rem 1rem; background-color: var(--gray-light); border-radius: 6px;
     }
+    .volantino-message-display a:hover { background-color: var(--gray-medium); }
+
     .close-morph-volantino-btn {
       position: absolute;
-      top: -10px; right: -10px; /* Leggermente fuori, più visibile */
-      font-size: 1.8rem;
-      color: var(--white, #fff);
-      background-color: var(--dark); /* Sfondo scuro per contrasto */
-      border: 2px solid var(--white);
-      border-radius: 50%;
-      width: 44px; height: 44px; /* Leggermente più grande */
-      line-height: 40px;
+      top: 8px;
+      right: 8px;
+      width: 36px; /* Adjusted size */
+      height: 36px; /* Adjusted size */
+      font-size: 1.5rem; /* Adjusted icon size */
+      line-height: 36px; /* Center icon */
       text-align: center;
+      background-color: rgba(0,0,0,0.5);
+      color: var(--white);
+      border-radius: 50%;
+      border: none;
       cursor: pointer;
-      transition: all 0.2s ease-in-out;
-      z-index: 2001;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 10;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.2);
     }
     .close-morph-volantino-btn:hover {
-      background-color: var(--danger); /* Rosso al hover per azione distruttiva */
+      background-color: var(--danger);
       transform: scale(1.1) rotate(90deg);
     }
+
     body.volantino-morph-active { overflow: hidden; }
+    /* === FINE STILI VOLANTINO MORPH (RINNOVATI v2) === */
 
   </style>
 </head>
@@ -838,43 +851,64 @@
 
   function showVolantinoWithMorph(volantinoUrl) {
     if (!volantinoMorphOverlay) return;
-    if (morphingCard) cleanUpMorphingCard();
+    if (morphingCard) cleanUpMorphingCard(); // Pulisce la card precedente se esiste
 
     document.body.classList.add("volantino-morph-active");
     volantinoMorphOverlay.classList.add("active");
 
     morphingCard = document.createElement("article");
-    morphingCard.className = "morph-active-card";
+    morphingCard.className = "morph-active-card"; // La classe principale del popup
 
     let flyerContentHTML = '';
+    const sanitizedUrl = sanitizeForAttribute(volantinoUrl);
+
     if (volantinoUrl && volantinoUrl.trim() !== "") {
       if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-        flyerContentHTML = `<img src="${sanitizeForAttribute(volantinoUrl)}" alt="Volantino Evento">`;
+        flyerContentHTML = `<img src="${sanitizedUrl}" alt="Volantino Evento">`;
       } else if (volantinoUrl.endsWith('.pdf')) {
-        flyerContentHTML = `<iframe src="${sanitizeForAttribute(volantinoUrl)}" type="application/pdf"></iframe>`;
+        // Per i PDF, assicurati che l'URL sia completo e accessibile
+        flyerContentHTML = `<iframe src="${sanitizedUrl}" type="application/pdf"></iframe>`;
       } else {
-        flyerContentHTML = `<div class="volantino-message-display"><p>Il volantino è disponibile come file esterno.</p><a href="${sanitizeForAttribute(volantinoUrl)}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`;
+        flyerContentHTML = `<div class="volantino-message-display"><p>Il volantino è disponibile come file esterno.</p><a href="${sanitizedUrl}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`;
       }
     } else {
       flyerContentHTML = `<div class="volantino-message-display"><p>Volantino non disponibile.</p></div>`;
     }
-    morphingCard.innerHTML = `<div class="morph-content-wrapper"><div class="volantino-image-container-morph">${flyerContentHTML}</div></div><button class="close-morph-volantino-btn" aria-label="Chiudi">&times;</button>`;
+
+    // Struttura HTML interna del popup con il bottone chiudi dentro morph-content-wrapper
+    morphingCard.innerHTML = `
+        <div class="morph-content-wrapper">
+            <button class="close-morph-volantino-btn" aria-label="Chiudi">&times;</button>
+            <div class="volantino-image-container-morph">${flyerContentHTML}</div>
+        </div>`;
+
     volantinoMorphOverlay.appendChild(morphingCard);
-    morphingCard.querySelector('.close-morph-volantino-btn').onclick = hideVolantinoWithMorph;
+
+    // Aggiunge l'event listener al nuovo bottone chiudi
+    const closeBtn = morphingCard.querySelector('.close-morph-volantino-btn');
+    if (closeBtn) {
+      closeBtn.onclick = hideVolantinoWithMorph;
+    } else {
+      console.error("Bottone chiudi non trovato nel volantino morphing card.");
+    }
   }
+
   function hideVolantinoWithMorph() {
     if (volantinoMorphOverlay) {
       volantinoMorphOverlay.classList.remove("active");
     }
-    setTimeout(cleanUpMorphingCard, 300); // Sincronizza con la transizione dell'overlay (0.3s)
+    // La pulizia della card avviene dopo la transizione dell'overlay
+    setTimeout(cleanUpMorphingCard, 300); // Sincronizza con la transizione CSS (0.3s)
     document.body.classList.remove("volantino-morph-active");
   }
+
   function cleanUpMorphingCard() {
     if (morphingCard) {
-      morphingCard.remove();
-      morphingCard = null;
+      morphingCard.remove(); // Rimuove l'elemento dal DOM
+      morphingCard = null;   // Resetta la variabile
     }
   }
+
 
   const MAX_SEATS_PER_BOOKING = 5; const MAX_TOTAL_SEATS_PER_USER = 5;
 
@@ -916,15 +950,15 @@
       card.classList.add('admin-card');
       let volantinoAdminLinkHTML = '';
       if (event.volantino_url && event.volantino_url.trim() !== "") {
-        volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em; margin-bottom: 0.5rem;"><b>Volantino:</b> <a href="${event.volantino_url}" target="_blank" title="Visualizza il volantino dell'evento">Visualizza Volantino</a></p>`;
+        volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em; margin-bottom: 0.5rem;"><b>Volantino:</b> <a href="${sanitizeForAttribute(event.volantino_url)}" target="_blank" title="Visualizza il volantino dell'evento">Visualizza Volantino</a></p>`;
       }
       card.innerHTML = `
-            <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+            <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
             <div class="card-content">
-                <h3>${event.titolo || "Titolo non disponibile"}</h3>
-                <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ""}</p>
-                <p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}`: ""}</p>
-                <p class="card-description" style="font-size:0.95em; min-height: auto;">${event.descrizione || "Nessuna descrizione."}</p>
+                <h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3>
+                <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario/Durata:</b> ${sanitizeText(event.durata)}` : ""}</p>
+                <p class="card-info"><b>${sanitizeText(event.prefisso_relatore) || "Relatore"}:</b> ${sanitizeText(event.relatore) || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${sanitizeText(event.associazione)}`: ""}</p>
+                <p class="card-description" style="font-size:0.95em; min-height: auto;">${sanitizeText(event.descrizione) || "Nessuna descrizione."}</p>
                 <p class="card-info" style="margin-bottom: 0.5rem;">
                     <b>Posti Disp.:</b> <span class="posti-disponibili">${event.posti_disponibili !== null ? event.posti_disponibili : 'N/D'}</span>
                     ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0.00 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}
@@ -949,7 +983,7 @@
       const postiDispEv = parseInt(event.posti_disponibili) || 0; const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
       const inCodaPerP = parseInt(event.in_coda_per_posti) || 0; const flagPrenDB = parseInt(event.flagprenotabile) === 1;
       let primaryBtnHTML = ''; let volantinoBtnHTML = "";
-      if (event.volantino_url?.trim()) { volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${event.volantino_url}">Volantino</button>`; } else { volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="">Dettagli</button>`; }
+      if (event.volantino_url?.trim()) { volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${sanitizeForAttribute(event.volantino_url)}">Volantino</button>`; } else { volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="">Dettagli</button>`; }
       if (!flagPrenDB) { primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled title="Prenotazioni chiuse">(Pren. Chiuse)</button>`; }
       else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti (${pGiaPrenUt})</button>`; }
       else if (inCodaPerP > 0) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`; }
@@ -1482,7 +1516,15 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     const cY = gebi("currentYear"); if (cY) cY.textContent = new Date().getFullYear();
-    volantinoMorphOverlay = gebi('volantinoMorphOverlay'); if (volantinoMorphOverlay) volantinoMorphOverlay.addEventListener("click", (e) => { if (e.target === volantinoMorphOverlay && morphingCard) hideVolantinoWithMorph(); });
+    volantinoMorphOverlay = gebi('volantinoMorphOverlay');
+    if (volantinoMorphOverlay) {
+      volantinoMorphOverlay.addEventListener("click", (e) => {
+        // Chiude il popup solo se si clicca direttamente sull'overlay (non sul contenuto)
+        if (e.target === volantinoMorphOverlay) {
+          hideVolantinoWithMorph();
+        }
+      });
+    }
     loadUserData(); updateNavbarUI(); await loadEvents();
     initializeBookingPopupHandlers();
     initializeWaitlistPopupHandlers();
