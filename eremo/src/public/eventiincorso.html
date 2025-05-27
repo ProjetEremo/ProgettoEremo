@@ -62,33 +62,33 @@
     .card-actions .btn-delete:hover { background-color: darkred !important; }
 
     /* === STILE PER BOTTONE "AGGIUNGI EVENTO" (STILE DASHBOARD) === */
-    .add-event-btn-container-wrapper { /* Nuovo wrapper per centrare/allineare il bottone */
+    .add-event-btn-container-wrapper {
       width: 100%;
-      padding: 1rem 0; /* Spazio sopra e sotto il bottone */
+      padding: 1rem 0;
       display: flex;
-      justify-content: center; /* Centra il bottone se non è a larghezza piena */
+      justify-content: center;
     }
-    #adminAddEventBtn { /* Stile ispirato a .add-event-bar della dashboard */
-      display: inline-flex; /* Permette di controllare la larghezza con padding */
+    #adminAddEventBtn {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 0.8rem 1.5rem;
       font-size: 1rem;
       font-weight: 500;
-      color: var(--success-dark, #155724); /* Colore testo verde scuro */
+      color: var(--success-dark, #155724);
       background-color: var(--white, #fff);
-      border: 2px dashed var(--success, #28a745); /* Bordo verde tratteggiato */
-      border-radius: var(--border-radius-large, 12px); /* Angoli più arrotondati */
+      border: 2px dashed var(--success, #28a745);
+      border-radius: var(--border-radius-large, 12px);
       cursor: pointer;
       transition: all 0.2s ease-in-out;
       text-decoration: none;
-      width: auto; /* Larghezza basata sul contenuto */
-      max-width: 400px; /* Limite opzionale alla larghezza */
-      margin: 0 auto; /* Per centrare se il wrapper è a larghezza piena */
+      width: auto;
+      max-width: 400px;
+      margin: 0 auto;
     }
     #adminAddEventBtn:hover, #adminAddEventBtn:focus {
-      background-color: var(--success-light, #d4edda); /* Sfondo verde chiaro al hover */
-      border-color: var(--success-dark, #155724); /* Bordo più scuro al hover */
+      background-color: var(--success-light, #d4edda);
+      border-color: var(--success-dark, #155724);
       color: var(--success-dark, #155724);
       box-shadow: 0 4px 12px rgba(var(--success-rgb, 40, 167, 69), 0.2);
       transform: translateY(-2px);
@@ -98,13 +98,11 @@
       box-shadow: 0 2px 6px rgba(var(--success-rgb, 40, 167, 69), 0.15);
     }
     #adminAddEventBtn .plus-icon {
-      font-size: 1.3em; /* Icona leggermente più grande */
+      font-size: 1.3em;
       margin-right: 0.6em;
-      font-weight: bold; /* Rende il + più visibile */
+      font-weight: bold;
     }
-    #adminAddEventBtn .fab-text-label {
-      /* Il font-size è ereditato, il font-weight è già 500 */
-    }
+    #adminAddEventBtn .fab-text-label { }
 
 
     /* === STILI PER IL NUOVO POPUP ADMIN (stile Dashboard) === */
@@ -125,13 +123,13 @@
       width: 95%; max-width: 900px;
       max-height: 90vh;
       display: none; opacity: 0;
-      transform: translate(-50%, -48%) scale(0.95);
+      transform: translate(-50%, -50%) scale(0.95);
       transition: opacity 0.3s ease, transform 0.3s ease;
       overflow: hidden;
     }
     .dash-admin-event-popup.active {
-      display: flex; flex-direction: column;
       opacity: 1; transform: translate(-50%, -50%) scale(1);
+      display: flex; flex-direction: column;
     }
 
     .dash-admin-event-popup-header {
@@ -227,6 +225,32 @@
     #dashAdminEventFormMessage.form-message { margin-top: 1rem; }
 
     /* === ANIMAZIONE PRENOTAZIONE COMPLETATA (TICK BIANCO) === */
+    .booking-popup-overlay {
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      pointer-events: none; /* Aggiunto per evitare click durante transizione */
+    }
+    .booking-popup-overlay.active { opacity: 1; pointer-events: auto; }
+    .booking-popup-overlay.fading-out { opacity: 0 !important; }
+
+
+    .booking-popup {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.9); /* Inizia leggermente più piccolo e centrato */
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      pointer-events: none; /* Aggiunto */
+    }
+    .booking-popup.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+    .booking-popup.fading-out {
+      opacity: 0 !important;
+      transform: translate(-50%, -50%) scale(0.9) !important;
+    }
+
+
     #bookingForm .form-content-wrapper.swept-away {
       transition: opacity 0.4s ease-out, max-height 0.5s ease-in-out, transform 0.4s ease-out;
       opacity: 0;
@@ -240,33 +264,33 @@
       width: 80px; height: 80px;
       border-radius: 50%;
       display: block;
-      stroke-width: 3; /* Spessore del tratto del cerchio esterno */
-      stroke: var(--success, #4CAF50); /* Colore del cerchio esterno */
+      stroke-width: 3;
+      stroke: var(--success, #4CAF50);
       stroke-miterlimit: 10;
       margin: 20px auto;
-      box-shadow: inset 0px 0px 0px var(--success, #4CAF50); /* Riempimento iniziale */
+      box-shadow: inset 0px 0px 0px var(--success, #4CAF50);
       animation: check_fill .4s ease-in-out .4s forwards, check_scale .3s ease-in-out .9s both;
     }
     .animated-check-icon__circle {
       stroke-dasharray: 166;
       stroke-dashoffset: 166;
-      stroke-width: 3; /* Spessore del tratto del cerchio animato */
+      stroke-width: 3;
       stroke-miterlimit: 10;
-      stroke: var(--success, #4CAF50); /* Colore del cerchio animato */
-      fill: none; /* Nessun riempimento per il cerchio animato */
+      stroke: var(--success, #4CAF50);
+      fill: none;
       animation: check_stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
     }
     .animated-check-icon__check {
       transform-origin: 50% 50%;
       stroke-dasharray: 48;
       stroke-dashoffset: 48;
-      stroke-width: 4; /* Spessore del tratto della spunta */
-      stroke: #FFFFFF; /* MODIFICATO: Colore della spunta BIANCO */
+      stroke-width: 4;
+      stroke: #FFFFFF; /* TICK BIANCO */
       animation: check_stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
     }
     @keyframes check_stroke { 100% { stroke-dashoffset: 0; } }
     @keyframes check_scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
-    @keyframes check_fill { 100% { box-shadow: inset 0px 0px 0px 45px var(--success, #4CAF50); } } /* Riempie il cerchio */
+    @keyframes check_fill { 100% { box-shadow: inset 0px 0px 0px 45px var(--success, #4CAF50); } }
 
     #bookingSuccessAnimation p {
       font-size: 1.3em;
@@ -277,6 +301,95 @@
       opacity: 0;
     }
     @keyframes fadeInText { to { opacity: 1; } }
+
+    /* === STILI PER VOLANTINO MORPH (MIGLIORATI) === */
+    .volantino-morph-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.8); /* Sfondo più scuro per focus */
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s;
+    }
+    .volantino-morph-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      transition-delay: 0s;
+    }
+    .morph-active-card {
+      background-color: var(--white, #fff);
+      border-radius: var(--border-radius-large, 12px);
+      box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+      width: clamp(300px, 90vw, 1000px); /* Responsive width */
+      height: clamp(400px, 85vh, 800px); /* Responsive height */
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      opacity: 0;
+      transform: scale(0.9) translateY(20px); /* Inizia leggermente più piccolo e in basso */
+      transition: opacity 0.3s ease-in-out 0.1s, transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s;
+    }
+    .volantino-morph-overlay.active .morph-active-card {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .morph-content-wrapper {
+      padding: 5px; /* Minimo padding per non tagliare i bordi del contenuto */
+      overflow: hidden; /* Nasconde lo scrollbar del wrapper, gestito dal contenuto */
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column; /* Per far sì che l'iframe occupi altezza */
+    }
+    .volantino-image-container-morph {
+      width: 100%;
+      height: 100%; /* Occupa tutto lo spazio del wrapper */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden; /* Nasconde parti dell'immagine se non 'contain' */
+    }
+    .volantino-image-container-morph img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: var(--border-radius-medium, 8px);
+    }
+    .volantino-image-container-morph iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: var(--border-radius-medium, 8px);
+    }
+    .volantino-message-display {
+      text-align: center; padding: 2rem; font-size: 1.1rem;
+    }
+    .volantino-message-display a {
+      color: var(--primary); text-decoration: underline; font-weight: 500;
+    }
+    .close-morph-volantino-btn {
+      position: absolute;
+      top: -15px; right: -15px; /* Spostato leggermente fuori dal card */
+      font-size: 1.5rem;
+      color: var(--white, #fff);
+      background-color: rgba(var(--dark-rgb, 51, 51, 51), 0.8);
+      border: 2px solid var(--white, #fff);
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      line-height: 36px; /* Aggiustato per allineamento verticale */
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      z-index: 2001;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .close-morph-volantino-btn:hover {
+      background-color: rgba(var(--dark-rgb, 0,0,0), 1);
+      transform: scale(1.1);
+    }
+    body.volantino-morph-active { overflow: hidden; }
 
   </style>
 </head>
@@ -632,7 +745,7 @@
       navGestioneEventiAdmin: gebi('nav-gestione-eventi-admin'),
       mobileNavGestioneEventiAdmin: gebi('mobile-nav-gestione-eventi-admin'),
       mainPageTitle: gebi('mainPageTitle'),
-      addEventFabContainerWrapper: gebi('addEventFabContainerWrapper') // Wrapper del bottone
+      addEventFabContainerWrapper: gebi('addEventFabContainerWrapper')
     };
 
     if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
@@ -653,7 +766,7 @@
         if (el.navDashboard) el.navDashboard.style.display = 'block';
         if (el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
         if (el.mainPageTitle) el.mainPageTitle.textContent = "Gestione Calendario Attività";
-        if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'flex'; // Mostra il wrapper
+        if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'flex';
         if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
         if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
         if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
@@ -665,7 +778,7 @@
         if (el.navDashboard) el.navDashboard.style.display = 'none';
         if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
         if (el.mainPageTitle) el.mainPageTitle.textContent = "Calendario Attività";
-        if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none'; // Nascondi il wrapper
+        if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none';
         if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
         if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
         if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
@@ -682,7 +795,7 @@
       if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
       if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
       if (el.mainPageTitle) el.mainPageTitle.textContent = "Calendario Attività";
-      if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none'; // Nascondi il wrapper
+      if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none';
       if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
       if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
       if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
@@ -722,9 +835,45 @@
   gebi('logout-link-desktop')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
   gebi('mobile-logout-link')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenuOnLinkClick(); });
 
-  function showVolantinoWithMorph(volantinoUrl) { if (!volantinoMorphOverlay) return; if (morphingCard) cleanUpMorphingCard(); volantinoMorphOverlay.classList.add("active"); document.body.classList.add("volantino-morph-active"); morphingCard = document.createElement("article"); morphingCard.className = "card morph-active-card"; let flyerContentHTML = ''; if (volantinoUrl && volantinoUrl.trim() !== "") { if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) { flyerContentHTML = `<img src="${volantinoUrl}" alt="Volantino Evento">`; } else if (volantinoUrl.endsWith('.pdf')) { flyerContentHTML = `<iframe src="${volantinoUrl}" type="application/pdf" width="100%" height="100%" style="border:none; min-height: 80vh;"></iframe>`; } else { flyerContentHTML = `<div class="volantino-message-display"><p>Il volantino è disponibile come file esterno.</p><a href="${volantinoUrl}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`; } } else { flyerContentHTML = `<div class="volantino-message-display"><p>Volantino non disponibile.</p></div>`; } morphingCard.innerHTML = `<div class="morph-content-wrapper"><div class="volantino-image-container-morph">${flyerContentHTML}</div></div><button class="close-morph-volantino-btn" aria-label="Chiudi">&times;</button>`; volantinoMorphOverlay.appendChild(morphingCard); morphingCard.querySelector('.close-morph-volantino-btn').onclick = hideVolantinoWithMorph; requestAnimationFrame(() => { morphingCard.classList.add("zoomed-in", "volantino-visible"); }); }
-  function hideVolantinoWithMorph() { if (morphingCard && volantinoMorphOverlay) { morphingCard.classList.remove("zoomed-in", "volantino-visible"); volantinoMorphOverlay.classList.remove("active"); document.body.classList.remove("volantino-morph-active"); setTimeout(cleanUpMorphingCard, 300); } }
-  function cleanUpMorphingCard() { if (morphingCard) { morphingCard.remove(); morphingCard = null; } }
+  function showVolantinoWithMorph(volantinoUrl) {
+    if (!volantinoMorphOverlay) return;
+    if (morphingCard) cleanUpMorphingCard();
+
+    document.body.classList.add("volantino-morph-active");
+    volantinoMorphOverlay.classList.add("active");
+
+    morphingCard = document.createElement("article");
+    morphingCard.className = "morph-active-card";
+
+    let flyerContentHTML = '';
+    if (volantinoUrl && volantinoUrl.trim() !== "") {
+      if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+        flyerContentHTML = `<img src="${sanitizeForAttribute(volantinoUrl)}" alt="Volantino Evento">`;
+      } else if (volantinoUrl.endsWith('.pdf')) {
+        flyerContentHTML = `<iframe src="${sanitizeForAttribute(volantinoUrl)}" type="application/pdf"></iframe>`;
+      } else {
+        flyerContentHTML = `<div class="volantino-message-display"><p>Il volantino è disponibile come file esterno.</p><a href="${sanitizeForAttribute(volantinoUrl)}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`;
+      }
+    } else {
+      flyerContentHTML = `<div class="volantino-message-display"><p>Volantino non disponibile.</p></div>`;
+    }
+    morphingCard.innerHTML = `<div class="morph-content-wrapper"><div class="volantino-image-container-morph">${flyerContentHTML}</div></div><button class="close-morph-volantino-btn" aria-label="Chiudi">&times;</button>`;
+    volantinoMorphOverlay.appendChild(morphingCard);
+    morphingCard.querySelector('.close-morph-volantino-btn').onclick = hideVolantinoWithMorph;
+  }
+  function hideVolantinoWithMorph() {
+    if (volantinoMorphOverlay) {
+      volantinoMorphOverlay.classList.remove("active");
+    }
+    setTimeout(cleanUpMorphingCard, 400);
+    document.body.classList.remove("volantino-morph-active");
+  }
+  function cleanUpMorphingCard() {
+    if (morphingCard) {
+      morphingCard.remove();
+      morphingCard = null;
+    }
+  }
 
   const MAX_SEATS_PER_BOOKING = 5; const MAX_TOTAL_SEATS_PER_USER = 5;
 
@@ -848,6 +997,7 @@
       if (formContentWrapper) {
         formContentWrapper.classList.remove('swept-away');
         formContentWrapper.style.display = 'block';
+        formContentWrapper.style.maxHeight = 'none';
       }
       if (successAnimationContainer) successAnimationContainer.style.display = 'none';
       if (bRM) { bRM.style.display = 'none'; bRM.className = 'form-message'; }
@@ -866,12 +1016,14 @@
       if (bO) bO.classList.add('active'); if (bP) bP.classList.add('active');
       document.body.style.overflow = 'hidden';
     };
-    function cBP() {
-      if (bO) bO.classList.remove('active'); if (bP) bP.classList.remove('active');
+    function cBP_actualClose() { // Funzione che effettivamente chiude e resetta
+      if (bO) bO.classList.remove('active', 'fading-out');
+      if (bP) bP.classList.remove('active', 'fading-out');
       if (!isAnyPopupActive()) document.body.style.overflow = '';
       if (formContentWrapper) {
         formContentWrapper.classList.remove('swept-away');
         formContentWrapper.style.display = 'block';
+        formContentWrapper.style.maxHeight = 'none';
       }
       if (successAnimationContainer) successAnimationContainer.style.display = 'none';
       if (bF) bF.reset();
@@ -879,8 +1031,14 @@
       if (iPP) iPP.textContent = '';
       if (bRM) { bRM.style.display = 'none'; bRM.className = 'form-message';}
     }
-    if (cB) cB.addEventListener('click', cBP);
-    if (bO) bO.addEventListener('click', (e) => { if (e.target === bO) cBP(); });
+    function cBP_withAnimation() { // Funzione che avvia l'animazione di chiusura
+      if (bO) bO.classList.add('fading-out');
+      if (bP) bP.classList.add('fading-out');
+      setTimeout(cBP_actualClose, 300); // Durata della transizione CSS
+    }
+    if (cB) cB.addEventListener('click', cBP_withAnimation);
+    if (bO) bO.addEventListener('click', (e) => { if (e.target === bO) cBP_withAnimation(); });
+
     if (nPI && pFC) nPI.addEventListener('input', (e) => {
       const currentVal = parseInt(e.target.value);
       const maxVal = parseInt(nPI.max);
@@ -916,7 +1074,12 @@
         try { j = JSON.parse(rt); }
         catch (err) { throw new Error("Risposta non valida dal server: " + rt.substring(0, 150)); }
         if (j.success) {
-          if (formContentWrapper) formContentWrapper.classList.add('swept-away');
+          if (formContentWrapper) {
+            formContentWrapper.style.maxHeight = formContentWrapper.scrollHeight + 'px';
+            setTimeout(() => {
+              formContentWrapper.classList.add('swept-away');
+            }, 10);
+          }
           if (bRM) bRM.style.display = 'none';
           if (successAnimationContainer) {
             successAnimationContainer.style.display = 'block';
@@ -927,7 +1090,7 @@
             }
           }
           loadEvents();
-          setTimeout(cBP, 3500);
+          setTimeout(cBP_withAnimation, 3000); // Chiude popup con animazione dopo il successo
         } else { throw new Error(j.message || 'Errore durante la prenotazione.'); }
       } catch (err) {
         if (bRM) { bRM.textContent = `Errore: ${err.message}`; bRM.className = 'form-message error'; }
@@ -1247,7 +1410,6 @@
         dashAdminCurrentImagePreviewEl.style.display = 'block';
       }
       if (dashAdminCurrentFlyerPreviewEl && eventData.volantino_url) {
-        // MODIFICATO: Testo link volantino più pulito
         dashAdminCurrentFlyerPreviewEl.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank" title="Visualizza il volantino attuale">Visualizza volantino attuale</a>`;
       } else if (dashAdminCurrentFlyerPreviewEl) {
         dashAdminCurrentFlyerPreviewEl.innerHTML = `<span>Nessun volantino caricato.</span>`;
@@ -1334,7 +1496,11 @@
       if (e.key === "Escape") {
         if (gebi('loginPopup')?.classList.contains("active")) closeLoginPopup();
         if (gebi('forgotPasswordPopup')?.classList.contains("active")) closeForgotPasswordPopup();
-        if (gebi('bookingPopup')?.classList.contains("active")) gebi('closeBookingPopupBtn')?.click();
+        // Per il booking popup, ora chiamiamo cBP_withAnimation per la chiusura fluida
+        if (gebi('bookingPopup')?.classList.contains("active")) {
+          const closeBtn = gebi('closeBookingPopupBtn');
+          if (closeBtn) closeBtn.click(); // Simula click per triggerare cBP_withAnimation
+        }
         if (gebi('waitlistPopup')?.classList.contains("active")) gebi('closeWaitlistPopupBtn')?.click();
         if (volantinoMorphOverlay?.classList.contains("active")) hideVolantinoWithMorph();
         if (gebi('dashAdminEventPopup')?.classList.contains("active")) closeDashAdminEventPopup();
