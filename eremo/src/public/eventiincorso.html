@@ -34,9 +34,7 @@
     .form-message.success { color: var(--success, green); background-color: rgba(var(--success-rgb, 46, 204, 113), 0.1); border: 1px solid rgba(var(--success-rgb, 46, 204, 113), 0.3); }
     .spinner-mini-light, .spinner-mini { display: inline-block; width: 1em; height: 1em; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; }
     .spinner-mini-light { border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: #fff; margin-left: 5px; }
-    .spinner-mini { border: 2px solid rgba(0,0,0,0.2); border-top-color: var(--primary); margin-right: 5px; } /* Usato nel popup admin */
-    .btn-popup .spinner-mini { border-top-color: #fff; } /* Per bottoni popup con sfondo scuro e testo bianco */
-
+    .spinner-mini { border: 2px solid rgba(0, 0, 0, 0.2); border-top-color: var(--primary); margin-right: 5px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .user-avatar img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
     .terms-checkbox { text-align: left; font-size: 0.9em; margin-top: 0.5rem; margin-bottom: 1rem; color: var(--gray-dark); }
@@ -45,181 +43,132 @@
     .terms-checkbox a { color: var(--primary); text-decoration: underline; }
     #eventiGridContainer .no-events, #eventiGridContainer .error-message { grid-column: 1 / -1; text-align: center; padding: 2rem; font-size: 1.1rem; }
 
-    /* === CSS PER FUNZIONALITÀ ADMIN ESISTENTI === */
-    .card.admin-card .card-info b { font-weight: 600; }
-    .card.admin-card .status-prenotabile { color: var(--success, green); font-weight: bold; }
-    .card.admin-card .status-non-prenotabile { color: var(--danger, red); font-weight: bold; }
-    .card-actions.admin-actions {
-      margin-top: 1rem;
-      border-top: 1px solid var(--gray-light, #eee);
-      padding-top: 1rem;
-      display: flex; gap: 0.5rem;
-    }
-    .card-actions.admin-actions .card-btn { flex-grow: 1; text-align: center; }
-    .card-actions .btn-delete {
-      background-color: var(--danger, #e74c3c) !important; color: white !important;
-    }
-    .card-actions .btn-delete:hover { background-color: darkred !important; }
-
-    /* === NUOVO STILE PER FAB "AGGIUNGI EVENTO" === */
-    .add-event-btn-container {
-      position: fixed; bottom: 30px; right: 30px; z-index: 1000;
-    }
-    #adminAddEventBtn { /* ID specifico per il bottone */
-      background-color: var(--primary, #007bff); color: white;
-      border: none; border-radius: 50%; width: 60px; height: 60px;
-      font-size: 28px; /* Leggermente più grande per il '+' */
-      display: flex; justify-content: center; align-items: center;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-      transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-      outline: none;
-    }
-    #adminAddEventBtn:hover, #adminAddEventBtn:focus {
-      background-color: var(--primary-dark, #0056b3); /* Assumendo var(--primary-dark) */
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    }
-    #adminAddEventBtn .plus-icon { line-height: 1; font-weight: 300; }
-
-
-    /* === STILI PER IL NUOVO POPUP ADMIN (stile Dashboard) === */
-    .dash-admin-event-popup-overlay { /* Overlay per il nuovo popup */
+    /* Stili per il popup evento (ispirati da dashboard.html e admin) */
+    .event-popup-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.65); z-index: 1050; /* Alto z-index */
-      display: none; opacity: 0; transition: opacity 0.3s ease;
+      background-color: rgba(0,0,0,0.6); z-index: 999;
+      display: none;
+      opacity: 0; transition: opacity 0.3s ease;
     }
-    .dash-admin-event-popup-overlay.active { display: block; opacity: 1; }
+    .event-popup-overlay.active { display: flex; opacity: 1; align-items: center; justify-content: center;}
 
-    .dash-admin-event-popup { /* Popup principale */
-      position: fixed; top: 50%; left: 50%;
-      background-color: var(--white, #fff);
-      padding: 0; /* Padding sarà nel content */
-      border-radius: var(--border-radius-large, 12px);
-      box-shadow: var(--shadow-strong, 0 10px 30px rgba(0,0,0,0.2));
-      z-index: 1051;
-      width: 95%; max-width: 900px; /* Più largo per form e preview */
-      max-height: 90vh;
-      display: none; opacity: 0;
-      transform: translate(-50%, -48%) scale(0.95);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      overflow: hidden; /* Per gestire lo scroll interno */
+    .event-popup {
+      background-color: var(--white); color: var(--dark);
+      padding: 2rem; border-radius: var(--border-radius-large);
+      width: 90%; max-width: 650px;
+      box-shadow: var(--shadow-strong);
+      position: relative; max-height: 90vh; overflow-y: auto;
+      transform: scale(0.95); opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
-    .dash-admin-event-popup.active {
-      display: flex; /* Usare flex per struttura interna */
-      flex-direction: column;
-      opacity: 1; transform: translate(-50%, -50%) scale(1);
-    }
+    .event-popup-overlay.active .event-popup { transform: scale(1); opacity: 1; }
 
-    .dash-admin-event-popup-header {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid var(--gray-light, #eee);
+    .event-popup h2 { color: var(--primary); margin-top: 0; margin-bottom: 1.5rem; font-size: 1.8rem; text-align: center; }
+    .event-popup .form-group { margin-bottom: 1rem; }
+    .event-popup .form-group label { display: block; font-weight: 500; margin-bottom: 0.4rem; color: var(--primary-dark); font-size:0.95rem; }
+    .event-popup .form-control {
+      width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-medium);
+      border-radius: 8px; font-size: 1rem; box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+    .event-popup .form-control:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2); }
+    .event-popup textarea.form-control { min-height: 80px; resize: vertical; }
+    .event-popup .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .event-popup .form-check-group { display: flex; align-items: center; margin-bottom: 1rem; }
+    .event-popup .form-check-group input[type="checkbox"] { margin-right: 0.5rem; width: auto; height: auto; transform: scale(1.1); }
+    .event-popup .form-check-group label { font-weight: normal; font-size: 0.95rem; color: var(--dark); }
+    .event-popup .form-actions { text-align: right; margin-top: 1.5rem; }
+    .event-popup .btn-popup {
+      padding: 0.8rem 1.8rem; background-color: var(--secondary); color: white;
+      border: none; border-radius: 8px; cursor: pointer;
+      font-size: 1rem; font-weight: 500; transition: var(--transition-medium);
+    }
+    .event-popup .btn-popup:hover { background-color: var(--primary); }
+    .event-popup .close-popup {
+      position: absolute; top: 15px; right: 20px;
+      background: none; border: none; font-size: 2rem; color: var(--gray-dark);
+      cursor: pointer; line-height: 1; padding: 0;
+    }
+    .event-popup .close-popup:hover { color: var(--primary); }
+    .event-popup .form-message { margin-top: 1rem; margin-bottom: 0; }
+    .event-popup small { font-size: 0.85em; color: var(--gray-dark); display: block; margin-top: 0.2rem; }
+    #current-event-image-preview { max-width:100px; max-height:100px; display:none; margin-top:5px; border-radius: 4px; border: 1px solid var(--gray-light); }
+    #current-event-flyer-preview a { color: var(--primary); text-decoration: underline; }
+    #current-event-flyer-preview a:hover { color: var(--accent); }
+
+    /* Stile per il bottone "Nuovo Evento" (FAB) */
+    .add-event-btn-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 990;
+      display: none;
+    }
+    .add-event-btn {
+      background-color: var(--secondary); color: white;
+      border: none; border-radius: 50%;
+      width: 60px; height: 60px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      font-size: 28px; line-height: 60px; text-align: center;
+      cursor: pointer; transition: all 0.3s ease;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .add-event-btn:hover { background-color: var(--primary); transform: scale(1.1); }
+    .add-event-btn .plus-icon { display: block; }
+    .add-event-btn .btn-label { display: none; }
+
+    /* Stili per card admin */
+    .card.admin-card .card-actions {
+      margin-top: 1rem;
+      border-top: 1px solid var(--gray-light);
+      padding-top: 1rem;
       display: flex;
-      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .card.admin-card .card-actions .card-btn {
+      flex-grow: 1;
+    }
+    .card.admin-card .btn-delete {
+      background-color: var(--danger) !important;
+      color: white !important;
+    }
+    .card.admin-card .btn-delete:hover {
+      background-color: darkred !important;
+    }
+    .status-prenotabile { color: var(--success, green); font-weight: bold; }
+    .status-non-prenotabile { color: var(--danger, red); font-weight: bold; }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 255, 255, 0.85);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       align-items: center;
+      z-index: 10;
+      visibility: hidden; opacity: 0;
+      transition: opacity 0.3s, visibility 0.3s;
+      border-radius: inherit;
     }
-    .dash-admin-event-popup-header h2 {
-      margin: 0; color: var(--primary); font-size: 1.5rem;
+    .loading-overlay.visible { visibility: visible; opacity: 1; }
+    .loading-overlay .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border-left-color: var(--primary);
+      animation: spin 1s ease infinite;
+      margin-bottom: 0.8rem;
     }
-    .dash-admin-event-popup .close-popup { /* Pulsante chiusura */
-      font-size: 1.8rem; color: var(--gray-dark, #777); background: none;
-      border: none; cursor: pointer; padding: 0.5rem; line-height: 1;
+    .loading-overlay p {
+      font-size: 1.1em;
+      color: var(--dark);
+      font-weight: 500;
     }
-    .dash-admin-event-popup .close-popup:hover { color: var(--dark, #333); }
-
-    .dash-admin-event-popup-content { /* Contenitore scrollabile per form e preview */
-      overflow-y: auto;
-      padding: 1.5rem;
-    }
-
-    .dash-admin-event-form-and-preview-container {
-      display: flex; flex-wrap: wrap; gap: 2rem;
-    }
-    #dashAdminEventForm { /* Form effettivo */
-      flex: 2; min-width: 320px; /* Più spazio per il form */
-    }
-    #dashAdminEventCardPreviewContainer { /* Contenitore preview */
-      flex: 1; min-width: 280px; /* Meno spazio relativo per preview */
-      padding: 1rem; border: 1px dashed var(--gray-medium, #ccc);
-      border-radius: var(--border-radius-medium, 8px);
-      background-color: var(--background-light, #f8f9fa);
-      height: fit-content; position: sticky; top: 1.5rem; /* Sticky preview */
-    }
-    @media (max-width: 768px) { /* Su mobile, preview sopra */
-      .dash-admin-event-form-and-preview-container { flex-direction: column-reverse; }
-      #dashAdminEventCardPreviewContainer { position: static; margin-bottom: 2rem;}
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
-
-    #dashAdminEventCardPreviewContainer h4 {
-      text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 1rem;
-      font-size: 1.1rem; border-bottom: 1px solid var(--gray-light, #eee); padding-bottom: 0.5rem;
-    }
-    /* Stili per la card di anteprima */
-    .dash-admin-preview-card {
-      background: var(--white); border-radius: var(--border-radius-medium);
-      box-shadow: var(--shadow-light); overflow: hidden; border: 1px solid var(--gray-light);
-    }
-    .dash-admin-preview-card-image-container {
-      height: 160px; background-color: var(--gray-lighter, #f0f0f0); display: flex;
-      align-items: center; justify-content: center; overflow: hidden;
-    }
-    .dash-admin-preview-card-image-container img { width: 100%; height: 100%; object-fit: cover; }
-    .dash-admin-preview-card-image-container .dash-admin-no-image-placeholder { font-size: 0.9rem; color: var(--gray-dark); }
-    .dash-admin-preview-card-content { padding: 0.8rem 1rem; }
-    .dash-admin-preview-card-content h5 {
-      font-size: 1.15rem; color: var(--primary); margin: 0 0 0.4rem 0;
-      font-weight: 600; min-height: 1.2em; word-break: break-word;
-    }
-    .dash-admin-preview-card-content p {
-      font-size: 0.85rem; color: var(--gray-dark); line-height: 1.4;
-      margin-bottom: 0.4rem; min-height: 1em; word-break: break-word;
-    }
-    .dash-admin-preview-card-content .dash-admin-preview-relatore { font-style: italic; }
-    .dash-admin-preview-card-content .dash-admin-preview-posti,
-    .dash-admin-preview-card-content .dash-admin-preview-costo { font-weight: bold; }
-
-    /* Stili per il form dentro il nuovo popup */
-    #dashAdminEventForm .form-group { margin-bottom: 1rem; }
-    #dashAdminEventForm .form-group label {
-      display: block; margin-bottom: 0.3rem; color: var(--primary-dark, #333);
-      font-weight: 500; font-size: 0.9rem;
-    }
-    #dashAdminEventForm .form-control, #dashAdminEventForm select.form-control {
-      width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--gray-medium, #ccc);
-      border-radius: 6px; font-size: 0.95rem; background-color: var(--white, #fff);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    #dashAdminEventForm .form-control:focus {
-      border-color: var(--secondary, #8db187);
-      box-shadow: 0 0 0 2px rgba(var(--secondary-rgb, 141, 177, 135), 0.2);
-      outline: none;
-    }
-    #dashAdminEventForm textarea.form-control { min-height: 70px; resize: vertical; }
-    #dashAdminEventForm .form-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;
-    }
-    #dashAdminEventForm .form-check-group {
-      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;
-    }
-    #dashAdminEventForm .form-check-group input[type="checkbox"] {
-      width: auto; margin-right: 0.2rem; transform: scale(1.05);
-    }
-    #dashAdminEventForm .form-check-group label {
-      font-weight: normal; font-size: 0.9rem; margin-bottom: 0; color: var(--dark);
-    }
-    #dashAdminEventForm .form-actions { margin-top: 1.5rem; text-align: right; }
-    #dashAdminEventForm small {
-      font-size: 0.8rem; color: var(--gray-dark); display: block; margin-top: 0.2rem;
-    }
-    #dashAdmin-current-event-image-preview, #dashAdmin-current-event-flyer-preview {
-      margin-top: 0.5rem; max-width: 120px; border: 1px solid var(--gray-light, #eee);
-      padding: 4px; border-radius: 4px;
-    }
-    #dashAdmin-current-event-image-preview { display:none; } /* Nascosta di default */
-    #dashAdmin-current-event-flyer-preview a { font-size: 0.85rem; color: var(--primary); }
-    #dashAdminEventFormMessage.form-message { margin-top: 1rem; }
-    /* === FINE CSS AGGIUNTO === */
   </style>
 </head>
 
@@ -246,8 +195,7 @@
         <div class="dropdown-menu" id="userDropdownMenu">
           <a href="areapersonale.html" id="nav-profilo">Il mio profilo</a>
           <a href="areapersonale.html#prenotazioni" id="nav-mie-prenotazioni">Le mie prenotazioni</a>
-          <a href="dashboard.html" id="nav-dashboard">Dashboard Admin</a>
-          <a href="eventiincorsoAdmin.html" id="nav-gestione-eventi-admin" style="display: none;">Gestione Eventi</a>
+          <a href="dashboard.html" id="nav-dashboard" style="display: none;">Dashboard Admin</a>
           <a href="#" id="logout-link-desktop">Esci</a>
         </div>
       </div>
@@ -265,30 +213,26 @@
     <a href="areapersonale.html" id="mobile-nav-profilo" style="display: none;">Il mio profilo</a>
     <a href="areapersonale.html#prenotazioni" id="mobile-nav-mie-prenotazioni" style="display: none;">Le mie prenotazioni</a>
     <a href="dashboard.html" id="mobile-nav-dashboard" style="display: none;">Dashboard Admin</a>
-    <a href="eventiincorsoAdmin.html" id="mobile-nav-gestione-eventi-admin" style="display: none;">Gestione Eventi</a>
     <a href="#" id="mobile-logout-link" style="display: none;">Esci</a>
   </div>
 </header>
 
 <main>
   <div class="container section-padding">
-    <h1 id="mainPageTitle">Calendario Attività</h1>
+    <h1 id="pageMainTitle">Calendario Attività</h1>
     <div id="eventiGridContainer">
-      <div id="loadingIndicator" class="loading-overlay visible">
-        <div class="spinner">
-          <div class="bounce1"></div>
-          <div class="bounce2"></div>
-          <div class="bounce3"></div>
-        </div>
+      <div id="loadingIndicator" class="loading-overlay">
+        <div class="spinner"></div>
         <p>Sto caricando gli eventi...</p>
       </div>
       <div class="card-grid" id="eventiGrid">
       </div>
     </div>
   </div>
-  <div class="add-event-btn-container" id="addEventFabContainer" style="display:none;">
-    <button id="adminAddEventBtn">
+  <div class="add-event-btn-container" id="addEventBtnContainer">
+    <button class="add-event-btn" id="addEventBtnAdmin">
       <span class="plus-icon">+</span>
+      <span class="btn-label">Nuovo Evento</span>
     </button>
   </div>
 </main>
@@ -373,117 +317,43 @@
   </form>
 </div>
 
-<div class="dash-admin-event-popup-overlay" id="dashAdminEventPopupOverlay"></div>
-<div class="dash-admin-event-popup" id="dashAdminEventPopup">
-  <div class="dash-admin-event-popup-header">
-    <h2 id="dashAdminEventPopupTitle">Aggiungi Nuovo Evento</h2>
-    <button class="close-popup" id="closeDashAdminEventPopupBtn" aria-label="Chiudi popup">&times;</button>
-  </div>
-  <div class="dash-admin-event-popup-content">
-    <div class="dash-admin-event-form-and-preview-container">
-      <form id="dashAdminEventForm" method="POST" enctype="multipart/form-data">
-        <input type="hidden" id="dashAdmin-event-id" name="event-id">
-
-        <div class="form-group">
-          <label for="dashAdmin-event-title">Titolo Evento*</label>
-          <input type="text" id="dashAdmin-event-title" name="event-title" class="form-control" required>
-        </div>
-
-        <div class="form-group">
-          <label for="dashAdmin-event-date">Data Inizio*</label>
-          <input type="date" id="dashAdmin-event-date" name="event-date" class="form-control" required>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="dashAdmin-event-start-time">Orario Inizio (HH:MM)</label>
-            <input type="time" id="dashAdmin-event-start-time" name="event-start-time" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="dashAdmin-event-end-time">Orario Fine (HH:MM)</label>
-            <input type="time" id="dashAdmin-event-end-time" name="event-end-time" class="form-control">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="dashAdmin-event-short-desc">Descrizione Breve* (max 200 caratteri)</label>
-          <textarea id="dashAdmin-event-short-desc" name="event-short-desc" class="form-control" rows="2" required maxlength="200"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="dashAdmin-event-long-desc">Descrizione Estesa</label>
-          <textarea id="dashAdmin-event-long-desc" name="event-long-desc" class="form-control" rows="4"></textarea>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="dashAdmin-event-prefix">Prefisso Relatore</label>
-            <input type="text" id="dashAdmin-event-prefix" name="event-prefix" class="form-control" placeholder="Default: Relatore">
-          </div>
-          <div class="form-group">
-            <label for="dashAdmin-event-speaker">Nome Relatore*</label>
-            <input type="text" id="dashAdmin-event-speaker" name="event-speaker" class="form-control" required>
-          </div>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="dashAdmin-event-association">Associazione</label>
-            <input type="text" id="dashAdmin-event-association" name="event-association" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="dashAdmin-event-seats">Posti Disponibili Iniziali*</label>
-            <input type="number" id="dashAdmin-event-seats" name="event-seats" class="form-control" required min="0">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="dashAdmin-event-image">Immagine Copertina</label>
-          <input type="file" id="dashAdmin-event-image" name="event-image" class="form-control" accept="image/*">
-          <small>Lascia vuoto se non vuoi modificare l'immagine esistente.</small>
-          <img id="dashAdmin-current-event-image-preview" src="#" alt="Anteprima Immagine">
-        </div>
-
-        <div class="form-check-group">
-          <input type="checkbox" id="dashAdmin-event-booking" name="event-booking" checked>
-          <label for="dashAdmin-event-booking">Prenotazioni aperte</label>
-        </div>
-
-        <div class="form-check-group">
-          <input type="checkbox" id="dashAdmin-event-voluntary" name="event-voluntary">
-          <label for="dashAdmin-event-voluntary">Offerta libera</label>
-        </div>
-
-        <div class="form-group" id="dashAdmin-event-price-container" style="display: block;">
-          <label for="dashAdmin-event-price">Prezzo (€)</label>
-          <input type="number" id="dashAdmin-event-price" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00">
-        </div>
-
-        <div id="dashAdminEventFormMessage" class="form-message" style="display:none;"></div>
-        <div class="form-actions">
-          <button type="submit" class="btn-popup">Salva Evento</button>
-        </div>
-      </form>
-
-      <div id="dashAdminEventCardPreviewContainer">
-        <h4>Anteprima Card Evento</h4>
-        <div class="dash-admin-preview-card">
-          <div class="dash-admin-preview-card-image-container">
-            <img id="dashAdmin_previewImage" src="images/default-event.jpg" alt="Anteprima copertina evento">
-            <span class="dash-admin-no-image-placeholder" style="display:none;">Nessuna immagine</span>
-          </div>
-          <div class="dash-admin-preview-card-content">
-            <h5 id="dashAdmin_previewTitle">Titolo Evento</h5>
-            <p id="dashAdmin_previewDateFull"><b>Data:</b> <span class="value">Seleziona data</span></p>
-            <p id="dashAdmin_previewTimeFull" style="display:none;"><b>Orario:</b> <span class="value"></span></p>
-            <p id="dashAdmin_previewSpeakerFull" class="dash-admin-preview-relatore"><b><span id="dashAdmin_previewSpeakerPrefix">Relatore</span>:</b> <span id="dashAdmin_previewSpeakerName" class="value">Nome Relatore</span></p>
-            <p id="dashAdmin_previewShortDesc">Descrizione breve dell'evento qui...</p>
-            <p id="dashAdmin_previewSeatsFull" class="dash-admin-preview-posti"><b>Posti:</b> <span class="value">0</span></p>
-            <p id="dashAdmin_previewPriceFull" class="dash-admin-preview-costo"><b>Costo:</b> <span class="value">€ 0.00</span></p>
-          </div>
-        </div>
+<div class="event-popup-overlay" id="adminEventPopupOverlay">
+  <div class="event-popup" id="adminEventPopup">
+    <button class="close-popup" id="closeAdminEventPopupBtn" aria-label="Chiudi popup">&times;</button>
+    <h2 id="adminEventPopupTitle">Aggiungi Nuovo Evento</h2>
+    <form id="adminEventForm" method="POST" enctype="multipart/form-data">
+      <input type="hidden" id="admin-event-id" name="event-id">
+      <div class="form-group"> <label for="admin-event-title">Titolo Evento*</label> <input type="text" id="admin-event-title" name="event-title" class="form-control" required> </div>
+      <div class="form-grid">
+        <div class="form-group"> <label for="admin-event-date">Data Inizio*</label> <input type="date" id="admin-event-date" name="event-date" class="form-control" required> </div>
+        <div class="form-group"> <label for="admin-event-time">Orario/Durata</label> <input type="text" id="admin-event-time" name="event-time" class="form-control" placeholder="es. 18:00-19:30 o 2 giorni"> </div>
       </div>
-    </div>
+      <div class="form-group"> <label for="admin-event-short-desc">Descrizione Breve*</label> <textarea id="admin-event-short-desc" name="event-short-desc" class="form-control" rows="3" required maxlength="200"></textarea> </div>
+      <div class="form-group"> <label for="admin-event-long-desc">Descrizione Estesa</label> <textarea id="admin-event-long-desc" name="event-long-desc" class="form-control" rows="5"></textarea> </div>
+      <div class="form-grid">
+        <div class="form-group"> <label for="admin-event-prefix">Prefisso Relatore</label> <input type="text" id="admin-event-prefix" name="event-prefix" class="form-control" placeholder="Default: Relatore"> </div>
+        <div class="form-group"> <label for="admin-event-speaker">Nome Relatore*</label> <input type="text" id="admin-event-speaker" name="event-speaker" class="form-control" required> </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"> <label for="admin-event-association">Associazione</label> <input type="text" id="admin-event-association" name="event-association" class="form-control"> </div>
+        <div class="form-group"> <label for="admin-event-seats">Posti Disponibili*</label> <input type="number" id="admin-event-seats" name="event-seats" class="form-control" required min="0"> </div>
+      </div>
+      <div class="form-group">
+        <label for="admin-event-image">Immagine Copertina</label> <input type="file" id="admin-event-image" name="event-image" class="form-control" accept="image/*">
+        <small>Lascia vuoto se non vuoi modificare l'immagine corrente.</small>
+        <img id="current-event-image-preview" src="#" alt="Anteprima copertina">
+      </div>
+      <div class="form-group">
+        <label for="admin-event-flyer">Volantino (PDF/Immagine)</label> <input type="file" id="admin-event-flyer" name="event-flyer" class="form-control" accept="image/*,application/pdf">
+        <small>Lascia vuoto se non vuoi modificare il volantino corrente.</small>
+        <div id="current-event-flyer-preview"></div>
+      </div>
+      <div class="form-check-group"> <input type="checkbox" id="admin-event-booking" name="event-booking" checked> <label for="admin-event-booking">Prenotazioni aperte</label> </div>
+      <div class="form-check-group"> <input type="checkbox" id="admin-event-voluntary" name="event-voluntary"> <label for="admin-event-voluntary">Costo su base volontaria (offerta libera)</label> </div>
+      <div class="form-group" id="admin-event-price-container"> <label for="admin-event-price">Prezzo (€)</label> <input type="number" id="admin-event-price" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00"> </div>
+      <div id="adminEventFormMessage" class="form-message"></div>
+      <div class="form-actions"> <button type="submit" class="btn-popup">Salva Evento</button> </div>
+    </form>
   </div>
 </div>
 
@@ -499,29 +369,6 @@
   let volantinoMorphOverlay = null;
   let morphingCard = null;
   let currentEventsData = [];
-
-  // Elementi DOM per Admin Event Popup (Stile Dashboard)
-  let adminAddEventBtnEl = null; // Rinominato per coerenza
-  let dashAdminEventPopupOverlayEl = null;
-  let dashAdminEventPopupEl = null;
-  let closeDashAdminEventPopupBtnEl = null;
-  let dashAdminEventFormEl = null;
-  let dashAdminEventPopupTitleEl = null;
-  let dashAdminEventIdInputEl = null; /* ID evento nel form */
-  /* Campi specifici del form */
-  let dashAdminEventTitleEl, dashAdminEventDateEl, dashAdminEventStartTimeEl, dashAdminEventEndTimeEl,
-          dashAdminEventShortDescEl, dashAdminEventLongDescEl, dashAdminEventPrefixEl, dashAdminEventSpeakerEl,
-          dashAdminEventAssociationEl, dashAdminEventSeatsEl, dashAdminEventImageEl,
-          dashAdminEventBookingCheckbox, dashAdminEventVoluntaryCheckbox,
-          dashAdminEventPriceContainerEl, dashAdminEventPriceInputEl;
-  let dashAdminEventFormMessageEl = null;
-  let dashAdminCurrentImagePreviewEl = null;
-  // Preview elements
-  let dashAdminPreviewImageEl, dashAdminPreviewNoImagePlaceholderEl, dashAdminPreviewTitleEl,
-          dashAdminPreviewDateFullEl, dashAdminPreviewTimeFullEl, dashAdminPreviewTimeValueEl,
-          dashAdminPreviewSpeakerFullEl, dashAdminPreviewSpeakerPrefixEl, dashAdminPreviewSpeakerNameEl,
-          dashAdminPreviewShortDescEl, dashAdminPreviewSeatsFullEl, dashAdminPreviewPriceFullEl;
-
 
   function gebi(id) { return document.getElementById(id); }
 
@@ -550,19 +397,29 @@
       mobileNavDashboard: gebi('mobile-nav-dashboard'), mobileNavProfilo: gebi('mobile-nav-profilo'),
       mobileNavMiePrenotazioni: gebi('mobile-nav-mie-prenotazioni'), mobileLogoutLink: gebi('mobile-logout-link'),
       mobileMenuSeparator: gebi('mobile-menu-separator'), navbarTitle: gebi('navbar-title'),
-      navGestioneEventiAdmin: gebi('nav-gestione-eventi-admin'),
-      mobileNavGestioneEventiAdmin: gebi('mobile-nav-gestione-eventi-admin'),
-      mainPageTitle: gebi('mainPageTitle'),
-      addEventFabContainer: gebi('addEventFabContainer')
+      pageMainTitle: gebi('pageMainTitle'),
+      addEventBtnContainer: gebi('addEventBtnContainer')
     };
 
-    if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
-    if(el.mobileNavGestioneEventiAdmin) el.mobileNavGestioneEventiAdmin.style.display = 'none';
+    if(el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'none';
+    if(el.loginBtnMobile) el.loginBtnMobile.style.display = 'none';
+    if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'none';
+    if(el.navDashboard) el.navDashboard.style.display = 'none';
+    if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
+    if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
+    if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
+    if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
+    if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
+    if(el.addEventBtnContainer) el.addEventBtnContainer.style.display = 'none';
+
 
     if (currentUserData) {
-      if (el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'none';
-      if (el.loginBtnMobile) el.loginBtnMobile.style.display = 'none';
       if (el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block';
+      if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
+      if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
+      if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
+      if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
+
       if (el.navbarUsername) el.navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
       if (el.navbarAvatarImg) {
         el.navbarAvatarImg.src = currentUserData.iconPath || defaultUserIconPath;
@@ -572,48 +429,25 @@
 
       if (currentUserData.isAdmin) {
         if (el.navDashboard) el.navDashboard.style.display = 'block';
-        if (el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
-        if (el.mainPageTitle) el.mainPageTitle.textContent = "Gestione Calendario Attività";
-        if (el.addEventFabContainer) el.addEventFabContainer.style.display = 'block';
         if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
-        if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
-        if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
-        if (gebi('nav-profilo')) gebi('nav-profilo').style.display = 'none';
-        if (gebi('nav-mie-prenotazioni')) gebi('nav-mie-prenotazioni').style.display = 'none';
-        if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
-        if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
+        if (el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
+        if (el.pageMainTitle) el.pageMainTitle.textContent = "Gestione Calendario Attività";
+        if (el.addEventBtnContainer) el.addEventBtnContainer.style.display = 'block';
       } else {
-        if (el.navDashboard) el.navDashboard.style.display = 'none';
         if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
-        if (el.mainPageTitle) el.mainPageTitle.textContent = "Calendario Attività";
-        if (el.addEventFabContainer) el.addEventFabContainer.style.display = 'none';
-        if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
-        if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
-        if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
-        if (gebi('nav-profilo')) gebi('nav-profilo').style.display = 'block';
-        if (gebi('nav-mie-prenotazioni')) gebi('nav-mie-prenotazioni').style.display = 'block';
-        if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
-        if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
+        if (el.pageMainTitle) el.pageMainTitle.textContent = "Calendario Attività";
       }
     } else {
       if (el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'inline-block';
       if (el.loginBtnMobile) el.loginBtnMobile.style.display = 'block';
-      if (el.userDropdownContainer) el.userDropdownContainer.style.display = 'none';
-      if (el.navDashboard) el.navDashboard.style.display = 'none';
-      if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
       if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
-      if (el.mainPageTitle) el.mainPageTitle.textContent = "Calendario Attività";
-      if (el.addEventFabContainer) el.addEventFabContainer.style.display = 'none';
-      if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
-      if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
-      if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
-      if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
+      if (el.pageMainTitle) el.pageMainTitle.textContent = "Calendario Attività";
     }
   }
 
   let lastScrollNav = 0; const navbarContainerEl = gebi("navbarContainer"); if (navbarContainerEl) { window.addEventListener("scroll", function () { const cS = window.pageYOffset || document.documentElement.scrollTop; if (cS <= 50) { navbarContainerEl.classList.remove("hidden"); lastScrollNav = 0; return; } if (cS > lastScrollNav && !navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.add("hidden"); else if (cS < lastScrollNav && navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.remove("hidden"); lastScrollNav = cS <= 0 ? 0 : cS; }, false); }
-  const mobileMenuEl = gebi("mobileMenu"); const hamburgerButton = gebi("hamburgerBtn"); function toggleMobileMenu() { if (mobileMenuEl && hamburgerButton) { const iO = mobileMenuEl.classList.toggle("open"); hamburgerButton.setAttribute("aria-expanded", String(iO)); document.body.style.overflow = iO ? "hidden" : ""; } } function closeMobileMenuOnLinkClick() { if (mobileMenuEl && hamburgerButton && mobileMenuEl.classList.contains("open")) { mobileMenuEl.classList.remove("open"); hamburgerButton.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; } } if (hamburgerButton) hamburgerButton.addEventListener("click", toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobile-logout-link' && l.id !== 'mobile-nav-gestione-eventi-admin') l.addEventListener("click", closeMobileMenuOnLinkClick); }); document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) toggleMobileMenu(); });
-  const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iO = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iO ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iO)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl.style.display === 'block' && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
+  const mobileMenuEl = gebi("mobileMenu"); const hamburgerButton = gebi("hamburgerBtn"); function toggleMobileMenu() { if (mobileMenuEl && hamburgerButton) { const iO = mobileMenuEl.classList.toggle("open"); hamburgerButton.setAttribute("aria-expanded", String(iO)); document.body.style.overflow = iO ? "hidden" : ""; } } function closeMobileMenuOnLinkClick() { if (mobileMenuEl && hamburgerButton && mobileMenuEl.classList.contains("open")) { mobileMenuEl.classList.remove("open"); hamburgerButton.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; } } if (hamburgerButton) hamburgerButton.addEventListener("click", toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobile-logout-link') l.addEventListener("click", closeMobileMenuOnLinkClick); }); document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) toggleMobileMenu(); });
+  const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iO = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iO ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iO)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl && userDropdownMenuEl.style.display === 'block' && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
   const loginOverlayEl = gebi('loginOverlay'); const loginPopupEl = gebi('loginPopup'); const closeLoginPopupBtnEl = gebi('closeLoginPopupBtn'); const loginTabsEl = document.querySelectorAll('.login-tab'); const loginFormsEl = document.querySelectorAll('.login-popup .login-form'); const loginFormElement = gebi('loginForm'); const registerFormElement = gebi('registerForm'); const loginErrorMessageElement = gebi('login-error-message'); const registerErrorMessageElement = gebi('register-error-message');
   function openLoginPopup() { if (loginOverlayEl) loginOverlayEl.classList.add('active'); if (loginPopupEl) loginPopupEl.classList.add('active'); document.body.style.overflow = 'hidden'; resetFormErrorsAndMessages(); document.querySelector('.login-tab[data-tab="login"]')?.click(); gebi('login-email')?.focus(); }
   function closeLoginPopup() { if (loginOverlayEl) loginOverlayEl.classList.remove('active'); if (loginPopupEl) loginPopupEl.classList.remove('active'); if (!isAnyPopupActive()) document.body.style.overflow = ''; resetFormErrorsAndMessages(); }
@@ -625,19 +459,13 @@
   loginFormElement?.addEventListener('submit', async (e) => { e.preventDefault(); resetFormErrorsAndMessages(); const b = loginFormElement.querySelector('button[type="submit"]'); const o = b.innerHTML; b.disabled = true; b.innerHTML = 'Accesso...<div class="spinner-mini-light"></div>'; try { const r = await fetch('login.php', { method: 'POST', body: new FormData(loginFormElement) }); const j = await r.json(); if (!r.ok) throw new Error(j.message || `Errore ${r.status}`); if (j.success) { currentUserData = { email: j.email, nome: j.nome, iconPath: j.iconPath || defaultUserIconPath, isAdmin: j.is_admin === true || j.is_admin === 1 }; localStorage.setItem('userDataEFF', JSON.stringify(currentUserData)); updateNavbarUI(); closeLoginPopup(); loadEvents(); const pAction = localStorage.getItem("pending_action_eff"); if (pAction) { localStorage.removeItem("pending_action_eff"); const aD = JSON.parse(pAction); if (aD.action === 'book' && typeof window.openBookingPopup === 'function') window.openBookingPopup(aD.eventId, aD.eventTitle, aD.postiDisp, aD.postiGiaPren); else if (aD.action === 'waitlist' && typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(aD.eventId, aD.eventTitle, aD.postiGiaPren); } } else { loginFormElement.querySelectorAll('#login-email,#login-password').forEach(el => el.classList.add('error-border')); if (loginErrorMessageElement) { loginErrorMessageElement.textContent = j.message || "Credenziali errate."; loginErrorMessageElement.style.display = 'block'; } } } catch (err) { console.error("Errore login:", err); if (loginErrorMessageElement) { loginErrorMessageElement.textContent = "Errore connessione o server."; loginErrorMessageElement.style.display = 'block'; } } finally { b.disabled = false; b.innerHTML = o; } });
   registerFormElement?.addEventListener('submit', async (e) => { e.preventDefault(); resetFormErrorsAndMessages(); const b = registerFormElement.querySelector('button[type="submit"]'); const o = b.innerHTML; b.disabled = true; b.innerHTML = 'Registrazione...<div class="spinner-mini-light"></div>'; try { const r = await fetch('registrati.php', { method: 'POST', body: new FormData(registerFormElement) }); const j = await r.json(); if (!r.ok) throw new Error(j.message || `Errore ${r.status}`); if (j.success) { alert(j.message || "Registrazione completata! Ora puoi accedere."); document.querySelector('.login-tab[data-tab="login"]')?.click(); gebi('login-email').value = gebi('register-email').value; registerFormElement.reset(); } else { if (registerErrorMessageElement) { registerErrorMessageElement.textContent = j.message || "Errore registrazione."; registerErrorMessageElement.style.display = 'block'; } if (j.errors) { for (const f in j.errors) gebi(`register-${f}`)?.classList.add('error-border'); } } } catch (err) { console.error("Errore registrazione:", err); if (registerErrorMessageElement) { registerErrorMessageElement.textContent = "Errore connessione o server."; registerErrorMessageElement.style.display = 'block'; } } finally { b.disabled = false; b.innerHTML = o; } });
 
-  const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-  const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
-  const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
-  const closeForgotPasswordPopupBtn = document.getElementById('closeForgotPasswordPopupBtn');
-  const forgotPasswordForm = document.getElementById('forgotPasswordForm');
-  const forgotPasswordMessage = document.getElementById('forgot-password-message');
-
-  function openForgotPasswordPopup() { if (loginPopupEl?.classList.contains('active')) closeLoginPopup(); if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active'); document.body.style.overflow = 'hidden'; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; gebi('forgot-email')?.focus(); }
+  const forgotPasswordLink = document.getElementById('forgotPasswordLink'); const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay'); const forgotPasswordPopup = document.getElementById('forgotPasswordPopup'); const closeForgotPasswordPopupBtn = document.getElementById('closeForgotPasswordPopupBtn'); const forgotPasswordForm = document.getElementById('forgotPasswordForm'); const forgotPasswordMessage = document.getElementById('forgot-password-message');
+  function openForgotPasswordPopup() { if (typeof closeLoginPopup === 'function' && loginPopupEl?.classList.contains('active')) { closeLoginPopup(); } if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active'); document.body.style.overflow = 'hidden'; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; const forgotEmailInput = document.getElementById('forgot-email'); if(forgotEmailInput) forgotEmailInput.focus(); }
   function closeForgotPasswordPopup() { if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active'); if (!isAnyPopupActive()) document.body.style.overflow = ''; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; if(forgotPasswordForm) forgotPasswordForm.reset(); }
-  if (forgotPasswordLink) forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); openForgotPasswordPopup(); });
+  if (forgotPasswordLink) { forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); openForgotPasswordPopup(); }); }
   if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
   if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
-  if (forgotPasswordForm) forgotPasswordForm.addEventListener('submit', async (e) => { e.preventDefault(); if (forgotPasswordMessage) { forgotPasswordMessage.style.display = 'none'; forgotPasswordMessage.className = 'form-message'; } const sB = forgotPasswordForm.querySelector('button[type="submit"]'); const oT = sB.innerHTML; sB.disabled = true; sB.innerHTML = 'Invio...<div class="spinner-mini-light"></div>'; try { const fD = new FormData(forgotPasswordForm); const rsp = await fetch('richiesta_recupero_password.php', { method: 'POST', body: fD }); const res = await rsp.json(); if (res.success) { forgotPasswordMessage.textContent = res.message; forgotPasswordMessage.classList.add('success'); gebi('forgot-email').value = ''; } else { forgotPasswordMessage.textContent = res.message || "Si è verificato un errore."; forgotPasswordMessage.classList.add('error'); } } catch (err) { console.error('Errore recupero password:', err); forgotPasswordMessage.textContent = "Errore di connessione o del server."; forgotPasswordMessage.classList.add('error'); } finally { if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block'; sB.disabled = false; sB.innerHTML = oT; } });
+  if (forgotPasswordForm) { forgotPasswordForm.addEventListener('submit', async (e) => { e.preventDefault(); if (forgotPasswordMessage) { forgotPasswordMessage.style.display = 'none'; forgotPasswordMessage.className = 'form-message'; } const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML; submitBtn.disabled = true; submitBtn.innerHTML = 'Invio...<div class="spinner-mini-light"></div>'; try { const formData = new FormData(forgotPasswordForm); const response = await fetch('richiesta_recupero_password.php', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { forgotPasswordMessage.textContent = result.message; forgotPasswordMessage.classList.add('success'); document.getElementById('forgot-email').value = ''; } else { forgotPasswordMessage.textContent = result.message || "Si è verificato un errore."; forgotPasswordMessage.classList.add('error'); } } catch (error) { forgotPasswordMessage.textContent = "Errore di connessione o del server."; forgotPasswordMessage.classList.add('error'); } finally { if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } }); }
 
   function handleLogout() { localStorage.removeItem('userDataEFF'); currentUserData = null; updateNavbarUI(); loadEvents(); alert('Logout effettuato.'); }
   gebi('logout-link-desktop')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
@@ -651,30 +479,30 @@
 
   async function loadEvents() {
     const eventsGrid = gebi("eventiGrid"); const loadingIndicator = gebi("loadingIndicator");
-    if (loadingIndicator) loadingIndicator.style.display = 'flex'; if (eventsGrid) eventsGrid.innerHTML = ""; currentEventsData = [];
+    if (loadingIndicator) loadingIndicator.classList.add('visible');
+    if (eventsGrid) eventsGrid.innerHTML = "";
+
     try {
       let apiUrl = 'get_events.php';
       if (currentUserData && currentUserData.isAdmin) {
-        apiUrl = 'get_events.php?admin_view=true';
+        apiUrl += '?admin_view=true';
       } else if (currentUserData && currentUserData.email) {
         apiUrl += `?user_email=${encodeURIComponent(currentUserData.email)}`;
       }
+
       const response = await fetch(apiUrl); const responseText = await response.text(); if (!response.ok) throw new Error(`Errore HTTP ${response.status}: ${responseText.substring(0, 100)}`);
       let result; try { result = JSON.parse(responseText); } catch (e) { throw new Error("Risposta server non JSON."); }
       if (!result.success) throw new Error(result.message || "Caricamento eventi fallito."); if (!eventsGrid) return;
 
-      if (result.data) {
-        currentEventsData = result.data;
-        if (result.data.length === 0) {
-          eventsGrid.innerHTML = `<p class="no-events">Nessun evento ${(currentUserData && currentUserData.isAdmin) ? 'presente. Clicca il "+" per aggiungerne uno!' : 'in programma al momento.'}</p>`;
-        } else {
-          currentEventsData.forEach((event) => eventsGrid.appendChild(createEventCard(event)));
-        }
-      } else {
-        eventsGrid.innerHTML = '<p class="no-events">Nessun dato evento ricevuto.</p>';
+      if (currentUserData && currentUserData.isAdmin) {
+        currentEventsData = result.data || [];
       }
+
+      if (result.data && result.data.length === 0) { eventsGrid.innerHTML = '<p class="no-events">Nessun evento in programma al momento.</p>'; }
+      else if (result.data) { result.data.forEach((event) => eventsGrid.appendChild(createEventCard(event))); }
+      else { eventsGrid.innerHTML = '<p class="no-events">Nessun dato evento ricevuto.</p>'; }
     } catch (error) { console.error("Errore loadEvents:", error); if (eventsGrid) eventsGrid.innerHTML = `<div class="error-message" style="width:100%;"><p><strong>Errore:</strong> ${error.message}</p><button onclick="loadEvents()" class="btn-popup">Riprova</button></div>`; }
-    finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
+    finally { if (loadingIndicator) loadingIndicator.classList.remove('visible'); }
   }
 
   function createEventCard(event) {
@@ -687,413 +515,315 @@
       card.classList.add('admin-card');
       let volantinoAdminLinkHTML = '';
       if (event.volantino_url && event.volantino_url.trim() !== "") {
-        const volantinoName = event.volantino_url.split('/').pop();
-        volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em; margin-bottom: 0.5rem;"><b>Volantino:</b> <a href="${event.volantino_url}" target="_blank" title="${volantinoName}">Visualizza</a></p>`;
+        // MODIFICA: Testo link volantino per admin card
+        volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em;"><b>Volantino:</b> <a href="${event.volantino_url}" target="_blank">Visualizza volantino</a></p>`;
       }
+
       card.innerHTML = `
             <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
             <div class="card-content">
                 <h3>${event.titolo || "Titolo non disponibile"}</h3>
                 <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ""}</p>
                 <p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}`: ""}</p>
-                <p class="card-description" style="font-size:0.95em; min-height: auto;">${event.descrizione || "Nessuna descrizione."}</p>
-                <p class="card-info" style="margin-bottom: 0.5rem;">
-                    <b>Posti Disp.:</b> <span class="posti-disponibili">${event.posti_disponibili !== null ? event.posti_disponibili : 'N/D'}</span>
-                    ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0.00 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}
-                </p>
-                <p class="card-info" style="margin-bottom: 0.5rem;"><b>Prenotazioni:</b> ${parseInt(event.flagprenotabile) === 1 ? '<span class="status-prenotabile">Aperte</span>' : '<span class="status-non-prenotabile">Chiuse</span>'}</p>
+                <p class="card-description" style="font-size:0.95em; min-height: 4.5em;">${event.descrizione || "Nessuna descrizione breve."}</p>
+                <p class="card-info"><b>Posti Totali:</b> ${event.posti_disponibili !== null ? event.posti_disponibili : 'N/D'}</p>
+                <p class="card-info"><b>Prenotazioni:</b> ${parseInt(event.flagprenotabile) === 1 ? '<span class="status-prenotabile">Aperte</span>' : '<span class="status-non-prenotabile">Chiuse</span>'}</p>
+                ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<p class="card-info"><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €</p>` : (parseFloat(event.costo) === 0 ? "<p class='card-info'><b>Costo:</b> Offerta libera</p>" : "")) : ""}
                 ${volantinoAdminLinkHTML}
                 <div class="card-actions admin-actions">
                     <button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
                     <button class="card-btn btn-delete card-btn-primary" data-event-id="${event.idevento}">Elimina</button>
                 </div>
             </div>`;
+
       card.querySelector('.btn-edit').addEventListener('click', function() {
-        const eventToEdit = currentEventsData.find(e => e.idevento == this.dataset.eventId);
-        if (eventToEdit) openDashAdminEventPopup(eventToEdit); // Usa nuovo popup
-        else alert("Dettagli evento non trovati per la modifica.");
+        const eventIdToEdit = this.dataset.eventId;
+        const eventToEdit = currentEventsData.find(e => e.idevento == eventIdToEdit);
+        if (eventToEdit) {
+          openAdminEventPopup(eventToEdit);
+        } else {
+          console.error("Dettagli evento non trovati per la modifica. Event ID:", eventIdToEdit, "Dati correnti:", currentEventsData);
+          alert("Dettagli evento non trovati per la modifica.");
+        }
       });
-      card.querySelector('.btn-delete').addEventListener('click', function() {
-        handleDeleteEvent(this.dataset.eventId);
+
+      card.querySelector('.btn-delete').addEventListener('click', async function() {
+        const eventIdToDelete = this.dataset.eventId;
+        const eventToDelete = currentEventsData.find(e => e.idevento == eventIdToDelete);
+        const eventTitle = eventToDelete ? eventToDelete.titolo : "questo evento";
+
+        if (confirm(`Sei sicuro di voler eliminare l'evento "${eventTitle}"? L'azione è irreversibile.`)) {
+          const btn = this;
+          const originalBtnText = btn.innerHTML;
+          btn.disabled = true;
+          btn.innerHTML = '<div class="spinner-mini" style="border-top-color:white;"></div>';
+          try {
+            const formData = new FormData();
+            formData.append('action', 'delete_event');
+            formData.append('event_id', eventIdToDelete);
+            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+            const responseText = await response.text();
+            let result;
+            try { result = JSON.parse(responseText); }
+            catch (e) { throw new Error(`Risposta non JSON (delete): ${responseText.substring(0,100)}`); }
+
+            if (!response.ok || !result.success) {
+              throw new Error(result.message || "Eliminazione fallita.");
+            }
+            alert(result.message || 'Evento eliminato con successo.');
+            loadEvents();
+          } catch (error) {
+            console.error('Errore eliminazione evento:', error);
+            alert(`Errore durante l'eliminazione: ${error.message}`);
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalBtnText;
+          }
+        }
       });
 
     } else {
-      const postiDispEv = parseInt(event.posti_disponibili) || 0; const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
-      const inCodaPerP = parseInt(event.in_coda_per_posti) || 0; const flagPrenDB = parseInt(event.flagprenotabile) === 1;
-      let primaryBtnHTML = ''; let volantinoBtnHTML = "";
-      if (event.volantino_url?.trim()) { volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${event.volantino_url}">Volantino</button>`; } else { volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="">Dettagli</button>`; }
-      if (!flagPrenDB) { primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled title="Prenotazioni chiuse">(Pren. Chiuse)</button>`; }
-      else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti (${pGiaPrenUt})</button>`; }
-      else if (inCodaPerP > 0) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`; }
-      else if (postiDispEv > 0) { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`; }
-      else { primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Entra in Coda</button>`; }
-      card.innerHTML = `<div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div><div class="card-content"><h3>${event.titolo || "Titolo non disponibile"}</h3><p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario:</b> ${event.durata}` : ""}</p><p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ""}</p><p class="card-description">${event.descrizione || "Nessuna descrizione."}</p><p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">${postiDispEv > 0 ? postiDispEv : (flagPrenDB ? 'Esaurito' : 'Pren. Chiuse')}</span>${(currentUserData && pGiaPrenUt > 0) ? `<br><b>Tuoi posti:</b> <span class="posti-disponibili">${pGiaPrenUt}</span>` : ''}${(currentUserData && inCodaPerP > 0) ? `<br><b>In coda per:</b> <span class="posti-disponibili">${inCodaPerP} posti</span>` : ''}${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0.00 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}</p><div class="card-actions">${volantinoBtnHTML}${primaryBtnHTML}</div></div>`;
-      const actionBtn = card.querySelector('.btn-prenota'); if (actionBtn && !actionBtn.disabled) { actionBtn.addEventListener('click', function () { const act = this.dataset.action; const eId = this.dataset.eventId; const eTitle = this.dataset.eventTitle; const pDisp = parseInt(this.dataset.postiDisponibiliEvento); const pGiaPren = parseInt(this.dataset.postiGiaPrenotatiUtente); if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: act, eventId: eId, eventTitle: eTitle, postiDisp: pDisp, postiGiaPren: pGiaPren })); return; } if (act === 'book') { if (typeof window.openBookingPopup === 'function') window.openBookingPopup(eId, eTitle, pDisp, pGiaPren); } else if (act === 'waitlist') { if (typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(eId, eTitle, pGiaPren); } }); }
-      card.querySelector(".btn-visualizza-volantino")?.addEventListener("click", function () { if (typeof showVolantinoWithMorph === 'function') showVolantinoWithMorph(this.dataset.volantinoUrl); });
+      const postiDispEv = parseInt(event.posti_disponibili) || 0;
+      const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
+      const inCodaPerP = parseInt(event.in_coda_per_posti) || 0;
+      const flagPrenDB = parseInt(event.flagprenotabile) === 1;
+      let primaryBtnHTML = '';
+      let volantinoBtnHTML = "";
+
+      if (event.volantino_url?.trim()) {
+        volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${event.volantino_url}">Volantino</button>`;
+      } else {
+        volantinoBtnHTML = `<a href="evento_dettaglio.html?id=${event.idevento}" class="card-btn card-btn-secondary">Dettagli</a>`;
+      }
+
+      if (!flagPrenDB) {
+        primaryBtnHTML = `<a class="card-btn card-btn-primary">(Pren. Chiuse)</a>`;
+      } else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) {
+        primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti (${pGiaPrenUt})</button>`;
+      } else if (inCodaPerP > 0) {
+        primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`;
+      } else if (postiDispEv > 0) {
+        primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`;
+      } else {
+        primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${event.titolo || ''}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Entra in Coda</button>`;
+      }
+
+      card.innerHTML = `
+            <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+            <div class="card-content">
+                <h3>${event.titolo || "Titolo non disponibile"}</h3>
+                <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario:</b> ${event.durata}` : ""}</p>
+                <p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}` : ""}</p>
+                <p class="card-description">${event.descrizione || "Nessuna descrizione."}</p>
+                <p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">${postiDispEv > 0 ? postiDispEv : (flagPrenDB ? 'Esaurito' : 'Pren. Chiuse')}</span>${(currentUserData && pGiaPrenUt > 0) ? `<br><b>Tuoi posti:</b> <span class="posti-disponibili">${pGiaPrenUt}</span>` : ''}${(currentUserData && inCodaPerP > 0) ? `<br><b>In coda per:</b> <span class="posti-disponibili">${inCodaPerP} posti</span>` : ''}${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}</p>
+                <div class="card-actions">${volantinoBtnHTML}${primaryBtnHTML}</div>
+            </div>`;
+
+      const actionBtn = card.querySelector('.btn-prenota');
+      if (actionBtn && !actionBtn.disabled) {
+        actionBtn.addEventListener('click', function () {
+          const act = this.dataset.action;
+          const eId = this.dataset.eventId;
+          const eTitle = this.dataset.eventTitle;
+          const pDisp = parseInt(this.dataset.postiDisponibiliEvento);
+          const pGiaPren = parseInt(this.dataset.postiGiaPrenotatiUtente);
+
+          if (!currentUserData) {
+            openLoginPopup();
+            localStorage.setItem("pending_action_eff", JSON.stringify({ action: act, eventId: eId, eventTitle: eTitle, postiDisp: pDisp, postiGiaPren: pGiaPren }));
+            return;
+          }
+          if (act === 'book') {
+            if (typeof window.openBookingPopup === 'function') {
+              window.openBookingPopup(eId, eTitle, pDisp, pGiaPren);
+            } else { console.error("Funzione openBookingPopup non definita."); }
+          } else if (act === 'waitlist') {
+            if (typeof window.openWaitlistPopup === 'function') {
+              window.openWaitlistPopup(eId, eTitle, pGiaPren);
+            } else { console.error("Funzione openWaitlistPopup non definita."); }
+          }
+        });
+      }
+
+      const volantinoDisplayBtn = card.querySelector(".btn-visualizza-volantino");
+      if (volantinoDisplayBtn) {
+        volantinoDisplayBtn.addEventListener("click", function () {
+          if (typeof showVolantinoWithMorph === 'function') {
+            showVolantinoWithMorph(this.dataset.volantinoUrl);
+          } else { console.error("Funzione showVolantinoWithMorph non definita.");}
+        });
+      }
     }
     return card;
   }
 
+
   function formatDate(dateString) {
-    if (!dateString) return "Data non disponibile";
+    if (!dateString) return "N/D";
     try {
-      const normalizedDateString = dateString.length === 10 ? dateString + "T00:00:00Z" : dateString.replace(" ", "T") + (dateString.endsWith("Z") ? "" : "Z");
-      const date = new Date(normalizedDateString);
-      if (isNaN(date.getTime())) {
-        if (/^\d{4}-\d{2}-\d{2}$/.test(dateString.substring(0,10))) {
-          const parts = dateString.substring(0,10).split('-');
-          const utcDate = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
-          if (!isNaN(utcDate.getTime())) return utcDate.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
-        } return dateString;
-      }
-      return date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
-    } catch (e) { return dateString; }
-  }
-  // Funzione per formattare la data come GG/MM/YYYY per il preview (usata da updateDashAdminEventPreview)
-  function formatSimpleDateForPreview(dateString) {
-    if (!dateString) return 'Seleziona data';
-    try {
-      // Assumiamo che dateString sia in formato YYYY-MM-DD
-      const parts = dateString.split('-');
-      if (parts.length === 3) {
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
-      }
-      return dateString; // Fallback
-    } catch (e) { return dateString; }
-  }
-
-
-  function initializeBookingPopupHandlers() { /* ... (codice esistente, non modificato) ... */ }
-  function generateParticipantFields(c, cont, bId, maxA) { /* ... (codice esistente, non modificato) ... */ }
-  function initializeWaitlistPopupHandlers() { /* ... (codice esistente, non modificato) ... */ }
-
-  // === Funzioni Admin Event Popup (Stile Dashboard) ===
-  function initializeDashAdminEventPopupHandlers() {
-    adminAddEventBtnEl = gebi('adminAddEventBtn');
-    dashAdminEventPopupOverlayEl = gebi('dashAdminEventPopupOverlay');
-    dashAdminEventPopupEl = gebi('dashAdminEventPopup');
-    closeDashAdminEventPopupBtnEl = gebi('closeDashAdminEventPopupBtn');
-    dashAdminEventFormEl = gebi('dashAdminEventForm');
-    dashAdminEventPopupTitleEl = gebi('dashAdminEventPopupTitle');
-    dashAdminEventIdInputEl = gebi('dashAdmin-event-id');
-    // Campi del form
-    dashAdminEventTitleEl = gebi('dashAdmin-event-title');
-    dashAdminEventDateEl = gebi('dashAdmin-event-date');
-    dashAdminEventStartTimeEl = gebi('dashAdmin-event-start-time');
-    dashAdminEventEndTimeEl = gebi('dashAdmin-event-end-time');
-    dashAdminEventShortDescEl = gebi('dashAdmin-event-short-desc');
-    dashAdminEventLongDescEl = gebi('dashAdmin-event-long-desc');
-    dashAdminEventPrefixEl = gebi('dashAdmin-event-prefix');
-    dashAdminEventSpeakerEl = gebi('dashAdmin-event-speaker');
-    dashAdminEventAssociationEl = gebi('dashAdmin-event-association');
-    dashAdminEventSeatsEl = gebi('dashAdmin-event-seats');
-    dashAdminEventImageEl = gebi('dashAdmin-event-image');
-    dashAdminEventBookingCheckbox = gebi('dashAdmin-event-booking');
-    dashAdminEventVoluntaryCheckbox = gebi('dashAdmin-event-voluntary');
-    dashAdminEventPriceContainerEl = gebi('dashAdmin-event-price-container');
-    dashAdminEventPriceInputEl = gebi('dashAdmin-event-price');
-    dashAdminEventFormMessageEl = gebi('dashAdminEventFormMessage');
-    dashAdminCurrentImagePreviewEl = gebi('dashAdmin-current-event-image-preview');
-    // Elementi Preview
-    dashAdminPreviewImageEl = gebi('dashAdmin_previewImage');
-    dashAdminPreviewNoImagePlaceholderEl = document.querySelector('#dashAdminEventCardPreviewContainer .dash-admin-no-image-placeholder');
-    dashAdminPreviewTitleEl = gebi('dashAdmin_previewTitle');
-    dashAdminPreviewDateFullEl = gebi('dashAdmin_previewDateFull').querySelector('.value');
-    dashAdminPreviewTimeFullEl = gebi('dashAdmin_previewTimeFull');
-    dashAdminPreviewTimeValueEl = gebi('dashAdmin_previewTimeFull').querySelector('.value');
-    dashAdminPreviewSpeakerFullEl = gebi('dashAdmin_previewSpeakerFull');
-    dashAdminPreviewSpeakerPrefixEl = gebi('dashAdmin_previewSpeakerPrefix');
-    dashAdminPreviewSpeakerNameEl = gebi('dashAdmin_previewSpeakerName');
-    dashAdminPreviewShortDescEl = gebi('dashAdmin_previewShortDesc');
-    dashAdminPreviewSeatsFullEl = gebi('dashAdmin_previewSeatsFull').querySelector('.value');
-    dashAdminPreviewPriceFullEl = gebi('dashAdmin_previewPriceFull').querySelector('.value');
-
-
-    if (adminAddEventBtnEl) adminAddEventBtnEl.addEventListener('click', () => openDashAdminEventPopup(null));
-    if (closeDashAdminEventPopupBtnEl) closeDashAdminEventPopupBtnEl.addEventListener('click', closeDashAdminEventPopup);
-    if (dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.addEventListener('click', (e) => { if (e.target === dashAdminEventPopupOverlayEl) closeDashAdminEventPopup(); });
-    if (dashAdminEventVoluntaryCheckbox) dashAdminEventVoluntaryCheckbox.addEventListener('change', updateDashAdminPriceFieldVisibility);
-
-    attachDashAdminPreviewListeners(); // Attacca listener per la preview
-
-    dashAdminEventFormEl?.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const submitBtn = this.querySelector('button[type="submit"]');
-      const originalBtnText = submitBtn.innerHTML;
-      submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
-      if(dashAdminEventFormMessageEl) { dashAdminEventFormMessageEl.style.display = 'none'; dashAdminEventFormMessageEl.className = 'form-message';}
-
-      try {
-        const formData = new FormData(this);
-        formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
-
-        // Combina start e end time in 'event-time' (durata)
-        const startTime = formData.get('event-start-time');
-        const endTime = formData.get('event-end-time');
-        let durataString = '';
-        if (startTime && endTime) {
-          durataString = `${startTime}-${endTime}`;
-        } else if (startTime) {
-          durataString = startTime;
-        }
-        formData.append('event-time', durataString); // Chiave attesa da gestione_eventi.php
-        formData.delete('event-start-time'); // Rimuovi i campi singoli se non servono al backend
-        formData.delete('event-end-time');
-
-        if (dashAdminEventVoluntaryCheckbox.checked) {
-          formData.set('event-price', '0.00');
-        } else if (!formData.get('event-price')) { // Se non volontaria e prezzo vuoto, imposta a 0.00
-          formData.set('event-price', '0.00');
-        }
-        // 'event-booking' è un checkbox, il suo valore "on" o l'assenza sono gestiti da PHP
-
-        const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
-        const responseText = await response.text();
-        let result;
-        try { result = JSON.parse(responseText); }
-        catch (jsonError) { throw new Error(`Risposta non JSON dal server: ${responseText.substring(0,200)}`); }
-
-        if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
-        if (result.success) {
-          if(dashAdminEventFormMessageEl) { dashAdminEventFormMessageEl.textContent = result.message || 'Operazione completata!'; dashAdminEventFormMessageEl.classList.add('success'); dashAdminEventFormMessageEl.style.display = 'block';}
-          loadEvents();
-          setTimeout(closeDashAdminEventPopup, 1500);
-        } else { throw new Error(result.message || 'Errore durante il salvataggio dell\'evento.'); }
-      } catch (error) {
-        console.error('Errore invio form evento admin (stile dashboard):', error);
-        if(dashAdminEventFormMessageEl) { dashAdminEventFormMessageEl.textContent = `Errore: ${error.message}`; dashAdminEventFormMessageEl.classList.add('error'); dashAdminEventFormMessageEl.style.display = 'block';}
-      } finally {
-        submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText;
-      }
-    });
-  }
-
-  function updateDashAdminPriceFieldVisibility() {
-    if (dashAdminEventVoluntaryCheckbox && dashAdminEventPriceContainerEl && dashAdminEventPriceInputEl) {
-      const isVoluntary = dashAdminEventVoluntaryCheckbox.checked;
-      dashAdminEventPriceContainerEl.style.display = isVoluntary ? 'none' : 'block';
-      dashAdminEventPriceInputEl.required = !isVoluntary;
-      if (isVoluntary) dashAdminEventPriceInputEl.value = '';
-      updateDashAdminEventPreview(); // Aggiorna preview quando cambia
-    }
-  }
-
-  function sanitizeForAttribute(str) {
-    if (typeof str !== 'string' || str === null) return '';
-    return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-  }
-  function sanitizeText(text) {
-    if (text === null || typeof text === 'undefined') return '';
-    const element = document.createElement('div'); element.innerText = String(text); return element.innerHTML;
-  }
-
-
-  function updateDashAdminEventPreview() {
-    if (!dashAdminPreviewTitleEl) return; // Esce se gli elementi di preview non sono pronti
-
-    dashAdminPreviewTitleEl.textContent = dashAdminEventTitleEl.value || 'Titolo Evento';
-    const dateValue = dashAdminEventDateEl.value;
-    dashAdminPreviewDateFullEl.textContent = dateValue ? formatSimpleDateForPreview(dateValue) : 'Seleziona data';
-
-    const startTimeValue = dashAdminEventStartTimeEl.value;
-    const endTimeValue = dashAdminEventEndTimeEl.value;
-    let timeString = '';
-    if (startTimeValue && endTimeValue) {
-      timeString = `${startTimeValue} - ${endTimeValue}`;
-    } else if (startTimeValue) {
-      timeString = startTimeValue;
-    }
-
-    if (timeString && dashAdminPreviewTimeFullEl && dashAdminPreviewTimeValueEl) {
-      dashAdminPreviewTimeFullEl.style.display = 'block';
-      dashAdminPreviewTimeValueEl.textContent = timeString;
-    } else if (dashAdminPreviewTimeFullEl && dashAdminPreviewTimeValueEl) {
-      dashAdminPreviewTimeFullEl.style.display = 'none';
-      dashAdminPreviewTimeValueEl.textContent = '';
-    }
-
-    dashAdminPreviewSpeakerPrefixEl.textContent = dashAdminEventPrefixEl.value || 'Relatore';
-    dashAdminPreviewSpeakerNameEl.textContent = dashAdminEventSpeakerEl.value || 'Nome Relatore';
-    dashAdminPreviewShortDescEl.textContent = dashAdminEventShortDescEl.value || 'Descrizione breve dell\'evento qui...';
-    dashAdminPreviewSeatsFullEl.textContent = dashAdminEventSeatsEl.value || '0';
-
-    const isVoluntary = dashAdminEventVoluntaryCheckbox.checked;
-    if (isVoluntary) {
-      dashAdminPreviewPriceFullEl.textContent = 'Offerta libera';
-    } else {
-      const priceValue = parseFloat(dashAdminEventPriceInputEl.value);
-      dashAdminPreviewPriceFullEl.textContent = !isNaN(priceValue) && priceValue > 0 ? `€ ${priceValue.toFixed(2)}` : '€ 0.00';
-    }
-
-    const imageInput = dashAdminEventImageEl;
-    if (imageInput.files && imageInput.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        dashAdminPreviewImageEl.src = e.target.result;
-        dashAdminPreviewImageEl.style.display = 'block';
-        if(dashAdminPreviewNoImagePlaceholderEl) dashAdminPreviewNoImagePlaceholderEl.style.display = 'none';
-      }
-      reader.readAsDataURL(imageInput.files[0]);
-    } else if (dashAdminCurrentImagePreviewEl && dashAdminCurrentImagePreviewEl.src !== '#' && dashAdminCurrentImagePreviewEl.style.display !== 'none') {
-      dashAdminPreviewImageEl.src = dashAdminCurrentImagePreviewEl.src;
-      dashAdminPreviewImageEl.style.display = 'block';
-      if(dashAdminPreviewNoImagePlaceholderEl) dashAdminPreviewNoImagePlaceholderEl.style.display = 'none';
-    } else {
-      dashAdminPreviewImageEl.src = 'images/default-event.jpg';
-      dashAdminPreviewImageEl.style.display = 'block';
-      if(dashAdminPreviewNoImagePlaceholderEl) dashAdminPreviewNoImagePlaceholderEl.style.display = 'none';
-    }
-  }
-
-  function attachDashAdminPreviewListeners() {
-    const formElementsToWatch = [
-      'dashAdmin-event-title', 'dashAdmin-event-date',
-      'dashAdmin-event-start-time', 'dashAdmin-event-end-time',
-      'dashAdmin-event-short-desc', 'dashAdmin-event-prefix', 'dashAdmin-event-speaker',
-      'dashAdmin-event-seats', 'dashAdmin-event-price', 'dashAdmin-event-voluntary',
-      'dashAdmin-event-image'
-    ];
-    formElementsToWatch.forEach(id => {
-      const element = gebi(id);
-      if (element) {
-        element.addEventListener('input', updateDashAdminEventPreview);
-        if (element.type === 'checkbox' || element.type === 'file' || element.type === 'date' || element.type === 'time') {
-          element.addEventListener('change', updateDashAdminEventPreview);
-        }
-      }
-    });
-  }
-
-
-  function openDashAdminEventPopup(eventData = null) {
-    if (!dashAdminEventFormEl) return;
-    dashAdminEventFormEl.reset(); // Resetta il form
-    updateDashAdminPriceFieldVisibility(); // Aggiorna visibilità campi prezzo e chiama preview
-
-    if(dashAdminEventFormMessageEl) { dashAdminEventFormMessageEl.style.display = 'none'; dashAdminEventFormMessageEl.className = 'form-message';}
-    if(dashAdminCurrentImagePreviewEl) { dashAdminCurrentImagePreviewEl.style.display = 'none'; dashAdminCurrentImagePreviewEl.src = '#';}
-
-    // Resetta specificamente i campi orario perché .reset() non sempre li pulisce bene con type="time"
-    if(dashAdminEventStartTimeEl) dashAdminEventStartTimeEl.value = '';
-    if(dashAdminEventEndTimeEl) dashAdminEventEndTimeEl.value = '';
-
-
-    if (eventData) { // Modalità Modifica
-      if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Modifica Evento';
-      if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = eventData.idevento;
-
-      dashAdminEventTitleEl.value = eventData.titolo || '';
-      dashAdminEventDateEl.value = eventData.datainizio ? eventData.datainizio.substring(0,10) : '';
-
-      let startTime = '', endTime = '';
-      const durata = eventData.durata || '';
-      if (durata.includes('-')) {
-        const parts = durata.split('-');
-        startTime = parts[0].trim().match(/^\d{2}:\d{2}/) ? parts[0].trim().substring(0,5) : '';
-        endTime = parts[1].trim().match(/^\d{2}:\d{2}/) ? parts[1].trim().substring(0,5) : '';
-      } else if (durata.match(/^\d{2}:\d{2}/)) { // Solo ora inizio
-        startTime = durata.substring(0,5);
-      }
-      dashAdminEventStartTimeEl.value = startTime;
-      dashAdminEventEndTimeEl.value = endTime;
-
-      dashAdminEventShortDescEl.value = eventData.descrizione || '';
-      dashAdminEventLongDescEl.value = eventData.descrizione_estesa || '';
-      dashAdminEventPrefixEl.value = eventData.prefisso_relatore || 'Relatore';
-      dashAdminEventSpeakerEl.value = eventData.relatore || '';
-      dashAdminEventAssociationEl.value = eventData.associazione || '';
-      dashAdminEventSeatsEl.value = eventData.posti_disponibili !== null ? eventData.posti_disponibili : '0';
-      dashAdminEventBookingCheckbox.checked = parseInt(eventData.flagprenotabile) === 1;
-
-      dashAdminEventVoluntaryCheckbox.checked = parseFloat(eventData.costo) === 0.00;
-      updateDashAdminPriceFieldVisibility(); // Aggiorna visibilità e required per il prezzo
-      if (!dashAdminEventVoluntaryCheckbox.checked && eventData.costo && parseFloat(eventData.costo) > 0) {
-        dashAdminEventPriceInputEl.value = parseFloat(eventData.costo).toFixed(2);
+      let d;
+      if (/^\d{4}-\d{2}-\d{2}/.test(dateString)) {
+        const p = dateString.substring(0, 10).split('-');
+        d = new Date(Date.UTC(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2])));
       } else {
-        dashAdminEventPriceInputEl.value = '';
+        d = new Date(dateString);
       }
-
-      if (dashAdminCurrentImagePreviewEl && eventData.immagine_url) {
-        dashAdminCurrentImagePreviewEl.src = eventData.immagine_url;
-        dashAdminCurrentImagePreviewEl.style.display = 'block';
-      }
-      // Non c'è campo per il volantino in questo form, quindi non si gestisce la preview del volantino qui.
-
-    } else { // Modalità Aggiungi
-      if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Aggiungi Nuovo Evento';
-      if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = '';
-      dashAdminEventBookingCheckbox.checked = true;
-      dashAdminEventVoluntaryCheckbox.checked = false;
-      dashAdminEventSeatsEl.value = '50'; // Default
-      dashAdminEventPrefixEl.value = 'Relatore'; // Default
-      updateDashAdminPriceFieldVisibility(); // Aggiorna per default
+      if (isNaN(d.getTime())) return dateString;
+      return d.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
+    } catch (e) {
+      console.error("Errore formattazione data:", dateString, e);
+      return dateString;
     }
-
-    updateDashAdminEventPreview(); // Chiamata finale per assicurare che la preview sia corretta all'apertura
-
-    if(dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.classList.add('active');
-    if(dashAdminEventPopupEl) dashAdminEventPopupEl.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    if(dashAdminEventTitleEl) dashAdminEventTitleEl.focus();
   }
 
-  function closeDashAdminEventPopup() {
-    if(dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.classList.remove('active');
-    if(dashAdminEventPopupEl) dashAdminEventPopupEl.classList.remove('active');
+  function initializeBookingPopupHandlers() { const bO = gebi('bookingPopupOverlay'); const bP = gebi('bookingPopup'); const cB = gebi('closeBookingPopupBtn'); const bF = gebi('bookingForm'); const nPI = gebi('numeroPosti'); const pFC = gebi('participantFieldsContainer'); const bEII = gebi('bookingEventId'); const bPT = gebi('bookingPopupTitle'); const bRM = gebi('bookingResponseMessage'); const iPP = gebi('infoPostiPrenotabili'); const mSB = gebi('maxSeatsAllowedBooking');
+    window.openBookingPopup = function (id, t, disp, giaP) { if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: 'book', eventId: id, eventTitle: t, postiDisp: disp, postiGiaPren: giaP })); return; } bEII.value = id; bPT.textContent = `Prenota: ${t}`; const pDN = parseInt(disp); const pGPN = parseInt(giaP) || 0; const maxPrUsrSTrx = Math.min(MAX_SEATS_PER_BOOKING, MAX_TOTAL_SEATS_PER_USER - pGPN); const maxE = Math.min(maxPrUsrSTrx, pDN); if (maxE < 1) { alert("Non puoi prenotare ulteriori posti."); return; }
+      nPI.max = maxE; nPI.value = 1; if (mSB) mSB.textContent = maxE; if (iPP) iPP.textContent = `Puoi prenotare da 1 a ${maxE} posti. (Già prenotati: ${pGPN}/${MAX_TOTAL_SEATS_PER_USER})`; generateParticipantFields(1, pFC, 'bp', maxE); if (bRM) { bRM.style.display = 'none'; bRM.className = 'form-message'; } if (bO) bO.classList.add('active'); if (bP) bP.classList.add('active'); document.body.style.overflow = 'hidden'; }; function cBP() { if (bO) bO.classList.remove('active'); if (bP) bP.classList.remove('active'); if (!isAnyPopupActive()) document.body.style.overflow = ''; if (pFC) pFC.innerHTML = ''; if (bF) bF.reset(); if (iPP) iPP.textContent = ''; } if (cB) cB.addEventListener('click', cBP); if (bO) bO.addEventListener('click', (e) => { if (e.target === bO) cBP(); });
+    if (nPI && pFC) nPI.addEventListener('input', (e) => generateParticipantFields(e.target.value, pFC, 'bp', parseInt(nPI.max)));
+    if (bF) bF.addEventListener('submit', async function (e) { e.preventDefault(); if (!currentUserData || !currentUserData.email) { alert("Sessione scaduta."); window.location.href = 'index.html'; return; } const btn = this.querySelector('button[type="submit"]'); const oT = btn.textContent; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini"></div> Elaboro...'; if (bRM) bRM.style.display = 'none'; const fd = new FormData(); fd.append('eventId', bEII.value); fd.append('numeroPosti', nPI.value); fd.append('contatto', currentUserData.email); const N = pFC.querySelectorAll('input[name="participant_nome[]"]'); const C = pFC.querySelectorAll('input[name="participant_cognome[]"]'); let v = true; if (N.length !== parseInt(nPI.value)) { v = false; if (bRM) bRM.textContent = 'Num. partecipanti non corrisponde.'; } else { for (let i = 0; i < N.length; i++) { if (N[i].value.trim() === '' || C[i].value.trim() === '') { v = false; if (bRM) bRM.textContent = 'Nome e cognome obbligatori.'; break; } fd.append('partecipanti_nomi[]', N[i].value.trim()); fd.append('partecipanti_cognomi[]', C[i].value.trim()); } } if (!v) { if (bRM) { bRM.className = 'form-message error'; bRM.style.display = 'block'; } btn.disabled = false; btn.textContent = oT; return; }
+      try { const r = await fetch('prenota_evento.php', { method: 'POST', body: fd }); const rt = await r.text(); let j; try { j = JSON.parse(rt); } catch (err) { throw new Error("Risposta non valida: " + rt.substring(0, 100)); } if (j.success) { if (bRM) { bRM.textContent = j.message || 'Prenotazione confermata!'; bRM.className = 'form-message success'; } loadEvents(); setTimeout(cBP, 2000); } else { throw new Error(j.message || 'Errore prenotazione.'); } } catch (err) { if (bRM) { bRM.textContent = `Errore: ${err.message}`; bRM.className = 'form-message error'; } } finally { if (bRM) bRM.style.display = 'block'; btn.disabled = false; btn.textContent = oT; } });
+  }
+  function generateParticipantFields(c, cont, bId, maxA) { if (!cont) return; cont.innerHTML = ''; let vC = parseInt(c); if (isNaN(vC) || vC < 1) vC = 1; if (isNaN(maxA) || maxA < 1) maxA = MAX_SEATS_PER_BOOKING; if (vC > maxA) vC = maxA; const nI = cont.closest('form')?.querySelector('input[type="number"]'); if (nI && parseInt(nI.value) !== vC) nI.value = vC; if (vC > 0) { for (let i = 1; i <= vC; i++) { const fS = document.createElement('div'); fS.className = 'participant-entry'; fS.innerHTML = `<p style="margin-bottom:0.5rem;font-weight:500;color:var(--dark);">Partecipante ${i}:</p><div class="form-grid"><div><label for="${bId}_nome_${i}">Nome*</label><input type="text" id="${bId}_nome_${i}" name="participant_nome[]" class="form-control" required></div><div><label for="${bId}_cognome_${i}">Cognome*</label><input type="text" id="${bId}_cognome_${i}" name="participant_cognome[]" class="form-control" required></div></div>`; cont.appendChild(fS); } } }
+  function initializeWaitlistPopupHandlers() { const wO = gebi('waitlistPopupOverlay'); const wP = gebi('waitlistPopup'); const cB = gebi('closeWaitlistPopupBtn'); const wF = gebi('waitlistForm'); const wNPI = gebi('waitlistNumeroPosti'); const wEII = gebi('waitlistEventId'); const wPT = gebi('waitlistPopupTitle'); const wEI = gebi('waitlistEventInfo'); const wRM = gebi('waitlistResponseMessage'); const mSEW = gebi('maxSeatsAllowedWaitlist');
+    window.openWaitlistPopup = function (id, t, pGiaP) { if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: 'waitlist', eventId: id, eventTitle: t, postiGiaPren: pGiaP })); return; } if (wEII) wEII.value = id; if (wPT) wPT.textContent = `Entra in Lista d'Attesa`; if (wEI) wEI.textContent = `Evento: ${t}`; const pGPN = parseInt(pGiaP) || 0; const maxPC = Math.min(MAX_SEATS_PER_BOOKING, MAX_TOTAL_SEATS_PER_USER - pGPN); if (maxPC < 1) { alert("Limite posti raggiunto."); return; } if (wNPI) { wNPI.max = maxPC; wNPI.value = 1; } if (mSEW) mSEW.textContent = maxPC; const iCEl = gebi('infoPostiCoda'); if (iCEl) iCEl.textContent = `Puoi richiedere da 1 a ${maxPC} posti. (Già prenotati/in coda: ${pGPN}/${MAX_TOTAL_SEATS_PER_USER})`; if (wRM) { wRM.style.display = 'none'; wRM.className = 'form-message'; } if (wO) wO.classList.add('active'); if (wP) wP.classList.add('active'); document.body.style.overflow = 'hidden'; };
+    function cWP() { if (wO) wO.classList.remove('active'); if (wP) wP.classList.remove('active'); if (!isAnyPopupActive()) document.body.style.overflow = ''; if (wF) wF.reset(); }
+    if (cB) cB.addEventListener('click', cWP); if (wO) wO.addEventListener('click', (e) => { if (e.target === wO) cWP(); });
+    if (wF) wF.addEventListener('submit', async function (e) { e.preventDefault(); if (!currentUserData || !currentUserData.email) { alert("Sessione scaduta."); window.location.href = 'index.html'; return; } const btn = this.querySelector('button[type="submit"]'); const oT = btn.textContent; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini"></div> Elaboro...'; if (wRM) wRM.style.display = 'none'; const fd = new FormData(); fd.append('eventId', wEII.value); fd.append('numeroPosti', wNPI.value); fd.append('contatto', currentUserData.email);
+      try { const r = await fetch('gestisci_coda.php', { method: 'POST', body: fd }); const rt = await r.text(); let j; try { j = JSON.parse(rt); } catch (err) { throw new Error("Risposta non valida: " + rt.substring(0, 100)); } if (j.success) { if (wRM) { wRM.textContent = j.message || "Richiesta coda inviata!"; wRM.className = 'form-message success'; } loadEvents(); setTimeout(cWP, 2000); } else { throw new Error(j.message || "Errore richiesta coda."); } } catch (err) { if (wRM) { wRM.textContent = `Errore: ${err.message}`; wRM.className = 'form-message error'; } } finally { if (wRM) wRM.style.display = 'block'; btn.disabled = false; btn.textContent = oT; } });
+  }
+
+  const adminEventPopupOverlayEl = gebi('adminEventPopupOverlay');
+  const adminEventPopupEl = gebi('adminEventPopup');
+  const closeAdminEventPopupBtnEl = gebi('closeAdminEventPopupBtn');
+  const adminEventFormEl = gebi('adminEventForm');
+  const adminEventPopupTitleEl = gebi('adminEventPopupTitle');
+  const adminEventIdInputEl = gebi('admin-event-id');
+  const adminVoluntaryCheckboxEl = gebi('admin-event-voluntary');
+  const adminPriceContainerEl = gebi('admin-event-price-container');
+  const adminEventPriceInputEl = gebi('admin-event-price');
+  const adminEventFormMessageEl = gebi('adminEventFormMessage');
+  const adminCurrentImagePreviewEl = gebi('current-event-image-preview');
+  const adminCurrentFlyerPreviewEl = gebi('current-event-flyer-preview');
+  const addEventBtnAdminEl = gebi('addEventBtnAdmin');
+
+  function updateAdminPriceFieldVisibility() {
+    if (adminVoluntaryCheckboxEl && adminPriceContainerEl && adminEventPriceInputEl) {
+      const isVoluntary = adminVoluntaryCheckboxEl.checked;
+      adminPriceContainerEl.style.display = isVoluntary ? 'none' : 'block';
+      adminEventPriceInputEl.required = !isVoluntary;
+      if (isVoluntary) adminEventPriceInputEl.value = '';
+    }
+  }
+  if (adminVoluntaryCheckboxEl) adminVoluntaryCheckboxEl.addEventListener('change', updateAdminPriceFieldVisibility);
+
+  function openAdminEventPopup(eventData = null) {
+    if (!adminEventFormEl || !adminEventPopupEl || !adminEventPopupOverlayEl) return;
+    adminEventFormEl.reset();
+    updateAdminPriceFieldVisibility();
+    if(adminEventFormMessageEl) { adminEventFormMessageEl.style.display = 'none'; adminEventFormMessageEl.className = 'form-message'; }
+    if(adminCurrentImagePreviewEl) { adminCurrentImagePreviewEl.style.display = 'none'; adminCurrentImagePreviewEl.src = '#';}
+    if(adminCurrentFlyerPreviewEl) adminCurrentFlyerPreviewEl.innerHTML = '';
+
+    if (eventData) {
+      if(adminEventPopupTitleEl) adminEventPopupTitleEl.textContent = 'Modifica Evento';
+      if(adminEventIdInputEl) adminEventIdInputEl.value = eventData.idevento;
+      gebi('admin-event-title').value = eventData.titolo || '';
+      gebi('admin-event-date').value = eventData.datainizio ? eventData.datainizio.substring(0,10) : '';
+      gebi('admin-event-time').value = eventData.durata || '';
+      gebi('admin-event-short-desc').value = eventData.descrizione || '';
+      gebi('admin-event-long-desc').value = eventData.descrizione_estesa || '';
+      gebi('admin-event-prefix').value = eventData.prefisso_relatore || '';
+      gebi('admin-event-speaker').value = eventData.relatore || '';
+      gebi('admin-event-association').value = eventData.associazione || '';
+      gebi('admin-event-seats').value = eventData.posti_disponibili !== null ? eventData.posti_disponibili : '';
+      gebi('admin-event-booking').checked = parseInt(eventData.flagprenotabile) === 1;
+
+      if(adminVoluntaryCheckboxEl) adminVoluntaryCheckboxEl.checked = parseFloat(eventData.costo) === 0.00;
+      updateAdminPriceFieldVisibility();
+      if (adminEventPriceInputEl && !adminVoluntaryCheckboxEl.checked && eventData.costo && parseFloat(eventData.costo) > 0) {
+        adminEventPriceInputEl.value = parseFloat(eventData.costo).toFixed(2);
+      } else if (adminEventPriceInputEl) {
+        adminEventPriceInputEl.value = '';
+      }
+
+      if (adminCurrentImagePreviewEl && eventData.immagine_url) {
+        adminCurrentImagePreviewEl.src = eventData.immagine_url; adminCurrentImagePreviewEl.style.display = 'block';
+      }
+      if (adminCurrentFlyerPreviewEl && eventData.volantino_url) {
+        // MODIFICA: Testo link volantino per admin popup
+        adminCurrentFlyerPreviewEl.innerHTML = `<p>Volantino attuale: <a href="${eventData.volantino_url}" target="_blank">Visualizza volantino</a></p>`;
+      }
+    } else {
+      if(adminEventPopupTitleEl) adminEventPopupTitleEl.textContent = 'Aggiungi Nuovo Evento';
+      if(adminEventIdInputEl) adminEventIdInputEl.value = '';
+      gebi('admin-event-booking').checked = true;
+      if(adminVoluntaryCheckboxEl) adminVoluntaryCheckboxEl.checked = false;
+      updateAdminPriceFieldVisibility();
+    }
+    adminEventPopupOverlayEl.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    gebi('admin-event-title').focus();
+  }
+
+  function closeAdminEventPopup() {
+    if (!adminEventPopupEl || !adminEventPopupOverlayEl) return;
+    adminEventPopupOverlayEl.classList.remove('active');
     if (!isAnyPopupActive()) {
       document.body.style.overflow = '';
     }
   }
+  if (addEventBtnAdminEl) addEventBtnAdminEl.addEventListener('click', () => openAdminEventPopup());
+  if (closeAdminEventPopupBtnEl) closeAdminEventPopupBtnEl.addEventListener('click', closeAdminEventPopup);
+  if (adminEventPopupOverlayEl) adminEventPopupOverlayEl.addEventListener('click', (e) => { if (e.target === adminEventPopupOverlayEl) closeAdminEventPopup(); });
 
-  async function handleDeleteEvent(eventId) {
-    const eventToDelete = currentEventsData.find(e => e.idevento == eventId);
-    const eventTitle = eventToDelete ? eventToDelete.titolo : "questo evento";
-    if (confirm(`Sei sicuro di voler eliminare l'evento "${eventTitle}"? L'azione è irreversibile.`)) {
-      try {
-        const formData = new FormData();
-        formData.append('action', 'delete_event');
-        formData.append('event_id', eventId);
-        const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
-        const resText = await response.text();
-        let result;
-        try { result = JSON.parse(resText); }
-        catch(e) { throw new Error("Risposta non JSON dal server (delete): "+resText.substring(0,100));}
+  adminEventFormEl?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!currentUserData || !currentUserData.isAdmin) return;
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
+    if(adminEventFormMessageEl) { adminEventFormMessageEl.style.display = 'none'; adminEventFormMessageEl.className = 'form-message'; }
 
-        if (!response.ok) throw new Error(result.message || `Errore HTTP ${response.status}`);
-        if (result.success) {
-          alert(result.message || 'Evento eliminato con successo.');
-          loadEvents();
-        } else {
-          throw new Error(result.message || 'Eliminazione fallita.');
-        }
-      } catch (error) {
-        console.error('Errore eliminazione evento:', error);
-        alert(`Errore durante l'eliminazione: ${error.message}`);
-      }
+    try {
+      const formData = new FormData(this);
+      formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
+
+      const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+      const responseText = await response.text();
+      let result;
+      try { result = JSON.parse(responseText); }
+      catch (jsonError) { throw new Error(`Risposta non JSON dal server: ${responseText.substring(0,200)}`); }
+
+      if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
+      if (result.success) {
+        if(adminEventFormMessageEl) { adminEventFormMessageEl.textContent = result.message || 'Operazione completata!'; adminEventFormMessageEl.classList.add('success'); }
+        loadEvents();
+        setTimeout(closeAdminEventPopup, 1500);
+      } else { throw new Error(result.message || 'Errore durante il salvataggio.'); }
+    } catch (error) {
+      console.error('Errore invio form evento admin:', error);
+      if(adminEventFormMessageEl) { adminEventFormMessageEl.textContent = `Errore: ${error.message}`; adminEventFormMessageEl.classList.add('error'); }
+    } finally {
+      if(adminEventFormMessageEl) adminEventFormMessageEl.style.display = 'block';
+      submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText;
     }
-  }
+  });
 
   function isAnyPopupActive() {
     return gebi('loginPopup')?.classList.contains('active') ||
             gebi('forgotPasswordPopup')?.classList.contains('active') ||
-            gebi('bookingPopup')?.classList.contains('active') ||
-            gebi('waitlistPopup')?.classList.contains('active') ||
-            gebi('dashAdminEventPopup')?.classList.contains('active') || // Controlla il nuovo popup
-            volantinoMorphOverlay?.classList.contains('active');
+            gebi('bookingPopupOverlay')?.classList.contains('active') || // Controlla l'overlay per coerenza
+            gebi('waitlistPopupOverlay')?.classList.contains('active') || // Controlla l'overlay
+            gebi('adminEventPopupOverlay')?.classList.contains('active');
   }
 
 
   document.addEventListener('DOMContentLoaded', async () => {
     const cY = gebi("currentYear"); if (cY) cY.textContent = new Date().getFullYear();
     volantinoMorphOverlay = gebi('volantinoMorphOverlay'); if (volantinoMorphOverlay) volantinoMorphOverlay.addEventListener("click", (e) => { if (e.target === volantinoMorphOverlay && morphingCard) hideVolantinoWithMorph(); });
-
-    loadUserData();
-    updateNavbarUI();
-    await loadEvents();
-
-    initializeBookingPopupHandlers();
-    initializeWaitlistPopupHandlers();
-    initializeDashAdminEventPopupHandlers(); // Inizializza i gestori per il NUOVO popup admin
+    loadUserData(); updateNavbarUI(); await loadEvents();
+    initializeBookingPopupHandlers(); initializeWaitlistPopupHandlers();
+    updateAdminPriceFieldVisibility();
 
     const pAction = localStorage.getItem("pending_action_eff");
     if (pAction && currentUserData) {
@@ -1101,16 +831,19 @@
       if (aD.action === 'book' && typeof window.openBookingPopup === 'function') window.openBookingPopup(aD.eventId, aD.eventTitle, aD.postiDisp, aD.postiGiaPren);
       else if (aD.action === 'waitlist' && typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(aD.eventId, aD.eventTitle, aD.postiGiaPren);
       localStorage.removeItem("pending_action_eff");
+    } else if (pAction && !currentUserData) {
+      // Non cancellare, l'utente potrebbe loggarsi più tardi
     }
+
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         if (gebi('loginPopup')?.classList.contains("active")) closeLoginPopup();
-        if (gebi('forgotPasswordPopup')?.classList.contains("active")) closeForgotPasswordPopup();
-        if (gebi('bookingPopup')?.classList.contains("active")) gebi('closeBookingPopupBtn')?.click();
-        if (gebi('waitlistPopup')?.classList.contains("active")) gebi('closeWaitlistPopupBtn')?.click();
-        if (volantinoMorphOverlay?.classList.contains("active")) hideVolantinoWithMorph();
-        if (gebi('dashAdminEventPopup')?.classList.contains("active")) closeDashAdminEventPopup(); // Chiude NUOVO popup admin
+        else if (gebi('forgotPasswordPopup')?.classList.contains("active")) closeForgotPasswordPopup();
+        else if (gebi('bookingPopupOverlay')?.classList.contains("active")) gebi('closeBookingPopupBtn')?.click();
+        else if (gebi('waitlistPopupOverlay')?.classList.contains("active")) gebi('closeWaitlistPopupBtn')?.click();
+        else if (gebi('adminEventPopupOverlay')?.classList.contains("active")) closeAdminEventPopup();
+        else if (volantinoMorphOverlay?.classList.contains("active")) hideVolantinoWithMorph();
       }
     });
   });
