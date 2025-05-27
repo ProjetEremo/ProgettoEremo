@@ -120,6 +120,23 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Aggiunta per rendere il bottone like cliccabile su tutta l'area */
+        .like-btn {
+            padding: 0.3rem 0.6rem; /* Assicurati che ci sia padding per creare area */
+            border-radius: 6px;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .like-btn:hover {
+            background-color: rgba(255, 0, 0, 0.05); /* Leggero sfondo rosso al hover */
+        }
+        .like-btn .like-count {
+            cursor: pointer; /* Mantiene il cursore a puntatore sul numero */
+            margin-left: 0.3em;
+        }
+        .like-btn .like-count:hover {
+            text-decoration: underline; /* Sottolinea il numero al hover */
+        }
+
 
     </style>
 </head>
@@ -593,9 +610,26 @@
             </div>
             <div class="reply-form" id="${(options.isForPopup ? 'popup-' : '')}reply-form-${commentData.Progressivo}" style="display:none;"> <form data-parent-comment-id="${commentData.Progressivo}" data-event-id="${commentData.IDEvento}"> <textarea name="Descrizione" placeholder="Rispondi a ${commenterDisplayName}..." rows="2" required aria-label="Testo risposta"></textarea> <button type="submit" class="btn-comment btn-small"><i class="fas fa-paper-plane"></i> Invia</button> <div class="form-message-local" style="flex-basis: 100%; margin-top: 0.5em; display:none;"></div> </form> </div>
             <div class="replies"></div>`;
+
         attachCommentInteractionListeners(commentDiv, commentData, options);
-        commentDiv.querySelector('.like-count')?.addEventListener('click', function(e){ e.stopPropagation(); const currentCount = parseInt(this.textContent); if (currentCount > 0) openLikersPopup(this.dataset.commentId); });
-        commentDiv.querySelector('.like-btn > i')?.addEventListener('click', function(e){ e.stopPropagation(); handleLikeAction(this.closest('.like-btn'), options); });
+
+        // --- START MODIFICATION ---
+        // Listener per il numero di like (apre popup)
+        commentDiv.querySelector('.like-count')?.addEventListener('click', function(e){
+            e.stopPropagation(); // Crucial: Stop click from reaching the button listener
+            const currentCount = parseInt(this.textContent);
+            if (currentCount > 0) {
+                openLikersPopup(this.dataset.commentId);
+            }
+        });
+        // Listener per l'intero bottone like (mette/toglie like)
+        commentDiv.querySelector('.like-btn')?.addEventListener('click', function(e) {
+            // Se l'evento viene da .like-count, non farà nulla perché lo stopPropagation
+            // nel listener precedente lo impedirà. Altrimenti, esegue l'azione di like.
+            handleLikeAction(this, options);
+        });
+        // --- END MODIFICATION ---
+
         return commentDiv;
     }
 
