@@ -163,11 +163,11 @@
             margin-top: 10px;
             margin-bottom: 10px;
         }
-        .moderation-feedback-area-reply { /* Specific for reply forms */
-            margin-top: 8px;
-            margin-bottom: 8px;
-            padding: 10px; /* Slightly smaller padding */
-            font-size: 0.9em; /* Slightly smaller font for compactness */
+        .moderation-feedback-area-reply { /* Specific for reply forms - more compact */
+            margin-top: 6px;
+            margin-bottom: 6px;
+            padding: 8px;
+            font-size: 0.85em;
         }
 
 
@@ -187,8 +187,9 @@
         .moderation-text-message-common.type-info,
         .moderation-text-message-common.type-info_sticky { color: #007AFF; }
 
-        .moderation-text-message-reply { /* Specific for reply text if needed, inherits common */
-            margin-bottom: 6px;
+        .moderation-text-message-reply { /* Specific for reply text - more compact */
+            margin-bottom: 4px; /* Reduced margin */
+            font-size: 0.9em; /* Relative to parent's 0.85em */
         }
 
 
@@ -201,14 +202,14 @@
             overflow: hidden;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
         }
-        .offensiveness-meter-container-reply { /* Specific for reply meter */
-            height: 15px; /* Smaller height */
+        .offensiveness-meter-container-reply { /* Specific for reply meter - more compact */
+            height: 12px; /* Thinner bar */
         }
         .offensiveness-meter-container-reply .offensiveness-bar-common {
-            border-radius: 15px; /* Match height */
+            border-radius: 12px; /* Match height */
         }
         .offensiveness-meter-container-reply .offensiveness-score-text-common {
-            font-size: 0.7em; /* Smaller text */
+            font-size: 0.65em; /* Smaller score text */
         }
 
 
@@ -241,9 +242,9 @@
             margin-bottom: 5px;
             display: block;
         }
-        .moderation-bar-label-reply { /* Specific for reply label */
-            font-size: 0.9em; /* Relative to parent reply area font-size */
-            margin-bottom: 3px;
+        .moderation-bar-label-reply { /* Specific for reply label - more compact */
+            font-size: 0.85em; /* Relative to parent's 0.85em */
+            margin-bottom: 2px; /* Reduced margin */
         }
 
         .moderation-threshold-info-common { /* Common for threshold info */
@@ -252,9 +253,9 @@
             color: #8e8e93;
             text-align: right;
         }
-        .moderation-threshold-info-reply { /* Specific for reply threshold */
-            margin-top: 4px;
-            font-size: 0.85em; /* Relative */
+        .moderation-threshold-info-reply { /* Specific for reply threshold - more compact */
+            margin-top: 3px; /* Reduced margin */
+            font-size: 0.8em; /* Relative to parent's 0.85em */
         }
 
 
@@ -303,6 +304,11 @@
         #comment-text.scanning + #comment-scanner-wave {
             display: block;
         }
+        /* Scanner wave for reply textareas (if implemented) */
+        .reply-form textarea.scanning + .comment-scanner-wave-reply { /* Assuming a similar wave element for replies */
+            display: block;
+        }
+
 
         .comment-form-container {
             display: flex;
@@ -845,7 +851,6 @@
 
     // --- INIZIO FUNZIONE PER BARRA DI MODERAZIONE ---
     function updateOffensivenessDisplay(score, textMessage, threshold, messageType, analysisInProgress = false, elements) {
-        // Destructure elements for easier access, with fallbacks if any are missing
         const {
             feedbackArea, barElement, scoreTextElement, textMessageElement,
             thresholdInfoElement, meterContainer, commentTextarea, barLabel
@@ -853,13 +858,12 @@
 
         if (!feedbackArea || !barElement || !scoreTextElement || !textMessageElement || !thresholdInfoElement || !meterContainer || !barLabel) {
             console.error("Elementi UI per il feedback di moderazione mancanti nel set fornito:", elements);
-            // Fallback to old message display if new elements are missing
-            const fallbackMsgEl = document.getElementById('comment-form-message'); // Or a more context-specific fallback
+            const fallbackMsgEl = document.getElementById('comment-form-message');
             if (fallbackMsgEl) {
                 let fullText = textMessage;
                 if (score !== null && !analysisInProgress) fullText += ` (Punteggio: ${score}/10)`;
-                if (analysisInProgress) fullText = `<span class="moderation-spinner"></span> ` + textMessage; // Use .moderation-spinner for consistency
-                fallbackMsgEl.innerHTML = sanitizeTextForHTML(fullText); // Ensure sanitizeTextForHTML is defined and handles HTML correctly
+                if (analysisInProgress) fullText = `<span class="moderation-spinner"></span> ` + textMessage;
+                fallbackMsgEl.innerHTML = sanitizeTextForHTML(fullText);
                 fallbackMsgEl.className = `form-message ${messageType.replace('_sticky', '')}`;
                 fallbackMsgEl.style.display = 'block';
                 if (messageType !== 'error' && !analysisInProgress && messageType !== 'info_sticky') {
@@ -870,7 +874,6 @@
         }
 
         feedbackArea.classList.add('visible');
-        // feedbackArea.style.display = 'block'; // .visible class should handle this
 
         if (analysisInProgress) {
             textMessageElement.innerHTML = `<span class="moderation-spinner"></span> ${sanitizeTextForHTML(textMessage)}`;
@@ -879,15 +882,20 @@
             barLabel.style.display = 'none';
             thresholdInfoElement.style.display = 'none';
             feedbackArea.classList.add('loading');
-            if (commentTextarea && commentTextarea.id === 'comment-text') { // Only apply scanning to main textarea for now
+            if (commentTextarea && commentTextarea.id === 'comment-text') {
                 commentTextarea.classList.add('scanning');
             }
         } else {
             let contextualMessage = textMessage;
-            if (score !== null) { // Append score context to the main message
-                if (messageType === 'error') contextualMessage = `Commento Rifiutato (Grado Offensività: ${score}/10). ${textMessage}`;
-                else if (messageType === 'success') contextualMessage = `Commento Approvato. ${textMessage}`; // Score will be on bar
+            if (messageType === 'error') {
+                contextualMessage = `Commento Rifiutato. ${textMessage}`; // Score is on the bar
+            } else if (messageType === 'success' && score !== null) {
+                contextualMessage = `Commento Approvato. ${textMessage}`; // Score is on the bar
+            } else if (messageType === 'success') {
+                contextualMessage = textMessage; // No score to show, just success message
             }
+            // For 'info' or 'info_sticky', textMessage is used as is, score will be on bar if available
+
             textMessageElement.innerHTML = sanitizeTextForHTML(contextualMessage).replace(/\n/g, '<br>');
             textMessageElement.className = `moderation-text-message-common type-${messageType.replace('_sticky', '')}`;
             feedbackArea.classList.remove('loading');
@@ -970,7 +978,6 @@
 
         const replyFormId = `${(options.isForPopup ? 'popup-' : '')}reply-form-${uniqueIdSuffix}`;
 
-        // HTML for Mini Moderation Bar in Replies
         const miniModBarHTML = `
             <div id="reply-mod-feedback-area-${uniqueIdSuffix}" class="moderation-feedback-area-common moderation-feedback-area-reply" style="display:none;">
                 <p id="reply-mod-text-message-${uniqueIdSuffix}" class="moderation-text-message-common moderation-text-message-reply"></p>
@@ -1171,6 +1178,9 @@
             const isActive = formDiv.style.display === 'block'; formDiv.style.display = isActive ? 'none' : 'block';
             if(!isActive && formDiv.querySelector('textarea')) formDiv.querySelector('textarea').focus();
             const localMsg = formDiv.querySelector('.form-message-local'); if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; localMsg.className='form-message-local'; }
+            // Also hide the specific moderation bar for replies if the form is hidden
+            const replyModFeedbackArea = formDiv.querySelector(`#reply-mod-feedback-area-${commentId}`);
+            if (replyModFeedbackArea) replyModFeedbackArea.style.display = 'none';
         }
     }
 
@@ -1180,13 +1190,13 @@
         if (!descriptionTextarea) { console.error("Textarea non trovata:", formElement); return; }
         const description = descriptionTextarea.value.trim();
 
-        let msgEl = formElement.querySelector('.form-message-local'); // Default for replies / fallback
+        let msgEl = formElement.querySelector('.form-message-local');
         let useSpecificModerationDisplay = false;
         let moderationElements = {};
-        let moderationResult; // To store moderation result for later use if needed
+        let moderationResult;
 
         if (isReply) {
-            const uniqueSuffix = parentCommentId; // parentCommentId is the Progressivo of the comment being replied to
+            const uniqueSuffix = parentCommentId;
             moderationElements.feedbackArea = formElement.querySelector(`#reply-mod-feedback-area-${uniqueSuffix}`);
             if (moderationElements.feedbackArea) {
                 useSpecificModerationDisplay = true;
@@ -1196,24 +1206,22 @@
                 moderationElements.barElement = formElement.querySelector(`#reply-mod-bar-${uniqueSuffix}`);
                 moderationElements.scoreTextElement = formElement.querySelector(`#reply-mod-score-text-${uniqueSuffix}`);
                 moderationElements.thresholdInfoElement = formElement.querySelector(`#reply-mod-threshold-info-${uniqueSuffix}`);
-                moderationElements.commentTextarea = descriptionTextarea; // The reply's own textarea
+                moderationElements.commentTextarea = descriptionTextarea;
             }
-            // msgEl is already set to .form-message-local which is correct for replies if bar isn't used
-        } else if (!options.isForPopup && formElement.id === 'new-comment-form') { // Main comment form
+        } else if (!options.isForPopup && formElement.id === 'new-comment-form') {
             moderationElements.feedbackArea = document.getElementById('moderation-feedback-area');
             if (moderationElements.feedbackArea) {
                 useSpecificModerationDisplay = true;
                 moderationElements.textMessageElement = document.getElementById('moderation-text-message');
-                moderationElements.barLabel = document.querySelector('#moderation-feedback-area .moderation-bar-label-common'); // Use common class
+                moderationElements.barLabel = document.querySelector('#moderation-feedback-area .moderation-bar-label-common');
                 moderationElements.meterContainer = document.getElementById('offensiveness-meter-container');
                 moderationElements.barElement = document.getElementById('offensiveness-bar');
                 moderationElements.scoreTextElement = document.getElementById('offensiveness-score-text');
                 moderationElements.thresholdInfoElement = document.getElementById('moderation-threshold-info');
                 moderationElements.commentTextarea = document.getElementById('comment-text');
             }
-            msgEl = document.getElementById('comment-form-message'); // Fallback for main form
+            msgEl = document.getElementById('comment-form-message');
         }
-        // If not main form and not reply with bar, msgEl remains formElement.querySelector('.form-message-local')
 
         const showFeedback = (score, text, threshold, type, analysisInProgress = false) => {
             if (useSpecificModerationDisplay && moderationElements.feedbackArea) {
@@ -1259,7 +1267,7 @@
 
         if (globalGroqOffensivenessThreshold < 10) {
             showFeedback(null, "Analisi del commento in corso...", globalGroqOffensivenessThreshold, 'info_sticky', true);
-            moderationResult = await getCommentOffensivenessScore(description); // Store result
+            moderationResult = await getCommentOffensivenessScore(description);
 
             if (moderationResult.error) {
                 showFeedback(null, `Errore durante la moderazione: ${moderationResult.error} Il commento non può essere inviato. Riprova o contatta l'assistenza se il problema persiste.`, globalGroqOffensivenessThreshold, 'error');
@@ -1272,8 +1280,7 @@
                 if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
                 return;
             }
-            const scoreText = moderationResult.score !== null ? ` (Grado Offensività: ${moderationResult.score}/10)` : "";
-            showFeedback(moderationResult.score, `Analisi completata. Invio in corso...`, globalGroqOffensivenessThreshold, 'info_sticky'); // Removed scoreText from here as it's in updateOffensivenessDisplay
+            showFeedback(moderationResult.score, `Analisi completata. Invio in corso...`, globalGroqOffensivenessThreshold, 'info_sticky');
             if (submitBtn) { submitBtn.innerHTML = `<span class="spinner-mini"></span> Invio...`; }
 
         } else {
@@ -1393,11 +1400,10 @@
             if(localMsgEl){
                 let fullText = txt;
                 if (score !== null) fullText += ` (Punteggio: ${score}/10)`;
-                // Ensure spinner HTML is correctly prepended if "analisi" is in text
                 if (txt.toLowerCase().includes("analisi") && !fullText.startsWith('<span class="spinner-mini">')) {
                     fullText = `<span class="spinner-mini"></span> ` + fullText;
                 }
-                localMsgEl.innerHTML = fullText; // Set as innerHTML to render spinner
+                localMsgEl.innerHTML = fullText;
                 localMsgEl.className = `form-message-local ${type.replace('_sticky', '')}`;
                 localMsgEl.style.display = 'block';
                 if (!isSticky && type !== 'error') {
