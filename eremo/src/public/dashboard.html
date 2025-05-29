@@ -9,422 +9,414 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        .event-controls-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 0 !important;
-            flex-wrap: wrap;
-            position: relative;
+        /* Stili da style.css (riportati qui per completezza, ma idealmente in style.css) */
+        /* ----- Reset & Basic Styles ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        .event-tabs-container-main {
-            display: flex;
-            flex-grow: 1;
-            align-items: flex-end;
+        :root {
+            --primary: #365e51;
+            --secondary: #8db187;
+            --accent: #d18c60;
+            --light: #f8f5ef;
+            --dark: #1e3b2f;
+            --dark-rgb: 30, 59, 47;
+            --white: #ffffff;
+            --gray-light: #e9e9e9;
+            --gray-medium: #cccccc;
+            --gray-dark: #555555;
+            --danger: #e74c3c;
+            --danger-rgb: 231, 76, 60;
+            --success: #2ecc71;
+            --success-rgb: 46, 204, 113;
+            --warning: #f39c12;
+            --info: #3498db;
+            --shadow-light: 0 6px 20px rgba(0, 0, 0, 0.09);
+            --shadow-medium: 0 10px 38px rgba(0, 0, 0, 0.13);
+            --border-radius-small: .25rem;
+            --border-radius-medium: 15px;
+            --border-radius-large: 24px;
+            --transition-fast: all 0.2s ease-in-out;
+            --transition-duration-medium: 0.3s;
+            --transition-timing-medium: ease-in-out;
+            --transition-medium: all var(--transition-duration-medium) var(--transition-timing-medium);
+            --navbar-height: 80px;
         }
 
-        .filter-trigger-container-main {
-            position: relative;
-            margin-left: auto;
-            align-self: flex-end;
-            display: inline-block; /* Assicura che il contenitore si adatti al pulsante */
-        }
+        html, body { overflow-x: hidden; }
+        body { background-color: var(--light); color: var(--dark); line-height: 1.9; font-size: 22px; display: flex; flex-direction: column; min-height: 100vh; }
+        main { flex-grow: 1; padding-top: var(--navbar-height); width: 100%; }
+        h1, h2, h3, h4, h5, h6 { color: var(--primary); margin-bottom: 1.5rem; font-weight: 600; line-height: 1.5; }
+        h1 { font-size: clamp(2.8rem, 5.8vw, 3.5rem); }
+        h2 { font-size: clamp(2.3rem, 4.8vw, 2.9rem); }
+        h3 { font-size: clamp(1.8rem, 3.8vw, 2.1rem); }
+        h4 { font-size: clamp(1.45rem, 3.2vw, 1.7rem); }
+        p { margin-bottom: 1.4rem; font-size: 1.25rem; }
+        a { color: var(--secondary); text-decoration: none; transition: var(--transition-fast); }
+        a:hover { color: var(--accent); text-decoration: none; }
+        img { max-width: 100%; height: auto; display: block; }
 
+        /* ----- Utility Classes ----- */
+        .container { max-width: 1400px; width: 97%; margin-left: auto; margin-right: auto; padding-left: 25px; padding-right: 25px; }
+        .section-padding { padding-top: clamp(1.2rem, 3vw, 2rem); padding-bottom: clamp(1.2rem, 3vw, 2rem); }
+        .text-center { text-align: center !important; }
 
-        .event-controls-header .event-tab-button {
-            padding: 0.9rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--gray-dark);
-            background-color: var(--gray-light);
-            border: 1px solid var(--gray-medium);
-            border-bottom: none;
-            cursor: pointer;
-            transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5em;
-            line-height: 1.4;
-            text-align: center;
-            justify-content: center;
-            margin-right: -1px;
-        }
-        .event-controls-header .event-tab-button:hover {
-            background-color: #e0e0e0;
-            color: var(--primary);
-        }
-        .event-controls-header .event-tab-button.active {
-            color: var(--primary);
-            background-color: var(--white);
-            border-color: var(--gray-medium) var(--gray-medium) var(--white);
-            font-weight: 600;
-            position: relative;
-            z-index: 2;
-        }
-        .event-controls-header .event-tab-button.active i {
-            color: var(--accent);
-        }
+        /* ----- Navbar ----- */
+        .navbar-container { position: fixed; top: 0; left: 0; width: 100%; background: var(--primary); box-shadow: var(--shadow-medium); z-index: 1000; transition: transform 0.3s ease-in-out; height: var(--navbar-height); display: flex; align-items: center; }
+        .navbar-container.hidden { transform: translateY(-100%); }
+        .navbar { display: flex; align-items: center; justify-content: space-between; color: var(--white); max-width: 1400px; width: 97%; margin: 0 auto; }
+        .navbar .logo { display: flex; align-items: center; gap: 1rem; }
+        .navbar .logo a { color: var(--white); text-decoration: none; display: flex; align-items: center; gap: 1rem; }
+        .navbar .logo a:hover { text-decoration: none; opacity: 0.9; }
+        .navbar .logo h2 { color: var(--white); font-size: clamp(1.4rem, 3.4vw, 1.7rem); margin: 0; font-weight: 600; }
+        .navbar .logo .emoji { font-size: 2rem; }
+        .navbar .right-menu { display: flex; align-items: center; gap: 1.4rem; }
+        .navbar .login-btn, .navbar .user-btn { background: rgba(255, 255, 255, 0.1); color: var(--white); padding: 0.8rem 1.4rem; border-radius: 10px; font-size: 1.15rem; font-weight: 500; border: 1px solid rgba(255, 255, 255, 0.2); transition: var(--transition-fast); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
+        .navbar .login-btn:hover, .navbar .user-btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(0px); box-shadow: none; text-decoration: none; }
+        .hamburger { display: block; font-size: 2.1rem; cursor: pointer; background: none; border: none; color: var(--white); padding: 0.6rem; margin-left: 0.8rem; }
+        .mobile-menu { display: flex; flex-direction: column; position: fixed; top: var(--navbar-height); left: 0; width: 100%; height: auto; background: var(--primary); border-top: 1px solid rgba(255, 255, 255, 0.1); overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(0%); transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; z-index: 999; }
+        .mobile-menu.open { opacity: 1; visibility: visible; transform: translateX(0%); }
+        .mobile-menu a { color: var(--white); padding: 1.4rem 2rem; font-size: 1.3rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-decoration: none; transition: background-color var(--transition-fast); }
+        .mobile-menu a:last-child { border-bottom: none; }
+        .mobile-menu a:hover, .mobile-menu a.active { background-color: rgba(255, 255, 255, 0.1); text-decoration: none; }
+        .user-dropdown { position: relative; display: inline-block; }
+        .user-dropdown .user-btn { display: flex; align-items: center; gap: 0.6rem; }
+        .user-dropdown .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 11px); background-color: var(--white); min-width: 240px; box-shadow: 0 8.5px 25px rgba(0,0,0,0.15); z-index: 1001; border-radius: 11px; overflow: hidden; border: 1px solid var(--gray-light); }
+        .user-dropdown .dropdown-menu a { color: var(--dark); padding: 1rem 1.4rem; text-decoration: none; display: block; font-size: 1.2rem; white-space: nowrap; transition: background-color var(--transition-fast), color var(--transition-fast); }
+        .user-dropdown .dropdown-menu a:hover { background-color: var(--light); color: var(--primary); }
+        .user-dropdown .dropdown-menu a:last-child { border-top: 1px solid var(--gray-light); color: var(--danger); }
+        .user-dropdown .dropdown-menu a:last-child:hover { background-color: rgba(var(--danger-rgb), 0.11); color: #a71d2a; }
+        .user-dropdown.show .dropdown-menu { display: block; animation: fadeInDropdown 0.2s ease-out; }
+        @keyframes fadeInDropdown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .user-dropdown .dropdown-arrow { font-size: 0.9rem; transition: transform var(--transition-fast); }
+        .user-dropdown.show .dropdown-arrow { transform: rotate(180deg); }
 
-        .event-tabs-container-main .event-tab-button {
-            border-radius: 0;
-            border-right: none;
-        }
-        .event-tabs-container-main .event-tab-button:first-child {
-            border-top-left-radius: 10px;
-        }
-        .event-tabs-container-main > .event-tab-button:last-of-type {
-            border-top-right-radius: 10px;
-            border-right: 1px solid var(--gray-medium);
-        }
-
-        .filter-trigger-container-main #filterToggleButton.event-tab-button {
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            margin-right: 0;
-            border-left: 1px solid var(--gray-medium);
-            margin-left: 8px;
-        }
-        .filter-trigger-container-main #filterToggleButton.event-tab-button.active {
-            border-bottom-color: var(--white);
-        }
-
-
-        .dropdown-arrow-filter {
-            margin-left: 0.5em;
-            font-size: 0.8em;
-            transition: transform 0.2s ease-in-out;
-        }
-        #filterToggleButton.active .dropdown-arrow-filter {
-            transform: rotate(180deg);
-        }
-
-        .filter-panel {
-            display: none;
-            position: absolute;
-            top: calc(100% - 1px);
-            right: 0; /* Allinea il bordo DESTRO del pannello con il bordo DESTRO del suo contenitore (.filter-trigger-container-main) */
-            left: auto; /* Assicura che 'left' non interferisca */
-            z-index: 100;
-            background-color: var(--white);
-            border: 1px solid var(--gray-medium);
-            border-top: none;
-            box-shadow: var(--shadow-medium);
-            padding: 1.5rem;
-            width: 320px;
-            max-width: calc(100vw - 20px);
-            box-sizing: border-box; /* padding e border inclusi nella width */
-            border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
-        }
-
-        .filter-panel.active {
-            display: block;
-            animation: fadeInDropdown 0.2s ease-out;
-        }
-        @keyframes fadeInDropdown {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .filter-panel h4 {
-            margin-top: 0; margin-bottom: 1.2rem; font-size: 1.1rem; color: var(--primary);
-            border-bottom: 1px solid var(--gray-light); padding-bottom: 0.6rem; text-align: left;
-        }
+        /* ----- Dashboard ----- */
+        body.page-dashboard { background-color: var(--light); }
+        body.page-dashboard main.dashboard-main { padding-top: calc(var(--navbar-height) + 1.5rem); padding-left: 1.5rem; padding-right: 1.5rem; padding-bottom: 2.5rem; }
+        body.page-dashboard main.dashboard-main h1 { color: var(--primary); margin-bottom: 2rem; text-align: center; margin-top: 0; font-size: clamp(1.8rem, 3.5vw, 2.4rem); display: flex; align-items: center; justify-content: center; }
+        body.page-dashboard main.dashboard-main h1 i { margin-right: 0.8rem; font-size: 0.9em; color: var(--secondary); }
+        .dashboard-section { background-color: var(--white); padding: 1.5rem; border-radius: var(--border-radius-medium); box-shadow: var(--shadow-light); margin-bottom: 2rem; }
+        .dashboard-section h2 { color: var(--secondary); margin-top: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--gray-light); padding-bottom: 1rem; font-size: 1.6rem; text-align: left; display: flex; align-items: center; }
+        .dashboard-section h2 i { margin-right: 0.6rem; font-size: 1em; }
+        .form-message { padding: 0.75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: var(--border-radius-small, .25rem); font-size: 0.95rem; }
+        .form-message.success { color: var(--success-dark, #155724); background-color: var(--success-light, #d4edda); border-color: var(--success, #c3e6cb); }
+        .form-message.error { color: var(--danger-dark, #721c24); background-color: var(--danger-light, #f8d7da); border-color: var(--danger, #f5c6cb); }
+        .spinner-mini { display: inline-block; width: 1em; height: 1em; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-infinite; margin-right: 0.5em; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn-admin .spinner-mini { border-top-color: var(--primary-dark, #2c4a43); }
+        button:disabled .spinner-mini { border-top-color: #ccc; }
+        .btn-popup .spinner-mini { border-top-color: #fff; }
+        .event-controls-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0 !important; flex-wrap: wrap; position: relative; }
+        .event-tabs-container-main { display: flex; flex-grow: 1; align-items: flex-end; }
+        .filter-trigger-container-main { position: relative; margin-left: auto; align-self: flex-end; display: inline-block; }
+        .event-controls-header .event-tab-button { padding: 0.9rem 1.5rem; font-size: 1rem; font-weight: 500; color: var(--gray-dark); background-color: var(--gray-light); border: 1px solid var(--gray-medium); border-bottom: none; cursor: pointer; transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease; display: inline-flex; align-items: center; gap: 0.5em; line-height: 1.4; text-align: center; justify-content: center; margin-right: -1px; }
+        .event-controls-header .event-tab-button:hover { background-color: #e0e0e0; color: var(--primary); }
+        .event-controls-header .event-tab-button.active { color: var(--primary); background-color: var(--white); border-color: var(--gray-medium) var(--gray-medium) var(--white); font-weight: 600; position: relative; z-index: 2; }
+        .event-controls-header .event-tab-button.active i { color: var(--accent); }
+        .event-tabs-container-main .event-tab-button { border-radius: 0; border-right: none; }
+        .event-tabs-container-main .event-tab-button:first-child { border-top-left-radius: 10px; }
+        .event-tabs-container-main > .event-tab-button:last-of-type { border-top-right-radius: 10px; border-right: 1px solid var(--gray-medium); }
+        .filter-trigger-container-main #filterToggleButton.event-tab-button { border-top-left-radius: 10px; border-top-right-radius: 10px; margin-right: 0; border-left: 1px solid var(--gray-medium); margin-left: 8px; }
+        .filter-trigger-container-main #filterToggleButton.event-tab-button.active { border-bottom-color: var(--white); }
+        .dropdown-arrow-filter { margin-left: 0.5em; font-size: 0.8em; transition: transform 0.2s ease-in-out; }
+        #filterToggleButton.active .dropdown-arrow-filter { transform: rotate(180deg); }
+        .filter-panel { display: none; position: absolute; top: calc(100% - 1px); right: 0; left: auto; z-index: 100; background-color: var(--white); border: 1px solid var(--gray-medium); border-top: none; box-shadow: var(--shadow-medium); padding: 1.5rem; width: 320px; max-width: calc(100vw - 20px); box-sizing: border-box; border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium); }
+        .filter-panel.active { display: block; animation: fadeInDropdown 0.2s ease-out; }
+        .filter-panel h4 { margin-top: 0; margin-bottom: 1.2rem; font-size: 1.1rem; color: var(--primary); border-bottom: 1px solid var(--gray-light); padding-bottom: 0.6rem; text-align: left; }
         .filter-panel .form-group { margin-bottom: 1rem; }
         .filter-panel .form-group label { text-align: left; }
-        .filter-panel .filter-panel-actions {
-            margin-top: 1.5rem; display: flex; justify-content: space-between; gap: 0.5rem;
-        }
+        .filter-panel .filter-panel-actions { margin-top: 1.5rem; display: flex; justify-content: space-between; gap: 0.5rem; }
         .filter-panel .filter-panel-actions .btn-admin { flex-grow: 1; }
         .filter-panel-actions .btn-admin i { margin-right: 0.3em; }
-
-
-        .event-view-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem 1.5rem;
-            padding: 1rem 1.5rem;
-            background-color: var(--white);
-            border: 1px solid var(--gray-medium);
-            border-top: none;
-            margin-bottom: 1.5rem;
-            border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
-            box-shadow: var(--shadow-light);
-            position: relative;
-            z-index: 1;
-            margin-top: -1px;
-        }
-
-        .event-view-controls .form-group {
-            flex-grow: 1; flex-basis: 180px; min-width: 160px;
-        }
-        .event-view-controls label {
-            font-size: 0.85rem; margin-bottom: 0.3rem; color: var(--primary);
-            display: block; font-weight: 500; text-align: left;
-        }
-        .event-view-controls select.form-control {
-            width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--gray-medium);
-            border-radius: 6px; font-size: 0.9rem; background-color: var(--white);
-            line-height: 1.4; appearance: none; -webkit-appearance: none; -moz-appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23365e51%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat; background-position: right 0.6rem center;
-            background-size: 0.6em auto; padding-right: 2rem; cursor: pointer;
-        }
-        .event-view-controls select.form-control:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25);
-            outline: none;
-        }
-
-        /* Stili per la sezione Opzioni Avanzate */
-        .advanced-options-content {
-            background-color: var(--white);
-            padding: 1.5rem;
-            border: 1px solid var(--gray-medium);
-            border-radius: var(--border-radius-medium);
-            box-shadow: var(--shadow-light);
-            margin-top: 1.5rem; /* Spazio sopra la sezione */
-            margin-bottom: 1.5rem; /* Spazio sotto la sezione */
-        }
-        .advanced-options-content .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .advanced-options-content label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--primary);
-            font-weight: 500;
-        }
-        .advanced-options-content select.form-control {
-            width: 100%;
-            max-width: 500px; /* Allargato per leggibilità */
-            padding: 0.75rem 1rem; /* Coerenza con altri form control */
-            border: 1px solid var(--gray-medium);
-            border-radius: 8px;
-            font-size: 1rem;
-            background-color: var(--white);
-        }
-        .advanced-options-content select.form-control:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25);
-            outline: none;
-        }
-        .advanced-options-content .form-actions {
-            text-align: left;
-            margin-top: 1rem;
-        }
-        /* Stili per i messaggi di feedback (utilizzati anche dal form eventi) */
-        .form-message {
-            padding: 0.75rem 1.25rem;
-            margin-bottom: 1rem;
-            border: 1px solid transparent;
-            border-radius: var(--border-radius-small, .25rem);
-            font-size: 0.95rem;
-        }
-        .form-message.success {
-            color: var(--success-dark, #155724);
-            background-color: var(--success-light, #d4edda);
-            border-color: var(--success, #c3e6cb);
-        }
-        .form-message.error {
-            color: var(--danger-dark, #721c24);
-            background-color: var(--danger-light, #f8d7da);
-            border-color: var(--danger, #f5c6cb);
-        }
-        /* Spinner per bottoni (utilizzato anche dal form eventi) */
-        .spinner-mini {
-            display: inline-block;
-            width: 1em;
-            height: 1em;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-infinite;
-            margin-right: 0.5em;
-            vertical-align: middle;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .btn-admin .spinner-mini { /* Colore per spinner su bottoni con sfondo scuro */
-            border-top-color: var(--primary-dark, #2c4a43); /* Adatta se necessario */
-        }
-        button:disabled .spinner-mini { /* Per bottoni generici disabilitati */
-            border-top-color: #ccc;
-        }
-        .btn-popup .spinner-mini { /* Specifico per spinner in popup con testo bianco */
-            border-top-color: #fff;
-        }
-
-
-        .event-form-and-preview-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-
-        #eventFormDashboard {
-            flex: 2;
-            min-width: 300px;
-            background-color: #f9f9f9;
-            padding: 1.5rem;
-            border-radius: var(--border-radius-medium);
-            border: 1px solid var(--gray-light);
-        }
-        #eventFormDashboard .form-row {
-            margin-bottom: 1rem;
-        }
-        #eventFormDashboard .form-row-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-        }
-
-
-        #eventCardPreviewContainer {
-            flex: 1;
-            min-width: 300px;
-            padding: 1.5rem;
-            border: 1px dashed var(--gray-medium);
-            border-radius: var(--border-radius-medium);
-            background-color: #fdfdfd;
-            height: fit-content;
-        }
-
-        #eventCardPreviewContainer h4 {
-            text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 1rem;
-            font-size: 1.2rem; border-bottom: 1px solid var(--gray-light); padding-bottom: 0.5rem;
-        }
-
-        .preview-card {
-            background: var(--white); border-radius: var(--border-radius-medium);
-            box-shadow: var(--shadow-light); overflow: hidden; border: 1px solid var(--gray-light);
-        }
-        .preview-card-image-container {
-            height: 180px; background-color: var(--gray-light); display: flex;
-            align-items: center; justify-content: center; overflow: hidden;
-        }
+        .event-view-controls { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; padding: 1rem 1.5rem; background-color: var(--white); border: 1px solid var(--gray-medium); border-top: none; margin-bottom: 1.5rem; border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium); box-shadow: var(--shadow-light); position: relative; z-index: 1; margin-top: -1px; }
+        .event-view-controls .form-group { flex-grow: 1; flex-basis: 180px; min-width: 160px; }
+        .event-view-controls label { font-size: 0.85rem; margin-bottom: 0.3rem; color: var(--primary); display: block; font-weight: 500; text-align: left; }
+        .event-view-controls select.form-control { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--gray-medium); border-radius: 6px; font-size: 0.9rem; background-color: var(--white); line-height: 1.4; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23365e51%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.6rem center; background-size: 0.6em auto; padding-right: 2rem; cursor: pointer; }
+        .event-view-controls select.form-control:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25); outline: none; }
+        .event-form-and-preview-container { display: flex; flex-wrap: wrap; gap: 2rem; margin-top: 1rem; }
+        #eventFormDashboard { flex: 2; min-width: 300px; background-color: #f9f9f9; padding: 1.5rem; border-radius: var(--border-radius-medium); border: 1px solid var(--gray-light); }
+        #eventFormDashboard .form-row { margin-bottom: 1rem; }
+        #eventFormDashboard .form-row-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        #eventCardPreviewContainer { flex: 1; min-width: 300px; padding: 1.5rem; border: 1px dashed var(--gray-medium); border-radius: var(--border-radius-medium); background-color: #fdfdfd; height: fit-content; }
+        #eventCardPreviewContainer h4 { text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 1rem; font-size: 1.2rem; border-bottom: 1px solid var(--gray-light); padding-bottom: 0.5rem; }
+        .preview-card { background: var(--white); border-radius: var(--border-radius-medium); box-shadow: var(--shadow-light); overflow: hidden; border: 1px solid var(--gray-light); }
+        .preview-card-image-container { height: 180px; background-color: var(--gray-light); display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .preview-card-image-container img { width: 100%; height: 100%; object-fit: cover; }
         .preview-card-image-container .no-image-placeholder { font-size: 1rem; color: var(--gray-dark); }
         .preview-card-content { padding: 1rem; }
-        .preview-card-content h5 {
-            font-size: 1.3rem; color: var(--primary); margin: 0 0 0.5rem 0;
-            font-weight: 600; min-height: 1.3em; word-break: break-word;
-        }
-        .preview-card-content p {
-            font-size: 0.9rem; color: var(--gray-dark); line-height: 1.5;
-            margin-bottom: 0.5rem; min-height: 1em; word-break: break-word;
-        }
+        .preview-card-content h5 { font-size: 1.3rem; color: var(--primary); margin: 0 0 0.5rem 0; font-weight: 600; min-height: 1.3em; word-break: break-word; }
+        .preview-card-content p { font-size: 0.9rem; color: var(--gray-dark); line-height: 1.5; margin-bottom: 0.5rem; min-height: 1em; word-break: break-word; }
         .preview-card-content .preview-relatore { font-style: italic; }
         .preview-card-content .preview-posti, .preview-card-content .preview-costo { font-weight: bold; }
-
         #eventFormDashboard .form-group { margin-bottom: 1.2rem; }
-        #eventFormDashboard .form-group label {
-            display: block; margin-bottom: 0.4rem; color: var(--primary);
-            font-weight: 500; font-size: 0.95rem;
-        }
-        #eventFormDashboard .form-control, #eventFormDashboard select.form-control {
-            width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-medium);
-            border-radius: 8px; font-size: 1rem; background-color: var(--white);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        #eventFormDashboard .form-control:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25);
-            outline: none;
-        }
+        #eventFormDashboard .form-group label { display: block; margin-bottom: 0.4rem; color: var(--primary); font-weight: 500; font-size: 0.95rem; }
+        #eventFormDashboard .form-control, #eventFormDashboard select.form-control { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-medium); border-radius: 8px; font-size: 1rem; background-color: var(--white); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        #eventFormDashboard .form-control:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25); outline: none; }
         #eventFormDashboard textarea.form-control { min-height: 80px; resize: vertical; }
-        #eventFormDashboard .form-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;
-        }
-        #eventFormDashboard .form-check-group {
-            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;
-        }
-        #eventFormDashboard .form-check-group input[type="checkbox"] {
-            width: auto; margin-right: 0.3rem; transform: scale(1.1);
-        }
-        #eventFormDashboard .form-check-group label {
-            font-weight: normal; font-size: 0.95rem; margin-bottom: 0;
-        }
+        #eventFormDashboard .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        #eventFormDashboard .form-check-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+        #eventFormDashboard .form-check-group input[type="checkbox"] { width: auto; margin-right: 0.3rem; transform: scale(1.1); }
+        #eventFormDashboard .form-check-group label { font-weight: normal; font-size: 0.95rem; margin-bottom: 0; }
         #eventFormDashboard .form-actions { margin-top: 1.5rem; text-align: right; }
         #eventFormDashboard .btn-popup { padding: 0.8rem 1.5rem; }
-        #eventFormDashboard small {
-            font-size: 0.8rem; color: var(--gray-dark); display: block; margin-top: 0.3rem;
-        }
-        #current-event-image-preview-dashboard, #current-event-flyer-preview-dashboard {
-            margin-top: 0.5rem; max-width: 150px; border: 1px solid var(--gray-light);
-            padding: 5px; border-radius: 6px;
-        }
+        #eventFormDashboard small { font-size: 0.8rem; color: var(--gray-dark); display: block; margin-top: 0.3rem; }
+        #current-event-image-preview-dashboard, #current-event-flyer-preview-dashboard { margin-top: 0.5rem; max-width: 150px; border: 1px solid var(--gray-light); padding: 5px; border-radius: 6px; }
         #current-event-flyer-preview-dashboard a { font-size: 0.9rem; }
+        footer { background: var(--dark); color: var(--light); padding: 3rem 2.2rem; text-align: center; margin-top: auto; font-size: 1.15rem; }
+        footer p { margin: 0; opacity: 0.7; text-align: center; }
+        .btn-admin { padding: 0.6rem 1.2rem; border-radius: var(--border-radius-medium); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: var(--transition-medium); border: 1px solid transparent; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.4em; line-height: 1.3; }
+        .btn-admin:hover { transform: translateY(-2px); box-shadow: var(--shadow-light); }
+        .btn-admin i.fas { line-height: 1; }
+        .btn-admin.btn-admin-primary { background-color: var(--primary); color: var(--white); border-color: var(--primary); }
+        .btn-admin.btn-admin-primary:hover { background-color: var(--dark); border-color: var(--dark); }
+        .btn-admin.btn-admin-secondary { background-color: var(--secondary); color: var(--white); border-color: var(--secondary); }
+        .btn-admin.btn-admin-secondary:hover { background-color: var(--primary); border-color: var(--primary); }
+        .btn-admin.btn-admin-danger { background-color: var(--danger); color: var(--white); border-color: var(--danger); }
+        .btn-admin.btn-admin-danger:hover { background-color: #c0392b; border-color: #b92c1c; }
+        .btn-admin.btn-admin-warning { background-color: var(--warning); color: var(--dark); border-color: var(--warning); }
+        .btn-admin.btn-admin-warning:hover { background-color: #e67e22; border-color: #d35400; }
+        .btn-admin.btn-admin-info { background-color: var(--info); color: var(--white); border-color: var(--info); }
+        .btn-admin.btn-admin-info:hover { background-color: #2980b9; border-color: #2471a3; }
+        .btn-admin.btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; gap: 0.25em; }
+        .btn-admin.btn-sm i.fas { font-size: 0.9em; }
+        .modal { display: none; position: fixed; z-index: 1050; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(var(--dark-rgb), 0.84); backdrop-filter: blur(5px); transition: opacity 0.2s ease-out; align-items: center; justify-content: center; }
+        .modal.active { display: flex; opacity: 1; }
+        .modal-content { background-color: var(--white); padding: 2.4rem 3rem; border: none; width: 90%; max-width: 660px; border-radius: var(--border-radius-medium); position: relative; box-shadow: 0 11px 38px rgba(0,0,0,0.15); max-height: 90vh; display: flex; flex-direction: column; }
+        .close-modal-btn { color: var(--gray-medium); position: absolute; top: 1.1rem; right: 1.1rem; font-size: 2.4rem; font-weight: bold; cursor: pointer; line-height: 1; padding: 0.32rem; transition: var(--transition-fast); z-index: 10; }
+        .close-modal-btn:hover, .close-modal-btn:focus { color: var(--dark); transform: rotate(90deg) scale(1.12); }
+        .modal-content-scrollable { overflow-y: auto; flex-grow: 1; padding: 0.5rem; min-height: 150px; }
+        .modal-content h3 { color: var(--primary); font-size: 1.7rem; margin-bottom: 1.5rem; }
+        .modal-content .form-group { margin-bottom: 1rem; }
+        .modal-content .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--dark); font-size: 1rem; text-align: left; }
+        .modal-content .form-group input[type="file"], .modal-content .form-group textarea, .modal-content .form-group input[type="text"] { width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--gray-medium); border-radius: var(--border-radius-medium); font-size: 1rem; box-sizing: border-box; }
+        .modal-content .form-group input[type="file"] { padding: 0.6rem; }
+        .modal-content .form-group textarea { min-height: 80px; resize: vertical; }
+        .modal-content form button[type="submit"].btn-admin { margin-top: 1rem; width: auto; display: block; margin-left: auto; margin-right: auto; }
+        .modal-content .form-actions { margin-top: 1.5rem; text-align: right; }
+        .modal-content .form-actions .btn-admin { margin-left: 0.5rem; }
+        .existing-media-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-light); }
+        .existing-media-section h4 { margin-bottom: 1rem; font-size: 1.1rem; color: var(--primary); font-weight: 500; }
+        .existing-media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.8rem; max-height: 300px; overflow-y: auto; padding: 0.5rem; background-color: var(--light); border-radius: 8px; border: 1px solid var(--gray-light); }
+        .existing-media-item { border: 1px solid var(--gray-medium); padding: 0.75rem; border-radius: 8px; background-color: var(--white); text-align: center; font-size: 0.8rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-light); transition: var(--transition-fast); }
+        .existing-media-item:hover { box-shadow: var(--shadow-medium); transform: translateY(-2px); }
+        .existing-media-item img, .existing-media-item video { width: 100%; height: 70px; object-fit: cover; margin-bottom: 0.5rem; border-radius: 4px; border: 1px solid var(--gray-light); background-color: var(--gray-light); }
+        .existing-media-item .media-icon-placeholder { font-size: 30px; height: 70px; display: flex; align-items: center; justify-content: center; color: var(--gray-medium); margin-bottom: 0.5rem; }
+        .existing-media-item .media-filename { font-weight: 500; margin-bottom: 0.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.8rem; color: var(--dark); line-height: 1.2; }
+        .existing-media-item .media-description { font-size: 0.75rem; color: var(--gray-dark); margin-bottom: 0.5rem; max-height: 2.6em; overflow: hidden; text-overflow: ellipsis; line-height: 1.3em; word-wrap: break-word; }
+        .existing-media-item .btn-delete-media { width: auto; align-self: center; margin-top: auto; padding-top: 0.5rem; }
+        #uploadMediaFeedback p, #commentsManagementFeedback p { margin: 0; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid transparent; }
+        #uploadMediaFeedback p.success-message, #commentsManagementFeedback p.success-message { background-color: rgba(var(--success-rgb), 0.15); border-color: var(--success); color: var(--dark); }
+        #uploadMediaFeedback p.error-message, #commentsManagementFeedback p.error-message { background-color: rgba(var(--danger-rgb), 0.15); border-color: var(--danger); color: var(--dark); }
+        #manageCommentsModal .comments-list-admin-styled { list-style: none; padding: 0; margin: 0; }
+        #manageCommentsModal .comment-item-admin-styled { background: var(--white); border-radius: var(--border-radius-medium); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-light); border-left: 4px solid var(--secondary); }
+        #manageCommentsModal .comment-item-admin-styled:last-child { margin-bottom: 0; }
+        #manageCommentsModal .comment-header { display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 0.8rem; }
+        #manageCommentsModal .comment-header .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gray-light); flex-shrink: 0; }
+        #manageCommentsModal .comment-meta strong { font-size: 1rem; color: var(--dark); font-weight: 600; }
+        #manageCommentsModal .comment-meta small { font-size: 0.8rem; color: var(--gray-dark); margin-left: 0.5rem; display: block; }
+        #manageCommentsModal .comment-meta small.comment-id-details { font-style: italic; font-size: 0.75rem; }
+        #manageCommentsModal .comment-text-admin { font-size: 0.95rem; color: var(--dark); line-height: 1.6; margin-bottom: 1rem; word-wrap: break-word; }
+        #manageCommentsModal .comment-actions-admin { display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--gray-light); }
+        #manageCommentsModal .btn-admin-reply, #manageCommentsModal .btn-admin-delete-comment { font-size: 0.8rem; padding: 0.4rem 0.8rem; gap: 0.3em; }
+        #manageCommentsModal .btn-admin-reply { background-color: var(--secondary); color: white; }
+        #manageCommentsModal .btn-admin-reply:hover { background-color: var(--primary); }
+        #manageCommentsModal .reply-form-admin { display: none; margin-top: 1rem; margin-left: 50px; padding: 1rem; background-color: var(--light); border-radius: 8px; border: 1px solid var(--gray-light); }
+        #manageCommentsModal .reply-form-admin.active { display: block; animation: fadeIn 0.3s ease-out; }
+        #manageCommentsModal .reply-form-admin textarea { width: 100%; min-height: 70px; padding: 0.6rem; border: 1px solid var(--gray-medium); border-radius: 6px; font-size: 0.9rem; margin-bottom: 0.5rem; resize: vertical; }
+        #manageCommentsModal .reply-form-admin .form-actions-reply { text-align: right; }
+        #manageCommentsModal .reply-form-admin .form-message-local { font-size: 0.85rem; margin-top: 0.5rem; text-align: left; }
+        #manageCommentsModal .comment-replies-list-styled { list-style: none; padding-left: 0; margin-top: 1rem; margin-left: 25px; border-left: 2px dotted var(--gray-medium); padding-left: 15px; }
+        .admin-event-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 2rem; margin-top: 1.5rem; }
+        .admin-event-grid .loading-message-dashboard, .admin-event-grid .error-message-dashboard, .admin-event-grid .no-events-dashboard { grid-column: 1 / -1; text-align: center; padding: 2rem; font-size: 1.1rem; color: var(--gray-dark); background-color: var(--white); border-radius: var(--border-radius-medium); box-shadow: var(--shadow-light); }
+        .admin-event-grid .loading-message-dashboard i { margin-right: 0.5em; }
+        .admin-event-card { background: var(--white); border-radius: var(--border-radius-medium); box-shadow: var(--shadow-light); border: 1px solid var(--gray-light); display: flex; flex-direction: column; overflow: hidden; transition: var(--transition-medium); }
+        .admin-event-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-medium); }
+        .admin-event-card-image-container { height: 180px; background-color: var(--gray-light); overflow: hidden; }
+        .admin-event-card-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease-out; }
+        .admin-event-card:hover .admin-event-card-image { transform: scale(1.05); }
+        .admin-event-card-content { padding: 1rem 1.2rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .admin-event-card-header { margin-bottom: 0.8rem; }
+        .admin-event-card-header .admin-event-title { font-size: 1.3rem; color: var(--primary); margin: 0 0 0.3rem 0; font-weight: 600; line-height: 1.4; }
+        .admin-event-card-header .admin-event-date { font-size: 0.85rem; color: var(--gray-dark); }
+        .admin-event-card-quick-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem 0.8rem; margin-bottom: 1rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--gray-light); }
+        .admin-event-card-quick-stats .stat-item { font-size: 0.85rem; color: var(--dark); display: flex; align-items: center; background-color: var(--light); padding: 0.3rem 0.5rem; border-radius: 6px; }
+        .admin-event-card-quick-stats .stat-item i { margin-right: 0.5em; color: var(--secondary); font-size: 0.9em; width: 16px; text-align: center; }
+        .admin-event-card-actions { display: grid; gap: 0.6rem; }
+        .admin-event-card-actions .btn-admin { width: 100%; font-size: 0.82rem; padding: 0.5rem 0.55rem; }
+        .admin-event-card-actions .btn-admin i { font-size: 0.9em; }
+        .admin-event-card-actions.top-actions { grid-template-columns: repeat(3, 1fr); margin-bottom: 0.5rem; }
+        .admin-event-card-actions.bottom-actions { grid-template-columns: repeat(3, 1fr); padding-top: 0.5rem; margin-top: 0; border-top: none; }
+        .admin-event-card-actions .btn-bookings { background-color: #4CAF50; color: var(--white); border-color: #4CAF50; }
+        .admin-event-card-actions .btn-bookings:hover { background-color: #45a049; border-color: #388E3C; }
+        .admin-event-card-actions .btn-edit { background-color: var(--accent); color: var(--white); border-color: var(--accent); }
+        .admin-event-card-actions .btn-edit:hover { background-color: #b8734a; border-color: #b8734a; }
+        .month-year-header { font-size: 1.45rem; color: var(--accent); margin-top: 1.5rem; margin-bottom: 1.2rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--accent); text-align: left; font-weight: 600; grid-column: 1 / -1 !important; width: 100%; }
+        .admin-event-grid > .add-event-bar + .month-year-header, .admin-event-grid > .month-year-header:first-child { margin-top: 0; }
+        #manageBookingsModal .modal-content { max-width: 750px; }
+        #bookingsListContainerModal .user-booking-group { border: 1px solid var(--gray-light); border-radius: 8px; padding: 0.8rem; margin-bottom: 0.8rem; background-color: #fdfdfd; }
+        #bookingsListContainerModal .user-booking-group h5 { font-size: 1.05rem; color: var(--primary); margin-top: 0; margin-bottom: 0.8rem; padding-bottom: 0.5rem; border-bottom: 1px dotted var(--gray-medium); }
+        #bookingsListContainerModal .single-booking-details { padding: 0.5rem; margin-bottom: 0.5rem; border-left: 3px solid var(--secondary); background-color: var(--white); }
+        #bookingsListContainerModal .single-booking-details > p { font-size: 0.9rem; margin-bottom: 0.3rem; }
+        #bookingsListContainerModal .participant-list-inline { list-style: none; padding-left: 0; margin-bottom: 0.5rem; font-size: 0.85rem; }
+        #bookingsListContainerModal .participant-list-inline li { display: inline-block; margin-right: 0.8rem; padding: 0.2rem 0.5rem; background-color: var(--light); border-radius: 4px; border: 1px solid var(--gray-light); }
+        #bookingsListContainerModal .single-booking-details .btn-admin.btn-sm { display: inline-block; margin-top: 0.5rem; }
+        #bookingsManagementFeedbackModal p { margin: 0; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid transparent; font-size: 0.9rem; }
+        #bookingsManagementFeedbackModal p.success-message { background-color: rgba(var(--success-rgb), 0.15); border-color: var(--success); color: var(--dark); }
+        #bookingsManagementFeedbackModal p.error-message { background-color: rgba(var(--danger-rgb), 0.15); border-color: var(--danger); color: var(--dark); }
+        .loading-message-dashboard, .error-message-dashboard, .no-events-dashboard { text-align: center; padding: 2rem; font-size: 1.1rem; color: var(--gray-dark); }
+        .admin-event-grid > .no-events-dashboard { grid-column: 1 / -1; }
+        .no-events-dashboard a { color: var(--accent); text-decoration: underline; }
+        .no-events-dashboard a:hover { color: var(--primary); }
+        .badge-admin-dashboard { display: inline-block; margin-left: 0.6em; padding: 0.2em 0.6em; font-size: 0.75em; font-weight: bold; color: var(--white); background-color: var(--primary); border-radius: 4px; line-height: 1.2; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px; }
+        .add-event-bar { grid-column: 1 / -1 !important; display: flex; align-items: center; justify-content: center; gap: 0.8rem; padding: 1rem; border: 2px dashed var(--secondary); border-radius: var(--border-radius-medium); background-color: var(--light); color: var(--secondary); font-size: 1.15rem; font-weight: 500; text-align: center; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; margin-bottom: 1.8rem; min-height: 60px; }
+        .add-event-bar:hover { background-color: #e8f0e7; border-color: var(--primary); color: var(--primary); }
+        .add-event-bar i { font-size: 1.3rem; }
 
         @media (max-width: 767px) {
-            .event-controls-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .event-tabs-container-main {
-                width: 100%;
-                margin-bottom: 0;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-            }
-            .event-tabs-container-main .event-tab-button {
-                margin-right: 0;
-                border-radius:0 !important;
-                border-bottom: 1px solid var(--gray-medium);
-            }
-            .event-tabs-container-main .event-tab-button:first-child {
-                border-top-left-radius: 10px !important;
-                border-right: 1px solid var(--gray-medium);
-            }
-            .event-tabs-container-main .event-tab-button:nth-child(2) {
-                border-top-right-radius: 10px !important;
-            }
+            .event-controls-header { flex-direction: column; align-items: stretch; }
+            .event-tabs-container-main { width: 100%; margin-bottom: 0; display: grid; grid-template-columns: 1fr 1fr; }
+            .event-tabs-container-main .event-tab-button { margin-right: 0; border-radius:0 !important; border-bottom: 1px solid var(--gray-medium); }
+            .event-tabs-container-main .event-tab-button:first-child { border-top-left-radius: 10px !important; border-right: 1px solid var(--gray-medium); }
+            .event-tabs-container-main .event-tab-button:nth-child(2) { border-top-right-radius: 10px !important; }
+            .filter-trigger-container-main { width: 100%; margin-left: 0; }
+            .filter-trigger-container-main #filterToggleButton.event-tab-button { width: 100%; justify-content: center; border-radius: 0 0 10px 10px !important; border-left: 1px solid var(--gray-medium) !important; border-right: 1px solid var(--gray-medium) !important; margin-left: 0; }
+            .filter-trigger-container-main #filterToggleButton.event-tab-button.active { border-radius:0 !important; border-bottom: none !important; }
+            .filter-panel { position: static; width: 100%; box-shadow: none; border-radius: 0 0 10px 10px; border-top: 1px solid var(--gray-medium); margin-bottom: 1rem; }
+            .filter-trigger-container-main #filterToggleButton.event-tab-button.active + .filter-panel { border-top: none; }
+            .event-view-controls { flex-direction: column; align-items: stretch; border-radius: var(--border-radius-medium); margin-top: 1rem; border: 1px solid var(--gray-medium); }
+            #eventManagementContent { border-radius: var(--border-radius-medium); margin-top: 1rem; border: 1px solid var(--gray-medium); }
+            .admin-event-grid { grid-template-columns: 1fr; }
+            .admin-event-card { max-width: none; min-height: auto; }
+            .add-event-bar { min-height: auto; padding: 1rem; margin-bottom: 1rem; }
+            .add-event-bar i { font-size: 1.5rem; }
+            .add-event-bar span { font-size: 1.1rem; }
+            .admin-event-card-actions.top-actions, .admin-event-card-actions.bottom-actions { grid-template-columns: repeat(auto-fit, minmax(85px, 1fr)); }
+        }
 
+        /* NUOVI STILI PER SLIDER E SIMULAZIONE CHAT */
+        .moderation-slider-group {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: #f0f3f5;
+            border-radius: 8px;
+            border: 1px solid #dfe6e9;
+        }
+        .moderation-slider-label-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+        .moderation-slider-label-container label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+        #moderationLevelLabel { /* Etichetta dinamica del livello */
+            font-weight: bold;
+            font-size: 1rem;
+            padding: 0.4em 0.8em;
+            border-radius: 6px;
+            color: var(--white); /* Testo bianco di default, modificato per level-1 */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            min-width: 180px;
+            text-align: center;
+        }
+        /* Colori di sfondo per l'etichetta */
+        #moderationLevelLabel.level-0 { background-color: #2ecc71; } /* Verde */
+        #moderationLevelLabel.level-1 { background-color: #f1c40f; color: var(--dark); } /* Giallo, testo scuro */
+        #moderationLevelLabel.level-2 { background-color: #e67e22; } /* Arancione */
+        #moderationLevelLabel.level-3 { background-color: #e74c3c; } /* Rosso */
 
-            .filter-trigger-container-main {
-                width: 100%;
-                margin-left: 0;
-            }
-            .filter-trigger-container-main #filterToggleButton.event-tab-button {
-                width: 100%;
-                justify-content: center;
-                border-radius: 0 0 10px 10px !important;
-                border-left: 1px solid var(--gray-medium) !important;
-                border-right: 1px solid var(--gray-medium) !important;
-                margin-left: 0;
-            }
-            .filter-trigger-container-main #filterToggleButton.event-tab-button.active {
-                border-radius:0 !important;
-                border-bottom: none !important;
-            }
+        .moderation-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 10px;
+            background: #dfe6e9;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        /* Pollice Slider Webkit */
+        .moderation-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--secondary); /* Default */
+            cursor: pointer;
+            border: 3px solid var(--white);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+            margin-top: -6px; /* Allineamento verticale */
+            transition: background-color 0.3s ease, transform 0.15s ease;
+        }
+        .moderation-slider:active::-webkit-slider-thumb { transform: scale(1.1); }
+        .moderation-slider.level-0::-webkit-slider-thumb { background-color: #2ecc71; }
+        .moderation-slider.level-1::-webkit-slider-thumb { background-color: #f1c40f; }
+        .moderation-slider.level-2::-webkit-slider-thumb { background-color: #e67e22; }
+        .moderation-slider.level-3::-webkit-slider-thumb { background-color: #e74c3c; }
 
-            .filter-panel {
-                position: static; /* Cambia a static per il layout mobile in colonna */
-                width: 100%; /* Occupa tutta la larghezza disponibile */
-                box-shadow: none; /* Rimuovi ombra se è in flusso normale */
-                border-radius: 0 0 10px 10px; /* Stondatura solo sotto */
-                border-top: 1px solid var(--gray-medium); /* Bordo sopra per separarlo dal bottone */
-                margin-bottom: 1rem; /* Spazio prima dei controlli di vista */
-            }
-            /* Nasconde il bordo superiore del pannello se il bottone Filtri è attivo e "connesso" */
-            .filter-trigger-container-main #filterToggleButton.event-tab-button.active + .filter-panel {
-                border-top: none;
-            }
+        /* Pollice Slider Firefox */
+        .moderation-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--secondary); /* Default */
+            cursor: pointer;
+            border: 3px solid var(--white);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+            transition: background-color 0.3s ease, transform 0.15s ease;
+        }
+        .moderation-slider:active::-moz-range-thumb { transform: scale(1.1); }
+        .moderation-slider.level-0::-moz-range-thumb { background-color: #2ecc71; }
+        .moderation-slider.level-1::-moz-range-thumb { background-color: #f1c40f; }
+        .moderation-slider.level-2::-moz-range-thumb { background-color: #e67e22; }
+        .moderation-slider.level-3::-moz-range-thumb { background-color: #e74c3c; }
 
+        #moderationLevelDescription {
+            font-size: 0.9rem;
+            color: var(--gray-dark);
+            text-align: center;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background-color: var(--white);
+            border-radius: 6px;
+            border: 1px solid var(--gray-light);
+            min-height: 1.5em;
+        }
 
-            .event-view-controls {
-                flex-direction: column; align-items: stretch;
-                border-radius: var(--border-radius-medium);
-                margin-top: 1rem;
-                border: 1px solid var(--gray-medium);
-            }
-            .advanced-options-content select.form-control {
-                max-width: 100%; /* Full width on mobile */
-            }
-            #eventManagementContent {
-                border-radius: var(--border-radius-medium);
-                margin-top: 1rem;
-                border: 1px solid var(--gray-medium);
-            }
+        .moderation-preview-container { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-light); }
+        .moderation-preview-container h5 { font-size: 1.2rem; color: var(--primary); margin-bottom: 1.2rem; text-align: center; font-weight: 600; }
+        #moderationPreviewChat { background-color: #f0f3f5; border: 1px solid #dfe6e9; border-radius: 8px; padding: 1rem; max-height: 280px; overflow-y: auto; box-shadow: inset 0 2px 4px rgba(0,0,0,0.04); }
+        .chat-message-example { position: relative; background-color: var(--white); padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.7rem; border: 1px solid var(--gray-light); font-size: 0.95rem; transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); min-height: 50px; display: flex; flex-direction: column; justify-content: center; }
+        .chat-message-example:last-child { margin-bottom: 0; }
+        .chat-message-example .chat-user { font-weight: 700; color: var(--secondary); margin-right: 0.5em; }
+        .chat-message-example .chat-text { color: #444; transition: opacity 0.25s ease-out, filter 0.25s ease-out; }
+        .chat-message-example .blocked-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(231, 76, 60, 0.08); color: var(--danger); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; opacity: 0; visibility: hidden; transform: translateY(8px) scale(0.97); transition: opacity 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) 0.05s, transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) 0.05s, visibility 0s linear 0.35s; pointer-events: none; border: 1px dashed rgba(231, 76, 60, 0.4); padding: 8px; box-sizing: border-box; text-align: center; }
+        .chat-message-example.blocked .chat-text { filter: blur(1px); opacity: 0.4; }
+        .chat-message-example.blocked .blocked-overlay { opacity: 1; visibility: visible; transform: translateY(0) scale(1); transition-delay: 0s; pointer-events: auto; }
+        .blocked-overlay .blocked-icon { font-size: 1.6em; margin-bottom: 0.2em; color: var(--danger); animation: popInBlockedIcon 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s backwards; }
+        .blocked-overlay .blocked-text { font-size: 0.8rem; font-weight: 500; line-height: 1.3; word-wrap: break-word; overflow-wrap: break-word; animation: fadeInBlockedText 0.4s ease-out 0.2s backwards; }
+        @keyframes popInBlockedIcon { 0% { transform: scale(0.4) rotate(-15deg); opacity: 0; } 70% { transform: scale(1.1) rotate(5deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+        @keyframes fadeInBlockedText { 0% { opacity: 0; transform: translateY(3px); } 100% { opacity: 1; transform: translateY(0); } }
+        #advancedOptionsModal .form-actions { display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid var(--gray-light); }
+        #advancedOptionsModal .btn-admin-secondary { background-color: var(--gray-light); color: var(--dark); border-color: var(--gray-medium); }
+        #advancedOptionsModal .btn-admin-secondary:hover { background-color: var(--gray-medium); }
+        #advancedSettingsModalMessage { margin-top: 1rem; text-align: center; font-size: 0.95rem; }
+
+        /* MODIFICA: Nascondi hamburger menu */
+        .navbar .hamburger {
+            display: none !important;
         }
     </style>
 </head>
@@ -433,7 +425,7 @@
 <header class="navbar-container" id="navbarContainer">
     <nav class="navbar">
         <div class="logo">
-            <a href="indexadmin.html"> <span class="emoji">🏔️</span>
+            <a href="index.html"> <span class="emoji">🏔️</span>
                 <h2 id="navbar-title-admin">Eremo Frate Francesco - Admin</h2>
             </a>
         </div>
@@ -464,6 +456,12 @@
 
 <main class="dashboard-main">
     <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+
+    <div style="text-align: right; margin-bottom: 1.5rem;">
+        <button id="openAdvancedOptionsModalBtn" class="btn-admin btn-admin-info">
+            <i class="fas fa-cogs"></i> Opzioni Avanzate
+        </button>
+    </div>
 
     <div class="event-controls-header">
         <div class="event-tabs-container-main">
@@ -530,26 +528,6 @@
         </div>
     </div>
 
-    <div class="dashboard-section" id="advancedOptionsSection">
-        <h2><i class="fas fa-cogs"></i> Opzioni Avanzate</h2>
-        <div class="advanced-options-content">
-            <div class="form-group">
-                <label for="commentModerationLevel">Livello Moderazione Commenti</label>
-                <select id="commentModerationLevel" class="form-control">
-                    <option value="0">Nessuna Moderazione (commenti sempre pubblicati)</option>
-                    <option value="1">Moderazione Leggera (più tollerante, soglia Groq: 6)</option>
-                    <option value="2" selected>Moderazione Standard (raccomandato, soglia Groq: 4)</option>
-                    <option value="3">Moderazione Rigorosa (meno tollerante, soglia Groq: 2)</option>
-                </select>
-                <small>Questa impostazione influenza il filtro automatico dei commenti basato sull'offensività. Si applica globalmente a tutti gli eventi. La soglia indica il punteggio massimo (da 1 a 10) consentito affinché un commento passi la moderazione automatica.</small>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn-admin btn-admin-primary" id="saveAdvancedSettingsBtn">Salva Impostazioni Avanzate</button>
-            </div>
-            <div id="advancedSettingsMessage" class="form-message" style="display:none; margin-top: 1rem;"></div>
-        </div>
-    </div>
-
     <div id="eventManagementContent" class="dashboard-section">
         <div class="event-tab-content active" id="upcomingEventsContainer">
             <div id="upcomingEventsGrid" class="admin-event-grid">
@@ -564,9 +542,38 @@
     </div>
 </main>
 
+<div id="advancedOptionsModal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+        <span class="close-modal-btn" data-modal-id="advancedOptionsModal">&times;</span>
+        <h3><i class="fas fa-user-shield"></i> Impostazioni Moderazione Commenti</h3>
+        <div class="modal-content-scrollable">
+
+            <div class="moderation-slider-group">
+                <div class="moderation-slider-label-container">
+                    <label for="moderationLevelSliderInput">Livello Filtro IA:</label>
+                    <span id="moderationLevelLabel" class="slider-level-label">Moderazione Standard</span>
+                </div>
+                <input type="range" id="moderationLevelSliderInput" class="moderation-slider" min="0" max="3" value="2" step="1">
+                <p id="moderationLevelDescription" class="slider-level-description">Descrizione livello...</p>
+            </div>
+
+            <div class="moderation-preview-container">
+                <h5><i class="fas fa-comments"></i> Anteprima Effetto Moderazione</h5>
+                <div id="moderationPreviewChat">
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn-admin btn-admin-secondary close-modal-btn-alt" data-modal-id="advancedOptionsModal">Annulla</button>
+            <button type="button" class="btn-admin btn-admin-primary" id="saveAdvancedSettingsModalBtn"><i class="fas fa-save"></i> Salva Impostazioni</button>
+        </div>
+        <div id="advancedSettingsModalMessage" class="form-message" style="display:none;"></div>
+    </div>
+</div>
+
 <div id="uploadMediaModal" class="modal">
     <div class="modal-content">
-        <span class="close-modal-btn" onclick="closeModal('uploadMediaModal')">&times;</span>
+        <span class="close-modal-btn" data-modal-id="uploadMediaModal">&times;</span>
         <h3>Gestisci Media per Evento: <span id="uploadMediaEventTitle"></span></h3>
         <div class="modal-content-scrollable">
             <h4>Carica Nuovi Media</h4>
@@ -584,7 +591,7 @@
 
 <div id="manageCommentsModal" class="modal">
     <div class="modal-content">
-        <span class="close-modal-btn" onclick="closeModal('manageCommentsModal')">&times;</span>
+        <span class="close-modal-btn" data-modal-id="manageCommentsModal">&times;</span>
         <h3>Gestisci Commenti: <span id="commentsEventTitle"></span></h3>
         <div class="modal-content-scrollable">
             <ul id="commentsListContainer" class="comments-list-admin-styled">
@@ -597,7 +604,7 @@
 
 <div id="manageBookingsModal" class="modal">
     <div class="modal-content">
-        <span class="close-modal-btn" onclick="closeModal('manageBookingsModal')">&times;</span>
+        <span class="close-modal-btn" data-modal-id="manageBookingsModal">&times;</span>
         <h3>Gestisci Prenotazioni: <span id="bookingsEventTitle"></span></h3>
         <div class="modal-content-scrollable" id="bookingsListContainerModal">
             <p><i class="fas fa-spinner fa-spin"></i> Caricamento prenotazioni...</p>
@@ -614,19 +621,16 @@
     <div class="event-form-and-preview-container">
         <form id="eventFormDashboard" method="POST" enctype="multipart/form-data">
             <input type="hidden" id="event-id-dashboard" name="event-id">
-
             <div class="form-group">
                 <label for="event-title-dashboard">Titolo Evento*</label>
                 <input type="text" id="event-title-dashboard" name="event-title" class="form-control" required>
             </div>
-
             <div class="form-row">
                 <div class="form-group">
                     <label for="event-date-dashboard">Data Inizio*</label>
                     <input type="date" id="event-date-dashboard" name="event-date" class="form-control" required>
                 </div>
             </div>
-
             <div class="form-row-grid">
                 <div class="form-group">
                     <label for="event-start-time-dashboard">Orario Inizio (HH:MM)</label>
@@ -637,17 +641,14 @@
                     <input type="time" id="event-end-time-dashboard" name="event-end-time" class="form-control">
                 </div>
             </div>
-
             <div class="form-group">
                 <label for="event-short-desc-dashboard">Descrizione Breve* (max 255 caratteri)</label>
                 <textarea id="event-short-desc-dashboard" name="event-short-desc" class="form-control" rows="2" required maxlength="255"></textarea>
             </div>
-
             <div class="form-group">
                 <label for="event-long-desc-dashboard">Descrizione Estesa</label>
                 <textarea id="event-long-desc-dashboard" name="event-long-desc" class="form-control" rows="4"></textarea>
             </div>
-
             <div class="form-grid">
                 <div class="form-group">
                     <label for="event-prefix-dashboard">Prefisso Relatore</label>
@@ -658,7 +659,6 @@
                     <input type="text" id="event-speaker-dashboard" name="event-speaker" class="form-control" required>
                 </div>
             </div>
-
             <div class="form-grid">
                 <div class="form-group">
                     <label for="event-association-dashboard">Associazione</label>
@@ -669,36 +669,30 @@
                     <input type="number" id="event-seats-dashboard" name="event-seats" class="form-control" required min="0">
                 </div>
             </div>
-
             <div class="form-group">
                 <label for="event-image-dashboard">Immagine Copertina</label>
                 <input type="file" id="event-image-dashboard" name="event-image" class="form-control" accept="image/*">
                 <small>Lascia vuoto se non vuoi modificare l'immagine esistente.</small>
                 <img id="current-event-image-preview-dashboard" src="#" alt="Anteprima Immagine" style="max-width:150px; display:none; margin-top:5px;">
             </div>
-
             <div class="form-group">
                 <label for="event-flyer-dashboard">Volantino (PDF/Immagine)</label>
                 <input type="file" id="event-flyer-dashboard" name="event-flyer" class="form-control" accept="image/*,application/pdf">
                 <small>Lascia vuoto se non vuoi modificare il volantino esistente.</small>
                 <div id="current-event-flyer-preview-dashboard" style="margin-top:5px;"></div>
             </div>
-
             <div class="form-check-group">
                 <input type="checkbox" id="event-booking-dashboard" name="event-booking">
                 <label for="event-booking-dashboard">Prenotazioni aperte</label>
             </div>
-
             <div class="form-check-group">
                 <input type="checkbox" id="event-voluntary-dashboard" name="event-voluntary">
                 <label for="event-voluntary-dashboard">Offerta libera</label>
             </div>
-
             <div class="form-group" id="event-price-container-dashboard" style="display: block;">
                 <label for="event-price-dashboard">Prezzo (€)</label>
                 <input type="number" id="event-price-dashboard" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00">
             </div>
-
             <div id="eventFormMessageDashboard" class="form-message" style="display:none;"></div>
             <div class="form-actions">
                 <button type="submit" class="btn-popup">Salva Evento</button>
@@ -766,8 +760,11 @@
     function closeMobileMenu() {
         const mobileMenu = document.getElementById("mobileMenu");
         const hamburger = document.querySelector(".navbar .hamburger");
-        if(mobileMenu && hamburger){
+        if(mobileMenu && hamburger && mobileMenu.classList.contains("open")){
             mobileMenu.classList.remove("open");
+            if (hamburger.classList.contains("open")) { // Controlla se hamburger ha la classe open prima di rimuoverla
+                hamburger.classList.remove("open");
+            }
             hamburger.setAttribute("aria-expanded", "false");
             document.body.style.overflow = '';
         }
@@ -798,7 +795,7 @@
         }
         const filterPanel = document.getElementById('filterPanelDropdown');
         const filterToggle = document.getElementById('filterToggleButton');
-        if (filterPanel && filterPanel.classList.contains('active') && !filterPanel.contains(event.target) && !filterToggle.contains(event.target)) {
+        if (filterPanel && filterPanel.classList.contains('active') && !filterPanel.contains(event.target) && filterToggle && !filterToggle.contains(event.target)) {
             filterPanel.classList.remove('active');
             filterToggle.classList.remove('active');
             filterToggle.setAttribute('aria-expanded', 'false');
@@ -807,17 +804,27 @@
     function logout() {
         localStorage.removeItem('adminUserEFF');
         alert('Logout effettuato.');
-        window.location.href = 'login_admin.html';
+        window.location.href = 'index.html';
     }
 
     function openModal(modalId) {
         const modal = document.getElementById(modalId);
-        if (modal) modal.classList.add('active');
+        if (modal) {
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
         document.body.style.overflow = 'hidden';
     }
     function closeModal(modalId) {
         const modal = document.getElementById(modalId);
-        if (modal) modal.classList.remove('active');
+        if (modal) {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                if (modal && !modal.classList.contains('active')) {
+                    modal.style.display = 'none';
+                }
+            }, 250);
+        }
         const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active');
         if (!anyModalActive) {
             document.body.style.overflow = '';
@@ -825,7 +832,7 @@
         if (modalId === 'uploadMediaModal') {
             document.getElementById('uploadMediaForm')?.reset();
             const uploadFeedback = document.getElementById('uploadMediaFeedback'); if (uploadFeedback) uploadFeedback.innerHTML = '';
-            const existingMedia = document.getElementById('existingMediaContainer'); if (existingMedia) existingMedia.innerHTML = '<p>Caricamento media...</p>';
+            const existingMedia = document.getElementById('existingMediaContainer'); if (existingMedia) existingMedia.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media...</p>';
         }
         if (modalId === 'manageCommentsModal') {
             let commentsListContainer = document.getElementById('commentsListContainer');
@@ -839,6 +846,10 @@
         if (modalId === 'manageBookingsModal') {
             const bookingsContainer = document.getElementById('bookingsListContainerModal'); if (bookingsContainer) bookingsContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento prenotazioni...</p>';
             const bookingsFeedback = document.getElementById('bookingsManagementFeedbackModal'); if (bookingsFeedback) bookingsFeedback.innerHTML = '';
+        }
+        if (modalId === 'advancedOptionsModal') {
+            const msgArea = document.getElementById('advancedSettingsModalMessage');
+            if(msgArea) { msgArea.style.display = 'none'; msgArea.textContent = ''; msgArea.className = 'form-message'; }
         }
     }
     window.onclick = function(event) {
@@ -873,10 +884,7 @@
                 return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
             }
             return dateString;
-        } catch (e) {
-            console.warn("Errore formattazione data DB:", dateString, e);
-            return dateString;
-        }
+        } catch (e) { console.warn("Errore formattazione data DB:", dateString, e); return dateString; }
     }
     function formatMonthYear(dateString) {
         if (!dateString) return 'Data sconosciuta';
@@ -889,12 +897,8 @@
                 if (isNaN(date.getTime())) return 'Data non valida';
                 const options = { month: 'long', year: 'numeric', timeZone: 'UTC' };
                 return new Intl.DateTimeFormat('it-IT', options).format(date);
-            }
-            return 'Data non valida';
-        } catch (e) {
-            console.warn("Errore formattazione Mese/Anno:", dateString, e);
-            return 'Data non valida';
-        }
+            } return 'Data non valida';
+        } catch (e) { console.warn("Errore formattazione Mese/Anno:", dateString, e); return 'Data non valida'; }
     }
     function getMonthIndexFromString(monthName) {
         const months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
@@ -913,7 +917,6 @@
     const eventFormMessageDashboard = document.getElementById('eventFormMessageDashboard');
     const currentImagePreviewDashboard = document.getElementById('current-event-image-preview-dashboard');
     const currentFlyerPreviewDashboard = document.getElementById('current-event-flyer-preview-dashboard');
-
     const previewImageEl = document.getElementById('previewImage');
     const previewNoImagePlaceholder = document.querySelector('#eventCardPreviewContainer .no-image-placeholder');
     const previewTitleEl = document.getElementById('previewTitle');
@@ -924,7 +927,6 @@
     const previewShortDescEl = document.getElementById('previewShortDesc');
     const previewSeatsEl = document.querySelector('#previewSeats .value');
     const previewPriceEl = document.querySelector('#previewPrice .value');
-
 
     function updatePriceFieldVisibilityDashboard() {
         if (voluntaryCheckboxDashboard && priceContainerDashboard && eventPriceInputDashboard) {
@@ -937,85 +939,43 @@
     }
     if (voluntaryCheckboxDashboard) voluntaryCheckboxDashboard.addEventListener('change', updatePriceFieldVisibilityDashboard);
 
-
     function updateEventPreview() {
         if (!previewTitleEl) return;
-
         previewTitleEl.textContent = document.getElementById('event-title-dashboard').value || 'Titolo Evento';
         const dateValue = document.getElementById('event-date-dashboard').value;
         previewDateEl.textContent = dateValue ? formatDbDate(dateValue) : 'Seleziona data';
-
         const startTimeValue = document.getElementById('event-start-time-dashboard').value;
         const endTimeValue = document.getElementById('event-end-time-dashboard').value;
         let timeString = '';
-        if (startTimeValue && endTimeValue) {
-            timeString = `${startTimeValue} - ${endTimeValue}`;
-        } else if (startTimeValue) {
-            timeString = startTimeValue;
-        }
-
-        if (timeString && previewTimeContainerEl && previewTimeEl) {
-            previewTimeContainerEl.style.display = 'block';
-            previewTimeEl.textContent = timeString;
-        } else if (previewTimeContainerEl && previewTimeEl) {
-            previewTimeContainerEl.style.display = 'none';
-            previewTimeEl.textContent = '';
-        }
-
+        if (startTimeValue && endTimeValue) timeString = `${startTimeValue} - ${endTimeValue}`;
+        else if (startTimeValue) timeString = startTimeValue;
+        if (timeString && previewTimeContainerEl && previewTimeEl) { previewTimeContainerEl.style.display = 'block'; previewTimeEl.textContent = timeString; }
+        else if (previewTimeContainerEl && previewTimeEl) { previewTimeContainerEl.style.display = 'none'; previewTimeEl.textContent = '';}
         const speakerPrefix = document.getElementById('event-prefix-dashboard').value || 'Relatore';
         const speakerName = document.getElementById('event-speaker-dashboard').value || 'Nome Relatore';
         previewSpeakerEl.textContent = `${speakerPrefix}: ${speakerName}`;
-
         previewShortDescEl.textContent = document.getElementById('event-short-desc-dashboard').value || 'Descrizione breve dell\'evento qui...';
         previewSeatsEl.textContent = document.getElementById('event-seats-dashboard').value || '0';
-
         const isVoluntary = document.getElementById('event-voluntary-dashboard').checked;
-        if (isVoluntary) {
-            previewPriceEl.textContent = 'Offerta libera';
-        } else {
-            const priceValue = parseFloat(document.getElementById('event-price-dashboard').value);
-            previewPriceEl.textContent = !isNaN(priceValue) && priceValue > 0 ? `€ ${priceValue.toFixed(2)}` : '€ 0.00';
-        }
-
+        if (isVoluntary) { previewPriceEl.textContent = 'Offerta libera'; }
+        else { const priceValue = parseFloat(document.getElementById('event-price-dashboard').value); previewPriceEl.textContent = !isNaN(priceValue) && priceValue > 0 ? `€ ${priceValue.toFixed(2)}` : '€ 0.00';}
         const imageInput = document.getElementById('event-image-dashboard');
         if (imageInput.files && imageInput.files[0]) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImageEl.src = e.target.result;
-                previewImageEl.style.display = 'block';
-                if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
-            }
+            reader.onload = function(e) { previewImageEl.src = e.target.result; previewImageEl.style.display = 'block'; if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none'; }
             reader.readAsDataURL(imageInput.files[0]);
         } else if (currentImagePreviewDashboard && currentImagePreviewDashboard.src !== '#' && currentImagePreviewDashboard.style.display !== 'none') {
-            previewImageEl.src = currentImagePreviewDashboard.src;
-            previewImageEl.style.display = 'block';
-            if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
-        } else {
-            previewImageEl.src = 'images/default-event.jpg'; // Default se nessun'altra immagine
-            previewImageEl.style.display = 'block';
-            if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
-        }
+            previewImageEl.src = currentImagePreviewDashboard.src; previewImageEl.style.display = 'block'; if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
+        } else { previewImageEl.src = 'images/default-event.jpg'; previewImageEl.style.display = 'block'; if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none'; }
     }
 
     function attachPreviewListeners() {
-        const formElementsToWatch = [
-            'event-title-dashboard', 'event-date-dashboard',
-            'event-start-time-dashboard', 'event-end-time-dashboard',
-            'event-short-desc-dashboard', 'event-prefix-dashboard', 'event-speaker-dashboard',
-            'event-seats-dashboard', 'event-price-dashboard', 'event-voluntary-dashboard',
-            'event-image-dashboard'
-        ];
+        const formElementsToWatch = ['event-title-dashboard', 'event-date-dashboard', 'event-start-time-dashboard', 'event-end-time-dashboard', 'event-short-desc-dashboard', 'event-prefix-dashboard', 'event-speaker-dashboard', 'event-seats-dashboard', 'event-price-dashboard', 'event-voluntary-dashboard', 'event-image-dashboard'];
         formElementsToWatch.forEach(id => {
             const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('input', updateEventPreview);
-                if (element.type === 'checkbox' || element.type === 'file') {
-                    element.addEventListener('change', updateEventPreview);
-                }
-            }
+            if (element) { element.addEventListener('input', updateEventPreview); if (element.type === 'checkbox' || element.type === 'file') { element.addEventListener('change', updateEventPreview);}}
         });
     }
-
 
     function openEventPopupDashboard(eventData = null) {
         if (!eventFormDashboard || !eventPopupTitleDashboard || !eventIdInputDashboard) { console.error("Elementi popup evento mancanti."); return; }
@@ -1024,29 +984,18 @@
         eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';
         currentImagePreviewDashboard.style.display = 'none'; currentImagePreviewDashboard.src = '#';
         currentFlyerPreviewDashboard.innerHTML = '';
-
         document.getElementById('event-start-time-dashboard').value = '';
         document.getElementById('event-end-time-dashboard').value = '';
-
         if (eventData) {
             eventPopupTitleDashboard.textContent = 'Modifica Evento'; eventIdInputDashboard.value = eventData.IDEvento;
             document.getElementById('event-title-dashboard').value = eventData.Titolo || '';
             const eventDate = eventData.Data ? new Date(eventData.Data.replace(/-/g, '/')) : null;
             document.getElementById('event-date-dashboard').value = (eventDate && !isNaN(eventDate)) ? eventDate.toISOString().split('T')[0] : '';
-
-            let startTime = '';
-            let endTime = '';
-            const durata = eventData.Durata || '';
-            if (durata.includes('-')) {
-                const parts = durata.split('-');
-                startTime = parts[0].trim().match(/^\d{2}:\d{2}/) ? parts[0].trim().substring(0,5) : '';
-                endTime = parts[1].trim().match(/^\d{2}:\d{2}/) ? parts[1].trim().substring(0,5) : '';
-            } else if (durata.match(/^\d{2}:\d{2}/)) {
-                startTime = durata.substring(0,5);
-            }
+            let startTime = ''; let endTime = ''; const durata = eventData.Durata || '';
+            if (durata.includes('-')) { const parts = durata.split('-'); startTime = parts[0].trim().match(/^\d{2}:\d{2}/) ? parts[0].trim().substring(0,5) : ''; endTime = parts[1].trim().match(/^\d{2}:\d{2}/) ? parts[1].trim().substring(0,5) : '';}
+            else if (durata.match(/^\d{2}:\d{2}/)) { startTime = durata.substring(0,5); }
             document.getElementById('event-start-time-dashboard').value = startTime;
             document.getElementById('event-end-time-dashboard').value = endTime;
-
             document.getElementById('event-short-desc-dashboard').value = eventData.descrizione || '';
             document.getElementById('event-long-desc-dashboard').value = eventData.descrizione_estesa || '';
             document.getElementById('event-prefix-dashboard').value = eventData.prefisso_relatore || 'Relatore';
@@ -1054,30 +1003,21 @@
             document.getElementById('event-association-dashboard').value = eventData.associazione || '';
             document.getElementById('event-seats-dashboard').value = eventData.posti_configurati_totali !== null ? eventData.posti_configurati_totali : '0';
             document.getElementById('event-booking-dashboard').checked = !!parseInt(eventData.FlagPrenotabile);
-
             voluntaryCheckboxDashboard.checked = eventData.costo !== null && parseFloat(eventData.costo) === 0;
             updatePriceFieldVisibilityDashboard();
-
-            if (!voluntaryCheckboxDashboard.checked && eventData.costo !== null && parseFloat(eventData.costo) > 0) {
-                eventPriceInputDashboard.value = parseFloat(eventData.costo).toFixed(2);
-            } else {
-                eventPriceInputDashboard.value = '';
-            }
-
+            if (!voluntaryCheckboxDashboard.checked && eventData.costo !== null && parseFloat(eventData.costo) > 0) { eventPriceInputDashboard.value = parseFloat(eventData.costo).toFixed(2); }
+            else { eventPriceInputDashboard.value = ''; }
             if (eventData.immagine_url) { currentImagePreviewDashboard.src = eventData.immagine_url; currentImagePreviewDashboard.style.display = 'block'; }
             if (eventData.volantino_url) { const fileName = eventData.volantino_url.split('/').pop(); currentFlyerPreviewDashboard.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank">Vedi volantino (${sanitizeText(fileName)})</a>`; }
         } else {
             eventPopupTitleDashboard.textContent = 'Aggiungi Nuovo Evento'; eventIdInputDashboard.value = '';
             document.getElementById('event-booking-dashboard').checked = true;
-            voluntaryCheckboxDashboard.checked = false;
-            updatePriceFieldVisibilityDashboard();
+            voluntaryCheckboxDashboard.checked = false; updatePriceFieldVisibilityDashboard();
             document.getElementById('event-seats-dashboard').value = '50';
             document.getElementById('event-prefix-dashboard').value = 'Relatore';
             eventPriceInputDashboard.value = '';
         }
-
         updateEventPreview();
-
         if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.add('active');
         if(eventPopupDashboard) eventPopupDashboard.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -1107,64 +1047,33 @@
             const formData = new FormData(this);
             formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
             if (formData.get('event-voluntary') === 'on') formData.set('event-price', '0.00');
-            else if (!formData.get('event-price') && !formData.get('event-voluntary')) {
-                formData.set('event-price', '0.00');
-            }
-
-            const startTime = formData.get('event-start-time');
-            const endTime = formData.get('event-end-time');
+            else if (!formData.get('event-price') && !formData.get('event-voluntary')) { formData.set('event-price', '0.00'); }
+            const startTime = formData.get('event-start-time'); const endTime = formData.get('event-end-time');
             let durataString = '';
-            if (startTime && endTime) {
-                durataString = `${startTime}-${endTime}`;
-            } else if (startTime) {
-                durataString = startTime;
-            }
+            if (startTime && endTime) durataString = `${startTime}-${endTime}`; else if (startTime) durataString = startTime;
             formData.append('event-time-combined', durataString);
-
-
             const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
             const responseText = await response.text();
-            let result;
-            try { result = JSON.parse(responseText); } catch (jsonError) { console.error("Risposta non JSON:", responseText); throw new Error(`Risposta server non valida.`); }
-
+            let result; try { result = JSON.parse(responseText); } catch (jsonError) { console.error("Risposta non JSON:", responseText); throw new Error(`Risposta server non valida.`); }
             if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
             if (result.success) {
-                if(eventFormMessageDashboard) {
-                    eventFormMessageDashboard.textContent = result.message || 'Operazione completata!';
-                    eventFormMessageDashboard.classList.remove('error'); eventFormMessageDashboard.classList.add('success');
-                }
-                await fetchDashboardData();
-                setTimeout(closeEventPopupDashboard, 1500);
-            } else {
-                throw new Error(result.message || 'Errore salvataggio.');
-            }
+                if(eventFormMessageDashboard) { eventFormMessageDashboard.textContent = result.message || 'Operazione completata!'; eventFormMessageDashboard.classList.remove('error'); eventFormMessageDashboard.classList.add('success');}
+                await fetchDashboardData(); setTimeout(closeEventPopupDashboard, 1500);
+            } else { throw new Error(result.message || 'Errore salvataggio.'); }
         } catch (error) {
             console.error('Errore form evento:', error);
-            if(eventFormMessageDashboard) {
-                eventFormMessageDashboard.textContent = `Errore: ${error.message}`;
-                eventFormMessageDashboard.classList.remove('success'); eventFormMessageDashboard.classList.add('error');
-            }
-        } finally {
-            if(eventFormMessageDashboard) eventFormMessageDashboard.style.display = 'block';
-            submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText;
-        }
+            if(eventFormMessageDashboard) { eventFormMessageDashboard.textContent = `Errore: ${error.message}`; eventFormMessageDashboard.classList.remove('success'); eventFormMessageDashboard.classList.add('error');}
+        } finally { if(eventFormMessageDashboard) eventFormMessageDashboard.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; }
     });
 
     const tabButtons = document.querySelectorAll('.event-tabs-container-main .event-tab-button');
     const tabContents = document.querySelectorAll('#eventManagementContent .event-tab-content');
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
-            if (!button.id || !button.id.startsWith('filterToggle')) { // Non agire sul bottone filtri
-                tabButtons.forEach(btn => {
-                    if (!btn.id || !btn.id.startsWith('filterToggle')) btn.classList.remove('active');
-                });
-                button.classList.add('active');
-                const targetTab = button.dataset.tab;
-                tabContents.forEach(content => {
-                    const isActiveTab = content.id === `${targetTab}EventsContainer`;
-                    content.style.display = isActiveTab ? 'block' : 'none';
-                    if (isActiveTab) content.classList.add('active'); else content.classList.remove('active');
-                });
+            if (!button.id || !button.id.startsWith('filterToggle')) {
+                tabButtons.forEach(btn => { if (!btn.id || !btn.id.startsWith('filterToggle')) btn.classList.remove('active'); });
+                button.classList.add('active'); const targetTab = button.dataset.tab;
+                tabContents.forEach(content => { const isActiveTab = content.id === `${targetTab}EventsContainer`; content.style.display = isActiveTab ? 'block' : 'none'; if (isActiveTab) content.classList.add('active'); else content.classList.remove('active'); });
             }
         });
     });
@@ -1173,54 +1082,23 @@
     const filterPanelDropdown = document.getElementById('filterPanelDropdown');
     const applyFiltersFromPanelBtn = document.getElementById('applyFiltersFromPanelBtn');
     const resetFiltersBtnPanel = document.getElementById('resetFiltersBtnPanel');
-
-    if (filterToggleButton && filterPanelDropdown) {
-        filterToggleButton.addEventListener('click', function(event) {
-            event.stopPropagation();
-            const isActive = filterPanelDropdown.classList.toggle('active');
-            filterToggleButton.classList.toggle('active', isActive);
-            filterToggleButton.setAttribute('aria-expanded', isActive.toString());
-        });
-    }
-    if (applyFiltersFromPanelBtn) applyFiltersFromPanelBtn.addEventListener('click', () => {
-        applyFiltersAndRender();
-        if (filterPanelDropdown) filterPanelDropdown.classList.remove('active');
-        if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}
-    });
-    if (resetFiltersBtnPanel) resetFiltersBtnPanel.addEventListener('click', () => {
-        const searchTitleInput = document.getElementById('searchTitleDashboard'); if(searchTitleInput) searchTitleInput.value = '';
-        const searchDateInput = document.getElementById('searchDateDashboard'); if(searchDateInput) searchDateInput.value = '';
-        const searchSpeakerInput = document.getElementById('searchSpeakerDashboard'); if(searchSpeakerInput) searchSpeakerInput.value = '';
-        applyFiltersAndRender();
-        if (filterPanelDropdown) filterPanelDropdown.classList.remove('active');
-        if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}
-    });
+    if (filterToggleButton && filterPanelDropdown) { filterToggleButton.addEventListener('click', function(event) { event.stopPropagation(); const isActive = filterPanelDropdown.classList.toggle('active'); filterToggleButton.classList.toggle('active', isActive); filterToggleButton.setAttribute('aria-expanded', isActive.toString()); });}
+    if (applyFiltersFromPanelBtn) applyFiltersFromPanelBtn.addEventListener('click', () => { applyFiltersAndRender(); if (filterPanelDropdown) filterPanelDropdown.classList.remove('active'); if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}});
+    if (resetFiltersBtnPanel) resetFiltersBtnPanel.addEventListener('click', () => { const searchTitleInput = document.getElementById('searchTitleDashboard'); if(searchTitleInput) searchTitleInput.value = ''; const searchDateInput = document.getElementById('searchDateDashboard'); if(searchDateInput) searchDateInput.value = ''; const searchSpeakerInput = document.getElementById('searchSpeakerDashboard'); if(searchSpeakerInput) searchSpeakerInput.value = ''; applyFiltersAndRender(); if (filterPanelDropdown) filterPanelDropdown.classList.remove('active'); if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}});
 
     async function fetchDashboardData() {
         const upcomingGrid = document.getElementById('upcomingEventsGrid');
         const pastGrid = document.getElementById('pastEventsGrid');
         if (!upcomingGrid || !pastGrid) { console.error("Elementi griglia eventi mancanti."); return; }
-
         upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>';
         pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento archivio eventi...</p>';
         try {
             const response = await fetch('get_dashboard_event_data.php');
             if (!response.ok) throw new Error(`Errore HTTP: ${response.status} ${response.statusText}`);
             const data = await response.json();
-
-            if (data.success) {
-                allUpcomingEventsData = data.upcoming_events || [];
-                allPastEventsData = data.past_events || [];
-                applyFiltersAndRender();
-            } else {
-                const errorMsg = sanitizeText(data.message || 'Formato dati non corretto.');
-                [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore nel caricamento: ${errorMsg}</p></div>`);
-            }
-        } catch (error) {
-            console.error('Errore fetchDashboardData:', error);
-            const errorMsg = sanitizeText(error.message);
-            [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare i dati: ${errorMsg}</p> <button onclick="fetchDashboardData()" class="btn-admin">Riprova</button></div>`);
-        }
+            if (data.success) { allUpcomingEventsData = data.upcoming_events || []; allPastEventsData = data.past_events || []; applyFiltersAndRender(); }
+            else { const errorMsg = sanitizeText(data.message || 'Formato dati non corretto.'); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore nel caricamento: ${errorMsg}</p></div>`); }
+        } catch (error) { console.error('Errore fetchDashboardData:', error); const errorMsg = sanitizeText(error.message); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare i dati: ${errorMsg}</p> <button onclick="fetchDashboardData()" class="btn-admin">Riprova</button></div>`);}
     }
 
     function applyFiltersAndRender() {
@@ -1230,803 +1108,184 @@
         const sortBy = document.getElementById('sortCriteria').value;
         const sortDirection = document.getElementById('sortDirection').value;
         const groupBy = document.getElementById('groupCriteria').value;
-
-        const filterEvent = (event) => {
-            const eventTitle = event.Titolo?.toLowerCase() || '';
-            const eventDateStr = event.Data || '';
-            const eventSpeaker = event.relatore?.toLowerCase() || '';
-
-            let titleMatch = !titleFilter || eventTitle.includes(titleFilter);
-            let dateMatch = !dateFilter || (eventDateStr && eventDateStr.substring(0, 7) === dateFilter);
-            let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter);
-            return titleMatch && dateMatch && speakerMatch;
-        };
-
+        const filterEvent = (event) => { const eventTitle = event.Titolo?.toLowerCase() || ''; const eventDateStr = event.Data || ''; const eventSpeaker = event.relatore?.toLowerCase() || ''; let titleMatch = !titleFilter || eventTitle.includes(titleFilter); let dateMatch = !dateFilter || (eventDateStr && eventDateStr.substring(0, 7) === dateFilter); let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter); return titleMatch && dateMatch && speakerMatch; };
         let filteredUpcoming = allUpcomingEventsData.filter(filterEvent);
         let filteredPast = allPastEventsData.filter(filterEvent);
-
-        const compareFunction = (a, b) => {
-            let valA, valB;
-            let comparison = 0;
-
-            switch (sortBy) {
-                case 'mese':
-                    valA = new Date(a.Data);
-                    valB = new Date(b.Data);
-                    if (valA < valB) comparison = -1;
-                    if (valA > valB) comparison = 1;
-                    break;
-                case 'titolo':
-                    valA = a.Titolo?.toLowerCase() || '';
-                    valB = b.Titolo?.toLowerCase() || '';
-                    comparison = valA.localeCompare(valB, 'it', { sensitivity: 'base' });
-                    break;
-                case 'relatore':
-                    valA = a.relatore?.toLowerCase() || '';
-                    valB = b.relatore?.toLowerCase() || '';
-                    comparison = valA.localeCompare(valB, 'it', { sensitivity: 'base' });
-                    break;
-                case 'prenotazioni':
-                    valA = parseInt(a.elenco_prenotazioni?.length) || 0;
-                    valB = parseInt(b.elenco_prenotazioni?.length) || 0;
-                    if (valA < valB) comparison = -1;
-                    if (valA > valB) comparison = 1;
-                    break;
-                case 'post_occupati':
-                    valA = parseInt(a.posti_occupati) || 0;
-                    valB = parseInt(b.posti_occupati) || 0;
-                    if (valA < valB) comparison = -1;
-                    if (valA > valB) comparison = 1;
-                    break;
-                case 'post_tot':
-                    valA = parseInt(a.posti_configurati_totali) || 0;
-                    valB = parseInt(b.posti_configurati_totali) || 0;
-                    if (valA < valB) comparison = -1;
-                    if (valA > valB) comparison = 1;
-                    break;
-                default: // Default to sorting by date if sortBy is unrecognized
-                    valA = new Date(a.Data);
-                    valB = new Date(b.Data);
-                    if (valA < valB) comparison = -1;
-                    if (valA > valB) comparison = 1;
-            }
-
-            // Secondary sort by date if primary sort results in a tie (and primary is not date)
-            if (comparison === 0 && sortBy !== 'mese') {
-                let dateA = new Date(a.Data);
-                let dateB = new Date(b.Data);
-                if (dateA < dateB) comparison = -1;
-                if (dateA > dateB) comparison = 1;
-            }
-            // Tertiary sort by ID to ensure stable sort order
-            if (comparison === 0) {
-                comparison = (parseInt(a.IDEvento) || 0) < (parseInt(b.IDEvento) || 0) ? -1 : 1;
-            }
-            return sortDirection === 'asc' ? comparison : -comparison;
-        };
-
-        filteredUpcoming.sort(compareFunction);
-        filteredPast.sort(compareFunction);
-
+        const compareFunction = (a, b) => { let valA, valB; let comparison = 0; switch (sortBy) { case 'mese': valA = new Date(a.Data); valB = new Date(b.Data); if (valA < valB) comparison = -1; if (valA > valB) comparison = 1; break; case 'titolo': valA = a.Titolo?.toLowerCase() || ''; valB = b.Titolo?.toLowerCase() || ''; comparison = valA.localeCompare(valB, 'it', { sensitivity: 'base' }); break; case 'relatore': valA = a.relatore?.toLowerCase() || ''; valB = b.relatore?.toLowerCase() || ''; comparison = valA.localeCompare(valB, 'it', { sensitivity: 'base' }); break; case 'prenotazioni': valA = parseInt(a.elenco_prenotazioni?.length) || 0; valB = parseInt(b.elenco_prenotazioni?.length) || 0; if (valA < valB) comparison = -1; if (valA > valB) comparison = 1; break; case 'post_occupati': valA = parseInt(a.posti_occupati) || 0; valB = parseInt(b.posti_occupati) || 0; if (valA < valB) comparison = -1; if (valA > valB) comparison = 1; break; case 'post_tot': valA = parseInt(a.posti_configurati_totali) || 0; valB = parseInt(b.posti_configurati_totali) || 0; if (valA < valB) comparison = -1; if (valA > valB) comparison = 1; break; default: valA = new Date(a.Data); valB = new Date(b.Data); if (valA < valB) comparison = -1; if (valA > valB) comparison = 1;} if (comparison === 0 && sortBy !== 'mese') { let dateA = new Date(a.Data); let dateB = new Date(b.Data); if (dateA < dateB) comparison = -1; if (dateA > valB) comparison = 1; } if (comparison === 0) { comparison = (parseInt(a.IDEvento) || 0) < (parseInt(b.IDEvento) || 0) ? -1 : 1; } return sortDirection === 'asc' ? comparison : -comparison; };
+        filteredUpcoming.sort(compareFunction); filteredPast.sort(compareFunction);
         renderEventsSection(filteredUpcoming, 'upcomingEventsGrid', true, groupBy, sortDirection);
         renderEventsSection(filteredPast, 'pastEventsGrid', false, groupBy, sortDirection);
     }
 
-    function getWeekStartDate(dInput) { // dInput in YYYY-MM-DD format
-        const parts = dInput.split('-');
-        const d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
-        const day = d.getUTCDay(); // 0 for Sunday, 1 for Monday, etc.
-        const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday as start of week
-        return new Date(d.setUTCDate(diff));
-    }
-
-    function getWeekRangeString(dateStr) { // dateStr in YYYY-MM-DD
-        if (!dateStr || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return 'Data non valida';
-        try {
-            const weekStart = getWeekStartDate(dateStr);
-            const weekEnd = new Date(weekStart);
-            weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
-
-            const options = { day: '2-digit', month: 'short', timeZone: 'UTC' };
-            const year = weekStart.getUTCFullYear(); // Get year from weekStart
-            return `Sett. ${weekStart.toLocaleDateString('it-IT', options)} - ${weekEnd.toLocaleDateString('it-IT', options)} ${year}`;
-        } catch (e) {
-            console.warn("Errore getWeekRangeString:", dateStr, e);
-            return 'Data non valida';
-        }
-    }
-
+    function getWeekStartDate(dInput) { const parts = dInput.split('-'); const d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))); const day = d.getUTCDay(); const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1); return new Date(d.setUTCDate(diff)); }
+    function getWeekRangeString(dateStr) { if (!dateStr || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return 'Data non valida'; try { const weekStart = getWeekStartDate(dateStr); const weekEnd = new Date(weekStart); weekEnd.setUTCDate(weekStart.getUTCDate() + 6); const options = { day: '2-digit', month: 'short', timeZone: 'UTC' }; const year = weekStart.getUTCFullYear(); return `Sett. ${weekStart.toLocaleDateString('it-IT', options)} - ${weekEnd.toLocaleDateString('it-IT', options)} ${year}`; } catch (e) { console.warn("Errore getWeekRangeString:", dateStr, e); return 'Data non valida'; } }
     function renderEventsSection(events, gridContainerId, isUpcoming, groupBy, sortDirection) {
-        const gridContainer = document.getElementById(gridContainerId);
-        if (!gridContainer) return;
-        gridContainer.innerHTML = '';
-
-        if (isUpcoming) {
-            const addEventBar = document.createElement('div');
-            addEventBar.className = 'add-event-bar';
-            addEventBar.innerHTML = `<i class="fas fa-plus-circle"></i><span>Aggiungi Nuovo Evento</span>`;
-            addEventBar.addEventListener('click', () => openEventPopupDashboard(null));
-            gridContainer.appendChild(addEventBar);
-        }
-
-        if (events.length === 0) {
-            // Only add "no events" message if it's not the upcoming grid with only the "Add Event" bar
-            if (!(isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar'))) {
-                gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'} trovato con i filtri applicati.</p>`;
-            }
-            return;
-        }
-
-        if (groupBy === "nessuno") {
-            events.forEach(event => gridContainer.appendChild(createAdminEventCard(event)));
-            return;
-        }
-
-        const groupedEvents = events.reduce((acc, event) => {
-            let groupKey = 'Non specificato';
-            try {
-                switch (groupBy) {
-                    case 'giorno': groupKey = event.Data ? formatDbDate(event.Data) : 'Data sconosciuta'; break;
-                    case 'settimana': groupKey = event.Data ? getWeekRangeString(event.Data) : 'Data sconosciuta'; break;
-                    case 'mese': groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta'; break;
-                    case 'anno': groupKey = event.Data ? new Date(event.Data.replace(/-/g,'/')).getUTCFullYear().toString() : 'Anno sconosciuto'; break;
-                    case 'relatore': groupKey = sanitizeText(event.relatore || 'Senza Relatore'); break;
-                    default: groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta'; // Default to month
-                }
-            } catch(e) { console.warn("Errore calcolo groupKey per evento:", event, e); }
-            if (!acc[groupKey]) acc[groupKey] = [];
-            acc[groupKey].push(event);
-            return acc;
-        }, {});
-
+        const gridContainer = document.getElementById(gridContainerId); if (!gridContainer) return; gridContainer.innerHTML = '';
+        if (isUpcoming) { const addEventBar = document.createElement('div'); addEventBar.className = 'add-event-bar'; addEventBar.innerHTML = `<i class="fas fa-plus-circle"></i><span>Aggiungi Nuovo Evento</span>`; addEventBar.addEventListener('click', () => openEventPopupDashboard(null)); gridContainer.appendChild(addEventBar); }
+        if (events.length === 0) { if (!(isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar'))) { gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'} trovato.</p>`;} return; }
+        if (groupBy === "nessuno") { events.forEach(event => gridContainer.appendChild(createAdminEventCard(event))); return; }
+        const groupedEvents = events.reduce((acc, event) => { let groupKey = 'Non specificato'; try { switch (groupBy) { case 'giorno': groupKey = event.Data ? formatDbDate(event.Data) : 'Data sconosciuta'; break; case 'settimana': groupKey = event.Data ? getWeekRangeString(event.Data) : 'Data sconosciuta'; break; case 'mese': groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta'; break; case 'anno': groupKey = event.Data ? new Date(event.Data.replace(/-/g,'/')).getUTCFullYear().toString() : 'Anno sconosciuto'; break; case 'relatore': groupKey = sanitizeText(event.relatore || 'Senza Relatore'); break; default: groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta'; }} catch(e) { console.warn("Errore calcolo groupKey:", event, e); } if (!acc[groupKey]) acc[groupKey] = []; acc[groupKey].push(event); return acc; }, {});
         let sortedGroupKeys = Object.keys(groupedEvents);
-
-        // Sort group keys based on type and direction
-        if (groupBy === 'giorno' || groupBy === 'settimana' || groupBy === 'mese' || groupBy === 'anno') {
-            sortedGroupKeys.sort((a, b) => {
-                let dateA, dateB;
-                try {
-                    if (groupBy === 'giorno') { // Format: GG/MM/YYYY
-                        const pA = a.split('/'); dateA = new Date(Date.UTC(pA[2], pA[1]-1, pA[0]));
-                        const pB = b.split('/'); dateB = new Date(Date.UTC(pB[2], pB[1]-1, pB[0]));
-                    } else if (groupBy === 'settimana') { // Format: "Sett. DD Mmm - DD Mmm YYYY"
-                        // Extract start date for sorting: "Sett. 01 gen - 07 gen 2023" -> "01 gen 2023"
-                        const matchA = a.match(/Sett\. (\d{2}) (\w+) .* (\d{4})/);
-                        if (matchA) dateA = new Date(Date.UTC(parseInt(matchA[3]), getMonthIndexFromString(matchA[2]), parseInt(matchA[1])));
-                        const matchB = b.match(/Sett\. (\d{2}) (\w+) .* (\d{4})/);
-                        if (matchB) dateB = new Date(Date.UTC(parseInt(matchB[3]), getMonthIndexFromString(matchB[2]), parseInt(matchB[1])));
-                    } else if (groupBy === 'mese') { // Format: Mese Anno (e.g., "Maggio 2023")
-                        const pA = a.split(' '); dateA = new Date(Date.UTC(pA[1], getMonthIndexFromString(pA[0]), 1));
-                        const pB = b.split(' '); dateB = new Date(Date.UTC(pB[1], getMonthIndexFromString(pB[0]), 1));
-                    } else if (groupBy === 'anno') { // Format: YYYY
-                        dateA = new Date(Date.UTC(a, 0, 1));
-                        dateB = new Date(Date.UTC(b, 0, 1));
-                    }
-                } catch(e) { // Fallback to string sort if date parsing fails
-                    console.warn("Errore parsing date per group key sort:", a, b, e);
-                    return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
-                }
-
-                if (dateA && dateB && !isNaN(dateA) && !isNaN(dateB)) {
-                    return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
-                }
-                // Fallback for invalid dates or parsing errors
-                return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a));
-            });
-        } else if (groupBy === 'relatore') {
-            sortedGroupKeys.sort((a,b) => sortDirection === 'asc' ? a.localeCompare(b,'it',{sensitivity:'base'}) : b.localeCompare(a,'it',{sensitivity:'base'}));
-        }
-
-
-        for (const groupKey of sortedGroupKeys) {
-            const headerEl = document.createElement('h3');
-            headerEl.className = 'month-year-header'; // Consider a more generic class name if groupBy is not always date-related
-            headerEl.textContent = groupKey;
-            gridContainer.appendChild(headerEl);
-            groupedEvents[groupKey].forEach(event => gridContainer.appendChild(createAdminEventCard(event)));
-        }
+        if (groupBy === 'giorno' || groupBy === 'settimana' || groupBy === 'mese' || groupBy === 'anno') { sortedGroupKeys.sort((a, b) => { let dateA, dateB; try { if (groupBy === 'giorno') { const pA = a.split('/'); dateA = new Date(Date.UTC(pA[2], pA[1]-1, pA[0])); const pB = b.split('/'); dateB = new Date(Date.UTC(pB[2], pB[1]-1, pB[0])); } else if (groupBy === 'settimana') { const matchA = a.match(/Sett\. (\d{2}) (\w+)/); const yearA = parseInt(a.substring(a.lastIndexOf(' ') + 1)); if (matchA) dateA = new Date(Date.UTC(yearA, getMonthIndexFromString(matchA[2]), parseInt(matchA[1]))); const matchB = b.match(/Sett\. (\d{2}) (\w+)/); const yearB = parseInt(b.substring(b.lastIndexOf(' ') + 1)); if (matchB) dateB = new Date(Date.UTC(yearB, getMonthIndexFromString(matchB[2]), parseInt(matchB[1]))); } else if (groupBy === 'mese') { const pA = a.split(' '); dateA = new Date(Date.UTC(pA[1], getMonthIndexFromString(pA[0]), 1)); const pB = b.split(' '); dateB = new Date(Date.UTC(pB[1], getMonthIndexFromString(pB[0]), 1)); } else if (groupBy === 'anno') { dateA = new Date(Date.UTC(a, 0, 1)); dateB = new Date(Date.UTC(b, 0, 1)); } } catch(e) { return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a)); } if (dateA && dateB && !isNaN(dateA) && !isNaN(dateB)) { return sortDirection === 'asc' ? dateA - dateB : dateB - dateA; } return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a)); });}
+        else if (groupBy === 'relatore') { sortedGroupKeys.sort((a,b) => sortDirection === 'asc' ? a.localeCompare(b,'it',{sensitivity:'base'}) : b.localeCompare(a,'it',{sensitivity:'base'})); }
+        for (const groupKey of sortedGroupKeys) { const headerEl = document.createElement('h3'); headerEl.className = 'month-year-header'; headerEl.textContent = groupKey; gridContainer.appendChild(headerEl); groupedEvents[groupKey].forEach(event => gridContainer.appendChild(createAdminEventCard(event)));}
     }
 
     function createAdminEventCard(event) {
-        const eventCard = document.createElement('article');
-        eventCard.className = 'admin-event-card';
-        eventCard.id = `admin-event-${event.IDEvento}`;
-
-        const numPrenotazioni = event.elenco_prenotazioni?.length || 0;
-        const partecipanti = event.posti_occupati || 0;
-        const postiConfigurati = event.posti_configurati_totali || 0;
-        const commentCount = event.comment_count || 0;
-        const mediaCount = event.media_count || 0;
-
+        const eventCard = document.createElement('article'); eventCard.className = 'admin-event-card'; eventCard.id = `admin-event-${event.IDEvento}`;
+        const numPrenotazioni = event.elenco_prenotazioni?.length || 0; const partecipanti = event.posti_occupati || 0; const postiConfigurati = event.posti_configurati_totali || 0; const commentCount = event.comment_count || 0; const mediaCount = event.media_count || 0;
         let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-admin.jpg';
         const relatoreDisplay = event.relatore ? `<span class="admin-event-date" style="display:block; margin-top:2px; font-style:italic;">${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>` : '';
-
-        eventCard.innerHTML = `
-            <div class="admin-event-card-image-container">
-                <img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.Titolo)}" class="admin-event-card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
-            </div>
-            <div class="admin-event-card-content">
-                <div class="admin-event-card-header">
-                    <h3 class="admin-event-title">${sanitizeText(event.Titolo)} <small>(ID: ${event.IDEvento})</small></h3>
-                    <span class="admin-event-date">Data: ${formatDbDate(event.Data)} ${sanitizeText(event.Durata) || ''}</span>
-                    ${relatoreDisplay}
-                </div>
-                <div class="admin-event-card-quick-stats">
-                    <div class="stat-item" title="Prenotazioni"><i class="fas fa-ticket-alt"></i> ${numPrenotazioni} Pren.</div>
-                    <div class="stat-item" title="Partecipanti / Posti Config."><i class="fas fa-users"></i> ${partecipanti}/${postiConfigurati}</div>
-                    <div class="stat-item" title="Media"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div>
-                    <div class="stat-item" title="Commenti"><i class="fas fa-comments"></i> ${commentCount} Comm.</div>
-                </div>
-                <div class="admin-event-card-actions top-actions">
-                    <button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Media"><i class="fas fa-photo-video"></i> Media</button>
-                    <button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Commenti"><i class="fas fa-comments"></i> Commenti</button>
-                    <button class="btn-admin btn-bookings" data-event-id="${event.IDEvento}" title="Prenotazioni"><i class="fas fa-list-alt"></i> Prenotazioni</button>
-                </div>
-                <div class="admin-event-card-actions bottom-actions">
-                    <button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="PDF"><i class="fas fa-file-pdf"></i> PDF</button>
-                    <button class="btn-admin btn-edit" data-event-id="${event.IDEvento}" title="Modifica"><i class="fas fa-edit"></i> Modifica</button>
-                    <button class="btn-admin btn-admin-danger btn-delete" data-event-id="${event.IDEvento}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button>
-                </div>
-            </div>`;
-
-        const editButton = eventCard.querySelector('.btn-edit');
-        if(editButton) editButton.addEventListener('click', function() {
-            const eventToEdit = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId);
-            if (eventToEdit) openEventPopupDashboard(eventToEdit);
-            else alert("Dati evento non trovati per la modifica.");
-        });
-
-        const deleteButton = eventCard.querySelector('.btn-delete');
-        if(deleteButton) deleteButton.addEventListener('click', function() {
-            const eventToDelete = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId);
-            confirmDeleteEvent(this.dataset.eventId, eventToDelete ? eventToDelete.Titolo : "evento sconosciuto");
-        });
-
-        const bookingsButton = eventCard.querySelector('.btn-bookings');
-        if(bookingsButton) bookingsButton.addEventListener('click', function() {
-            const eventForBookings = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId);
-            if (eventForBookings) openManageBookingsModal(eventForBookings);
-            else alert("Dati evento non trovati per le prenotazioni.");
-        });
+        eventCard.innerHTML = `<div class="admin-event-card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.Titolo)}" class="admin-event-card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div><div class="admin-event-card-content"><div class="admin-event-card-header"><h3 class="admin-event-title">${sanitizeText(event.Titolo)} <small>(ID: ${event.IDEvento})</small></h3><span class="admin-event-date">Data: ${formatDbDate(event.Data)} ${sanitizeText(event.Durata) || ''}</span>${relatoreDisplay}</div><div class="admin-event-card-quick-stats"><div class="stat-item" title="Prenotazioni"><i class="fas fa-ticket-alt"></i> ${numPrenotazioni} Pren.</div><div class="stat-item" title="Partecipanti / Posti Config."><i class="fas fa-users"></i> ${partecipanti}/${postiConfigurati}</div><div class="stat-item" title="Media"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div><div class="stat-item" title="Commenti"><i class="fas fa-comments"></i> ${commentCount} Comm.</div></div><div class="admin-event-card-actions top-actions"><button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Media"><i class="fas fa-photo-video"></i> Media</button><button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Commenti"><i class="fas fa-comments"></i> Commenti</button><button class="btn-admin btn-bookings" data-event-id="${event.IDEvento}" title="Prenotazioni"><i class="fas fa-list-alt"></i> Prenotazioni</button></div><div class="admin-event-card-actions bottom-actions"><button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="PDF"><i class="fas fa-file-pdf"></i> PDF</button><button class="btn-admin btn-edit" data-event-id="${event.IDEvento}" title="Modifica"><i class="fas fa-edit"></i> Modifica</button><button class="btn-admin btn-admin-danger btn-delete" data-event-id="${event.IDEvento}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div></div>`;
+        const editButton = eventCard.querySelector('.btn-edit'); if(editButton) editButton.addEventListener('click', function() { const eventToEdit = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); if (eventToEdit) openEventPopupDashboard(eventToEdit); else alert("Dati evento non trovati per la modifica."); });
+        const deleteButton = eventCard.querySelector('.btn-delete'); if(deleteButton) deleteButton.addEventListener('click', function() { const eventToDelete = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); confirmDeleteEvent(this.dataset.eventId, eventToDelete ? eventToDelete.Titolo : "evento sconosciuto"); });
+        const bookingsButton = eventCard.querySelector('.btn-bookings'); if(bookingsButton) bookingsButton.addEventListener('click', function() { const eventForBookings = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); if (eventForBookings) openManageBookingsModal(eventForBookings); else alert("Dati evento non trovati per le prenotazioni."); });
         return eventCard;
     }
-    function openManageBookingsModal(eventData) {
-        const modalTitleEl = document.getElementById('bookingsEventTitle');
-        const bookingsContainerEl = document.getElementById('bookingsListContainerModal');
-        const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
+    function openManageBookingsModal(eventData) { const modalTitleEl = document.getElementById('bookingsEventTitle'); const bookingsContainerEl = document.getElementById('bookingsListContainerModal'); const feedbackEl = document.getElementById('bookingsManagementFeedbackModal'); if (modalTitleEl) modalTitleEl.textContent = sanitizeText(eventData.Titolo); if (feedbackEl) feedbackEl.innerHTML = ''; if (bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento); openModal('manageBookingsModal');}
+    function renderGroupedBookings(bookings, eventId) { if (!bookings || bookings.length === 0) return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione.</p>'; let html = ''; bookings.forEach(booking => { const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim(); const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto); const partecipantiHTML = booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0 ? `<ul class="participant-list-inline">${booking.partecipanti_della_prenotazione.map(p => `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`).join('')}</ul>` : '<p><small>Nessun dettaglio partecipante.</small></p>'; html += `<div class="user-booking-group" id="booking-group-${booking.idPrenotazione}"><h5>Prenotazione di: ${displayNomeUtente} <small>(${sanitizeText(booking.Contatto)})</small></h5><div class="single-booking-details"><p><strong>ID Pren.: ${booking.idPrenotazione}</strong> - Posti: ${booking.NumeroPosti}</p><strong>Partecipanti:</strong>${partecipantiHTML}<button class="btn-admin btn-admin-danger btn-sm" onclick="confirmCancelBookingInModal(${booking.idPrenotazione}, ${eventId}, ${booking.NumeroPosti}, '${sanitizeForAttribute(displayNomeUtente)}')" title="Annulla"><i class="fas fa-times-circle"></i> Annulla</button></div></div>`; }); return html;}
+    function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) { if (confirm(`Annullare prenotazione ID ${idPrenotazione} (${numPosti} posti) di ${nomeUtente}?`)) { cancelBookingInModal(idPrenotazione, eventId);}}
+    async function cancelBookingInModal(idPrenotazione, eventIdForModalReload) { const feedbackEl = document.getElementById('bookingsManagementFeedbackModal'); if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento...</p>`; try { const formData = new FormData(); formData.append('id_prenotazione', idPrenotazione); const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData }); const result = await response.json(); if (feedbackEl) { if (result.success) { feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`; await fetchDashboardData(); const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === String(eventIdForModalReload)); if(updatedEventData) { const bookingsContainerEl = document.getElementById('bookingsListContainerModal'); if(bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(updatedEventData.elenco_prenotazioni || [], updatedEventData.IDEvento);} else { closeModal('manageBookingsModal'); }} else { feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare.')}</p>`;}}} catch (error) { console.error("Errore AJAX annullamento prenotazione:", error); if (feedbackEl) feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(error.message)}</p>`;}}
+    async function openManageMediaModal(eventId, eventTitle) { const eventIdInput = document.getElementById('uploadMediaEventId'); const eventTitleEl = document.getElementById('uploadMediaEventTitle'); const existingMediaContainer = document.getElementById('existingMediaContainer'); const feedbackDiv = document.getElementById('uploadMediaFeedback'); const uploadForm = document.getElementById('uploadMediaForm'); if(eventIdInput) eventIdInput.value = eventId; if(eventTitleEl) eventTitleEl.textContent = sanitizeText(eventTitle); if(uploadForm) uploadForm.reset(); if(feedbackDiv) feedbackDiv.innerHTML = ''; if(existingMediaContainer) existingMediaContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>'; openModal('uploadMediaModal'); try { const response = await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`); const result = await response.json(); if (result.success && result.media) { renderExistingMedia(result.media, eventId); } else if (existingMediaContainer) { existingMediaContainer.innerHTML = `<p>${sanitizeText(result.message || 'Nessun media o errore.')}</p>`; }} catch(error) { console.error('Errore recupero media:', error); if(existingMediaContainer) existingMediaContainer.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;}}
+    function renderExistingMedia(mediaItems, eventId) { const container = document.getElementById('existingMediaContainer'); if (!container) return; if (mediaItems.length === 0) { container.innerHTML = '<p>Nessun media caricato.</p>'; return; } let html = '<div class="existing-media-grid">'; mediaItems.forEach(item => { const filename = item.url_media ? item.url_media.split('/').pop() : 'File'; const itemDesc = sanitizeText(item.Descrizione || ''); let mediaPreviewHTML = ''; if (item.tipo_media === 'image') { mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Visualizza: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><img src="${sanitizeForAttribute(item.url_media)}" alt="${itemDesc || filename}" loading="lazy" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;" title="Immagine: ${sanitizeForAttribute(filename)}"><i class="fas fa-image"></i></div>`; } else if (item.tipo_media === 'video') { mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Guarda: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`; } else { mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Apri: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`; } html += `<div class="existing-media-item">${mediaPreviewHTML}<p class="media-filename" title="${sanitizeForAttribute(item.url_media)}">${sanitizeText(filename)}</p>${itemDesc ? `<p class="media-description"><em>${itemDesc}</em></p>` : ''}<button class="btn-admin btn-admin-danger btn-sm btn-delete-media" data-media-id="${item.id_media}" data-event-id="${eventId}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div>`; }); html += '</div>'; container.innerHTML = html; container.querySelectorAll('.btn-delete-media').forEach(button => { button.addEventListener('click', function() { if (confirm('Eliminare questo media?')) { deleteMediaItem(this.dataset.mediaId, this.dataset.eventId);}});});}
+    async function deleteMediaItem(mediaId, eventId) { const feedbackDiv = document.getElementById('uploadMediaFeedback'); if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>'; try { const formData = new FormData(); formData.append('action', 'delete_event_media'); formData.append('media_id', mediaId); const response = await fetch('manage_event_media.php', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`; openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); fetchDashboardData(); } else { if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;}} catch(error) { console.error('Errore eliminazione media:', error); if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 4000);}
+    const eventUploadMediaForm = document.getElementById('uploadMediaForm'); if(eventUploadMediaForm) eventUploadMediaForm.addEventListener('submit', async function(e) { e.preventDefault(); const eventId = document.getElementById('uploadMediaEventId').value; const feedbackDiv = document.getElementById('uploadMediaFeedback'); const mediaFilesInput = document.getElementById('mediaFiles'); if (mediaFilesInput.files.length === 0) { if(feedbackDiv) feedbackDiv.innerHTML = '<p class="error-message">Seleziona file.</p>'; return; } if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>'; const formData = new FormData(this); formData.set('action', 'upload_media'); formData.set('event_id', eventId); try { const response = await fetch('manage_event_media.php', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`; this.reset(); openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); fetchDashboardData(); } else { if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;}} catch(error) { console.error('Errore uploadMedia:', error); if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(() => { if(feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 5000);});
+    let currentEventIdForCommentsGl = null;
+    async function openManageCommentsModal(eventId, eventTitle) { currentEventIdForCommentsGl = eventId; const titleEl = document.getElementById('commentsEventTitle'); let listContainerEl = document.getElementById('commentsListContainer'); const feedbackEl = document.getElementById('commentsManagementFeedback'); if(titleEl) titleEl.textContent = sanitizeText(eventTitle); if(feedbackEl) feedbackEl.innerHTML = ''; if (listContainerEl && listContainerEl.parentNode) { const newClonedListContainer = listContainerEl.cloneNode(false); listContainerEl.parentNode.replaceChild(newClonedListContainer, listContainerEl); listContainerEl = newClonedListContainer; attachAdminCommentListeners(listContainerEl); } else { console.error("commentsListContainer non trovato."); if(feedbackEl) feedbackEl.innerHTML = '<p class="error-message">Errore UI.</p>'; openModal('manageCommentsModal'); return;} listContainerEl.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p></li>'; openModal('manageCommentsModal'); try { const response = await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`); if (!response.ok) { let errTxt = `Errore HTTP ${response.status}`; try { const errData = await response.json(); errTxt = errData.message || errTxt; } catch(e) {} throw new Error(errTxt); } const result = await response.json(); if (result.success && result.comments) { renderCommentsForAdminThreaded(result.comments, eventId, listContainerEl); } else { listContainerEl.innerHTML = `<li><p>${sanitizeText(result.message || 'Nessun commento o errore.')}</p></li>`;}} catch(error) { console.error('Errore caricamento commenti:', error); listContainerEl.innerHTML = `<li><p class="error-message">Errore: ${sanitizeText(error.message)}</p></li>`;}}
+    function renderCommentsForAdminThreaded(comments, eventId, parentUlElement, depth = 0) { if (depth === 0) { parentUlElement.innerHTML = ''; if (!comments || comments.length === 0) { parentUlElement.innerHTML = '<li style="list-style-type:none;text-align:center;margin:1rem 0;"><p>Nessun commento.</p></li>'; return;}} comments.forEach(comment => { const commentItemLi = document.createElement('li'); commentItemLi.className = 'comment-item-admin-styled'; commentItemLi.id = `admin-comment-${comment.Progressivo}`; if (comment.is_admin_reply) { commentItemLi.classList.add('commento-admin-generale');} const commenterAvatar = comment.commenter_icon_path || defaultUserIconPath; const commenterName = sanitizeText(comment.utente_display_name || 'Anonimo'); const commentDate = sanitizeText(comment.data_creazione_formattata || 'N/D'); const commentText = sanitizeTextForHTML(comment.Descrizione); let adminBadgeHTML = comment.is_admin_reply ? '<span class="badge-admin-dashboard">(Admin)</span>' : ''; commentItemLi.innerHTML = `<div class="comment-header"><img src="${commenterAvatar}" alt="Avatar" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';"><div class="comment-meta"><strong>${commenterName}</strong> ${adminBadgeHTML}<small>${commentDate}</small><small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta ? ` | Risposta a ID: ${comment.CodRisposta}` : ''}</small></div></div><div class="comment-text-admin">${commentText}</div><div class="comment-actions-admin"><button class="btn-admin btn-admin-reply btn-sm" data-comment-id="${comment.Progressivo}" title="Rispondi"><i class="fas fa-reply"></i> Rispondi</button><button class="btn-admin btn-admin-danger btn-admin-delete-comment btn-sm" data-comment-id="${comment.Progressivo}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div><div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}" style="display:none;"><form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}"><textarea name="Descrizione" placeholder="Rispondi come ${adminNameGlobalJS}..." rows="3" required class="form-control"></textarea><div class="form-actions-reply" style="text-align:right; margin-top:0.5rem;"><button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia</button></div><div class="form-message-local" style="margin-top:0.5em; font-size:0.85rem;"></div></form></div>`; parentUlElement.appendChild(commentItemLi); if (comment.replies && comment.replies.length > 0) { const repliesUl = document.createElement('ul'); repliesUl.className = 'comment-replies-list-styled'; commentItemLi.appendChild(repliesUl); renderCommentsForAdminThreaded(comment.replies, eventId, repliesUl, depth + 1);}}); }
+    function attachAdminCommentListeners(commentsListContainerUL) { if (!commentsListContainerUL) return; commentsListContainerUL.addEventListener('click', handleCommentActionClick); commentsListContainerUL.addEventListener('submit', handleCommentFormSubmit); }
+    async function handleCommentActionClick(event) { const target = event.target; const replyButton = target.closest('.btn-admin-reply'); if (replyButton) { event.preventDefault(); const commentId = replyButton.dataset.commentId; const replyFormDiv = document.getElementById(`reply-form-admin-${commentId}`); if (replyFormDiv) { const isActive = replyFormDiv.style.display === 'block'; replyFormDiv.style.display = isActive ? 'none' : 'block'; if (!isActive) replyFormDiv.querySelector('textarea')?.focus(); const localMsg = replyFormDiv.querySelector('.form-message-local'); if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }} return; } const deleteButton = target.closest('.btn-admin-delete-comment'); if (deleteButton) { event.preventDefault(); const commentId = deleteButton.dataset.commentId; if (currentEventIdForCommentsGl) { deleteAdminComment(commentId, currentEventIdForCommentsGl); } else { alert("Errore: ID evento non specificato."); } return;}}
+    async function handleCommentFormSubmit(event) { const targetForm = event.target.closest('.reply-form-admin form'); if (targetForm) { event.preventDefault(); const eventId = targetForm.dataset.eventId; await handleAdminReplySubmit(targetForm, eventId);}}
+    async function handleAdminReplySubmit(formElement, eventId) { const parentCommentId = formElement.dataset.parentCommentId; const replyText = formElement.querySelector('textarea[name="Descrizione"]').value.trim(); const feedbackEl = formElement.querySelector('.form-message-local'); const submitBtn = formElement.querySelector('button[type="submit"]'); if (!replyText) { if (feedbackEl) { feedbackEl.textContent = 'Risposta vuota.'; feedbackEl.className = 'form-message-local error-message'; feedbackEl.style.display = 'block';} return;} const originalBtnHTML = submitBtn.innerHTML; if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-mini" style="border-top-color:white;"></span> Invio...'; } if (feedbackEl) { feedbackEl.textContent = ''; feedbackEl.style.display = 'none'; } try { const formData = new FormData(); formData.append('action', 'submit_admin_reply'); formData.append('event_id', eventId); formData.append('comment_id', parentCommentId); formData.append('reply_text', replyText); const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData }); if (!response.ok) { let errData = { message: `Errore HTTP ${response.status}` }; try { errData = await response.json(); } catch (e) {} throw new Error(errData.message || `Errore server.`);} const result = await response.json(); if (result.success) { if (feedbackEl) { feedbackEl.textContent = 'Risposta inviata!'; feedbackEl.className = 'form-message-local success-message'; feedbackEl.style.display = 'block'; setTimeout(() => { if (feedbackEl) { feedbackEl.style.display = 'none'; feedbackEl.textContent = ''; }}, 3000);} formElement.reset(); const replyFormDiv = formElement.closest('.reply-form-admin'); if (replyFormDiv) replyFormDiv.style.display = 'none'; await openManageCommentsModal(eventId, document.getElementById('commentsEventTitle')?.textContent || "Evento"); fetchDashboardData(); } else { throw new Error(result.message || 'Errore invio.');}} catch(error) { console.error("Errore invio risposta admin:", error); if (feedbackEl) { feedbackEl.textContent = `Errore: ${sanitizeText(error.message)}`; feedbackEl.className = 'form-message-local error-message'; feedbackEl.style.display = 'block';}} finally { if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML;}}}
+    async function deleteAdminComment(commentId, eventIdForReload) { if (!confirm('Eliminare commento e risposte?')) return; const feedbackDiv = document.getElementById('commentsManagementFeedback'); if (feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>'; try { const formData = new FormData(); formData.append('action', 'delete_comment'); formData.append('comment_id', commentId); const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData }); if (!response.ok) { let errData = { message: `Errore HTTP ${response.status}` }; try { errData = await response.json(); } catch (e) {} throw new Error(errData.message || `Errore server.`);} const result = await response.json(); if (result.success) { if (feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`; await openManageCommentsModal(eventIdForReload, document.getElementById('commentsEventTitle')?.textContent || "Evento"); fetchDashboardData(); } else { throw new Error(result.message || "Errore eliminazione.");}} catch(error) { console.error('Errore deleteAdminComment:', error); if (feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(() => { if (feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 3000);}
+    async function confirmDeleteEvent(eventId, eventTitle) { if (!confirm(`ATTENZIONE: Eliminare evento "${sanitizeText(eventTitle)}" (ID: ${eventId}) e tutti i dati associati? L'azione è IRREVERSIBILE.`)) return; const cardEl = document.getElementById(`admin-event-${eventId}`); if (cardEl) cardEl.style.opacity = '0.5'; try { const formData = new FormData(); formData.append('action', 'delete_event'); formData.append('event_id', eventId); const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData }); const result = await response.json(); alert(sanitizeText(result.message)); if (result.success) { fetchDashboardData(); } else { if (cardEl) cardEl.style.opacity = '1';}} catch(error) { console.error('Errore deleteEvent:', error); alert(`Errore eliminazione: ${sanitizeText(error.message)}`); if (cardEl) cardEl.style.opacity = '1';}}
 
-        if (modalTitleEl) modalTitleEl.textContent = sanitizeText(eventData.Titolo);
-        if (feedbackEl) feedbackEl.innerHTML = '';
-        if (bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento);
-        openModal('manageBookingsModal');
+    // --- NUOVA LOGICA PER OPZIONI AVANZATE MODAL ---
+    const openAdvancedOptionsModalBtn = document.getElementById('openAdvancedOptionsModalBtn');
+    const advancedOptionsModal = document.getElementById('advancedOptionsModal');
+    const moderationSlider = document.getElementById('moderationLevelSliderInput');
+    const moderationLevelLabel = document.getElementById('moderationLevelLabel');
+    const moderationLevelDescription = document.getElementById('moderationLevelDescription');
+    const moderationPreviewChat = document.getElementById('moderationPreviewChat');
+    const saveAdvancedSettingsModalBtn = document.getElementById('saveAdvancedSettingsModalBtn');
+    const advancedSettingsModalMessage = document.getElementById('advancedSettingsModalMessage');
+
+    const moderationLevels = [
+        { label: "Nessuna Moderazione", threshold: 10, colorClass: "level-0", description: "Commenti sempre pubblicati (salvo filtri server per casi estremi)." },
+        { label: "Moderazione Leggera", threshold: 6, colorClass: "level-1", description: "Blocca commenti con punteggio offensività IA ≥ 6." },
+        { label: "Moderazione Standard", threshold: 4, colorClass: "level-2", description: "Blocca commenti con punteggio offensività IA ≥ 4. (Raccomandato)" },
+        { label: "Moderazione Rigorosa", threshold: 2, colorClass: "level-3", description: "Blocca commenti con punteggio offensività IA ≥ 2." }
+    ];
+
+    const exampleComments = [
+        { text: "Ciao, sono felice di essere parte di questa fraternità! Un saluto a tutti.", offensiveness: 1, id: "ex_comm_1" },
+        { text: "Bello il nuovo logo del gruppo, ci sta un sacco!", offensiveness: 2, id: "ex_comm_2" },
+        { text: "Attendo con ansia la festa di sabato, speriamo sia divertente.", offensiveness: 3, id: "ex_comm_3" },
+        { text: "L'organizzazione dell'ultimo evento lasciava un po' a desiderare, spero si possa fare meglio la prossima volta.", offensiveness: 4, id: "ex_comm_4" },
+        { text: "Francamente, alcuni membri dovrebbero impegnarsi di più invece di fare solo presenza e chiacchiere.", offensiveness: 5, id: "ex_comm_5" },
+        { text: "Ma come diavolo ha fatto certa gente ad entrare qui? Non capiscono nulla dello spirito del gruppo. Pazzesco.", offensiveness: 6, id: "ex_comm_6" },
+        { text: "Questo posto è pieno di superficiali ipocriti che pensano solo a sé stessi. La vera fratellanza è un'altra cosa, sveglia!", offensiveness: 7, id: "ex_comm_7" },
+        { text: "Una massa di idioti presuntuosi, ecco cos'è diventata questa fraternità. Solo apparenza e zero sostanza. Che schifo!", offensiveness: 8, id: "ex_comm_8" },
+        { text: "Quel cretino di Tizio e quell'incapace di Caio stanno mandando tutto a rotoli con le loro decisioni stupide. Via subito, incompetenti!", offensiveness: 9, id: "ex_comm_9" },
+        { text: "Questo posto fa vomitare, è un covo di gente spregevole e malintenzionata. Andatevene affanc**o tutti quanti!", offensiveness: 10, id: "ex_comm_10" }
+    ];
+
+    function updateModerationSliderUI(sliderValue) {
+        const value = parseInt(sliderValue);
+        if (isNaN(value) || value < 0 || value >= moderationLevels.length) { console.warn("Valore slider non valido:", sliderValue); return; }
+        const level = moderationLevels[value];
+        if (moderationLevelLabel) { moderationLevelLabel.textContent = level.label; moderationLevelLabel.className = 'slider-level-label ' + level.colorClass; }
+        if (moderationSlider) { moderationSlider.className = 'moderation-slider ' + level.colorClass; }
+        if (moderationLevelDescription) { moderationLevelDescription.textContent = level.description; }
+        renderChatSimulation(level.threshold);
     }
-    function renderGroupedBookings(bookings, eventId) {
-        if (!bookings || bookings.length === 0) return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione per questo evento.</p>';
-        let html = '';
-        bookings.forEach(booking => {
-            const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim();
-            const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto);
-            const partecipantiHTML = booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0
-                ? `<ul class="participant-list-inline">${booking.partecipanti_della_prenotazione.map(p => `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`).join('')}</ul>`
-                : '<p><small>Nessun dettaglio partecipante fornito.</small></p>';
 
-            html += `
-                <div class="user-booking-group" id="booking-group-${booking.idPrenotazione}">
-                    <h5>Prenotazione di: ${displayNomeUtente} <small>(${sanitizeText(booking.Contatto)})</small></h5>
-                    <div class="single-booking-details">
-                        <p><strong>ID Prenotazione: ${booking.idPrenotazione}</strong> - Posti Prenotati: ${booking.NumeroPosti}</p>
-                        <strong>Partecipanti:</strong>
-                        ${partecipantiHTML}
-                        <button class="btn-admin btn-admin-danger btn-sm" onclick="confirmCancelBookingInModal(${booking.idPrenotazione}, ${eventId}, ${booking.NumeroPosti}, '${sanitizeForAttribute(displayNomeUtente)}')" title="Annulla Prenotazione">
-                            <i class="fas fa-times-circle"></i> Annulla
-                        </button>
-                    </div>
+    function renderChatSimulation(currentThreshold) {
+        if (!moderationPreviewChat) return;
+        moderationPreviewChat.innerHTML = '';
+        exampleComments.forEach(comment => {
+            const isEffectivelyBlocked = currentThreshold < 10 && comment.offensiveness >= currentThreshold;
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message-example';
+            messageDiv.dataset.offensiveness = comment.offensiveness;
+            if (isEffectivelyBlocked) { messageDiv.classList.add('blocked'); }
+            messageDiv.innerHTML = `
+                <span class="chat-user">Utente Esempio:</span>
+                <span class="chat-text">${sanitizeText(comment.text)}</span>
+                <div class="blocked-overlay">
+                    <span class="blocked-icon"><i class="fas fa-ban"></i></span>
+                    <span class="blocked-text">Messaggio filtrato dall'IA</span>
                 </div>`;
-        });
-        return html;
-    }
-    function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) {
-        if (confirm(`Sei sicuro di voler annullare la prenotazione ID ${idPrenotazione} (${numPosti} posti) effettuata da ${nomeUtente}? L'azione è irreversibile.`)) {
-            cancelBookingInModal(idPrenotazione, eventId);
-        }
-    }
-    async function cancelBookingInModal(idPrenotazione, eventIdForModalReload) {
-        const feedbackEl = document.getElementById('bookingsManagementFeedbackModal');
-        if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento in corso...</p>`;
-        try {
-            const formData = new FormData();
-            formData.append('id_prenotazione', idPrenotazione);
-            const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData });
-            const result = await response.json();
-
-            if (feedbackEl) {
-                if (result.success) {
-                    feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`;
-                    await fetchDashboardData(); // Ricarica i dati della dashboard per aggiornare i conteggi
-                    const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === String(eventIdForModalReload));
-                    if(updatedEventData) {
-                        const bookingsContainerEl = document.getElementById('bookingsListContainerModal');
-                        if(bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(updatedEventData.elenco_prenotazioni || [], updatedEventData.IDEvento);
-                    } else {
-                        closeModal('manageBookingsModal'); // Chiudi se l'evento non è più trovato (improbabile)
-                    }
-                } else {
-                    feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare la prenotazione.')}</p>`;
-                }
-            }
-        } catch (error) {
-            console.error("Errore AJAX annullamento prenotazione nel modal:", error);
-            if (feedbackEl) feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore di connessione: ${sanitizeText(error.message)}</p>`;
-        }
-    }
-    async function openManageMediaModal(eventId, eventTitle) {
-        const eventIdInput = document.getElementById('uploadMediaEventId');
-        const eventTitleEl = document.getElementById('uploadMediaEventTitle');
-        const existingMediaContainer = document.getElementById('existingMediaContainer');
-        const feedbackDiv = document.getElementById('uploadMediaFeedback');
-        const uploadForm = document.getElementById('uploadMediaForm');
-
-        if(eventIdInput) eventIdInput.value = eventId;
-        if(eventTitleEl) eventTitleEl.textContent = sanitizeText(eventTitle);
-        if(uploadForm) uploadForm.reset();
-        if(feedbackDiv) feedbackDiv.innerHTML = '';
-        if(existingMediaContainer) existingMediaContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media esistenti...</p>';
-        openModal('uploadMediaModal');
-
-        try {
-            const response = await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`);
-            const result = await response.json();
-            if (result.success && result.media) {
-                renderExistingMedia(result.media, eventId);
-            } else if (existingMediaContainer) {
-                existingMediaContainer.innerHTML = `<p>${sanitizeText(result.message || 'Nessun media trovato o errore nel recupero.')}</p>`;
-            }
-        } catch(error) {
-            console.error('Errore recupero media:', error);
-            if(existingMediaContainer) existingMediaContainer.innerHTML = `<p class="error-message">Errore durante il caricamento dei media: ${sanitizeText(error.message)}</p>`;
-        }
-    }
-    function renderExistingMedia(mediaItems, eventId) {
-        const container = document.getElementById('existingMediaContainer');
-        if (!container) return;
-        if (mediaItems.length === 0) {
-            container.innerHTML = '<p>Nessun media attualmente caricato per questo evento.</p>';
-            return;
-        }
-        let html = '<div class="existing-media-grid">';
-        mediaItems.forEach(item => {
-            const filename = item.url_media ? item.url_media.split('/').pop() : 'File sconosciuto';
-            const itemDesc = sanitizeText(item.Descrizione || '');
-            let mediaPreviewHTML = '';
-            if (item.tipo_media === 'image') {
-                mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Visualizza: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><img src="${sanitizeForAttribute(item.url_media)}" alt="${itemDesc || filename}" loading="lazy" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;" title="Immagine: ${sanitizeForAttribute(filename)}"><i class="fas fa-image"></i></div>`;
-            } else if (item.tipo_media === 'video') {
-                mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Guarda: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`;
-            } else { // pdf or other
-                mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Apri: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`;
-            }
-
-            html += `
-                <div class="existing-media-item">
-                    ${mediaPreviewHTML}
-                    <p class="media-filename" title="${sanitizeForAttribute(item.url_media)}">${sanitizeText(filename)}</p>
-                    ${itemDesc ? `<p class="media-description"><em>${itemDesc}</em></p>` : ''}
-                    <button class="btn-admin btn-admin-danger btn-sm btn-delete-media" data-media-id="${item.id_media}" data-event-id="${eventId}" title="Elimina Media">
-                        <i class="fas fa-trash-alt"></i> Elimina
-                    </button>
-                </div>`;
-        });
-        html += '</div>';
-        container.innerHTML = html;
-        container.querySelectorAll('.btn-delete-media').forEach(button => {
-            button.addEventListener('click', function() {
-                if (confirm('Sei sicuro di voler eliminare questo file media? L\'azione è irreversibile.')) {
-                    deleteMediaItem(this.dataset.mediaId, this.dataset.eventId);
-                }
-            });
+            moderationPreviewChat.appendChild(messageDiv);
         });
     }
-    async function deleteMediaItem(mediaId, eventId) {
-        const feedbackDiv = document.getElementById('uploadMediaFeedback');
-        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione media in corso...</p>';
-        try {
-            const formData = new FormData();
-            formData.append('action', 'delete_event_media');
-            formData.append('media_id', mediaId);
-            const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
-            const result = await response.json();
 
-            if (result.success) {
-                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); // Ricarica i media nel modal
-                fetchDashboardData(); // Ricarica i dati della dashboard per aggiornare il conteggio media
-            } else {
-                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore eliminazione: ${sanitizeText(result.message)}</p>`;
-            }
-        } catch(error) {
-            console.error('Errore eliminazione media:', error);
-            if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore di connessione: ${sanitizeText(error.message)}</p>`;
-        }
-        setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 4000);
+    if (openAdvancedOptionsModalBtn) {
+        openAdvancedOptionsModalBtn.addEventListener('click', () => {
+            loadAdvancedSettings();
+            openModal('advancedOptionsModal');
+        });
     }
-    const eventUploadMediaForm = document.getElementById('uploadMediaForm');
-    if(eventUploadMediaForm) eventUploadMediaForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const eventId = document.getElementById('uploadMediaEventId').value;
-        const feedbackDiv = document.getElementById('uploadMediaFeedback');
-        const mediaFilesInput = document.getElementById('mediaFiles');
 
-        if (mediaFilesInput.files.length === 0) {
-            if(feedbackDiv) feedbackDiv.innerHTML = '<p class="error-message">Per favore, seleziona almeno un file da caricare.</p>';
-            return;
-        }
-        if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media in corso...</p>';
-
-        const formData = new FormData(this);
-        formData.set('action', 'upload_media'); // Assicurati che l'action sia corretta
-        formData.set('event_id', eventId); // event_id invece di eventId per coerenza con altri form
-
-        try {
-            const response = await fetch('manage_event_media.php', { method: 'POST', body: formData });
-            const result = await response.json();
-
-            if (result.success) {
-                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                this.reset(); // Resetta il form dopo l'upload
-                openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); // Ricarica i media nel modal
-                fetchDashboardData(); // Ricarica i dati della dashboard per aggiornare il conteggio media
-            } else {
-                if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore upload: ${sanitizeText(result.message)}</p>`;
-            }
-        } catch(error) {
-            console.error('Errore uploadMedia:', error);
-            if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore di connessione o risposta server non valida: ${sanitizeText(error.message)}</p>`;
-        }
-        setTimeout(() => { if(feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 5000);
+    document.querySelectorAll('#advancedOptionsModal .close-modal-btn, #advancedOptionsModal .close-modal-btn-alt').forEach(btn => {
+        btn.addEventListener('click', function() { closeModal(this.dataset.modalId); });
     });
-    let currentEventIdForCommentsGl = null; // Variabile globale per ID evento nel modal commenti
-    async function openManageCommentsModal(eventId, eventTitle) {
-        currentEventIdForCommentsGl = eventId; // Salva l'ID evento corrente
-        const titleEl = document.getElementById('commentsEventTitle');
-        let listContainerEl = document.getElementById('commentsListContainer'); // Riassegna se clonato
-        const feedbackEl = document.getElementById('commentsManagementFeedback');
 
-        if(titleEl) titleEl.textContent = sanitizeText(eventTitle);
-        if(feedbackEl) feedbackEl.innerHTML = '';
-
-        // Clona e sostituisci il contenitore per resettare gli event listener precedenti
-        if (listContainerEl && listContainerEl.parentNode) {
-            const newClonedListContainer = listContainerEl.cloneNode(false); // false per non clonare i figli
-            listContainerEl.parentNode.replaceChild(newClonedListContainer, listContainerEl);
-            listContainerEl = newClonedListContainer; // Aggiorna il riferimento
-            attachAdminCommentListeners(listContainerEl); // Riattacca i listener al nuovo elemento
-        } else {
-            console.error("Elemento commentsListContainer non trovato o senza genitore.");
-            if(feedbackEl) feedbackEl.innerHTML = '<p class="error-message">Errore UI: impossibile inizializzare la lista commenti.</p>';
-            openModal('manageCommentsModal');
-            return;
-        }
-
-        listContainerEl.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p></li>';
-        openModal('manageCommentsModal');
-
-        try {
-            const response = await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`);
-            if (!response.ok) {
-                let errTxt = `Errore HTTP ${response.status}`;
-                try { const errData = await response.json(); errTxt = errData.message || errTxt; } catch(e) { /* ignora */ }
-                throw new Error(errTxt);
-            }
-            const result = await response.json();
-            if (result.success && result.comments) {
-                renderCommentsForAdminThreaded(result.comments, eventId, listContainerEl); // Passa eventId
-            } else {
-                listContainerEl.innerHTML = `<li><p>${sanitizeText(result.message || 'Nessun commento trovato o errore nel recupero.')}</p></li>`;
-            }
-        } catch(error) {
-            console.error('Errore caricamento commenti:', error);
-            listContainerEl.innerHTML = `<li><p class="error-message">Impossibile caricare i commenti: ${sanitizeText(error.message)}</p></li>`;
-        }
+    if (moderationSlider) {
+        moderationSlider.addEventListener('input', function() { updateModerationSliderUI(this.value); });
     }
-    function renderCommentsForAdminThreaded(comments, eventId, parentUlElement, depth = 0) {
-        if (depth === 0) { // Solo al primo livello svuota e controlla se ci sono commenti
-            parentUlElement.innerHTML = '';
-            if (!comments || comments.length === 0) {
-                parentUlElement.innerHTML = '<li style="list-style-type:none;text-align:center;margin:1rem 0;"><p>Nessun commento per questo evento.</p></li>';
-                return;
-            }
-        }
-
-        comments.forEach(comment => {
-            const commentItemLi = document.createElement('li');
-            commentItemLi.className = 'comment-item-admin-styled';
-            commentItemLi.id = `admin-comment-${comment.Progressivo}`;
-            if (comment.is_admin_reply) { // Assumendo che is_admin_reply venga dal backend
-                commentItemLi.classList.add('commento-admin-generale'); // Classe per risposte admin
-            }
-
-            // Utilizza l'icona specifica del commentatore, altrimenti default
-            const commenterAvatar = comment.commenter_icon_path || defaultUserIconPath; // Usa defaultUserIconPath
-            const commenterName = sanitizeText(comment.utente_display_name || 'Utente Anonimo');
-            const commentDate = sanitizeText(comment.data_creazione_formattata || 'Data non disponibile');
-            const commentText = sanitizeTextForHTML(comment.Descrizione); // Sanifica HTML per il testo
-            let adminBadgeHTML = comment.is_admin_reply ? '<span class="badge-admin-dashboard">(Admin)</span>' : '';
-
-
-            commentItemLi.innerHTML = `
-                <div class="comment-header">
-                    <img src="${commenterAvatar}" alt="Avatar di ${commenterName}" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';">
-                    <div class="comment-meta">
-                        <strong>${commenterName}</strong> ${adminBadgeHTML}
-                        <small>${commentDate}</small>
-                        <small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta ? ` | Risposta a ID: ${comment.CodRisposta}` : ''}</small>
-                    </div>
-                </div>
-                <div class="comment-text-admin">${commentText}</div>
-                <div class="comment-actions-admin">
-                    <button class="btn-admin btn-admin-reply btn-sm" data-comment-id="${comment.Progressivo}" title="Rispondi a questo commento"><i class="fas fa-reply"></i> Rispondi</button>
-                    <button class="btn-admin btn-admin-danger btn-admin-delete-comment btn-sm" data-comment-id="${comment.Progressivo}" title="Elimina questo commento"><i class="fas fa-trash-alt"></i> Elimina</button>
-                </div>
-                <div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}" style="display:none;">
-                    <form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}">
-                        <textarea name="Descrizione" placeholder="Scrivi la tua risposta come ${adminNameGlobalJS}..." rows="3" required class="form-control"></textarea>
-                        <div class="form-actions-reply" style="text-align:right; margin-top:0.5rem;">
-                            <button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia Risposta</button>
-                        </div>
-                        <div class="form-message-local" style="margin-top:0.5em; font-size:0.85rem;"></div>
-                    </form>
-                </div>`;
-            parentUlElement.appendChild(commentItemLi);
-
-            if (comment.replies && comment.replies.length > 0) {
-                const repliesUl = document.createElement('ul');
-                repliesUl.className = 'comment-replies-list-styled'; // Classe per indentare risposte
-                commentItemLi.appendChild(repliesUl);
-                renderCommentsForAdminThreaded(comment.replies, eventId, repliesUl, depth + 1); // Passa eventId
-            }
-        });
-    }
-    function attachAdminCommentListeners(commentsListContainerUL) {
-        if (!commentsListContainerUL) return;
-        // Usa event delegation per gestire click e submit
-        commentsListContainerUL.addEventListener('click', handleCommentActionClick);
-        commentsListContainerUL.addEventListener('submit', handleCommentFormSubmit);
-    }
-    async function handleCommentActionClick(event) { // Gestore unificato per click
-        const target = event.target;
-        const replyButton = target.closest('.btn-admin-reply');
-        if (replyButton) {
-            event.preventDefault(); // Evita submit se il bottone è in un form
-            const commentId = replyButton.dataset.commentId;
-            const replyFormDiv = document.getElementById(`reply-form-admin-${commentId}`);
-            if (replyFormDiv) {
-                const isActive = replyFormDiv.style.display === 'block';
-                replyFormDiv.style.display = isActive ? 'none' : 'block';
-                if (!isActive) replyFormDiv.querySelector('textarea')?.focus();
-                const localMsg = replyFormDiv.querySelector('.form-message-local');
-                if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }
-            }
-            return;
-        }
-
-        const deleteButton = target.closest('.btn-admin-delete-comment');
-        if (deleteButton) {
-            event.preventDefault();
-            const commentId = deleteButton.dataset.commentId;
-            if (currentEventIdForCommentsGl) { // Usa la variabile globale per eventId
-                deleteAdminComment(commentId, currentEventIdForCommentsGl);
-            } else {
-                alert("Errore: ID evento non specificato per l'eliminazione del commento.");
-            }
-            return;
-        }
-    }
-    async function handleCommentFormSubmit(event) { // Gestore unificato per submit
-        const targetForm = event.target.closest('.reply-form-admin form');
-        if (targetForm) {
-            event.preventDefault();
-            const eventId = targetForm.dataset.eventId; // Prendi eventId dal form
-            await handleAdminReplySubmit(targetForm, eventId);
-        }
-    }
-    async function handleAdminReplySubmit(formElement, eventId) {
-        const parentCommentId = formElement.dataset.parentCommentId;
-        const replyText = formElement.querySelector('textarea[name="Descrizione"]').value.trim();
-        const feedbackEl = formElement.querySelector('.form-message-local');
-        const submitBtn = formElement.querySelector('button[type="submit"]');
-
-        if (!replyText) {
-            if (feedbackEl) {
-                feedbackEl.textContent = 'La risposta non può essere vuota.';
-                feedbackEl.className = 'form-message-local error-message'; // Usa classi per stile
-                feedbackEl.style.display = 'block';
-            }
-            return;
-        }
-
-        const originalBtnHTML = submitBtn.innerHTML;
-        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-mini" style="border-top-color:white;"></span> Invio...'; }
-        if (feedbackEl) { feedbackEl.textContent = ''; feedbackEl.style.display = 'none'; }
-
-        try {
-            const formData = new FormData();
-            formData.append('action', 'submit_admin_reply');
-            formData.append('event_id', eventId);
-            formData.append('comment_id', parentCommentId); // ID del commento a cui si risponde
-            formData.append('reply_text', replyText);
-            const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
-            if (!response.ok) { // Gestione errori HTTP
-                let errData = { message: `Errore HTTP ${response.status}` };
-                try { errData = await response.json(); } catch (e) { /* ignora */ }
-                throw new Error(errData.message || `Errore server sconosciuto.`);
-            }
-            const result = await response.json();
-            if (result.success) {
-                if (feedbackEl) {
-                    feedbackEl.textContent = 'Risposta inviata con successo!';
-                    feedbackEl.className = 'form-message-local success-message';
-                    feedbackEl.style.display = 'block';
-                    setTimeout(() => { if (feedbackEl) { feedbackEl.style.display = 'none'; feedbackEl.textContent = ''; } }, 3000);
-                }
-                formElement.reset(); // Resetta il form
-                const replyFormDiv = formElement.closest('.reply-form-admin');
-                if (replyFormDiv) replyFormDiv.style.display = 'none'; // Nascondi il form
-                // Ricarica i commenti nel modal per vedere la nuova risposta
-                await openManageCommentsModal(eventId, document.getElementById('commentsEventTitle')?.textContent || "Evento");
-                fetchDashboardData(); // Aggiorna conteggio commenti su card evento
-            } else {
-                throw new Error(result.message || 'Errore durante l\'invio della risposta.');
-            }
-        } catch(error) {
-            console.error("Errore invio risposta admin:", error);
-            if (feedbackEl) {
-                feedbackEl.textContent = `Errore: ${sanitizeText(error.message)}`;
-                feedbackEl.className = 'form-message-local error-message';
-                feedbackEl.style.display = 'block';
-            }
-        } finally {
-            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML; }
-        }
-    }
-    async function deleteAdminComment(commentId, eventIdForReload) {
-        if (!confirm('Sei sicuro di voler eliminare questo commento e tutte le sue eventuali risposte? L\'azione è irreversibile.')) return;
-
-        const feedbackDiv = document.getElementById('commentsManagementFeedback');
-        if (feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione commento in corso...</p>';
-
-        try {
-            const formData = new FormData();
-            formData.append('action', 'delete_comment');
-            formData.append('comment_id', commentId);
-            const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData });
-            if (!response.ok) { // Gestione errori HTTP
-                let errData = { message: `Errore HTTP ${response.status}` };
-                try { errData = await response.json(); } catch (e) { /* ignora */ }
-                throw new Error(errData.message || `Errore server sconosciuto.`);
-            }
-            const result = await response.json();
-            if (result.success) {
-                if (feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`;
-                // Ricarica i commenti nel modal
-                await openManageCommentsModal(eventIdForReload, document.getElementById('commentsEventTitle')?.textContent || "Evento");
-                fetchDashboardData(); // Aggiorna conteggio commenti su card evento
-            } else {
-                throw new Error(result.message || "Errore durante l'eliminazione del commento.");
-            }
-        } catch(error) {
-            console.error('Errore deleteAdminComment:', error);
-            if (feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;
-        }
-        setTimeout(() => { if (feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 3000);
-    }
-    async function confirmDeleteEvent(eventId, eventTitle) {
-        if (!confirm(`ATTENZIONE: Sei sicuro di voler eliminare l'evento "${sanitizeText(eventTitle)}" (ID: ${eventId}) e tutti i dati ad esso associati (prenotazioni, media, commenti)? L'azione è irreversibile.`)) return;
-
-        const cardEl = document.getElementById(`admin-event-${eventId}`);
-        if (cardEl) cardEl.style.opacity = '0.5'; // Feedback visivo
-
-        try {
-            const formData = new FormData();
-            formData.append('action', 'delete_event');
-            formData.append('event_id', eventId);
-            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
-            const result = await response.json(); // Assumendo che ritorni JSON
-            alert(sanitizeText(result.message)); // Mostra messaggio dall'API
-            if (result.success) {
-                fetchDashboardData(); // Ricarica i dati per aggiornare la UI
-            } else {
-                if (cardEl) cardEl.style.opacity = '1'; // Ripristina opacità se fallisce
-            }
-        } catch(error) {
-            console.error('Errore deleteEvent:', error);
-            alert(`Errore durante l'eliminazione dell'evento: ${sanitizeText(error.message)}`);
-            if (cardEl) cardEl.style.opacity = '1'; // Ripristina opacità in caso di errore
-        }
-    }
-
-    // Funzioni per Opzioni Avanzate
-    const commentModerationLevelSelect = document.getElementById('commentModerationLevel');
-    const saveAdvancedSettingsBtn = document.getElementById('saveAdvancedSettingsBtn');
-    const advancedSettingsMessage = document.getElementById('advancedSettingsMessage');
 
     async function loadAdvancedSettings() {
-        if (!commentModerationLevelSelect) return;
+        if (!moderationSlider) return;
         try {
             const response = await fetch('manage_global_settings.php?action=get_setting&key=comment_moderation_level');
             if (!response.ok) throw new Error(`Errore HTTP! status: ${response.status}`);
             const result = await response.json();
-
-            if (result.success && result.value !== null) {
-                commentModerationLevelSelect.value = result.value;
-            } else if (result.value === null) {
-                console.log("Livello moderazione non trovato nel DB, si usa il default 'Standard'.");
-                commentModerationLevelSelect.value = '2'; // Default a standard se non trovato
-            } else if(!result.success) { // Errore esplicito dal backend
-                console.error('Errore caricamento impostazioni avanzate:', result.message);
-                if(advancedSettingsMessage){
-                    advancedSettingsMessage.textContent = `Errore caricamento: ${result.message}`;
-                    advancedSettingsMessage.className = 'form-message error';
-                    advancedSettingsMessage.style.display = 'block';
-                }
-            }
+            let sliderValueToSet = '2';
+            if (result.success && result.value !== null && typeof moderationLevels[parseInt(result.value)] !== 'undefined') {
+                sliderValueToSet = result.value;
+            } else if (result.value === null) { console.log("Livello moderazione non trovato, si usa default 'Standard'.");
+            } else if(!result.success && advancedSettingsModalMessage){ advancedSettingsModalMessage.textContent = `Errore caricamento: ${result.message}`; advancedSettingsModalMessage.className = 'form-message error'; advancedSettingsModalMessage.style.display = 'block'; }
+            moderationSlider.value = sliderValueToSet;
+            updateModerationSliderUI(sliderValueToSet);
         } catch (error) {
             console.error('Fallimento fetch impostazioni avanzate:', error);
-            if(advancedSettingsMessage){
-                advancedSettingsMessage.textContent = `Errore di connessione caricando impostazioni: ${error.message}`;
-                advancedSettingsMessage.className = 'form-message error';
-                advancedSettingsMessage.style.display = 'block';
-            }
+            if(advancedSettingsModalMessage){ advancedSettingsModalMessage.textContent = `Errore caricamento: ${error.message}`; advancedSettingsModalMessage.className = 'form-message error'; advancedSettingsModalMessage.style.display = 'block'; }
+            moderationSlider.value = '2'; updateModerationSliderUI('2');
         }
     }
 
-    async function saveAdvancedSettings() {
-        if (!commentModerationLevelSelect || !saveAdvancedSettingsBtn || !advancedSettingsMessage) return;
-
-        const selectedLevel = commentModerationLevelSelect.value;
-        saveAdvancedSettingsBtn.disabled = true;
-        saveAdvancedSettingsBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
-        advancedSettingsMessage.style.display = 'none';
-        advancedSettingsMessage.className = 'form-message'; // Resetta classi
-
+    async function saveAdvancedSettingsFromModal() {
+        if (!moderationSlider || !saveAdvancedSettingsModalBtn || !advancedSettingsModalMessage) return;
+        const selectedLevelValue = moderationSlider.value;
+        saveAdvancedSettingsModalBtn.disabled = true;
+        saveAdvancedSettingsModalBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
+        advancedSettingsModalMessage.style.display = 'none'; advancedSettingsModalMessage.className = 'form-message';
         try {
             const formData = new FormData();
             formData.append('action', 'update_setting');
             formData.append('key', 'comment_moderation_level');
-            formData.append('value', selectedLevel);
-
-            const response = await fetch('manage_global_settings.php', {
-                method: 'POST',
-                body: formData
-            });
-            if (!response.ok) throw new Error(`Errore HTTP! status: ${response.status}`);
+            formData.append('value', selectedLevelValue);
+            const response = await fetch('manage_global_settings.php', { method: 'POST', body: formData });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const result = await response.json();
-
             if (result.success) {
-                advancedSettingsMessage.textContent = result.message || 'Impostazioni salvate!';
-                advancedSettingsMessage.classList.add('success');
-            } else {
-                throw new Error(result.message || 'Errore durante il salvataggio.');
-            }
+                advancedSettingsModalMessage.textContent = result.message || 'Impostazioni salvate!';
+                advancedSettingsModalMessage.classList.add('success');
+                advancedSettingsModalMessage.style.display = 'block';
+                setTimeout(() => { closeModal('advancedOptionsModal'); }, 1500);
+            } else { throw new Error(result.message || 'Errore durante il salvataggio.'); }
         } catch (error) {
             console.error('Errore salvataggio impostazioni avanzate:', error);
-            advancedSettingsMessage.textContent = `Errore: ${error.message}`;
-            advancedSettingsMessage.classList.add('error');
-        } finally {
-            advancedSettingsMessage.style.display = 'block';
-            saveAdvancedSettingsBtn.disabled = false;
-            saveAdvancedSettingsBtn.innerHTML = 'Salva Impostazioni Avanzate';
-            setTimeout(() => { // Nascondi messaggio dopo qualche secondo se è di successo
-                if(advancedSettingsMessage.classList.contains('success')) {
-                    advancedSettingsMessage.style.display = 'none';
-                }
-            }, 3000);
-        }
+            advancedSettingsModalMessage.textContent = `Errore: ${error.message}`;
+            advancedSettingsModalMessage.classList.add('error');
+            advancedSettingsModalMessage.style.display = 'block';
+        } finally { saveAdvancedSettingsModalBtn.disabled = false; saveAdvancedSettingsModalBtn.innerHTML = '<i class="fas fa-save"></i> Salva Impostazioni'; }
     }
 
-    if (saveAdvancedSettingsBtn) {
-        saveAdvancedSettingsBtn.addEventListener('click', saveAdvancedSettings);
+    if (saveAdvancedSettingsModalBtn) {
+        saveAdvancedSettingsModalBtn.addEventListener('click', saveAdvancedSettingsFromModal);
     }
-
 
     document.addEventListener('DOMContentLoaded', () => {
         const adminUserString = localStorage.getItem('adminUserEFF');
@@ -2036,41 +1295,30 @@
                 const navUsernameEl = document.getElementById('navbar-username');
                 if (navUsernameEl && adminUser.nome) navUsernameEl.textContent = adminUser.nome;
                 else if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
-
                 const navAvatarImgEl = document.querySelector('#navbar-avatar img');
                 if (navAvatarImgEl && adminUser.iconPath) navAvatarImgEl.src = adminUser.iconPath;
                 else if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
             } catch(e) {
                 console.error("Errore parsing localStorage adminUserEFF:", e);
-                const navUsernameEl = document.getElementById('navbar-username');
-                if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
-                const navAvatarImgEl = document.querySelector('#navbar-avatar img');
-                if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
+                const navUsernameEl = document.getElementById('navbar-username'); if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
+                const navAvatarImgEl = document.querySelector('#navbar-avatar img'); if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
             }
-        } else { // Se non c'è adminUserEFF in localStorage
-            const navUsernameEl = document.getElementById('navbar-username');
-            if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
-            const navAvatarImgEl = document.querySelector('#navbar-avatar img');
-            if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
+        } else {
+            const navUsernameEl = document.getElementById('navbar-username'); if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
+            const navAvatarImgEl = document.querySelector('#navbar-avatar img'); if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
         }
-
         updatePriceFieldVisibilityDashboard();
         attachPreviewListeners();
-
         const sortCriteriaSelect = document.getElementById('sortCriteria');
         const sortDirectionSelect = document.getElementById('sortDirection');
         const groupCriteriaSelect = document.getElementById('groupCriteria');
-
-        if(sortDirectionSelect) sortDirectionSelect.value = 'asc'; // Default
-        if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese'; // Default
-        if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese'; // Default
-
+        if(sortDirectionSelect) sortDirectionSelect.value = 'asc';
+        if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese';
+        if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese';
         if(sortCriteriaSelect) sortCriteriaSelect.addEventListener('change', applyFiltersAndRender);
         if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender);
         if(groupCriteriaSelect) groupCriteriaSelect.addEventListener('change', applyFiltersAndRender);
-
         fetchDashboardData();
-        loadAdvancedSettings(); // Carica impostazioni avanzate
     });
 </script>
 </body>
