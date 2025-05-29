@@ -35,8 +35,27 @@
     #editPageBtn:hover { background-color: #c07b50; } #savePageChangesBtn:hover { background-color: #27ae60; } #cancelPageChangesBtn:hover { background-color: var(--dark); }
     .editable-text-wrapper { position: relative; display: inline-block; width:100%; }
     .editable-image-wrapper { position: relative; display: block; /* o inline-block a seconda del layout */ }
-    .editable-text-wrapper:hover .edit-icon-text, .editable-image-wrapper:hover .edit-icon-image { display: inline-flex; align-items: center; justify-content: center; }
-    .edit-icon-text, .edit-icon-image { display: none; position: absolute; top: -8px; right: -8px; background: var(--accent); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7em; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-align: center; line-height: 20px; z-index:5; }
+
+    /* Visibilità icone modifica */
+    .editable-text-wrapper:hover .edit-icon-text,
+    .editable-image-wrapper:hover .edit-icon-image,
+    .hero-section:hover .edit-icon-banner-bg { /* Aggiunto per banner */
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    .edit-icon-text, .edit-icon-image, .edit-icon-banner-bg {
+      display: none; position: absolute; background: var(--accent); color: white;
+      width: 20px; height: 20px; border-radius: 50%; font-size: 0.7em;
+      cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      text-align: center; line-height: 20px; z-index:5;
+    }
+    .edit-icon-text { top: -8px; right: -8px; }
+    .edit-icon-image { top: -8px; right: -8px; }
+    .edit-icon-banner-bg { /* Posizionamento specifico per icona banner */
+      bottom: 20px; /* MODIFICATO da top a bottom */
+      right: 20px;
+    }
+
 
     img.editable-image-target { /* Classe aggiunta da JS in modalità modifica */
       border: 3px dashed var(--accent) !important;
@@ -162,6 +181,7 @@
         <span class="edit-icon-text" data-key="heroSubtitle" data-type="textarea" title="Modifica sottotitolo">&#9998;</span>
       </div>
     </div>
+    <span class="edit-icon-banner-bg" data-key="heroBackgroundImage" data-type="backgroundImage" title="Modifica immagine di sfondo banner">&#9998;</span>
   </section>
 
   <section class="section-padding">
@@ -311,16 +331,16 @@
   // === INIZIO SCRIPT UNIFICATO ===
   const PAGE_NAME_FOR_CONTENT = 'index';
   const defaultUserIconPath = 'uploads/icons/default_user.png';
-  // const placeholderImagePath = 'images/caricamento.png'; // Non più usato per queste immagini, sostituito da spinner
 
   let currentUserData = null;
   let isEditModeActive = false;
   let originalPageContentsForCancel = {};
-  let currentPageDbContents = {};
+  let currentPageDbContents = {}; // Contenuti attuali (dal DB o modificati localmente)
 
   const defaultPageContents = {
     heroTitle: "Eremo Frate Francesco",
     heroSubtitle: "Uno spazio sacro per il dialogo tra l'umano e il divino, immerso nella quiete delle Prealpi Bergamasche.",
+    heroBackgroundImage: "images/eremo.jpg", // Immagine di sfondo di default per hero section
     fraternitaHeading: "La Fraternità",
     fraternitaText: "La Fraternità Eremo Frate Francesco, nata nel 1992 attorno alla Parola di Dio sotto la guida di padre Maurizio Novelli secondo il metodo della “Lectio Divina”, è una organizzazione di volontari cristiani che condividono uno stile di vita comunitario e fraterno; non ha scopo di lucro e persegue finalità civiche, solidaristiche e di utilità sociale.",
     fraternitaImage: "images/fraternita.jpg",
@@ -381,9 +401,10 @@
       const cachedData = localStorage.getItem(cacheKey);
       if (cachedData) {
         cachedContents = JSON.parse(cachedData);
-        applyContentsToPage(cachedContents);
+        applyContentsToPage(cachedContents); // Applica subito dalla cache
         console.log("Contenuti caricati dalla cache.");
-        originalPageContentsForCancel = { ...cachedContents };
+        originalPageContentsForCancel = { ...cachedContents }; // Salva per annullamento
+        currentPageDbContents = { ...cachedContents }; // Imposta come contenuti correnti
         appliedFromCache = true;
       }
     } catch (e) {
@@ -396,67 +417,98 @@
       if (r.status === 401 || r.status === 403) {
         console.warn("Sessione scaduta o non valida secondo il server.");
         if (currentUserData) { handleLogout(); showPageStatus("La tua sessione è scaduta. Effettua nuovamente il login.", "error", 5000); }
-        currentPageDbContents = { ...defaultPageContents }; applyContentsToPage(currentPageDbContents); originalPageContentsForCancel = { ...currentPageDbContents }; updateNavbarUI(); return;
+        // Se la sessione non è valida e non c'era cache, usa i default
+        if (!appliedFromCache) {
+          currentPageDbContents = { ...defaultPageContents };
+          applyContentsToPage(currentPageDbContents);
+          originalPageContentsForCancel = { ...currentPageDbContents };
+        }
+        updateNavbarUI(); // Aggiorna UI per stato logout
+        return;
       }
       if (!r.ok) throw new Error(`Errore server: ${r.status}`);
       const d = await r.json();
       let serverContents;
-      if (d.success && d.contents && Object.keys(d.contents).length > 0) { serverContents = d.contents; }
-      else { console.warn("Nessun contenuto custom dal DB o errore API, uso i default.", d.message || ''); serverContents = { ...defaultPageContents }; }
+      if (d.success && d.contents && Object.keys(d.contents).length > 0) {
+        serverContents = d.contents;
+      } else {
+        console.warn("Nessun contenuto custom dal DB o errore API, uso i default.", d.message || '');
+        serverContents = { ...defaultPageContents };
+      }
+
+      // Aggiorna la pagina e la cache solo se i contenuti del server sono diversi da quelli in cache (o se non c'era cache)
       if (!cachedContents || JSON.stringify(cachedContents) !== JSON.stringify(serverContents)) {
-        currentPageDbContents = serverContents; applyContentsToPage(currentPageDbContents); localStorage.setItem(cacheKey, JSON.stringify(currentPageDbContents));
+        currentPageDbContents = serverContents; // Aggiorna i contenuti correnti
+        applyContentsToPage(currentPageDbContents);
+        localStorage.setItem(cacheKey, JSON.stringify(currentPageDbContents));
         console.log("Contenuti aggiornati dal server e cache salvata.");
-        if (cachedContents) { showPageStatus("Contenuti aggiornati.", "info", 2000); }
-      } else { console.log("Contenuti dal server identici alla cache."); }
-      currentPageDbContents = serverContents; originalPageContentsForCancel = { ...currentPageDbContents };
+        if (cachedContents) { // Mostra messaggio solo se c'era una cache da aggiornare
+          showPageStatus("Contenuti aggiornati.", "info", 2000);
+        }
+      } else {
+        console.log("Contenuti dal server identici alla cache. Nessun re-render necessario dalla risposta server.");
+      }
+      originalPageContentsForCancel = { ...currentPageDbContents }; // Aggiorna per annullamento
     } catch (err) {
       console.error("Errore caricamento contenuti dal server:", err);
-      if (!appliedFromCache) { currentPageDbContents = { ...defaultPageContents }; applyContentsToPage(currentPageDbContents); originalPageContentsForCancel = { ...currentPageDbContents };}
+      if (!appliedFromCache) { // Se non c'era cache e il server fallisce, usa i default
+        currentPageDbContents = { ...defaultPageContents };
+        applyContentsToPage(currentPageDbContents);
+        originalPageContentsForCancel = { ...currentPageDbContents };
+      }
       showPageStatus("Errore caricamento server. Mostrati dati locali/predefiniti.", "error");
     }
   }
 
-  // === MODIFIED: applyContentsToPage per gestire spinner e immagini ===
   function applyContentsToPage(contents) {
+    // Applica heroBackgroundImage
+    const heroSection = document.getElementById('heroSection');
+    if (heroSection) {
+      const heroBgUrl = contents.heroBackgroundImage || defaultPageContents.heroBackgroundImage || 'images/eremo.jpg';
+      heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${heroBgUrl}')`;
+    }
+
+    // Applica altri contenuti testuali e immagini
     document.querySelectorAll('[data-content-key]').forEach(el => {
       const key = el.dataset.contentKey;
+      // Salta heroBackgroundImage qui perché già gestito
+      if (key === 'heroBackgroundImage') return;
+
       const contentValue = contents[key] !== undefined ? contents[key] : defaultPageContents[key];
 
       if (el.tagName === 'IMG') {
         const imageElement = el;
-        const parentContainer = imageElement.parentElement;
+        const parentContainer = imageElement.closest('.editable-image-wrapper') || imageElement.parentElement; // Trova il wrapper corretto
         const spinnerContainer = parentContainer.querySelector('.image-loading-spinner');
         let errorDisplay = parentContainer.querySelector('.image-load-error-display');
 
-        // Rimuovi eventuale messaggio di errore precedente
         if (errorDisplay) errorDisplay.style.display = 'none';
 
-        const finalSrc = contentValue || defaultPageContents[key]; // URL immagine da server/cache o default specifico
+        const finalSrc = contentValue || defaultPageContents[key];
 
         if (finalSrc) {
-          if (spinnerContainer) spinnerContainer.style.display = 'none'; // Nascondi spinner
+          if (spinnerContainer) spinnerContainer.style.display = 'none';
           imageElement.src = finalSrc;
-          imageElement.style.display = 'block'; // Mostra immagine
-          imageElement.alt = (defaultPageContents[key] || `Immagine per ${key}`).replace(" - Caricamento...", ""); // Pulisci alt
+          imageElement.style.display = 'block';
+          imageElement.alt = (defaultPageContents[key] || `Immagine per ${key}`).replace(" - Caricamento...", "");
 
           imageElement.onerror = function() {
             console.warn(`Errore caricamento immagine: ${this.src}. Mostro messaggio di errore.`);
-            this.style.display = 'none'; // Nascondi img rotta
-            if (spinnerContainer) spinnerContainer.style.display = 'none'; // Assicurati che lo spinner sia nascosto
+            this.style.display = 'none';
+            if (spinnerContainer) spinnerContainer.style.display = 'none';
 
-            if (!errorDisplay) { // Crea div errore se non esiste
+            if (!errorDisplay) {
               errorDisplay = document.createElement('div');
               errorDisplay.className = 'image-load-error-display';
-              // Stili CSS per image-load-error-display sono nel tag <style>
               parentContainer.insertBefore(errorDisplay, this);
             }
             errorDisplay.innerHTML = `<p>Immagine non disponibile</p><p style="font-size:0.8em;">(${this.dataset.contentKey || key})</p>`;
             errorDisplay.style.display = 'flex';
-            this.onerror = null; // Previene loop infinito
+            this.onerror = null;
           };
-        } else { // Nessun URL immagine disponibile (né da server/cache, né da defaultPageContents)
-          if (spinnerContainer) spinnerContainer.style.display = 'flex'; // Mostra spinner
-          imageElement.style.display = 'none'; // Tieni immagine nascosta
+        } else {
+          if (spinnerContainer) spinnerContainer.style.display = 'flex';
+          imageElement.style.display = 'none';
           console.warn(`Nessun URL immagine per ${key}, mostro spinner.`);
         }
       } else { // Per elementi non-immagine (testo)
@@ -467,66 +519,238 @@
         }
       }
     });
+  }
 
-    const heroSection = document.getElementById('heroSection');
-    if (heroSection) {
-      const heroBgUrl = contents.heroBackgroundImage || defaultPageContents.heroBackgroundImage || 'images/eremo.jpg';
-      heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${heroBgUrl}')`;
+  function toggleEditMode(enable){
+    isEditModeActive=enable;
+    document.querySelectorAll('.edit-icon-text, .edit-icon-image, .edit-icon-banner-bg').forEach(icon =>
+            icon.style.display = (currentUserData?.isAdmin && enable) ? 'inline-flex' : 'none'
+    );
+    document.querySelectorAll('img.chi-siamo-image').forEach(img => {
+      (currentUserData?.isAdmin && enable) ? img.classList.add('editable-image-target') : img.classList.remove('editable-image-target');
+    });
+
+    // Gestione visibilità bottoni principali di modifica
+    const editContainer=document.getElementById('editPageBtnContainer');
+    const editBtn=document.getElementById('editPageBtn');
+    const saveBtn=document.getElementById('savePageChangesBtn');
+    const cancelBtn=document.getElementById('cancelPageChangesBtn');
+
+    if(editContainer) {
+      editContainer.style.display = currentUserData?.isAdmin ? 'flex' : 'none';
+      if (currentUserData?.isAdmin) {
+        if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block';
+        if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none';
+        if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none';
+      } else { // Se non è admin, nascondi tutti i bottoni di modifica pagina
+        if(editBtn) editBtn.style.display = 'none';
+        if(saveBtn) saveBtn.style.display = 'none';
+        if(cancelBtn) cancelBtn.style.display = 'none';
+      }
+    }
+
+    if(enable){
+      originalPageContentsForCancel={...currentPageDbContents}; // Salva stato corrente per annullamento
     }
   }
-  // === FINE MODIFIED: applyContentsToPage ===
 
+  function openEditModal(key,type,currentValue){
+    currentEditingKey=key;
+    currentEditingType=type;
+    if(!editContentModal||!editModalMessage)return;
+    editModalMessage.style.display='none';editModalMessage.textContent='';
 
-  function toggleEditMode(enable){isEditModeActive=enable;document.querySelectorAll('.edit-icon-text,.edit-icon-image').forEach(icon=>icon.style.display=(currentUserData?.isAdmin&&enable)?'inline-flex':'none');document.querySelectorAll('img.chi-siamo-image').forEach(img=>{ (currentUserData?.isAdmin&&enable)?img.classList.add('editable-image-target'):img.classList.remove('editable-image-target');});const editContainer=document.getElementById('editPageBtnContainer');const editBtn=document.getElementById('editPageBtn');const saveBtn=document.getElementById('savePageChangesBtn');const cancelBtn=document.getElementById('cancelPageChangesBtn');if(editContainer&&currentUserData?.isAdmin)editContainer.style.display='flex';else if(editContainer)editContainer.style.display='none';if(editBtn)editBtn.style.display=enable?'none':(currentUserData?.isAdmin?'inline-block':'none');if(saveBtn)saveBtn.style.display=enable?'inline-block':'none';if(cancelBtn)cancelBtn.style.display=enable?'inline-block':'none';if(enable){originalPageContentsForCancel={...currentPageDbContents};}}
+    editModalTextarea.style.display='none';editModalInputText.style.display='none';editModalInputImage.style.display='none';editModalInputFile.style.display='none';editModalFileLabel.style.display='none';editModalFileNote.style.display='none';editModalInputFile.value='';
 
-  function openEditModal(key,type,currentValue){currentEditingKey=key;currentEditingType=type;if(!editContentModal||!editModalMessage)return;editModalMessage.style.display='none';editModalMessage.textContent='';editModalTitle.textContent=`Modifica: ${key}`;editModalTextarea.style.display='none';editModalInputText.style.display='none';editModalInputImage.style.display='none';editModalInputFile.style.display='none';editModalFileLabel.style.display='none';editModalFileNote.style.display='none';editModalInputFile.value='';let valForInput=currentValue;if(type==='textarea'||type==='text'){const tmp=document.createElement('div');tmp.innerHTML=currentValue;valForInput=tmp.innerText.replace(/\r\n|\r|\n/g,"\n");}
-    if(type==='textarea'){editModalFieldLabelText.textContent="Testo (paragrafo):";editModalTextarea.value=valForInput;editModalTextarea.style.display='block';editModalTextarea.focus();}
-    else if(type==='image'){editModalFieldLabelText.textContent="URL Immagine Corrente:";editModalInputImage.value=valForInput;editModalInputImage.style.display='block';editModalInputFile.style.display='block';editModalFileLabel.style.display='block';editModalFileNote.style.display='block';editModalInputImage.focus();}
-    else{editModalFieldLabelText.textContent="Testo (titolo/corto):";editModalInputText.value=valForInput;editModalInputText.style.display='block';editModalInputText.focus();}
-    editContentModal.style.display='flex';}
+    let valForInput=currentValue;
+    // Per testo e textarea, decodifica HTML entities e normalizza newline per l'editing
+    if(type==='textarea'||type==='text'){
+      const tmp=document.createElement('div');tmp.innerHTML=currentValue;valForInput=tmp.innerText.replace(/<br\s*\/?>/gi, "\n");
+    }
+
+    if(type==='textarea'){
+      editModalTitle.textContent=`Modifica Testo Paragrafo: ${key}`;
+      editModalFieldLabelText.textContent="Testo (paragrafo):";editModalTextarea.value=valForInput;editModalTextarea.style.display='block';editModalTextarea.focus();
+    } else if(type==='image' || type === 'backgroundImage'){
+      editModalTitle.textContent = (type === 'backgroundImage') ? `Modifica Immagine Sfondo Banner` : `Modifica Immagine: ${key}`;
+      editModalFieldLabelText.textContent="URL Immagine Corrente:";editModalInputImage.value=valForInput;editModalInputImage.style.display='block';editModalInputFile.style.display='block';editModalFileLabel.style.display='block';editModalFileNote.style.display='block';editModalInputImage.focus();
+    } else { // text
+      editModalTitle.textContent=`Modifica Testo Breve: ${key}`;
+      editModalFieldLabelText.textContent="Testo (titolo/corto):";editModalInputText.value=valForInput;editModalInputText.style.display='block';editModalInputText.focus();
+    }
+    editContentModal.style.display='flex';
+  }
+
   function closeEditContentModal(){if(editContentModal)editContentModal.style.display='none';currentEditingKey=null;}
 
   if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
+
   if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{
     const contentsToSave={};
+
+    // Gestione specifica per heroBackgroundImage
+    const heroSectionForSave = document.getElementById('heroSection');
+    if (heroSectionForSave && heroSectionForSave.style.backgroundImage) {
+      const bgStyle = heroSectionForSave.style.backgroundImage;
+      const urlMatch = bgStyle.match(/url\("?([^"]*)"?\)/);
+      if (urlMatch && urlMatch[1]) {
+        contentsToSave.heroBackgroundImage = urlMatch[1];
+      } else {
+        // Se non c'è URL, salva stringa vuota o valore di default se preferito
+        contentsToSave.heroBackgroundImage = defaultPageContents.heroBackgroundImage || '';
+      }
+    } else if (heroSectionForSave) { // Se non c'è style.backgroundImage, usa default
+      contentsToSave.heroBackgroundImage = defaultPageContents.heroBackgroundImage || '';
+    }
+
+
+    // Gestione degli altri elementi con data-content-key
     document.querySelectorAll('[data-content-key]').forEach(el=>{
       const key=el.dataset.contentKey;
-      if (el) { contentsToSave[key] = el.tagName === 'IMG' ? el.src : (el.innerHTML || ''); }
+      // heroBackgroundImage è già gestito, quindi lo saltiamo qui
+      if (key === 'heroBackgroundImage') return;
+
+      if (el.tagName === 'IMG') {
+        contentsToSave[key] = el.src;
+      } else {
+        contentsToSave[key] = el.innerHTML || ''; // Usa innerHTML per testo formattato
+      }
     });
+
     const btn=savePageChangesBtn; const oldHtml=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
     try{
       const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});
       const j=await r.json(); if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");
-      currentPageDbContents={...contentsToSave}; originalPageContentsForCancel={...currentPageDbContents};
-      localStorage.setItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`, JSON.stringify(currentPageDbContents));
+
+      currentPageDbContents={...contentsToSave}; // Aggiorna stato corrente con i dati salvati
+      originalPageContentsForCancel={...currentPageDbContents}; // Aggiorna anche per annullamento futuro
+      localStorage.setItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`, JSON.stringify(currentPageDbContents)); // Aggiorna cache
+
       showPageStatus(j.message||'Modifiche salvate!','success'); toggleEditMode(false);
     }catch(err){ console.error("Errore salvataggio:",err); showPageStatus(`Errore: ${err.message}`,'error');
     }finally{ btn.disabled=false; btn.innerHTML=oldHtml; }
   });
-  if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{applyContentsToPage(originalPageContentsForCancel);toggleEditMode(false);showPageStatus('Modifiche annullate.','info');});
-  document.addEventListener('click',function(e){if(!isEditModeActive||!currentUserData?.isAdmin)return;const editIcon=e.target.closest('.edit-icon-text,.edit-icon-image');const imageTarget=e.target.closest('img.editable-image-target');let elToEdit,key,type,currentVal;
-    if(editIcon){key=editIcon.dataset.key;type=editIcon.dataset.type;elToEdit=document.getElementById(`content-${key}`);if(!elToEdit){console.error(`Elemento con id content-${key} non trovato`);return;}currentVal=elToEdit.tagName==='IMG'?elToEdit.src:elToEdit.innerHTML;openEditModal(key,type,currentVal);}
-    else if(imageTarget){const wrapper=imageTarget.closest('.editable-image-wrapper')||imageTarget.closest('.chi-siamo-image-container');if(wrapper){key=wrapper.dataset.contentKey||imageTarget.dataset.contentKey;type='image';currentVal=imageTarget.src;openEditModal(key,type,currentVal);}}});
+
+  if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{
+    applyContentsToPage(originalPageContentsForCancel); // Ripristina dai contenuti originali (prima dell'attivazione edit mode)
+    currentPageDbContents = {...originalPageContentsForCancel}; // Resetta anche i contenuti correnti
+    toggleEditMode(false);
+    showPageStatus('Modifiche annullate.','info');
+  });
+
+  document.addEventListener('click',function(e){
+    if(!isEditModeActive||!currentUserData?.isAdmin)return;
+    // Cerca l'icona di modifica più vicina (testo, immagine, o banner)
+    const editIcon = e.target.closest('.edit-icon-text, .edit-icon-image, .edit-icon-banner-bg');
+    const imageTarget = e.target.closest('img.editable-image-target'); // Per click diretto su immagini <IMG>
+
+    let elToEdit, key, type, currentVal;
+
+    if(editIcon){
+      key = editIcon.dataset.key;
+      type = editIcon.dataset.type;
+
+      if (type === 'backgroundImage' && key === 'heroBackgroundImage') {
+        elToEdit = document.getElementById('heroSection');
+        const bgStyle = elToEdit.style.backgroundImage;
+        const urlMatch = bgStyle.match(/url\("?([^"]*)"?\)/);
+        currentVal = (urlMatch && urlMatch[1]) ? urlMatch[1] : (defaultPageContents.heroBackgroundImage || '');
+      } else { // Per 'text', 'textarea', 'image'
+        elToEdit = document.getElementById(`content-${key}`);
+        if(!elToEdit){console.error(`Elemento con id content-${key} non trovato`);return;}
+        currentVal = elToEdit.tagName === 'IMG' ? elToEdit.src : elToEdit.innerHTML;
+      }
+      openEditModal(key,type,currentVal);
+    } else if(imageTarget){ // Click diretto su un <img> editabile
+      // L'immagine stessa ha data-content-key
+      key = imageTarget.dataset.contentKey;
+      type = 'image'; // Il click diretto su un img è sempre per 'image'
+      currentVal = imageTarget.src;
+      openEditModal(key,type,currentVal);
+    }
+  });
+
   if(closeEditContentModalBtn)closeEditContentModalBtn.addEventListener('click',closeEditContentModal);
   if(cancelEditModalBtn)cancelEditModalBtn.addEventListener('click',closeEditContentModal);
 
   if(saveEditModalBtn)saveEditModalBtn.addEventListener('click',async()=>{
-    if(!currentEditingKey)return;const targetElement=document.getElementById(`content-${currentEditingKey}`);if(!targetElement){if(editModalMessage){editModalMessage.textContent="Err: Elem. non trovato.";editModalMessage.className='form-message error';editModalMessage.style.display='block';}return;}
-    let newValue='';const fileInput=document.getElementById('editModalInputFile');
-    const saveModalButton=saveEditModalBtn;const originalSaveModalButtonHtml=saveModalButton.innerHTML; let closeTheModal = true;
-    if(currentEditingType==='image'&&fileInput.files[0]){
+    if(!currentEditingKey)return;
+
+    let targetElement;
+    if (currentEditingType === 'backgroundImage' && currentEditingKey === 'heroBackgroundImage') {
+      targetElement = document.getElementById('heroSection');
+    } else {
+      targetElement = document.getElementById(`content-${currentEditingKey}`);
+    }
+
+    if(!targetElement){
+      if(editModalMessage){editModalMessage.textContent="Err: Elem. non trovato.";editModalMessage.className='form-message error';editModalMessage.style.display='block';}
+      return;
+    }
+
+    let newValue='';
+    const fileInput=document.getElementById('editModalInputFile');
+    const saveModalButton=saveEditModalBtn;const originalSaveModalButtonHtml=saveModalButton.innerHTML;
+    let closeTheModal = true;
+
+    if((currentEditingType==='image' || currentEditingType === 'backgroundImage') && fileInput.files[0]){
       saveModalButton.disabled=true;saveModalButton.innerHTML='<i class="fas fa-spinner fa-spin"></i> Caricamento...';
-      const formData=new FormData();formData.append('imageFile',fileInput.files[0]);formData.append('page_name',PAGE_NAME_FOR_CONTENT);formData.append('content_key',currentEditingKey);
-      try{const r=await fetch('api_upload_image.php',{method:'POST',body:formData});const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Errore upload file.");newValue=j.filePath;targetElement.src=newValue;if(editModalMessage)editModalMessage.style.display='none';}
-      catch(err){console.error("Errore upload immagine:",err);if(editModalMessage){editModalMessage.textContent=`Errore upload: ${err.message}`;editModalMessage.className='form-message error';editModalMessage.style.display='block';} closeTheModal = false;}
+      const formData=new FormData();formData.append('imageFile',fileInput.files[0]);formData.append('page_name',PAGE_NAME_FOR_CONTENT);formData.append('content_key',currentEditingKey); // Usa currentEditingKey (es. 'heroBackgroundImage', 'fraternitaImage')
+      try{
+        const r=await fetch('api_upload_image.php',{method:'POST',body:formData});
+        const j=await r.json();
+        if(!r.ok||!j.success)throw new Error(j.message||"Errore upload file.");
+        newValue=j.filePath; // Questo è l'URL dell'immagine caricata
+
+        if (currentEditingType === 'backgroundImage') {
+          targetElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${newValue}')`;
+        } else { // 'image'
+          targetElement.src=newValue;
+        }
+        currentPageDbContents[currentEditingKey] = newValue; // Aggiorna stato corrente
+        if(editModalMessage)editModalMessage.style.display='none';
+      }
+      catch(err){
+        console.error("Errore upload immagine:",err);
+        if(editModalMessage){editModalMessage.textContent=`Errore upload: ${err.message}`;editModalMessage.className='form-message error';editModalMessage.style.display='block';}
+        closeTheModal = false;
+      }
       finally{saveModalButton.disabled=false;saveModalButton.innerHTML=originalSaveModalButtonHtml;}
-    }else if(currentEditingType==='image'){newValue=editModalInputImage.value.trim();targetElement.src=newValue;}
-    else if(currentEditingType==='textarea'){newValue=sanitizeTextForHTML(editModalTextarea.value);targetElement.innerHTML=newValue;}
-    else{newValue=sanitizeTextForHTML(editModalInputText.value);targetElement.innerHTML=newValue;}
+    } else if (currentEditingType==='image' || currentEditingType === 'backgroundImage'){
+      newValue = editModalInputImage.value.trim();
+      if (currentEditingType === 'backgroundImage') {
+        targetElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${newValue}')`;
+      } else { // 'image'
+        targetElement.src=newValue;
+      }
+      currentPageDbContents[currentEditingKey] = newValue; // Aggiorna stato corrente
+    } else if(currentEditingType==='textarea'){
+      newValue=sanitizeTextForHTML(editModalTextarea.value);targetElement.innerHTML=newValue;
+      currentPageDbContents[currentEditingKey] = editModalTextarea.value; // Salva testo grezzo per coerenza
+    } else { // text
+      newValue=sanitizeTextForHTML(editModalInputText.value);targetElement.innerHTML=newValue;
+      currentPageDbContents[currentEditingKey] = editModalInputText.value; // Salva testo grezzo
+    }
     if (closeTheModal) closeEditContentModal();
   });
 
-  document.addEventListener('DOMContentLoaded',async()=>{const c=document.getElementById('currentYear');if(c)c.textContent=new Date().getFullYear();loadUserData();updateNavbarUI();await loadPageContentsFromServer();if(!isEditModeActive||!currentUserData?.isAdmin){document.querySelectorAll('.edit-icon-text,.edit-icon-image').forEach(i=>i.style.display='none');document.querySelectorAll('img.chi-siamo-image.editable-image-target').forEach(img=>img.classList.remove('editable-image-target'));} else { toggleEditMode(false); } });
+  document.addEventListener('DOMContentLoaded',async()=>{
+    const c=document.getElementById('currentYear');if(c)c.textContent=new Date().getFullYear();
+    loadUserData();
+    updateNavbarUI(); // Chiamata iniziale per UI navbar
+    await loadPageContentsFromServer(); // Carica contenuti e applicali
+    // La visibilità dei bottoni di modifica pagina è gestita da updateNavbarUI e toggleEditMode
+    // Assicurati che toggleEditMode(false) venga chiamato se l'utente è admin ma non in edit mode all'inizio
+    if (currentUserData && currentUserData.isAdmin && !isEditModeActive) {
+      toggleEditMode(false);
+    } else if (!currentUserData || !currentUserData.isAdmin) {
+      // Nascondi tutte le icone se non admin o non loggato
+      document.querySelectorAll('.edit-icon-text,.edit-icon-image,.edit-icon-banner-bg').forEach(i=>i.style.display='none');
+      document.querySelectorAll('img.chi-siamo-image.editable-image-target').forEach(img=>img.classList.remove('editable-image-target'));
+      const editContainer=document.getElementById('editPageBtnContainer');
+      if(editContainer) editContainer.style.display='none';
+    }
+  });
   // === FINE SCRIPT UNIFICATO ===
 </script>
 </body>
