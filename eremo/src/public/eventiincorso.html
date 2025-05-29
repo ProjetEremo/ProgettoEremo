@@ -125,7 +125,7 @@
       display: none; opacity: 0;
       transform: translate(-50%, -50%) scale(0.95);
       transition: opacity 0.3s ease, transform 0.3s ease;
-      overflow: hidden;
+      overflow: hidden; /* Changed from visible to hidden */
     }
     .dash-admin-event-popup.active {
       opacity: 1; transform: translate(-50%, -50%) scale(1);
@@ -143,8 +143,137 @@
       border: none; cursor: pointer; padding: 0.5rem; line-height: 1;
     }
     .dash-admin-event-popup .close-popup:hover { color: var(--dark, #333); }
-    .dash-admin-event-popup-content { overflow-y: auto; padding: 1.5rem; }
-    .dash-admin-event-form-and-preview-container { display: flex; flex-wrap: wrap; gap: 2rem; }
+    .dash-admin-event-popup-content {
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* === NUOVI STILI PER LA SELEZIONE DELLA MODALITÀ DI CREAZIONE === */
+    /* MODIFICATO: flex-direction e gap per layout orizzontale */
+    #creationModeSelectionView {
+      display: flex;
+      flex-direction: row; /* MODIFICATO */
+      align-items: stretch; /* MODIFICATO per altezza uguale */
+      justify-content: center;
+      gap: 1rem; /* MODIFICATO */
+      padding: 2rem 1rem; /* MODIFICATO per padding laterale */
+      width: 100%;
+      flex-grow: 1;
+    }
+    .creation-mode-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem; /* MODIFICATO */
+      border: 2px solid var(--gray-light);
+      border-radius: var(--border-radius-medium);
+      background-color: var(--white);
+      box-shadow: var(--shadow-light);
+      cursor: pointer;
+      transition: all 0.25s ease-in-out;
+      width: 100%;
+      max-width: 300px; /* MODIFICATO per adattarsi meglio orizzontalmente */
+      text-align: center;
+      flex-basis: 0; /* MODIFICATO per flex-grow */
+      flex-grow: 1; /* MODIFICATO per riempire spazio */
+    }
+    .creation-mode-option:hover {
+      transform: translateY(-4px) scale(1.02); /* MODIFICATO: aggiunto scale */
+      box-shadow: var(--shadow-medium);
+      border-color: var(--secondary);
+    }
+    .creation-mode-option i {
+      font-size: 2.2rem; /* MODIFICATO */
+      color: var(--secondary);
+      margin-bottom: 0.8rem;
+      transition: color 0.25s ease-in-out, transform 0.25s ease-in-out; /* MODIFICATO */
+    }
+    .creation-mode-option:hover i {
+      color: var(--primary);
+      transform: scale(1.1); /* MODIFICATO */
+    }
+    /* MODIFICATO: Assicura centratura testo per h4 */
+    .creation-mode-option h4 {
+      font-size: 1.15rem; /* MODIFICATO */
+      color: var(--primary);
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+      text-align: center; /* MODIFICATO */
+    }
+    /* MODIFICATO: Assicura centratura testo per p */
+    .creation-mode-option p {
+      font-size: 0.85rem; /* MODIFICATO */
+      color: var(--gray-dark);
+      line-height: 1.5;
+      margin-bottom: 0;
+      text-align: center; /* MODIFICATO */
+    }
+
+    /* MODIFICATO: Stile specifico per il pulsante AI */
+    .creation-mode-option#extractFromFlyerModeBtn {
+      border-color: var(--primary-light, #a5c2b9);
+      background-color: var(--primary-lighter, #eef3f1); /* Sfondo leggermente diverso */
+    }
+    .creation-mode-option#extractFromFlyerModeBtn:hover {
+      border-color: var(--primary);
+      background-color: var(--white); /* Ritorna bianco su hover per contrasto */
+    }
+    .creation-mode-option#extractFromFlyerModeBtn i {
+      color: var(--primary); /* Icona già del colore primario */
+    }
+    .creation-mode-option#extractFromFlyerModeBtn:hover i {
+      color: var(--secondary-dark); /* Cambio colore icona su hover */
+    }
+
+
+    /* === NUOVI STILI PER LA SEZIONE CARICAMENTO VOLANTINO === */
+    #flyerUploadView {
+      display: none;
+      padding: 1.5rem;
+      border: 1px dashed var(--gray-medium);
+      border-radius: var(--border-radius-medium);
+      background-color: var(--background-light, #f8f9fa);
+      text-align: center;
+      margin-top: 1rem;
+    }
+    #flyerUploadView h4 {
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    #flyerUploadView .form-group { margin-bottom: 1rem; }
+    #flyerUploadView #flyerFile {
+      display: block;
+      margin: 0 auto 1rem auto;
+      max-width: 400px;
+    }
+    #flyerUploadView #flyerPreview {
+      max-width: 100%;
+      max-height: 200px;
+      margin: 0 auto 1rem auto;
+      border: 1px solid var(--gray-light);
+      border-radius: 4px;
+      display: none;
+    }
+    #flyerUploadView #processFlyerBtn.btn-popup .spinner-mini {
+      margin-right: 8px;
+    }
+    #flyerProcessingStatus {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      min-height: 1.2em;
+    }
+    #flyerProcessingStatus.error { color: var(--danger); }
+    #flyerProcessingStatus.success { color: var(--success); }
+
+
+    .dash-admin-event-form-and-preview-container {
+      display: none;
+      flex-wrap: wrap; gap: 2rem;
+    }
     #dashAdminEventForm { flex: 2; min-width: 320px; }
     #dashAdminEventCardPreviewContainer {
       flex: 1; min-width: 280px; padding: 1rem; border: 1px dashed var(--gray-medium, #ccc);
@@ -224,22 +353,22 @@
     #dashAdmin-current-event-flyer-preview span { color: var(--gray-dark); }
     #dashAdminEventFormMessage.form-message { margin-top: 1rem; }
 
-    /* === NUOVI STILI PER BOTTONE AI "DYNAMIC ISLAND" v3 === */
+    /* === NUOVI STILI PER BOTTONE AI "DYNAMIC ISLAND" v3 (Altezza corretta e Energia Cosmica) === */
     .ai-generate-btn-container {
       position: relative;
     }
     .ai-generate-btn {
       position: absolute;
-      top: -11px; /* Leggermente aggiustato per la nuova altezza */
+      top: -11px;
       right: 0px;
       background-color: var(--primary);
       color: white;
       border: none;
-      border-radius: 19px; /* Altezza/2 per pillola perfetta */
+      border-radius: 19px;
       min-width: 38px;
-      height: 38px; /* Altezza ridotta */
+      height: 38px;
       padding: 0 9px;
-      font-size: 1.05rem; /* Leggermente ridotta l'icona se necessario */
+      font-size: 1.05rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -256,29 +385,29 @@
       padding 0.35s ease-in-out,
       background-color 0.2s ease;
     }
-    /* Effetto "Energia Cosmica" interno */
     .ai-generate-btn::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
       border-radius: inherit;
       background-image:
-              radial-gradient(circle at 20% 30%, rgba(255,255,255,0.12) 1px, transparent 3px),
-              radial-gradient(circle at 80% 10%, rgba(255,255,255,0.1) 1px, transparent 2px),
-              radial-gradient(circle at 50% 70%, rgba(255,255,255,0.08) 1.5px, transparent 4px),
-              radial-gradient(circle at 30% 90%, rgba(255,255,255,0.11) 1px, transparent 3px),
-              radial-gradient(circle at 70% 50%, rgba(255,255,255,0.09) 1px, transparent 2.5px);
-      background-size: 200% 200%; /* Per permettere il movimento del pattern */
+              radial-gradient(circle at 25% 25%, rgba(255,255,255,0.15) 0px, transparent 2px),
+              radial-gradient(circle at 75% 15%, rgba(200,200,255,0.12) 0.5px, transparent 2.5px),
+              radial-gradient(circle at 50% 75%, rgba(220,220,255,0.1) 1px, transparent 3px),
+              radial-gradient(circle at 15% 85%, rgba(230,230,255,0.13) 0.5px, transparent 2px),
+              radial-gradient(circle at 85% 60%, rgba(210,210,255,0.11) 0.75px, transparent 2.5px);
+      background-size: 50px 50px;
       opacity: 0;
-      mix-blend-mode: screen; /* Per un effetto luminoso */
-      transition: opacity 0.4s ease-in-out;
-      animation: cosmicFlow 15s linear infinite;
-      z-index: 0; /* Dietro al contenuto del bottone */
+      mix-blend-mode: screen;
+      transition: opacity 0.5s ease-in-out;
+      animation: cosmicFlow 20s linear infinite;
+      z-index: 0;
+      will-change: transform, background-position;
     }
     @keyframes cosmicFlow {
-      0% { background-position: 0% 0%; transform: rotate(0deg); }
-      50% { background-position: 100% 100%; transform: rotate(180deg); }
-      100% { background-position: 0% 0%; transform: rotate(360deg); }
+      0% { background-position: 0% 0%; transform: rotate(0deg) scale(1); }
+      100% { background-position: 200px 200px; transform: rotate(360deg) scale(1.1); }
     }
 
     .ai-generate-btn.visible {
@@ -287,11 +416,11 @@
       pointer-events: auto;
       animation: aiButtonPulseMain 2.8s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.6s;
     }
-    .ai-generate-btn.visible::before { /* Mostra l'effetto cosmico quando il bottone è visibile */
-      opacity: 0.6; /* Opacità dell'effetto cosmico */
+    .ai-generate-btn.visible::before {
+      opacity: 0.5;
     }
     .ai-generate-btn.visible.expanded {
-      min-width: 170px; /* Leggermente ridotto per nuova altezza */
+      min-width: 170px;
       padding: 0 14px;
     }
 
@@ -302,7 +431,8 @@
       animation-play-state: paused;
     }
     .ai-generate-btn:not(.loading):hover::before {
-      animation-play-state: paused; /* Pausa effetto cosmico su hover */
+      animation-play-state: paused;
+      opacity: 0.7;
     }
     .ai-generate-btn:not(.loading):active {
       transform: scale(0.98) translateY(0);
@@ -321,7 +451,7 @@
     .ai-icon { display: inline-block; transition: opacity 0.2s ease, transform 0.3s ease; margin-right: 0; }
     .ai-text {
       opacity: 0; max-width: 0; overflow: hidden; white-space: nowrap;
-      font-size: 0.85rem; /* Leggermente ridotto */
+      font-size: 0.85rem;
       font-weight: 500; margin-left: 0.4em;
       transition: opacity 0.3s ease-in-out 0.1s, max-width 0.35s ease-in-out 0.05s;
     }
@@ -339,7 +469,7 @@
       content: ''; position: absolute; left: 50%; top: 50%;
       transform: translate(-50%, -50%) scale(0);
       border-radius: 50%;
-      background-color: rgba(var(--secondary-rgb, 141, 177, 135), 0.15); /* Onde più discrete */
+      background-color: rgba(var(--secondary-rgb, 141, 177, 135), 0.15);
       opacity: 0; pointer-events: none;
     }
     .ai-generate-btn.visible:not(.loading):not(:hover) .ai-ripple-container::before {
@@ -350,11 +480,10 @@
       width: 180%; height: 180%;
       animation: rippleWave 2.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0.9s;
     }
-    .ai-generate-btn:hover .ai-ripple-container::before, /* Pausa onde su hover */
+    .ai-generate-btn:hover .ai-ripple-container::before,
     .ai-generate-btn:hover .ai-ripple-container::after {
       animation-play-state: paused;
     }
-
 
     @keyframes rippleWave {
       0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0.6; }
@@ -374,13 +503,13 @@
     .ai-spinner-container .ai-loading-text { font-size: 0.8rem; font-weight: 500; color: white; margin-left: 8px; }
 
     .ai-generate-btn.loading {
-      min-width: 120px; /* Leggermente ridotto per nuova altezza */
+      min-width: 120px;
       padding: 0 14px;
       background-color: var(--secondary);
       animation-play-state: paused;
       cursor: default;
     }
-    .ai-generate-btn.loading::before { /* Nascondi effetto cosmico durante il loading */
+    .ai-generate-btn.loading::before {
       opacity: 0 !important;
       animation: none !important;
     }
@@ -856,6 +985,29 @@
     <button class="close-popup" id="closeDashAdminEventPopupBtn" aria-label="Chiudi popup">&times;</button>
   </div>
   <div class="dash-admin-event-popup-content">
+    <div id="creationModeSelectionView">
+      <div class="creation-mode-option" id="createManuallyModeBtn">
+        <i class="fas fa-edit"></i>
+        <h4>Crea Manualmente</h4>
+        <p>Inserisci tutti i dettagli dell'evento compilando il modulo.</p>
+      </div>
+      <div class="creation-mode-option" id="extractFromFlyerModeBtn">
+        <i class="fas fa-file-invoice"></i> <h4>Estrai da Volantino (AI)</h4>
+        <p>Carica un volantino e lascia che l'AI compili i campi per te.</p>
+      </div>
+    </div>
+
+    <div id="flyerUploadView">
+      <h4>Carica Volantino Evento</h4>
+      <div class="form-group">
+        <label for="flyerFile">Seleziona immagine volantino (JPG, PNG, WEBP):</label>
+        <input type="file" id="flyerFile" class="form-control" accept="image/jpeg, image/png, image/webp">
+      </div>
+      <img id="flyerPreview" src="#" alt="Anteprima Volantino" />
+      <button type="button" id="processFlyerBtn" class="btn-popup" disabled><i class="fas fa-cogs"></i> Processa Volantino con AI</button>
+      <div id="flyerProcessingStatus"></div>
+    </div>
+
     <div class="dash-admin-event-form-and-preview-container">
       <form id="dashAdminEventForm" method="POST" enctype="multipart/form-data">
         <input type="hidden" id="dashAdmin-event-id" name="event-id">
@@ -1007,6 +1159,11 @@
   let currentEventsData = [];
   let groqApiKey = null;
 
+  // Elementi DOM per la selezione della modalità di creazione
+  let creationModeSelectionViewEl, createManuallyModeBtnEl, extractFromFlyerModeBtnEl;
+  // Elementi DOM per il caricamento del volantino
+  let flyerUploadViewEl, flyerFileEl, flyerPreviewEl, processFlyerBtnEl, flyerProcessingStatusEl;
+
   let adminAddEventBtnEl, dashAdminEventPopupOverlayEl, dashAdminEventPopupEl, closeDashAdminEventPopupBtnEl,
           dashAdminEventFormEl, dashAdminEventPopupTitleEl, dashAdminEventIdInputEl, dashAdminEventTitleEl,
           dashAdminEventDateEl, dashAdminEventStartTimeEl, dashAdminEventEndTimeEl, dashAdminEventShortDescEl,
@@ -1028,6 +1185,8 @@
 
   let globalFlyerOverlayEff = null;
   let currentFlyerModalEff = null;
+
+  let dashAdminFormAndPreviewContainerEl = null;
 
   function gebi(id) { return document.getElementById(id); }
 
@@ -1081,7 +1240,6 @@
     if (groqApiKey) return true;
     try {
       const result = await callApi('api/get_groq_config.php');
-      // Ripristinato accesso diretto a result.obfuscatedApiKey e result.decryptionKey
       if (result.success && result.obfuscatedApiKey && result.decryptionKey) {
         const decryptedKey = simpleXorDecryptClient(result.obfuscatedApiKey, result.decryptionKey);
         if (decryptedKey) {
@@ -1091,19 +1249,132 @@
         } else {
           console.error("Fallimento decifratura API Key Groq.");
           if(aiShortDescStatusEl) aiShortDescStatusEl.textContent = "Errore configurazione AI (dec.).";
+          if(flyerProcessingStatusEl) flyerProcessingStatusEl.textContent = "Errore configurazione AI (dec.).";
           return false;
         }
       } else {
         console.error('Fallimento recupero componenti API key Groq:', result.message || 'Dati mancanti.');
         if(aiShortDescStatusEl) aiShortDescStatusEl.textContent = "Errore configurazione AI (fetch).";
+        if(flyerProcessingStatusEl) flyerProcessingStatusEl.textContent = "Errore configurazione AI (fetch).";
         return false;
       }
     } catch (error) {
       console.error('Errore recupero API key Groq:', error);
       if(aiShortDescStatusEl) aiShortDescStatusEl.textContent = "Errore connessione AI.";
+      if(flyerProcessingStatusEl) flyerProcessingStatusEl.textContent = "Errore connessione AI.";
       return false;
     }
   }
+
+  async function callGroqForFlyerExtraction(base64ImageData) {
+    if (!groqApiKey) {
+      const keyReady = await fetchAndPrepareGroqApiKey();
+      if (!keyReady) {
+        return { success: false, error: "Chiave API Groq non disponibile." };
+      }
+    }
+
+    const groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+    // MODIFICATO: Prompt aggiornato per essere più robusto e richiedere JSON pulito
+    const flyerPrompt = `Analizza l'immagine del volantino fornita e estrai le seguenti informazioni strutturate.
+Formatta l'output ESCLUSIVAMENTE come un oggetto JSON valido. Non includere testo prima o dopo l'oggetto JSON.
+Se un'informazione non è chiaramente presente o deducibile, usa 'null' per il valore del campo corrispondente.
+
+Schema JSON richiesto:
+{
+  "titolo": "string | null",
+  "data_inizio": "YYYY-MM-DD | null (es. '2024-07-20')",
+  "ora_inizio": "HH:MM | null (es. '09:30')",
+  "ora_fine": "HH:MM | null (es. '17:00', se non specificata, usa null)",
+  "relatore_prefisso": "string | null (es. 'Don', 'Suor', 'Prof.', 'Dott.')",
+  "relatore_nome": "string | null (nome completo del relatore/i)",
+  "associazione": "string | null (nome dell'associazione organizzatrice, se presente)",
+  "descrizione_breve_generata": "string (massimo 180 caratteri, concisa e informativa, basata sui contenuti principali)",
+  "descrizione_estesa_generata": "string (più dettagliata, riassumendo i temi e le attività principali descritte nel volantino)",
+  "posti_disponibili": "number | null (se indicato un numero esatto di posti)",
+  "costo": "number | null (es. 25.00. Se 'offerta libera' o 'ingresso gratuito con offerta', imposta a 0.00. Se solo 'ingresso gratuito' senza menzione di offerta, usa null o 0.00 a seconda del contesto. Se non menzionato, usa null)",
+  "flag_prenotabile": "boolean (true se il volantino indica la necessità o possibilità di prenotare/iscriversi, altrimenti false)",
+  "flag_offerta_libera": "boolean (true se esplicitamente menzionato 'offerta libera', 'ingresso a offerta', etc.)"
+}
+
+Interpreta le date e gli orari nel modo più accurato possibile. Per 'costo', se è 'offerta libera', assicurati che 'flag_offerta_libera' sia true e 'costo' sia 0.00.
+La 'descrizione_breve_generata' deve essere un riassunto molto conciso.
+La 'descrizione_estesa_generata' può essere più lunga ma deve rimanere un riassunto del contenuto del volantino.
+Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
+
+    const payload = {
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: flyerPrompt },
+            {
+              type: "image_url",
+              image_url: { url: `data:image/jpeg;base64,${base64ImageData}` }
+            }
+          ]
+        }
+      ],
+      // MODIFICATO: Utilizzo del modello specificato dall'utente
+      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      temperature: 0.2, // Leggermente ridotta per output JSON più consistente
+      max_tokens: 2500, // Aumentato per sicurezza con descrizioni più lunghe
+      // response_format: { type: "json_object" }, // Se supportato dal modello e endpoint, aiuta a forzare JSON
+    };
+
+    try {
+      const response = await fetch(groqApiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { error: { message: errorText || response.statusText }};
+        }
+        console.error("Errore API Groq per estrazione da volantino:", response.status, errorData);
+        return { success: false, error: `Errore AI (${response.status}): ${errorData.error?.message || 'Servizio non raggiungibile'}` };
+      }
+      const data = await response.json();
+      if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
+        let content = data.choices[0].message.content;
+        // Tentativo di pulire il JSON da eventuali ```json ... ``` o testo extra
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch && jsonMatch[0]) {
+          try {
+            const extractedJson = JSON.parse(jsonMatch[0]);
+            return { success: true, data: extractedJson };
+          } catch (e) {
+            console.error("Errore parsing JSON estratto da Groq:", e, "\nContenuto ricevuto ripulito:", jsonMatch[0], "\nContenuto originale:", content);
+            return { success: false, error: "Risposta AI non è un JSON valido dopo pulizia." };
+          }
+        } else {
+          // Se non trova un JSON pulito, prova a parsare direttamente, potrebbe funzionare se il modello è bravo
+          try {
+            const extractedJson = JSON.parse(content);
+            return { success: true, data: extractedJson };
+          } catch (e) {
+            console.warn("Nessun JSON valido trovato nella risposta Groq per volantino, né grezza né pulita:", content);
+            return { success: false, error: "Risposta AI non contiene un oggetto JSON interpretabile." };
+          }
+        }
+      } else {
+        console.warn("Struttura risposta Groq non valida per estrazione da volantino:", data);
+        return { success: false, error: "Risposta AI non valida (struttura)." };
+      }
+    } catch (error) {
+      console.error('Errore chiamata API Groq per estrazione da volantino:', error);
+      return { success: false, error: "Errore comunicazione con servizio AI per estrazione." };
+    }
+  }
+
 
   async function generateShortDescriptionAI(longDescription) {
     if (!groqApiKey) {
@@ -1126,9 +1397,13 @@
         { "role": "system", "content": promptSystem },
         { "role": "user", "content": `Descrizione estesa da riassumere:\n\n${longDescription}` }
       ],
-      "model": "llama3-8b-8192",
+      // MODIFICATO: Utilizzo del modello specificato dall'utente, anche se Llama-3-8b è testuale e va bene qui.
+      // Per coerenza con la richiesta di usare "Llama 4 Scout" per immagini, e dato che questo è un task testuale,
+      // potrei usare un modello testuale forte come Llama-3-70b se disponibile o mantenere Llama-3-8b.
+      // Dato che l'utente ha specificato Llama 4 Scout per "immagini", userò un modello testuale Groq standard per questo.
+      "model": "llama3-8b-8192", // Modello testuale Groq standard (ex llama3-8b-chat-hf)
       "temperature": 0.7,
-      "max_tokens": 65,
+      "max_tokens": 70, // Aumentato leggermente per sicurezza
       "top_p": 1,
       "stream": false
     };
@@ -1152,7 +1427,7 @@
       const data = await response.json();
       if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
         let generatedText = data.choices[0].message.content.trim();
-        generatedText = generatedText.replace(/^["']|["']$/g, "");
+        generatedText = generatedText.replace(/^["']|["']$/g, ""); // Rimuove virgolette esterne
         return { success: true, description: generatedText, error: null };
       } else {
         console.warn("Struttura risposta Groq non valida per descrizione (non-streaming):", data);
@@ -1641,10 +1916,73 @@
     customConfirmYesBtn = gebi('customConfirmYes');
     customConfirmNoBtn = gebi('customConfirmNo');
 
+    // Nuovi elementi per la selezione modalità e caricamento volantino
+    creationModeSelectionViewEl = gebi('creationModeSelectionView');
+    createManuallyModeBtnEl = gebi('createManuallyModeBtn');
+    extractFromFlyerModeBtnEl = gebi('extractFromFlyerModeBtn');
+    flyerUploadViewEl = gebi('flyerUploadView');
+    flyerFileEl = gebi('flyerFile');
+    flyerPreviewEl = gebi('flyerPreview');
+    processFlyerBtnEl = gebi('processFlyerBtn');
+    flyerProcessingStatusEl = gebi('flyerProcessingStatus');
+    dashAdminFormAndPreviewContainerEl = document.querySelector('.dash-admin-event-form-and-preview-container');
+
+
     if (adminAddEventBtnEl) adminAddEventBtnEl.addEventListener('click', () => openDashAdminEventPopup(null));
     if (closeDashAdminEventPopupBtnEl) closeDashAdminEventPopupBtnEl.addEventListener('click', () => tryCloseDashAdminEventPopup());
     if (dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.addEventListener('click', (e) => { if (e.target === dashAdminEventPopupOverlayEl) tryCloseDashAdminEventPopup(); });
     if (dashAdminEventVoluntaryCheckbox) dashAdminEventVoluntaryCheckbox.addEventListener('change', updateDashAdminPriceFieldVisibility);
+
+    // Listener per la selezione della modalità di creazione
+    if(createManuallyModeBtnEl) createManuallyModeBtnEl.addEventListener('click', () => {
+      if(creationModeSelectionViewEl) creationModeSelectionViewEl.style.display = 'none';
+      if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'none';
+      if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'flex';
+      // openDashAdminEventPopup(); // NON chiamare qui, ma solo dopo aver resettato il form
+      resetAndPrepareManualForm(); // Funzione helper per resettare e mostrare il form
+      if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Aggiungi Nuovo Evento Manualmente';
+      if(dashAdminEventTitleEl) dashAdminEventTitleEl.focus();
+      storeInitialFormData();
+    });
+
+    if(extractFromFlyerModeBtnEl) extractFromFlyerModeBtnEl.addEventListener('click', () => {
+      if(creationModeSelectionViewEl) creationModeSelectionViewEl.style.display = 'none';
+      if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'block';
+      if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'none';
+      if(flyerFileEl) flyerFileEl.value = '';
+      if(flyerPreviewEl) { flyerPreviewEl.style.display = 'none'; flyerPreviewEl.src = '#'; }
+      if(processFlyerBtnEl) processFlyerBtnEl.disabled = true;
+      if(flyerProcessingStatusEl) flyerProcessingStatusEl.textContent = '';
+      if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Estrai da Volantino';
+      resetAndPrepareManualForm(); // Resetta il form anche se non visibile subito, per pulizia
+    });
+
+    // Listener per il caricamento del volantino
+    if(flyerFileEl) flyerFileEl.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if(flyerPreviewEl) {
+            flyerPreviewEl.src = e.target.result;
+            flyerPreviewEl.style.display = 'block';
+          }
+        }
+        reader.readAsDataURL(file);
+        if(processFlyerBtnEl) processFlyerBtnEl.disabled = false;
+        if(flyerProcessingStatusEl) flyerProcessingStatusEl.textContent = '';
+      } else {
+        if(flyerPreviewEl) {
+          flyerPreviewEl.style.display = 'none';
+          flyerPreviewEl.src = '#';
+        }
+        if(processFlyerBtnEl) processFlyerBtnEl.disabled = true;
+        if(flyerProcessingStatusEl && file) flyerProcessingStatusEl.textContent = 'Per favore, seleziona un file immagine (JPG, PNG, WEBP).';
+      }
+    });
+
+    if(processFlyerBtnEl) processFlyerBtnEl.addEventListener('click', handleFlyerProcessing);
+
 
     if (dashAdminLongDescElForAI && generateShortDescBtnEl) {
       dashAdminLongDescElForAI.addEventListener('input', () => {
@@ -1699,6 +2037,98 @@
       if (e.target === customConfirmOverlayEl) handleConfirm(false);
     });
   }
+
+  async function handleFlyerProcessing() {
+    if (!flyerFileEl || !flyerFileEl.files || flyerFileEl.files.length === 0) {
+      if(flyerProcessingStatusEl) flyerProcessingStatusEl.textContent = 'Nessun volantino selezionato.';
+      return;
+    }
+    const file = flyerFileEl.files[0];
+    if (!file.type.startsWith('image/')) {
+      if(flyerProcessingStatusEl) flyerProcessingStatusEl.textContent = 'Per favore, carica un file immagine.';
+      return;
+    }
+
+    if(processFlyerBtnEl) {
+      processFlyerBtnEl.disabled = true;
+      processFlyerBtnEl.innerHTML = '<div class="spinner-mini"></div> Processo AI...';
+    }
+    if(flyerProcessingStatusEl) {
+      flyerProcessingStatusEl.textContent = 'Estrazione informazioni dal volantino in corso...';
+      flyerProcessingStatusEl.className = ''; // Reset classi
+    }
+
+
+    try {
+      const base64ImageData = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+
+      const extractionResult = await callGroqForFlyerExtraction(base64ImageData);
+
+      if (extractionResult.success && extractionResult.data) {
+        populateFormWithExtractedData(extractionResult.data);
+        if(flyerProcessingStatusEl) {
+          flyerProcessingStatusEl.textContent = 'Informazioni estratte! Controlla e completa il modulo.';
+          flyerProcessingStatusEl.classList.add('success');
+        }
+        if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'none';
+        if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'flex';
+        if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Verifica Evento da Volantino';
+        storeInitialFormData();
+      } else {
+        throw new Error(extractionResult.error || "Estrazione fallita.");
+      }
+    } catch (error) {
+      console.error("Errore processamento volantino:", error);
+      if(flyerProcessingStatusEl) {
+        flyerProcessingStatusEl.textContent = `Errore: ${error.message}`;
+        flyerProcessingStatusEl.classList.add('error');
+      }
+    } finally {
+      if(processFlyerBtnEl) {
+        processFlyerBtnEl.disabled = false;
+        processFlyerBtnEl.innerHTML = '<i class="fas fa-cogs"></i> Processa Volantino con AI';
+      }
+    }
+  }
+
+  function populateFormWithExtractedData(data) {
+    if (!data) return;
+
+    if(dashAdminEventTitleEl) dashAdminEventTitleEl.value = data.titolo || '';
+    if(dashAdminEventDateEl && data.data_inizio) dashAdminEventDateEl.value = data.data_inizio;
+    if(dashAdminEventStartTimeEl && data.ora_inizio) dashAdminEventStartTimeEl.value = data.ora_inizio;
+    if(dashAdminEventEndTimeEl && data.ora_fine) dashAdminEventEndTimeEl.value = data.ora_fine;
+
+    if(dashAdminEventPrefixEl) dashAdminEventPrefixEl.value = data.relatore_prefisso || 'Relatore';
+    if(dashAdminEventSpeakerEl) dashAdminEventSpeakerEl.value = data.relatore_nome || '';
+    if(dashAdminEventAssociationEl) dashAdminEventAssociationEl.value = data.associazione || '';
+
+    if(dashAdminEventShortDescEl) dashAdminEventShortDescEl.value = data.descrizione_breve_generata || '';
+    if(dashAdminEventLongDescEl) dashAdminEventLongDescEl.value = data.descrizione_estesa_generata || '';
+
+    if(dashAdminEventSeatsEl && data.posti_disponibili !== null) dashAdminEventSeatsEl.value = data.posti_disponibili;
+    else if(dashAdminEventSeatsEl) dashAdminEventSeatsEl.value = '50';
+
+    if(dashAdminEventBookingCheckbox && data.flag_prenotabile !== null) dashAdminEventBookingCheckbox.checked = data.flag_prenotabile;
+    else if(dashAdminEventBookingCheckbox) dashAdminEventBookingCheckbox.checked = true;
+
+    if(dashAdminEventVoluntaryCheckbox && data.flag_offerta_libera !== null) dashAdminEventVoluntaryCheckbox.checked = data.flag_offerta_libera;
+    updateDashAdminPriceFieldVisibility();
+
+    if(dashAdminEventPriceInputEl && data.costo !== null && !dashAdminEventVoluntaryCheckbox.checked) {
+      dashAdminEventPriceInputEl.value = parseFloat(data.costo).toFixed(2);
+    } else if (dashAdminEventPriceInputEl && !dashAdminEventVoluntaryCheckbox.checked) {
+      dashAdminEventPriceInputEl.value = '';
+    }
+
+    updateDashAdminEventPreview();
+  }
+
 
   function showCustomConfirm(message) {
     return new Promise((resolve) => {
@@ -1827,23 +2257,42 @@
     });
   }
 
-  function openDashAdminEventPopup(eventData = null) {
+  // Funzione helper per resettare e preparare il form per l'inserimento manuale
+  function resetAndPrepareManualForm() {
     if (!dashAdminEventFormEl) return;
     dashAdminEventFormEl.reset();
+    if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = ''; // Assicura che l'ID sia vuoto per nuovo evento
     updateDashAdminPriceFieldVisibility();
     if(dashAdminEventFormMessageEl) { dashAdminEventFormMessageEl.style.display = 'none'; dashAdminEventFormMessageEl.className = 'form-message';}
     if(dashAdminCurrentImagePreviewEl) { dashAdminCurrentImagePreviewEl.style.display = 'none'; dashAdminCurrentImagePreviewEl.src = '#';}
-    if(dashAdminCurrentFlyerPreviewEl) { dashAdminCurrentFlyerPreviewEl.innerHTML = ''; }
+    if(dashAdminCurrentFlyerPreviewEl) { dashAdminCurrentFlyerPreviewEl.innerHTML = '<span>Nessun volantino caricato.</span>'; }
     if(dashAdminEventFlyerEl) dashAdminEventFlyerEl.value = '';
     if(dashAdminEventImageEl) dashAdminEventImageEl.value = '';
     if(dashAdminEventStartTimeEl) dashAdminEventStartTimeEl.value = '';
     if(dashAdminEventEndTimeEl) dashAdminEventEndTimeEl.value = '';
     if(aiShortDescStatusEl) aiShortDescStatusEl.textContent = "";
-    if(generateShortDescBtnEl) {
-      generateShortDescBtnEl.classList.remove('visible', 'loading', 'expanded');
-    }
+    if(generateShortDescBtnEl) generateShortDescBtnEl.classList.remove('visible', 'loading', 'expanded');
+    updateDashAdminEventPreview(); // Aggiorna l'anteprima con i valori resettati
+  }
 
-    if (eventData) {
+
+  function openDashAdminEventPopup(eventData = null) {
+    if (!dashAdminEventFormEl) return;
+
+    // Logica di visualizzazione iniziale
+    if(creationModeSelectionViewEl) creationModeSelectionViewEl.style.display = 'flex';
+    if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'none';
+    if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'none';
+    if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Come vuoi creare l\'evento?';
+
+    if (!eventData) { // Nuovo evento: resetta il form (ma non lo mostra subito)
+      resetAndPrepareManualForm();
+      // Non chiamare storeInitialFormData qui, ma quando il form manuale viene effettivamente mostrato
+    } else { // Modifica evento: popola e mostra subito il form
+      if(creationModeSelectionViewEl) creationModeSelectionViewEl.style.display = 'none';
+      if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'none';
+      if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'flex';
+
       if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Modifica Evento';
       if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = eventData.idevento;
       dashAdminEventTitleEl.value = eventData.titolo || '';
@@ -1876,29 +2325,21 @@
       if (dashAdminCurrentImagePreviewEl && eventData.immagine_url) {
         dashAdminCurrentImagePreviewEl.src = eventData.immagine_url;
         dashAdminCurrentImagePreviewEl.style.display = 'block';
+      } else if (dashAdminCurrentImagePreviewEl) {
+        dashAdminCurrentImagePreviewEl.style.display = 'none';
+        dashAdminCurrentImagePreviewEl.src = '#';
       }
       if (dashAdminCurrentFlyerPreviewEl && eventData.volantino_url) {
         dashAdminCurrentFlyerPreviewEl.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank" title="Visualizza il volantino attuale">Visualizza volantino attuale</a>`;
       } else if (dashAdminCurrentFlyerPreviewEl) {
         dashAdminCurrentFlyerPreviewEl.innerHTML = `<span>Nessun volantino caricato.</span>`;
       }
-    } else {
-      if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Aggiungi Nuovo Evento';
-      if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = '';
-      dashAdminEventBookingCheckbox.checked = true;
-      dashAdminEventVoluntaryCheckbox.checked = false;
-      dashAdminEventSeatsEl.value = '50';
-      dashAdminEventPrefixEl.value = 'Relatore';
-      updateDashAdminPriceFieldVisibility();
-      if (dashAdminCurrentFlyerPreviewEl) {
-        dashAdminCurrentFlyerPreviewEl.innerHTML = `<span>Nessun volantino selezionato.</span>`;
-      }
+      updateDashAdminEventPreview();
+      storeInitialFormData();
+      if(dashAdminEventTitleEl) dashAdminEventTitleEl.focus();
     }
-    updateDashAdminEventPreview();
-    initialAdminEventFormData = getAdminEventFormData(dashAdminEventFormEl);
-    isEventFormDirty = false;
 
-    if (dashAdminLongDescElForAI && generateShortDescBtnEl) {
+    if (dashAdminLongDescElForAI && generateShortDescBtnEl) { // Aggiorna visibilità bottone AI
       const hasText = dashAdminLongDescElForAI.value.trim().length > 0;
       generateShortDescBtnEl.classList.toggle('visible', hasText);
       generateShortDescBtnEl.classList.toggle('expanded', hasText && !generateShortDescBtnEl.classList.contains('loading'));
@@ -1907,18 +2348,29 @@
     if(dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.classList.add('active');
     if(dashAdminEventPopupEl) dashAdminEventPopupEl.classList.add('active');
     document.body.style.overflow = 'hidden';
-    if(dashAdminEventTitleEl) dashAdminEventTitleEl.focus();
+  }
+
+  function storeInitialFormData() {
+    if (dashAdminEventFormEl) {
+      initialAdminEventFormData = getAdminEventFormData(dashAdminEventFormEl);
+      isEventFormDirty = false;
+    }
   }
 
   async function tryCloseDashAdminEventPopup() {
-    const currentFormData = getAdminEventFormData(dashAdminEventFormEl);
-    isEventFormDirty = !compareAdminEventFormData(initialAdminEventFormData, currentFormData);
-    if (isEventFormDirty) {
-      const confirmed = await showCustomConfirm("Hai modifiche non salvate. Sei sicuro di voler uscire?");
-      if (confirmed) closeDashAdminEventPopup_actual();
-    } else {
-      closeDashAdminEventPopup_actual();
+    if (dashAdminFormAndPreviewContainerEl && dashAdminFormAndPreviewContainerEl.style.display === 'flex') {
+      const currentFormData = getAdminEventFormData(dashAdminEventFormEl);
+      isEventFormDirty = !compareAdminEventFormData(initialAdminEventFormData, currentFormData);
+
+      if (isEventFormDirty) {
+        const confirmed = await showCustomConfirm("Hai modifiche non salvate. Sei sicuro di voler uscire?");
+        if (confirmed) {
+          closeDashAdminEventPopup_actual();
+        }
+        return;
+      }
     }
+    closeDashAdminEventPopup_actual();
   }
 
   function closeDashAdminEventPopup_actual() {
@@ -1926,6 +2378,11 @@
     if(dashAdminEventPopupEl) dashAdminEventPopupEl.classList.remove('active');
     if (!isAnyPopupActive()) document.body.style.overflow = '';
     isEventFormDirty = false;
+    // Riporta alla vista di selezione modalità
+    if(creationModeSelectionViewEl) creationModeSelectionViewEl.style.display = 'flex';
+    if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'none';
+    if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'none';
+    if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Come vuoi creare l\'evento?';
   }
 
   async function handleAdminEventFormSubmit(e) {
@@ -1957,8 +2414,7 @@
           dashAdminEventFormMessageEl.style.display = 'block';
         }
         loadEvents();
-        initialAdminEventFormData = getAdminEventFormData(dashAdminEventFormEl);
-        isEventFormDirty = false;
+        storeInitialFormData(); // Aggiorna lo stato "pulito" del form
         setTimeout(closeDashAdminEventPopup_actual, 1500);
       } else { throw new Error(result.message || 'Errore durante il salvataggio dell\'evento.'); }
     } catch (error) {
