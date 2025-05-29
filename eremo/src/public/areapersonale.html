@@ -49,12 +49,12 @@
       align-items: center;
       margin-bottom: 0.5rem;
     }
-    .prenotazione-card-past, .waitlist-card-unavailable { /* Aggiunta classe per coda */
+    .prenotazione-card-past, .waitlist-card-unavailable {
       opacity: 0.7;
       background-color: #f9f9f9;
     }
     .prenotazione-card-past h3 {
-      /* text-decoration: line-through; */ /* Opzionale per eventi passati */
+      /* text-decoration: line-through; */
     }
     .form-message {
       margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem;
@@ -77,6 +77,36 @@
     .profile-section form input:disabled {
       background-color: #e9ecef !important;
     }
+    .btn-danger { /* Stile per bottoni pericolosi */
+      background-color: var(--danger);
+      color: white;
+      border: none;
+      padding: 1rem 2.2rem;
+      border-radius: 10px;
+      font-size: 1.25rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-medium);
+      display: block;
+      width: fit-content;
+      margin: 2.6rem auto 0;
+    }
+    .btn-danger:hover {
+      background-color: #c0392b; /* Darker red on hover */
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-light);
+    }
+    .card-btn-danger { /* Per i bottoni "Esci dalla coda" */
+      background-color: var(--danger);
+      color: white !important; /* Forza colore testo bianco */
+      border-color: var(--danger);
+    }
+    .card-btn-danger:hover:not(:disabled) {
+      background-color: #c0392b !important; /* Darker red */
+      border-color: #c0392b !important;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
+      color: var(--white) !important;
+    }
   </style>
 </head>
 <body>
@@ -91,12 +121,12 @@
     </div>
     <div class="menu">
       <a href="eventiincorso.html">Calendario attività</a>
-      <a href="eventipassatiaccesso.html">Archivio attività</a>
+      <a href="eventipassati.html">Archivio attività</a>
       <span class="separator">|</span>
-      <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
+      <a href="incontrisullaparola.html">Incontri sulla parola</a>
       <span class="separator">|</span>
-      <a href="dovesiamoaccesso.html">Dove siamo</a>
-      <a href="contattiaccesso.html">Contatti</a>
+      <a href="dovesiamo.html">Dove siamo</a>
+      <a href="contatti.html">Contatti</a>
     </div>
     <div class="right-menu">
       <div class="user-dropdown" id="userDropdownContainer">
@@ -115,10 +145,10 @@
   </nav>
   <div class="mobile-menu" id="mobileMenu">
     <a href="eventiincorso.html" onclick="closeMobileMenu()">Calendario attività</a>
-    <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()">Archivio attività</a>
-    <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
-    <a href="dovesiamoaccesso.html" onclick="closeMobileMenu()">Dove siamo</a>
-    <a href="contattiaccesso.html" onclick="closeMobileMenu()">Contatti</a>
+    <a href="eventipassati.html" onclick="closeMobileMenu()">Archivio attività</a>
+    <a href="incontrisullaparola.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
+    <a href="dovesiamo.html" onclick="closeMobileMenu()">Dove siamo</a>
+    <a href="contatti.html" onclick="closeMobileMenu()">Contatti</a>
     <hr style="border-color: rgba(255,255,255,0.1);">
     <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
     <a href="areapersonale.html#prenotazioni" onclick="closeMobileMenu()">Le mie prenotazioni</a>
@@ -188,6 +218,20 @@
         <p>Non sei in lista d'attesa per nessun evento al momento.</p>
       </div>
     </section>
+
+    <section class="profile-section" id="delete-account-section">
+      <h2><i class="fas fa-user-times" style="margin-right: 8px;"></i> Elimina Account</h2>
+      <p style="color: var(--danger); text-align:center; margin-bottom: 1.5rem;">Attenzione: Questa azione è irreversibile e cancellerà tutti i tuoi dati personali, incluse prenotazioni, commenti e iscrizioni alle liste d'attesa.</p>
+      <form id="delete-account-form">
+        <div class="form-group" style="max-width: 400px; margin-left:auto; margin-right:auto;">
+          <label for="confirm-delete-email">Per confermare, inserisci la tua email:</label>
+          <input type="email" id="confirm-delete-email" name="confirm-delete-email" class="form-control" required>
+        </div>
+        <button type="submit" class="btn-danger" id="btn-confirm-delete-account">Elimina il Mio Account Definitivamente</button>
+        <p id="delete-account-message" class="form-message" style="display:none;"></p>
+      </form>
+    </section>
+
   </div>
 </main>
 
@@ -262,14 +306,14 @@
       el.textContent = message;
       el.className = 'form-message ' + (isSuccess ? 'success' : 'error');
       el.style.display = 'block';
-      setTimeout(() => { if(el) el.style.display = 'none'; }, 5000);
+      setTimeout(() => { if(el) el.style.display = 'none'; }, isSuccess ? 5000 : 7000);
     }
   }
 
   async function callApi(url, method = 'GET', data = null) {
     const headers = { 'Content-Type': 'application/json' };
     const options = { method, headers, credentials: 'same-origin' };
-    if (data && (method === 'POST' || method === 'PUT')) {
+    if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) { // Added DELETE
       options.body = JSON.stringify(data);
     }
     try {
@@ -281,11 +325,11 @@
         console.error(finalErrorMessage);
         throw new Error(finalErrorMessage);
       }
-      if (response.status === 204) return {};
+      if (response.status === 204) return {}; // No Content
       return await response.json();
     } catch (error) {
       console.error(`Fallimento chiamata API a ${url}:`, error.message);
-      throw error;
+      throw error; // Re-throw for the caller to handle
     }
   }
 
@@ -304,13 +348,13 @@
     if(emailInput) emailInput.value = '';
 
     document.querySelectorAll('#profile-info-form input:not(#email), #profile-info-form button').forEach(el => el.disabled = true);
-    document.querySelectorAll('#save-icon-btn, #password-change-form input, #password-change-form button').forEach(el => el.disabled = true);
+    document.querySelectorAll('#save-icon-btn, #password-change-form input, #password-change-form button, #delete-account-form input, #delete-account-form button').forEach(el => el.disabled = true);
 
     const avatarContainer = document.getElementById('avatar-options-container');
     if(avatarContainer) avatarContainer.innerHTML = `<p>${errorMessage}</p>`;
     const bookingsGrid = document.getElementById('user-bookings-grid');
     if(bookingsGrid) bookingsGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
-    const waitlistGrid = document.getElementById('user-waitlist-grid'); // Gestisci anche la nuova sezione
+    const waitlistGrid = document.getElementById('user-waitlist-grid');
     if(waitlistGrid) waitlistGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
 
     const noBookingsMsg = document.getElementById('no-bookings-message');
@@ -346,7 +390,7 @@
         if (profileGreeting) profileGreeting.textContent = `Ciao, ${currentUserDataFromStorage.nome || 'Utente'}!`;
         if (emailInput) emailInput.value = currentUserDataFromStorage.email || '';
         if(nomeInput) nomeInput.value = currentUserDataFromStorage.nome || '';
-        if(cognomeInput) cognomeInput.value = currentUserDataFromStorage.cognome || ''; // Popola anche cognome se c'è
+        if(cognomeInput) cognomeInput.value = currentUserDataFromStorage.cognome || '';
       } catch(e) {
         currentUserDataFromStorage = null;
         initializeUIForGuest("Errore nel caricamento dei dati locali. Prova a ricaricare o effettua nuovamente il login.");
@@ -356,11 +400,13 @@
     }
 
     if (currentUserDataFromStorage) {
-      await loadUserProfileFromServer();
+      await loadUserProfileFromServer(); // This will re-enable forms if successful
       await loadAvailableIcons();
       await loadUserBookings();
-      await loadUserWaitlist(); // Carica anche la lista d'attesa
+      await loadUserWaitlist();
     } else {
+      // Ensure forms remain disabled if no user data
+      document.querySelectorAll('#profile-info-form input:not(#email), #profile-info-form button, #save-icon-btn, #password-change-form input, #password-change-form button, #delete-account-form input, #delete-account-form button').forEach(el => el.disabled = true);
       const avatarContainer = document.getElementById('avatar-options-container');
       if(avatarContainer) avatarContainer.innerHTML = '<p>Effettua il login per visualizzare le icone.</p>';
       const bookingsGrid = document.getElementById('user-bookings-grid');
@@ -373,6 +419,7 @@
       const prenotazioniSection = document.getElementById('prenotazioni');
       if (prenotazioniSection) prenotazioniSection.scrollIntoView({ behavior: 'smooth' });
     }
+    document.getElementById('delete-account-form')?.addEventListener('submit', handleDeleteAccount);
   });
 
   async function loadUserProfileFromServer() {
@@ -381,9 +428,10 @@
     const navbarUsername = document.getElementById('navbar-username');
     const profileGreeting = document.getElementById('profile-greeting');
 
+    // Enable forms assuming user is logged in and we are fetching their profile
     document.querySelectorAll('#profile-info-form input:not([disabled]), #profile-info-form button').forEach(el => el.disabled = false);
-    document.querySelectorAll('#save-icon-btn, #password-change-form input, #password-change-form button').forEach(el => el.disabled = false);
-    document.getElementById('email').disabled = true;
+    document.querySelectorAll('#save-icon-btn, #password-change-form input, #password-change-form button, #delete-account-form input, #delete-account-form button').forEach(el => el.disabled = false);
+    document.getElementById('email').disabled = true; // Email should always be disabled
 
     try {
       const apiUserData = await callApi('api/api_get_user_profile.php');
@@ -399,6 +447,7 @@
         if(navbarUsername) navbarUsername.textContent = data.nome || 'Utente';
         if(profileGreeting) profileGreeting.textContent = `Ciao, ${data.nome || 'Utente'}!`;
 
+        // Update currentUserDataFromStorage with fresh server data
         currentUserDataFromStorage = {
           nome: data.nome,
           cognome: data.cognome,
@@ -407,12 +456,14 @@
         };
         localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
         updateIconSelectionVisual();
-      } else if (apiUserData && !apiUserData.success) {
-        displayMessage('profile-info-message', apiUserData.message || "Errore recupero profilo.", false);
-        initializeUIForGuest(apiUserData.message || "Impossibile caricare i dati del profilo. Effettua il login.");
+      } else { // API call was not successful (e.g., session expired server-side)
+        const message = (apiUserData && apiUserData.message) ? apiUserData.message : "Errore recupero profilo.";
+        displayMessage('profile-info-message', message, false);
+        initializeUIForGuest(message); // Re-disable forms, show guest state
       }
-    } catch (error) {
-      displayMessage('profile-info-message', `Errore caricamento profilo: ${error.message}.`, false);
+    } catch (error) { // Network error or other fetch failure
+      displayMessage('profile-info-message', `Errore caricamento profilo: ${error.message}. Prova a ricaricare la pagina.`, false);
+      initializeUIForGuest(`Impossibile caricare i dati del profilo. ${error.message}`);
     }
   }
 
@@ -439,6 +490,7 @@
           img.classList.add('avatar-option-image');
           img.setAttribute('data-path', path);
           img.addEventListener('click', () => {
+            if (!currentUserDataFromStorage) return; // Don't allow selection if not logged in
             selectedIconPath = path;
             updateIconSelectionVisual();
             const mainAvatarPreview = document.querySelector('#main-avatar img');
@@ -588,39 +640,45 @@
             let statusMessage = `Sei in coda per ${entry.numeroPostiInCoda} posto/i.`;
             let statusColor = 'orange';
             let cardClass = '';
+            let cancelButtonHtml = '';
 
-            if (parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile) {
+            if (parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) {
               statusMessage = `ATTENZIONE: Si sono liberati ${entry.eventPostiDisponibili} posti! Prenota ora. (Richiesti in coda: ${entry.numeroPostiInCoda})`;
               statusColor = 'var(--success, green)';
-            } else if (!entry.eventFlagPrenotabile) {
+            } else if (entry.eventFlagPrenotabile == 0) {
               statusMessage = `Evento non più prenotabile. (Richiesti in coda: ${entry.numeroPostiInCoda})`;
               statusColor = 'var(--gray-dark, grey)';
-              cardClass = 'waitlist-card-unavailable'; // Usa la stessa classe degli eventi passati per opacità
+              cardClass = 'waitlist-card-unavailable';
+            }
+            // Add cancel waitlist button if event is bookable or user is on waitlist for it
+            if (entry.eventFlagPrenotabile == 1) {
+              cancelButtonHtml = `<button class="card-btn card-btn-danger btn-cancel-waitlist" data-event-id="${entry.idEvento}">Esci dalla Coda</button>`;
             }
 
+
             const cardHtml = `
-                        <article class="card ${cardClass}">
-                          <div class="card-image-container">
-                              <img src="${entry.eventFotoCopertina || defaultIconPath}" alt="Evento: ${entry.eventTitolo}" class="card-image">
-                          </div>
-                          <div class="card-content">
-                              <h3>${entry.eventTitolo || 'Evento Sconosciuto'}</h3>
-                              <p class="card-info">
-                                  <b>Data Evento:</b> ${formattedDate}<br>
-                                  <b style="color: ${statusColor};">Stato Coda:</b> <span style="color: ${statusColor};">${statusMessage}</span>
-                              </p>
-                              <div class="card-actions">
-                                  <a href="evento_dettaglio_accesso.html?id=${entry.idEvento}" class="card-btn card-btn-secondary">Vedi Evento</a>
-                                  ${(parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile) ?
-                    `<a href="eventiincorsoaccesso.html" class="card-btn card-btn-primary">Prenota Ora</a>` :
-                    ''
+              <article class="card ${cardClass}">
+                <div class="card-image-container">
+                  <img src="${entry.eventFotoCopertina || defaultIconPath}" alt="Evento: ${entry.eventTitolo}" class="card-image">
+                </div>
+                <div class="card-content">
+                  <h3>${entry.eventTitolo || 'Evento Sconosciuto'}</h3>
+                  <p class="card-info">
+                    <b>Data Evento:</b> ${formattedDate}<br>
+                    <b style="color: ${statusColor};">Stato Coda:</b> <span style="color: ${statusColor};">${statusMessage}</span>
+                  </p>
+                  <div class="card-actions" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <a href="evento_dettaglio_accesso.html?id=${entry.idEvento}" class="card-btn card-btn-secondary" style="flex-grow: 1;">Vedi Evento</a>
+                    ${(parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) ?
+                    `<a href="eventiincorsoaccesso.html" class_name="card-btn card-btn-primary" style="flex-grow: 1;">Prenota Ora</a>` : ''
             }
-                                  </div>
-                          </div>
-                        </article>
-                    `;
+                    ${cancelButtonHtml}
+                  </div>
+                </div>
+              </article>`;
             waitlistGrid.insertAdjacentHTML('beforeend', cardHtml);
           });
+          attachCancelWaitlistListeners(); // Attach listeners after adding HTML
         } else {
           noWaitlistMsg.style.display = 'block';
         }
@@ -636,7 +694,7 @@
 
   function attachCancelBookingListeners() {
     document.querySelectorAll('.btn-annulla-prenotazione').forEach(button => {
-      button.removeEventListener('click', handleCancelBooking);
+      button.removeEventListener('click', handleCancelBooking); // Prevent multiple listeners
       button.addEventListener('click', handleCancelBooking);
     });
   }
@@ -648,28 +706,119 @@
       alert('Devi essere autenticato per annullare una prenotazione.'); return;
     }
     if (confirm('Sei sicuro di voler annullare questa prenotazione? L\'azione non è reversibile.')) {
+      button.disabled = true; // Disable button during API call
+      button.textContent = 'Annullamento...';
       try {
         const response = await callApi('api/api_cancel_booking.php', 'POST', { idPrenotazione: bookingId });
         if (response.success) {
           alert(response.message || `Prenotazione annullata con successo.`);
-          loadUserBookings(); // Ricarica la lista delle prenotazioni
-          loadUserWaitlist(); // Ricarica anche la lista d'attesa, perché l'annullamento potrebbe aver liberato posti e cambiato lo stato per l'utente stesso
+          loadUserBookings();
+          loadUserWaitlist();
         } else {
           alert(response.message || `Errore durante l'annullamento.`);
+          button.disabled = false;
+          button.textContent = 'Annulla Prenotazione';
         }
       } catch (error) {
         alert(`Errore durante l'annullamento: ${error.message}`);
+        button.disabled = false;
+        button.textContent = 'Annulla Prenotazione';
       }
     }
   }
 
+  function attachCancelWaitlistListeners() {
+    document.querySelectorAll('.btn-cancel-waitlist').forEach(button => {
+      button.removeEventListener('click', handleCancelWaitlist); // Prevent multiple listeners
+      button.addEventListener('click', handleCancelWaitlist);
+    });
+  }
+
+  async function handleCancelWaitlist(event) {
+    const button = event.target;
+    const eventId = button.dataset.eventId;
+    if (!currentUserDataFromStorage) {
+      alert('Devi essere autenticato per uscire dalla lista d\'attesa.'); return;
+    }
+    if (confirm('Sei sicuro di voler uscire dalla lista d\'attesa per questo evento?')) {
+      button.disabled = true;
+      button.textContent = 'Rimozione...';
+      try {
+        const response = await callApi('api/api_cancel_waitlist.php', 'POST', { idEvento: eventId });
+        if (response.success) {
+          alert(response.message || 'Rimozione dalla lista d\'attesa effettuata.');
+          loadUserWaitlist(); // Reload waitlist
+        } else {
+          alert(response.message || 'Errore durante la rimozione dalla lista d\'attesa.');
+          button.disabled = false;
+          button.textContent = 'Esci dalla Coda';
+        }
+      } catch (error) {
+        alert(`Errore: ${error.message}`);
+        button.disabled = false;
+        button.textContent = 'Esci dalla Coda';
+      }
+    }
+  }
+
+
+  async function handleDeleteAccount(event) {
+    event.preventDefault();
+    const confirmEmailInput = document.getElementById('confirm-delete-email');
+    const confirmEmail = confirmEmailInput.value;
+    const deleteButton = document.getElementById('btn-confirm-delete-account');
+
+    if (!currentUserDataFromStorage || !currentUserDataFromStorage.email) {
+      displayMessage('delete-account-message', 'Impossibile verificare l\'utente. Effettua nuovamente il login.', false);
+      return;
+    }
+
+    if (confirmEmail !== currentUserDataFromStorage.email) {
+      displayMessage('delete-account-message', 'L\'email inserita non corrisponde a quella del tuo account.', false);
+      return;
+    }
+
+    if (confirm('Sei assolutamente sicuro di voler eliminare il tuo account? Questa azione è IRREVERSIBILE e tutti i tuoi dati (profilo, prenotazioni, commenti, liste d\'attesa) verranno cancellati definitivamente.')) {
+      if (confirm('Conferma ulteriore: Sei consapevole che non potrai recuperare il tuo account o i tuoi dati?')) {
+        deleteButton.disabled = true;
+        deleteButton.textContent = 'Eliminazione in corso...';
+        try {
+          const response = await callApi('api/api_delete_account.php', 'POST', { email: confirmEmail });
+          if (response.success) {
+            displayMessage('delete-account-message', response.message, true);
+            alert(response.message); // Also alert for logout redirect
+            localStorage.removeItem('userDataEFF');
+            // Redirect to homepage after a short delay to allow message display
+            setTimeout(() => {
+              window.location.href = 'index.html';
+            }, 3000);
+          } else {
+            displayMessage('delete-account-message', response.message || 'Errore durante l\'eliminazione dell\'account.', false);
+            deleteButton.disabled = false;
+            deleteButton.textContent = 'Elimina il Mio Account Definitivamente';
+          }
+        } catch (error) {
+          displayMessage('delete-account-message', `Errore: ${error.message}`, false);
+          deleteButton.disabled = false;
+          deleteButton.textContent = 'Elimina il Mio Account Definitivamente';
+        }
+      }
+    }
+  }
+
+
   function logout() {
     localStorage.removeItem('userDataEFF');
-    // localStorage.removeItem('authTokenEFF'); // Se mai implementerai un token separato
-    // Idealmente, chiamare un endpoint API per invalidare la sessione PHP lato server
-    // fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' }); // Esempio
-    alert('Logout effettuato. Verrai reindirizzato alla homepage.');
-    window.location.href = 'index.html';
+    fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' }) // Call server-side logout
+            .then(() => {
+              alert('Logout effettuato. Verrai reindirizzato alla homepage.');
+              window.location.href = 'index.html';
+            })
+            .catch(error => {
+              console.error("Errore durante il logout server-side:", error);
+              alert('Logout effettuato (client-side). Verrai reindirizzato alla homepage.'); // Fallback
+              window.location.href = 'index.html';
+            });
   }
 </script>
 </body>
