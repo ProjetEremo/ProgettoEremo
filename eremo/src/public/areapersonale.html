@@ -107,6 +107,188 @@
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
       color: var(--white) !important;
     }
+
+    /* STILI PER SEZIONE AI ICON GENERATOR */
+    .ai-icon-generator-section {
+      position: relative;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px dashed var(--gray-medium);
+    }
+    .ai-icon-generator-section h3 {
+      font-size: 1.5rem;
+      color: var(--secondary);
+      margin-bottom: 1.5rem;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ai-icon-generator-section h3 i {
+      font-size: 1.1em;
+    }
+    .ai-icon-generator-section .form-group label {
+      font-size: 1.1rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+    .ai-icon-generator-section textarea#ai-icon-prompt {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--gray-medium);
+      border-radius: 8px;
+      font-size: 1rem;
+      min-height: 70px;
+      resize: vertical;
+      margin-bottom: 0.5rem;
+      background-color: var(--white);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .ai-icon-generator-section textarea#ai-icon-prompt:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3.5px rgba(141, 177, 135, 0.3);
+      outline: none;
+    }
+    .ai-icon-generator-section .btn-ai-generate {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-medium);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5em;
+      margin-top: 0.5rem;
+    }
+    .ai-icon-generator-section .btn-ai-generate.loading .fa-lightbulb {
+      display: none;
+    }
+    .ai-icon-generator-section .btn-ai-generate:hover:not(:disabled) {
+      background-color: #b8734a;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-light);
+    }
+    .ai-icon-generator-section .btn-ai-generate:disabled {
+      background-color: var(--gray-medium) !important;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Overlay di Caricamento per la Sezione AI */
+    .ai-section-loading-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(248, 245, 239, 0.85);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      border-radius: var(--border-radius-medium);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.35s;
+    }
+    .ai-section-loading-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      transition-delay: 0s;
+    }
+    /* Spinner Moderno */
+    .modern-spinner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: inline-block;
+      position: relative;
+      border: 3px solid;
+      border-color: var(--secondary) var(--secondary) transparent transparent;
+      box-sizing: border-box;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1.2rem;
+    }
+    .modern-spinner::after,
+    .modern-spinner::before {
+      content: ''; box-sizing: border-box; position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+      margin: auto; border: 3px solid; border-color: transparent transparent var(--primary) var(--primary);
+      width: 40px; height: 40px; border-radius: 50%; animation: spinBack 0.7s linear infinite; transform-origin: center center;
+    }
+    .modern-spinner::before {
+      width: 32px; height: 32px; border-color: var(--accent) var(--accent) transparent transparent;
+      animation: spin 1.5s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spinBack { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
+    .ai-section-loading-overlay p { font-size: 1.05rem; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; }
+
+    /* Display Immagine Generata */
+    #ai-generated-icon-preview-container {
+      margin-top: 2rem;
+      border: 1px solid var(--gray-light);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      padding: 1.5rem;
+      background-color: var(--white);
+      opacity: 0;
+      transform: translateY(15px) scale(0.98);
+      transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    }
+    #ai-generated-icon-preview-container.revealed {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    #ai-generated-icon-preview-container p {
+      font-size: 0.95rem; color: var(--gray-dark); margin-bottom: 0.8rem; text-align: center;
+    }
+    #ai-generated-icon-preview {
+      width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
+      border: 4px solid var(--gray-light);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+      display: block; margin-left: auto; margin-right: auto;
+    }
+    #ai-generated-icon-preview:hover {
+      transform: scale(1.08);
+      border-color: var(--secondary);
+    }
+    #ai-generated-icon-preview.selected {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--white), 0 0 0 7px var(--primary), 0 8px 20px rgba(var(--primary-rgb, 54, 94, 81), 0.4);
+      transform: scale(1.1);
+    }
+    #ai-icon-message.form-message { margin-top: 1rem;  }
+
+    /* Animazione salvataggio bottone */
+    .btn-save#save-icon-btn { position: relative; overflow: hidden; transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.15s ease-out, box-shadow 0.2s ease-in-out;}
+    .btn-save#save-icon-btn .btn-text { display: inline-block; transition: opacity 0.2s ease, transform 0.2s ease; }
+    .btn-save#save-icon-btn .btn-icon-fa { transition: opacity 0.2s ease, transform 0.2s ease; margin-right: 8px; }
+    .btn-save#save-icon-btn.saving { background-color: var(--accent) !important; color: white !important; cursor: wait; }
+    .btn-save#save-icon-btn.saving .btn-text,
+    .btn-save#save-icon-btn.saving .btn-icon-fa.fa-save { opacity: 0; transform: translateY(-5px); display:none !important; }
+    .btn-save#save-icon-btn .spinner-btn-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; pointer-events:none; }
+    .btn-save#save-icon-btn.saving .spinner-btn-overlay { opacity: 1; }
+    .btn-save#save-icon-btn .spinner-btn-overlay .modern-spinner { width: 20px; height: 20px; border-width: 2px; margin: 0; border-color: white white transparent transparent; }
+    .btn-save#save-icon-btn .spinner-btn-overlay .modern-spinner::after,
+    .btn-save#save-icon-btn .spinner-btn-overlay .modern-spinner::before { border-width: 2px; }
+    .btn-save#save-icon-btn .spinner-btn-overlay .modern-spinner::after { width: 16px; height: 16px; border-color: transparent transparent white white; }
+    .btn-save#save-icon-btn .spinner-btn-overlay .modern-spinner::before { width: 12px; height: 12px; border-color: rgba(255,255,255,0.7) rgba(255,255,255,0.7) transparent transparent;}
+    .btn-save#save-icon-btn.saved-success { background-color: var(--success) !important; color: white !important; }
+    .btn-save#save-icon-btn.saved-success .btn-icon-fa.fa-save { display: none !important; }
+    .btn-save#save-icon-btn.saved-success .btn-icon-fa.fa-check { display: inline-block !important; animation: bounceIn 0.5s ease; }
+    @keyframes bounceIn { 0%,100%,20%,40%,60%,80%{transition-timing-function:cubic-bezier(.215,.61,.355,1)}0%{opacity:0;transform:scale3d(.3,.3,.3)}20%{transform:scale3d(1.1,1.1,1.1)}40%{transform:scale3d(.9,.9,.9)}60%{opacity:1;transform:scale3d(1.03,1.03,1.03)}80%{transform:scale3d(.97,.97,.97)}100%{opacity:1;transform:scale3d(1,1,1)}}
+
+    #icon-save-message.form-message.toast-style { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); padding: 0.9rem 1.5rem; border-radius: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); z-index: 10010; font-size: 0.95rem; font-weight: 500; opacity: 0; transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1), bottom 0.4s cubic-bezier(0.23, 1, 0.32, 1); min-width: 280px; max-width: 90%; text-align: center;}
+    #icon-save-message.form-message.toast-style.show { opacity: 1; bottom: 25px; }
+    #icon-save-message.form-message.toast-style.success { background-color: var(--success) !important; color: white !important; border: 1px solid rgba(255,255,255,0.2) !important; }
+    #icon-save-message.form-message.toast-style.error { background-color: var(--danger) !important; color: white !important; border: 1px solid rgba(255,255,255,0.2) !important; }
+
   </style>
 </head>
 <body>
@@ -181,9 +363,47 @@
 
     <section class="profile-section">
       <h2><i class="fas fa-image" style="margin-right: 8px;"></i> Icona Profilo</h2>
-      <p>Scegli un'icona che ti rappresenti:</p>
+      <p>Scegli un'icona che ti rappresenti tra quelle disponibili oppure generane una nuova con l'AI:</p>
       <div class="avatar-options-grid" id="avatar-options-container"> <p>Caricamento icone disponibili...</p> </div>
-      <button class="btn-save" id="save-icon-btn">Salva Icona</button>
+
+      <div class="ai-icon-generator-section">
+        <div class="ai-section-loading-overlay" id="ai-section-loader">
+          <div class="modern-spinner"></div>
+          <p>Sto creando la tua icona...</p>
+        </div>
+        <div class="ai-title-container">
+          <h3><i class="fas fa-magic"></i> Genera Icona con Eremo AI</h3>
+          <span class="star-title s1"></span>
+          <span class="star-title s2"></span>
+          <span class="star-title s3"></span>
+          <span class="star-title s4"></span>
+          <span class="star-title s5"></span>
+          <span class="star-title s6"></span>
+        </div>
+        <div class="form-group">
+          <label for="ai-icon-prompt">Descrivi l'icona che vorresti (es. "gatto saggio con occhiali", "montagna stilizzata all'alba"):</label>
+          <textarea id="ai-icon-prompt" rows="3" class="form-control" placeholder="Max 250 caratteri..."></textarea>
+        </div>
+        <button type="button" class="btn-ai-generate cool-ai-btn" id="btn-generate-ai-icon">
+    <span class="ai-btn-content-wrapper">
+        <span class="ai-icon-btn"><i class="fas fa-lightbulb"></i></span>
+        <span class="ai-text-btn">Genera Icona</span>
+    </span>
+          <span class="ai-ripple-container-btn"></span>
+        </button>
+        <div id="ai-generated-icon-preview-container" style="display:none;">
+          <p>Icona generata (clicca per selezionarla):</p>
+          <img src="#" alt="Icona Generata con AI" id="ai-generated-icon-preview">
+        </div>
+        <p id="ai-icon-message" class="form-message" style="display:none;"></p>
+      </div>
+
+      <button class="btn-save" id="save-icon-btn" style="margin-top: 2rem;">
+        <i class="fas fa-save btn-icon-fa"></i>
+        <span class="btn-text">Salva Icona Selezionata</span>
+        <span class="spinner-btn-overlay" style="display: none;"><div class="modern-spinner"></div></span>
+        <i class="fas fa-check btn-icon-fa" style="display: none;"></i>
+      </button>
       <p id="icon-save-message" class="form-message" style="display:none;"></p>
     </section>
 
@@ -205,7 +425,7 @@
       <div id="user-bookings-grid" class="card-grid"> <p style="text-align:center; padding:1rem;">Caricamento prenotazioni...</p> </div>
       <div id="no-bookings-message" style="display: none; text-align: center; padding: 2rem;">
         <p>Non hai nessuna prenotazione attiva al momento.</p>
-        <a href="eventiincorsoaccesso.html" class="btn-primary" style="display: inline-block; margin-top: 1rem;">Scopri le attività</a>
+        <a href="eventiincorso.html" class="btn-primary" style="display: inline-block; margin-top: 1rem;">Scopri le attività</a>
       </div>
     </section>
 
@@ -231,7 +451,6 @@
         <p id="delete-account-message" class="form-message" style="display:none;"></p>
       </form>
     </section>
-
   </div>
 </main>
 
@@ -242,9 +461,45 @@
   const navbarContainer = document.getElementById('navbarContainer');
   const mobileMenu = document.getElementById("mobileMenu");
   const hamburger = document.querySelector(".navbar .hamburger");
-  const defaultIconPath = 'uploads/icons/default_user.png';
-  let selectedIconPath = defaultIconPath;
+  const defaultIconPath = 'uploads/icons/default_user.png'; // Senza slash iniziale
+  let selectedIconPath = defaultIconPath; // Internamente, manteniamo senza slash iniziale
   let currentUserDataFromStorage = null;
+  let stabilityApiKey = null;
+
+  let aiSectionLoaderEl, aiPreviewContainerEl, saveIconBtnEl, saveIconBtnOriginalText;
+  let loadAvailableIconsCallCount = 0;
+
+  function simpleXorDecryptClient(base64String, key) {
+    try {
+      const encryptedText = atob(base64String);
+      let outText = '';
+      for(let i = 0; i < encryptedText.length; i++) {
+        outText += String.fromCharCode(encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+      }
+      return outText;
+    } catch (e) { console.error("Fallimento decifratura API key (client):", e); return null; }
+  }
+
+  async function fetchAndPrepareStabilityApiKey() {
+    if (stabilityApiKey) return true;
+    try {
+      const result = await callApi('api/api_get_image_gen_config.php');
+      if (result.success && result.obfuscatedStabilityApiKey && result.decryptionKey) {
+        const decryptedKey = simpleXorDecryptClient(result.obfuscatedStabilityApiKey, result.decryptionKey);
+        if (decryptedKey) {
+          stabilityApiKey = decryptedKey;
+          console.log("Chiave API Stability AI pronta.");
+          return true;
+        } else {
+          displayMessage('ai-icon-message', "Errore config. AI (decifratura).", false); return false;
+        }
+      } else {
+        displayMessage('ai-icon-message', `Errore config. AI: ${result.message || 'Dati mancanti.'}`, false); return false;
+      }
+    } catch (error) {
+      displayMessage('ai-icon-message', `Errore connessione config. AI: ${error.message}`, false); return false;
+    }
+  }
 
   if (navbarContainer) {
     window.addEventListener('scroll', function() {
@@ -255,23 +510,16 @@
       lastScroll = currentScroll;
     });
   }
-
   function toggleMobileMenu() {
     const isOpen = mobileMenu.classList.toggle('open');
-    if (hamburger) hamburger.classList.toggle('open');
-    if (hamburger) hamburger.setAttribute('aria-expanded', String(isOpen));
+    if (hamburger) { hamburger.classList.toggle('open'); hamburger.setAttribute('aria-expanded', String(isOpen));}
     document.body.style.overflow = isOpen ? 'hidden' : '';
   }
-
   function closeMobileMenu() {
     if (mobileMenu) mobileMenu.classList.remove('open');
-    if (hamburger) {
-      hamburger.classList.remove('open');
-      hamburger.setAttribute('aria-expanded', 'false');
-    }
+    if (hamburger) { hamburger.classList.remove('open'); hamburger.setAttribute('aria-expanded', 'false');}
     document.body.style.overflow = '';
   }
-
   function toggleUserMenu(event) {
     if (event) event.stopPropagation();
     const dropdown = document.querySelector('.user-dropdown .dropdown-menu');
@@ -282,7 +530,6 @@
       btn.setAttribute('aria-expanded', String(!isOpen));
     }
   }
-
   document.addEventListener('click', function(event) {
     const userDropdownContainer = document.getElementById('userDropdownContainer');
     const dropdownMenu = document.querySelector('.user-dropdown .dropdown-menu');
@@ -300,36 +547,70 @@
     }
   });
 
-  function displayMessage(elementId, message, isSuccess) {
+  function displayMessage(elementId, message, isSuccess, clearAfter = true, isToast = false) {
     const el = document.getElementById(elementId);
     if (el) {
-      el.textContent = message;
-      el.className = 'form-message ' + (isSuccess ? 'success' : 'error');
+      el.innerHTML = message;
+      el.className = 'form-message';
+      if (isSuccess) el.classList.add('success'); else el.classList.add('error');
+
+      if (isToast) {
+        el.classList.add('toast-style');
+        void el.offsetWidth;
+        requestAnimationFrame(() => { el.classList.add('show'); });
+      } else {
+        el.classList.remove('toast-style', 'show');
+      }
       el.style.display = 'block';
-      setTimeout(() => { if(el) el.style.display = 'none'; }, isSuccess ? 5000 : 7000);
+
+      if(clearAfter){
+        const timeoutDuration = isToast ? 3500 : (isSuccess ? 5000 : 7000);
+        setTimeout(() => {
+          if(el) {
+            if (isToast && el.classList.contains('toast-style')) {
+              el.classList.remove('show');
+              el.addEventListener('transitionend', () => {
+                if (el.classList.contains('toast-style')) { el.style.display = 'none'; }
+              }, { once: true });
+            } else if (!isToast) { el.style.display = 'none'; }
+          }
+        }, timeoutDuration);
+      }
     }
   }
 
   async function callApi(url, method = 'GET', data = null) {
     const headers = { 'Content-Type': 'application/json' };
     const options = { method, headers, credentials: 'same-origin' };
-    if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) { // Added DELETE
+    if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
       options.body = JSON.stringify(data);
     }
     try {
       const response = await fetch(url, options);
       if (!response.ok) {
         let errorData = { message: `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
-        try { errorData = await response.json(); } catch (e) { /* usa default */ }
+        let rawErrorText = '';
+        try {
+          rawErrorText = await response.text();
+          console.debug("Raw error response from callApi to " + url + ":", rawErrorText);
+          errorData = JSON.parse(rawErrorText);
+        } catch (e) {
+          errorData.message = rawErrorText || errorData.message;
+        }
         const finalErrorMessage = errorData.message || `Errore del server: ${response.status} per ${url}`;
-        console.error(finalErrorMessage);
         throw new Error(finalErrorMessage);
       }
-      if (response.status === 204) return {}; // No Content
-      return await response.json();
+      if (response.status === 204) return {};
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        return await response.json();
+      } else {
+        const textResponse = await response.text();
+        return { success: true, data: textResponse, message: textResponse };
+      }
     } catch (error) {
       console.error(`Fallimento chiamata API a ${url}:`, error.message);
-      throw error; // Re-throw for the caller to handle
+      throw error;
     }
   }
 
@@ -338,36 +619,76 @@
     const navbarAvatarImg = document.querySelector('#navbar-avatar img');
     const navbarUsername = document.getElementById('navbar-username');
     const profileGreeting = document.getElementById('profile-greeting');
-
     if(mainAvatarImg) mainAvatarImg.src = defaultIconPath;
     if(navbarAvatarImg) navbarAvatarImg.src = defaultIconPath;
     if(navbarUsername) navbarUsername.textContent = 'Ospite';
     if(profileGreeting) profileGreeting.textContent = 'Area Personale';
-
     const emailInput = document.getElementById('email');
     if(emailInput) emailInput.value = '';
-
-    document.querySelectorAll('#profile-info-form input:not(#email), #profile-info-form button').forEach(el => el.disabled = true);
-    document.querySelectorAll('#save-icon-btn, #password-change-form input, #password-change-form button, #delete-account-form input, #delete-account-form button').forEach(el => el.disabled = true);
-
+    document.querySelectorAll('#profile-info-form input:not(#email), #profile-info-form button, #save-icon-btn, #password-change-form input, #password-change-form button, #delete-account-form input, #delete-account-form button, #btn-generate-ai-icon, #ai-icon-prompt').forEach(el => el.disabled = true);
     const avatarContainer = document.getElementById('avatar-options-container');
     if(avatarContainer) avatarContainer.innerHTML = `<p>${errorMessage}</p>`;
     const bookingsGrid = document.getElementById('user-bookings-grid');
     if(bookingsGrid) bookingsGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
     const waitlistGrid = document.getElementById('user-waitlist-grid');
     if(waitlistGrid) waitlistGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
-
+    const aiIconMessageEl = document.getElementById('ai-icon-message');
+    if(aiIconMessageEl) displayMessage('ai-icon-message', errorMessage, false, false);
     const noBookingsMsg = document.getElementById('no-bookings-message');
     if(noBookingsMsg) noBookingsMsg.style.display = 'none';
     const noWaitlistMsg = document.getElementById('no-waitlist-message');
     if(noWaitlistMsg) noWaitlistMsg.style.display = 'none';
-
+    if(aiSectionLoaderEl) aiSectionLoaderEl.classList.remove('active');
     if(errorMessage !== "Funzionalità non disponibile. Effettua il login.") {
       displayMessage('profile-info-message', errorMessage, false);
     }
   }
 
+  function normalizeIconPath(path) {
+    if (!path) return defaultIconPath; // Ritorna il default se il path è nullo o vuoto
+    if (path.startsWith('/')) {
+      return path.substring(1);
+    }
+    return path;
+  }
+
   document.addEventListener('DOMContentLoaded', async () => {
+    aiSectionLoaderEl = document.getElementById('ai-section-loader');
+    aiPreviewContainerEl = document.getElementById('ai-generated-icon-preview-container');
+    saveIconBtnEl = document.getElementById('save-icon-btn');
+    if (saveIconBtnEl) {
+      const textSpan = saveIconBtnEl.querySelector('.btn-text');
+      saveIconBtnOriginalText = textSpan ? textSpan.textContent : "Salva Icona Selezionata";
+
+      let spinnerOverlay = saveIconBtnEl.querySelector('.spinner-btn-overlay');
+      if (!spinnerOverlay) {
+        spinnerOverlay = document.createElement('span');
+        spinnerOverlay.className = 'spinner-btn-overlay';
+        spinnerOverlay.innerHTML = '<div class="modern-spinner"></div>';
+        saveIconBtnEl.appendChild(spinnerOverlay);
+      }
+      spinnerOverlay.style.display = 'none';
+
+      const iconNode = saveIconBtnEl.querySelector('.fas.fa-save');
+      if (iconNode && !iconNode.classList.contains('btn-icon-fa')) {
+        iconNode.classList.add('btn-icon-fa');
+      }
+
+      let checkIcon = saveIconBtnEl.querySelector('.btn-icon-fa.fa-check');
+      if (!checkIcon && iconNode && iconNode.classList.contains('fa-save') ) {
+        checkIcon = document.createElement('i');
+        checkIcon.className = 'fas fa-check btn-icon-fa';
+        // Inserisci DOPO l'icona di salvataggio, ma prima dello span del testo se presente
+        const existingTextSpan = saveIconBtnEl.querySelector('.btn-text');
+        if(existingTextSpan) {
+          iconNode.parentNode.insertBefore(checkIcon, existingTextSpan);
+        } else {
+          iconNode.parentNode.appendChild(checkIcon);
+        }
+      }
+      if(checkIcon) checkIcon.style.display = 'none';
+    }
+
     const currentYearEl = document.getElementById('currentYear');
     if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
@@ -384,13 +705,18 @@
         const cognomeInput = document.getElementById('cognome');
 
         if (navbarUsername) navbarUsername.textContent = currentUserDataFromStorage.nome || 'Utente';
-        selectedIconPath = currentUserDataFromStorage.iconPath || defaultIconPath;
+
+        selectedIconPath = normalizeIconPath(currentUserDataFromStorage.iconPath || defaultIconPath);
+
         if (navbarAvatarImg) navbarAvatarImg.src = selectedIconPath;
         if (mainAvatarImg) mainAvatarImg.src = selectedIconPath;
+
         if (profileGreeting) profileGreeting.textContent = `Ciao, ${currentUserDataFromStorage.nome || 'Utente'}!`;
         if (emailInput) emailInput.value = currentUserDataFromStorage.email || '';
         if(nomeInput) nomeInput.value = currentUserDataFromStorage.nome || '';
         if(cognomeInput) cognomeInput.value = currentUserDataFromStorage.cognome || '';
+
+        if (currentUserDataFromStorage) { await fetchAndPrepareStabilityApiKey(); }
       } catch(e) {
         currentUserDataFromStorage = null;
         initializeUIForGuest("Errore nel caricamento dei dati locali. Prova a ricaricare o effettua nuovamente il login.");
@@ -399,141 +725,334 @@
       initializeUIForGuest("Effettua il login per accedere a tutte le funzionalità.");
     }
 
-    if (currentUserDataFromStorage) {
-      await loadUserProfileFromServer(); // This will re-enable forms if successful
-      await loadAvailableIcons();
-      await loadUserBookings();
-      await loadUserWaitlist();
-    } else {
-      // Ensure forms remain disabled if no user data
-      document.querySelectorAll('#profile-info-form input:not(#email), #profile-info-form button, #save-icon-btn, #password-change-form input, #password-change-form button, #delete-account-form input, #delete-account-form button').forEach(el => el.disabled = true);
-      const avatarContainer = document.getElementById('avatar-options-container');
-      if(avatarContainer) avatarContainer.innerHTML = '<p>Effettua il login per visualizzare le icone.</p>';
-      const bookingsGrid = document.getElementById('user-bookings-grid');
-      if(bookingsGrid) bookingsGrid.innerHTML = '<p style="text-align:center;">Effettua il login per visualizzare le prenotazioni.</p>';
-      const waitlistGrid = document.getElementById('user-waitlist-grid');
-      if(waitlistGrid) waitlistGrid.innerHTML = '<p style="text-align:center;">Effettua il login per visualizzare gli eventi in coda.</p>';
+    // Blocco try-catch per il setup iniziale asincrono
+    try {
+      if (currentUserDataFromStorage) {
+        await loadUserProfileFromServer();
+        await loadAvailableIcons();
+        await loadUserBookings();
+        await loadUserWaitlist();
+        document.getElementById('btn-generate-ai-icon').disabled = false;
+        document.getElementById('ai-icon-prompt').disabled = false;
+      } else {
+        document.querySelectorAll('#profile-info-form input:not(#email), #profile-info-form button, #save-icon-btn, #password-change-form input, #password-change-form button, #delete-account-form input, #delete-account-form button, #btn-generate-ai-icon, #ai-icon-prompt').forEach(el => el.disabled = true);
+        if(aiSectionLoaderEl) aiSectionLoaderEl.classList.remove('active');
+      }
+    } catch (error) {
+      console.error("Errore durante il setup iniziale della pagina (DOMContentLoaded):", error);
+      const profileInfoMessage = document.getElementById('profile-info-message');
+      if (profileInfoMessage) displayMessage('profile-info-message', 'Si è verificato un errore critico durante il caricamento della pagina. Riprova più tardi.', false, false);
+      // Potresti voler disabilitare ulteriormente l'interfaccia qui se il caricamento fallisce gravemente
+      initializeUIForGuest('Errore caricamento dati profilo. Riprova.');
     }
 
+    document.getElementById('btn-generate-ai-icon')?.addEventListener('click', handleGenerateAiIcon);
+    document.getElementById('ai-generated-icon-preview')?.addEventListener('click', handleSelectAiGeneratedIcon);
+    if(saveIconBtnEl) saveIconBtnEl.addEventListener('click', handleSaveIcon);
+
     if (window.location.hash === '#prenotazioni') {
-      const prenotazioniSection = document.getElementById('prenotazioni');
-      if (prenotazioniSection) prenotazioniSection.scrollIntoView({ behavior: 'smooth' });
+      const el = document.getElementById('prenotazioni'); if(el) el.scrollIntoView({behavior:'smooth'});
     }
     document.getElementById('delete-account-form')?.addEventListener('submit', handleDeleteAccount);
+    console.log("DOMContentLoaded completato e listeners attaccati.");
   });
 
   async function loadUserProfileFromServer() {
+    console.log("loadUserProfileFromServer CHIAMATA");
     const mainAvatarImg = document.querySelector('#main-avatar img');
     const navbarAvatarImg = document.querySelector('#navbar-avatar img');
     const navbarUsername = document.getElementById('navbar-username');
     const profileGreeting = document.getElementById('profile-greeting');
-
-    // Enable forms assuming user is logged in and we are fetching their profile
-    document.querySelectorAll('#profile-info-form input:not([disabled]), #profile-info-form button').forEach(el => el.disabled = false);
-    document.querySelectorAll('#save-icon-btn, #password-change-form input, #password-change-form button, #delete-account-form input, #delete-account-form button').forEach(el => el.disabled = false);
-    document.getElementById('email').disabled = true; // Email should always be disabled
-
     try {
       const apiUserData = await callApi('api/api_get_user_profile.php');
+      console.log("loadUserProfileFromServer: Dati ricevuti", apiUserData);
       if (apiUserData && apiUserData.success) {
         const data = apiUserData.data;
         document.getElementById('nome').value = data.nome || '';
         document.getElementById('cognome').value = data.cognome || '';
         document.getElementById('email').value = data.email || (currentUserDataFromStorage ? currentUserDataFromStorage.email : '');
 
-        selectedIconPath = data.icon || defaultIconPath;
+        let serverIconPath = data.icon || defaultIconPath;
+        selectedIconPath = normalizeIconPath(serverIconPath);
+
         if(mainAvatarImg) mainAvatarImg.src = selectedIconPath;
         if(navbarAvatarImg) navbarAvatarImg.src = selectedIconPath;
         if(navbarUsername) navbarUsername.textContent = data.nome || 'Utente';
         if(profileGreeting) profileGreeting.textContent = `Ciao, ${data.nome || 'Utente'}!`;
 
-        // Update currentUserDataFromStorage with fresh server data
         currentUserDataFromStorage = {
-          nome: data.nome,
-          cognome: data.cognome,
-          email: data.email,
+          nome: data.nome, cognome: data.cognome, email: data.email,
           iconPath: selectedIconPath
         };
         localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
-        updateIconSelectionVisual();
-      } else { // API call was not successful (e.g., session expired server-side)
-        const message = (apiUserData && apiUserData.message) ? apiUserData.message : "Errore recupero profilo.";
-        displayMessage('profile-info-message', message, false);
-        initializeUIForGuest(message); // Re-disable forms, show guest state
+        // updateIconSelectionVisual(); // Rimossa chiamata duplicata, loadAvailableIcons la chiama già
+      } else {
+        console.error("loadUserProfileFromServer: Errore API o dati mancanti", apiUserData);
+        displayMessage('profile-info-message', (apiUserData && apiUserData.message) ? apiUserData.message : "Errore recupero profilo.", false);
+        // initializeUIForGuest((apiUserData && apiUserData.message) ? apiUserData.message : "Errore recupero profilo."); // Evita loop se questo causa ricaricamento
       }
-    } catch (error) { // Network error or other fetch failure
-      displayMessage('profile-info-message', `Errore caricamento profilo: ${error.message}. Prova a ricaricare la pagina.`, false);
-      initializeUIForGuest(`Impossibile caricare i dati del profilo. ${error.message}`);
+    } catch (error) {
+      console.error("loadUserProfileFromServer: Errore CATCH", error);
+      displayMessage('profile-info-message', `Errore caricamento profilo: ${error.message}.`, false);
+      // initializeUIForGuest(`Impossibile caricare i dati del profilo. ${error.message}`);
     }
   }
 
   function updateIconSelectionVisual() {
+    console.log("updateIconSelectionVisual CHIAMATA con selectedIconPath:", selectedIconPath);
     document.querySelectorAll('.avatar-option-image.selected').forEach(sel => sel.classList.remove('selected'));
-    const currentSelectedImg = document.querySelector(`.avatar-option-image[data-path="${selectedIconPath}"]`);
-    if (currentSelectedImg) {
-      currentSelectedImg.classList.add('selected');
+    const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
+    if (aiPreviewImg) aiPreviewImg.classList.remove('selected');
+
+    const normalizedComparePath = normalizeIconPath(selectedIconPath); // selectedIconPath è già normalizzato
+
+    const currentSelectedPredefinedImg = document.querySelector(`.avatar-option-image[data-path="${normalizedComparePath}"]`);
+    if (currentSelectedPredefinedImg) {
+      currentSelectedPredefinedImg.classList.add('selected');
+      console.log("Icona predefinita selezionata:", normalizedComparePath);
+    }
+    else if (selectedIconPath && selectedIconPath.startsWith('data:image/') && aiPreviewImg) {
+      aiPreviewImg.classList.add('selected');
+      console.log("Icona AI (base64) selezionata.");
+    } else {
+      console.log("Nessuna icona corrisponde a selectedIconPath per la selezione visiva:", selectedIconPath);
     }
   }
 
   async function loadAvailableIcons() {
+    loadAvailableIconsCallCount++;
+    console.log(`loadAvailableIcons CHIAMATA NUMERO: ${loadAvailableIconsCallCount}`);
+
     const container = document.getElementById('avatar-options-container');
-    if (!container) return;
-    container.innerHTML = '<p>Caricamento icone...</p>';
+    if (!container) { console.error("loadAvailableIcons: Contenitore avatar non trovato!"); return; }
+    container.innerHTML = '<p>Caricamento icone disponibili...</p>';
+
     try {
+      console.log("loadAvailableIcons: Chiamata a api_get_icons.php...");
       const iconsData = await callApi('api/api_get_icons.php');
-      if (iconsData.success && iconsData.icons && iconsData.icons.length > 0) {
-        container.innerHTML = '';
-        iconsData.icons.forEach(path => {
-          const img = document.createElement('img');
-          img.src = path;
-          img.alt = 'Icona profilo';
-          img.classList.add('avatar-option-image');
-          img.setAttribute('data-path', path);
-          img.addEventListener('click', () => {
-            if (!currentUserDataFromStorage) return; // Don't allow selection if not logged in
-            selectedIconPath = path;
-            updateIconSelectionVisual();
-            const mainAvatarPreview = document.querySelector('#main-avatar img');
-            if(mainAvatarPreview) mainAvatarPreview.src = selectedIconPath;
+      console.log("loadAvailableIcons: Risposta da api_get_icons.php:", iconsData);
+
+      if (iconsData && iconsData.success && iconsData.icons) {
+        if (iconsData.icons.length > 0) {
+          container.innerHTML = '';
+          iconsData.icons.forEach(path => {
+            const normalizedPath = normalizeIconPath(path);
+            const img = document.createElement('img');
+            img.src = normalizedPath;
+            img.alt = 'Icona profilo';
+            img.classList.add('avatar-option-image');
+            img.setAttribute('data-path', normalizedPath);
+            img.addEventListener('click', () => {
+              if (!currentUserDataFromStorage) return;
+              selectedIconPath = normalizedPath;
+              updateIconSelectionVisual();
+              const mainAvatarPreview = document.querySelector('#main-avatar img');
+              if(mainAvatarPreview) mainAvatarPreview.src = selectedIconPath;
+              const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
+              if (aiPreviewImg) aiPreviewImg.classList.remove('selected');
+            });
+            container.appendChild(img);
           });
-          container.appendChild(img);
-        });
-        updateIconSelectionVisual();
+          updateIconSelectionVisual(); // Chiamata dopo aver aggiunto tutte le immagini
+        } else {
+          container.innerHTML = `<p>${iconsData.message || 'Nessuna icona disponibile al momento.'}</p>`;
+        }
       } else {
-        container.innerHTML = `<p>${iconsData.message || 'Nessuna icona disponibile.'}</p>`;
+        console.error("loadAvailableIcons: Risposta API icone non valida o fallita:", iconsData);
+        container.innerHTML = `<p>${(iconsData && iconsData.message) ? iconsData.message : 'Errore nel formato risposta icone.'}</p>`;
       }
     } catch (error) {
+      console.error("loadAvailableIcons: Errore catch:", error);
       container.innerHTML = `<p class="form-message error" style="display:block;">Errore caricamento icone: ${error.message}</p>`;
     }
   }
 
-  document.getElementById('save-icon-btn')?.addEventListener('click', async () => {
-    if (!currentUserDataFromStorage) { displayMessage('icon-save-message', 'Devi essere autenticato per salvare l\'icona.', false); return; }
+  async function handleGenerateAiIcon() {
+    if (!currentUserDataFromStorage) { displayMessage('ai-icon-message', 'Autenticazione richiesta.', false); return; }
+    if (!stabilityApiKey) {
+      const keyReady = await fetchAndPrepareStabilityApiKey();
+      if (!keyReady) { displayMessage('ai-icon-message', "Errore chiave API AI. Riprova.", false); return; }
+    }
+    const promptInput = document.getElementById('ai-icon-prompt');
+    const promptText = promptInput.value.trim();
+    if (!promptText) { displayMessage('ai-icon-message', 'Inserisci una descrizione.', false); return; }
+
+    const generateBtn = document.getElementById('btn-generate-ai-icon');
+    const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
+
+    generateBtn.disabled = true;
+    promptInput.disabled = true;
+    if (aiSectionLoaderEl) aiSectionLoaderEl.classList.add('active');
+    if (aiPreviewContainerEl) {
+      aiPreviewContainerEl.style.display = 'none';
+      aiPreviewContainerEl.classList.remove('revealed');
+    }
+    displayMessage('ai-icon-message', '', true, false);
+
+    const STABILITY_API_ENDPOINT = 'https://api.stability.ai/v1/generation/stable-diffusion-v1-6/text-to-image';
+    const stabilityPayload = {
+      text_prompts: [{ "text": promptText + ", icon style, simple vector, clear background, 2d flat", "weight": 1 }],
+      cfg_scale: 7, height: 512, width: 512, samples: 1, steps: 25,
+    };
+
     try {
-      const response = await callApi('api/api_update_user_icon.php', 'PUT', { icon: selectedIconPath });
-      if (response.success) {
-        const navbarAvatarImg = document.querySelector('#navbar-avatar img');
-        if (navbarAvatarImg) navbarAvatarImg.src = selectedIconPath;
-        if(currentUserDataFromStorage) {
-          currentUserDataFromStorage.iconPath = selectedIconPath;
-          localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
+      const response = await fetch(STABILITY_API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${stabilityApiKey}`},
+        body: JSON.stringify(stabilityPayload)
+      });
+      if (!response.ok) {
+        const errorText = await response.text(); let errorData;
+        try { errorData = JSON.parse(errorText); } catch (e) { errorData = { message: errorText || `Errore HTTP ${response.status}` }; }
+        throw new Error(errorData.message || errorData.name || `Errore da Stability AI: ${response.statusText}`);
+      }
+      const result = await response.json();
+      if (result.artifacts && result.artifacts.length > 0 && result.artifacts[0].base64) {
+        const base64ImageData = result.artifacts[0].base64;
+        aiPreviewImg.src = `data:image/png;base64,${base64ImageData}`;
+        if (aiPreviewContainerEl) {
+          aiPreviewContainerEl.style.display = 'block';
+          void aiPreviewContainerEl.offsetWidth;
+          aiPreviewContainerEl.classList.add('revealed');
         }
-        displayMessage('icon-save-message', response.message || 'Icona profilo aggiornata!', true);
+        aiPreviewImg.classList.remove('selected');
+        displayMessage('ai-icon-message', 'Icona generata! Cliccala per selezionarla e poi salvala.', true);
       } else {
-        displayMessage('icon-save-message', response.message || 'Errore salvataggio icona.', false);
+        console.warn("Risposta da Stability AI non conforme:", result);
+        displayMessage('ai-icon-message', 'Nessuna immagine da Stability AI o formato non valido.', false);
       }
     } catch (error) {
-      displayMessage('icon-save-message', `Errore salvataggio icona: ${error.message}`, false);
+      console.error("Errore chiamata Stability AI:", error);
+      displayMessage('ai-icon-message', `Errore generazione AI: ${error.message}.`, false);
+    } finally {
+      generateBtn.disabled = false;
+      promptInput.disabled = false;
+      if (aiSectionLoaderEl) aiSectionLoaderEl.classList.remove('active');
     }
-  });
+  }
+
+  function handleSelectAiGeneratedIcon(event) {
+    if (!currentUserDataFromStorage) return;
+    const aiPreviewImg = event.target;
+    if (aiPreviewImg.src && aiPreviewImg.src.startsWith('data:image/')) {
+      selectedIconPath = aiPreviewImg.src; // È base64
+      updateIconSelectionVisual();
+      const mainAvatarPreview = document.querySelector('#main-avatar img');
+      if(mainAvatarPreview) mainAvatarPreview.src = selectedIconPath;
+    }
+  }
+
+  async function handleSaveIcon() {
+    if (!currentUserDataFromStorage || !saveIconBtnEl) return;
+
+    let finalIconPathToServer = selectedIconPath; // Mantiene formato normalizzato (senza / iniziale) o base64
+    const textSpan = saveIconBtnEl.querySelector('.btn-text');
+    const saveIcon = saveIconBtnEl.querySelector('.btn-icon-fa.fa-save');
+    const checkIcon = saveIconBtnEl.querySelector('.btn-icon-fa.fa-check');
+    const spinnerOverlay = saveIconBtnEl.querySelector('.spinner-btn-overlay');
+
+    saveIconBtnEl.disabled = true;
+    saveIconBtnEl.classList.remove('saved-success');
+    saveIconBtnEl.classList.add('saving');
+    if(textSpan) textSpan.style.opacity = '0';
+    if(saveIcon) saveIcon.style.display = 'none';
+    if(checkIcon) checkIcon.style.display = 'none';
+    if(spinnerOverlay) spinnerOverlay.style.display = 'flex';
+
+    if (selectedIconPath && selectedIconPath.startsWith('data:image/')) {
+      displayMessage('icon-save-message', 'Salvataggio icona AI sul server...', true, false, true);
+      try {
+        const saveResponse = await callApi('api/api_save_ai_icon.php', 'POST', { imageBase64: selectedIconPath });
+        if (saveResponse.success && saveResponse.iconPath) {
+          finalIconPathToServer = normalizeIconPath(saveResponse.iconPath);
+        } else { throw new Error(saveResponse.message || 'Errore salvataggio file icona AI.'); }
+      } catch (error) {
+        displayMessage('icon-save-message', `Errore salvataggio file: ${error.message}`, false, true, true);
+        saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
+        if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
+        if(saveIcon) saveIcon.style.display = 'inline-block';
+        if(spinnerOverlay) spinnerOverlay.style.display = 'none';
+        return;
+      }
+    } else if (!selectedIconPath || (selectedIconPath === normalizeIconPath(defaultIconPath) && !document.querySelector(`.avatar-option-image[data-path="${normalizeIconPath(defaultIconPath)}"].selected`))) {
+      const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
+      if (!document.querySelector('.avatar-option-image.selected') && !(aiPreviewImg && aiPreviewImg.classList.contains('selected'))) {
+        displayMessage('icon-save-message', 'Seleziona un\'icona prima di salvare.', false, true, true);
+        saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
+        if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
+        if(saveIcon) saveIcon.style.display = 'inline-block';
+        if(spinnerOverlay) spinnerOverlay.style.display = 'none';
+        return;
+      }
+    }
+
+    if (finalIconPathToServer && finalIconPathToServer.startsWith('data:image/')) {
+      displayMessage('icon-save-message', 'Errore: percorso icona non valido per aggiornamento.', false, true, true);
+      saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
+      if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
+      if(saveIcon) saveIcon.style.display = 'inline-block';
+      if(spinnerOverlay) spinnerOverlay.style.display = 'none';
+      return;
+    }
+
+    let pathToSaveForDB = finalIconPathToServer;
+    if (pathToSaveForDB && !pathToSaveForDB.startsWith('/') && pathToSaveForDB.startsWith('uploads/icons/')) {
+      pathToSaveForDB = '/' + pathToSaveForDB; // Aggiungi slash per il DB
+    }
+
+    try {
+      const response = await callApi('api/api_update_user_icon.php', 'PUT', { icon: pathToSaveForDB });
+      if (response.success) {
+        saveIconBtnEl.classList.remove('saving');
+        saveIconBtnEl.classList.add('saved-success');
+        if(spinnerOverlay) spinnerOverlay.style.display = 'none';
+        if(textSpan) {textSpan.textContent = 'Salvato!'; textSpan.style.opacity = '1';}
+        if(saveIcon) saveIcon.style.display = 'none';
+        if(checkIcon) checkIcon.style.display = 'inline-block';
+
+        const navbarAvatarImg = document.querySelector('#navbar-avatar img');
+        const mainAvatarImg = document.querySelector('#main-avatar img');
+        const cacheBuster = '?t=' + new Date().getTime();
+
+        if (navbarAvatarImg) navbarAvatarImg.src = finalIconPathToServer + cacheBuster;
+        if (mainAvatarImg) mainAvatarImg.src = finalIconPathToServer + cacheBuster;
+
+        selectedIconPath = finalIconPathToServer;
+
+        if(currentUserDataFromStorage) {
+          currentUserDataFromStorage.iconPath = finalIconPathToServer;
+          localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
+        }
+
+        const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
+        if (aiPreviewImg && aiPreviewImg.classList.contains('selected')) {
+          aiPreviewImg.classList.remove('selected');
+        }
+        updateIconSelectionVisual();
+        displayMessage('icon-save-message', response.message || 'Icona profilo aggiornata!', true, true, true);
+
+        setTimeout(() => {
+          saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saved-success');
+          if(textSpan) textSpan.textContent = saveIconBtnOriginalText;
+          if(saveIcon) saveIcon.style.display = 'inline-block';
+          if(checkIcon) checkIcon.style.display = 'none';
+        }, 2500);
+
+      } else { throw new Error(response.message || 'Errore salvataggio icona nel profilo.'); }
+    } catch (error) {
+      displayMessage('icon-save-message', `Errore: ${error.message} (Path inviato: ${pathToSaveForDB})`, false, true, true);
+      saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
+      if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
+      if(saveIcon) saveIcon.style.display = 'inline-block';
+      if(checkIcon) checkIcon.style.display = 'none';
+      if(spinnerOverlay) spinnerOverlay.style.display = 'none';
+    }
+  }
 
   document.getElementById('profile-info-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentUserDataFromStorage) { displayMessage('profile-info-message', 'Devi essere autenticato per salvare le informazioni.', false); return; }
-    const updatedInfo = {
-      nome: document.getElementById('nome').value,
-      cognome: document.getElementById('cognome').value
-    };
+    const updatedInfo = { nome: document.getElementById('nome').value, cognome: document.getElementById('cognome').value };
     try {
       const response = await callApi('api/api_update_user_profile.php', 'PUT', updatedInfo);
       if (response.success) {
@@ -547,12 +1066,8 @@
           localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
         }
         displayMessage('profile-info-message', response.message || 'Informazioni personali aggiornate!', true);
-      } else {
-        displayMessage('profile-info-message', response.message || 'Errore aggiornamento profilo.', false);
-      }
-    } catch (error) {
-      displayMessage('profile-info-message', `Errore aggiornamento profilo: ${error.message}`, false);
-    }
+      } else { displayMessage('profile-info-message', response.message || 'Errore aggiornamento profilo.', false); }
+    } catch (error) { displayMessage('profile-info-message', `Errore aggiornamento profilo: ${error.message}`, false); }
   });
 
   document.getElementById('password-change-form')?.addEventListener('submit', async (e) => {
@@ -561,21 +1076,15 @@
     const oldPassword = document.getElementById('vecchia-password').value;
     const newPassword = document.getElementById('nuova-password').value;
     const confirmPassword = document.getElementById('conferma-password').value;
-
     if (newPassword !== confirmPassword) { displayMessage('password-change-message', 'Le nuove password non coincidono!', false); return; }
     if (newPassword.length < 8) { displayMessage('password-change-message', 'La nuova password deve essere di almeno 8 caratteri.', false); return; }
-
     try {
       const response = await callApi('api/api_change_password.php', 'POST', { oldPassword, newPassword });
       if (response.success) {
         displayMessage('password-change-message', response.message || 'Password aggiornata con successo!', true);
         e.target.reset();
-      } else {
-        displayMessage('password-change-message', response.message || 'Errore cambio password.', false);
-      }
-    } catch (error) {
-      displayMessage('password-change-message', `Errore cambio password: ${error.message}`, false);
-    }
+      } else { displayMessage('password-change-message', response.message || 'Errore cambio password.', false); }
+    } catch (error) { displayMessage('password-change-message', `Errore cambio password: ${error.message}`, false); }
   });
 
   async function loadUserBookings() {
@@ -593,230 +1102,95 @@
           bookings.forEach(booking => {
             const formattedDate = booking.eventDataInizio ? new Date(booking.eventDataInizio.replace(/-/g, '/')).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Data non definita';
             const isPastOrCancelled = booking.statoPrenotazione === 'Concluso' || booking.statoPrenotazione === 'Annullata';
-            const cardHtml = `
-              <article class="card ${isPastOrCancelled ? 'prenotazione-card-past' : ''}">
-                <div class="card-image-container"> <img src="${booking.eventFotoCopertina || defaultIconPath}" alt="Evento: ${booking.eventTitolo}" class="card-image"> </div>
-                <div class="card-content"><h3>${booking.eventTitolo || 'Evento Sconosciuto'}</h3>
-                  <p class="card-info">
-                    <b>Data Evento:</b> ${formattedDate}<br>
-                    <b>Posti Prenotati:</b> ${booking.numeroPostiPrenotati || 'N/D'}<br>
-                    <b>Stato:</b> <span style="font-weight: bold; color: ${booking.statoPrenotazione === 'Confermata' ? 'var(--success, green)' : (isPastOrCancelled ? 'var(--gray-dark, grey)' : 'orange')};">${booking.statoPrenotazione || 'Sconosciuto'}</span>
-                  </p>
-                  <div class="card-actions">
-                    <a href="evento_dettaglio_accesso.html?id=${booking.idEvento}" class="card-btn card-btn-secondary">Vedi Evento</a>
-                    ${booking.statoPrenotazione === 'Confermata' ? `<button class="card-btn card-btn-secondary btn-annulla-prenotazione" data-booking-id="${booking.idPrenotazione}">Annulla Prenotazione</button>` : ''}
-                  </div></div></article>`;
+            const cardHtml = `<article class="card ${isPastOrCancelled ? 'prenotazione-card-past' : ''}"><div class="card-image-container"> <img src="${normalizeIconPath(booking.eventFotoCopertina || defaultIconPath)}" alt="Evento: ${booking.eventTitolo}" class="card-image"> </div><div class="card-content"><h3>${booking.eventTitolo || 'Evento Sconosciuto'}</h3><p class="card-info"><b>Data Evento:</b> ${formattedDate}<br><b>Posti Prenotati:</b> ${booking.numeroPostiPrenotati || 'N/D'}<br><b>Stato:</b> <span style="font-weight: bold; color: ${booking.statoPrenotazione === 'Confermata' ? 'var(--success, green)' : (isPastOrCancelled ? 'var(--gray-dark, grey)' : 'orange')};">${booking.statoPrenotazione || 'Sconosciuto'}</span></p><div class="card-actions"><a href="evento_dettaglio_accesso.html?id=${booking.idEvento}" class="card-btn card-btn-secondary">Vedi Evento</a>${booking.statoPrenotazione === 'Confermata' ? `<button class="card-btn card-btn-secondary btn-annulla-prenotazione" data-booking-id="${booking.idPrenotazione}">Annulla Prenotazione</button>` : ''}</div></div></article>`;
             bookingsGrid.insertAdjacentHTML('beforeend', cardHtml);
           });
           attachCancelBookingListeners();
         } else { noBookingsMsg.style.display = 'block'; }
-      } else {
-        bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento prenotazioni.'}</p>`;
-        noBookingsMsg.style.display = 'none';
-      }
-    } catch (error) {
-      bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore caricamento prenotazioni: ${error.message}</p>`;
-      noBookingsMsg.style.display = 'none';
-    }
+      } else { bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento prenotazioni.'}</p>`; noBookingsMsg.style.display = 'none'; }
+    } catch (error) { bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore caricamento prenotazioni: ${error.message}</p>`; noBookingsMsg.style.display = 'none'; }
   }
 
   async function loadUserWaitlist() {
     const waitlistGrid = document.getElementById('user-waitlist-grid');
     const noWaitlistMsg = document.getElementById('no-waitlist-message');
     if (!waitlistGrid || !noWaitlistMsg) return;
-
     waitlistGrid.innerHTML = '<p style="text-align:center; padding:1rem;">Caricamento eventi in coda...</p>';
     noWaitlistMsg.style.display = 'none';
-
     try {
       const response = await callApi('api/api_get_user_waitlist.php');
       if (response.success && response.waitlistEntries) {
         const entries = response.waitlistEntries;
         waitlistGrid.innerHTML = '';
-
         if (entries.length > 0) {
           entries.forEach(entry => {
             const formattedDate = entry.eventDataInizio ? new Date(entry.eventDataInizio.replace(/-/g, '/')).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Data non definita';
             let statusMessage = `Sei in coda per ${entry.numeroPostiInCoda} posto/i.`;
-            let statusColor = 'orange';
-            let cardClass = '';
-            let cancelButtonHtml = '';
-
-            if (parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) {
-              statusMessage = `ATTENZIONE: Si sono liberati ${entry.eventPostiDisponibili} posti! Prenota ora. (Richiesti in coda: ${entry.numeroPostiInCoda})`;
-              statusColor = 'var(--success, green)';
-            } else if (entry.eventFlagPrenotabile == 0) {
-              statusMessage = `Evento non più prenotabile. (Richiesti in coda: ${entry.numeroPostiInCoda})`;
-              statusColor = 'var(--gray-dark, grey)';
-              cardClass = 'waitlist-card-unavailable';
-            }
-            // Add cancel waitlist button if event is bookable or user is on waitlist for it
-            if (entry.eventFlagPrenotabile == 1) {
-              cancelButtonHtml = `<button class="card-btn card-btn-danger btn-cancel-waitlist" data-event-id="${entry.idEvento}">Esci dalla Coda</button>`;
-            }
-
-
-            const cardHtml = `
-              <article class="card ${cardClass}">
-                <div class="card-image-container">
-                  <img src="${entry.eventFotoCopertina || defaultIconPath}" alt="Evento: ${entry.eventTitolo}" class="card-image">
-                </div>
-                <div class="card-content">
-                  <h3>${entry.eventTitolo || 'Evento Sconosciuto'}</h3>
-                  <p class="card-info">
-                    <b>Data Evento:</b> ${formattedDate}<br>
-                    <b style="color: ${statusColor};">Stato Coda:</b> <span style="color: ${statusColor};">${statusMessage}</span>
-                  </p>
-                  <div class="card-actions" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                    <a href="evento_dettaglio_accesso.html?id=${entry.idEvento}" class="card-btn card-btn-secondary" style="flex-grow: 1;">Vedi Evento</a>
-                    ${(parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) ?
-                    `<a href="eventiincorsoaccesso.html" class_name="card-btn card-btn-primary" style="flex-grow: 1;">Prenota Ora</a>` : ''
-            }
-                    ${cancelButtonHtml}
-                  </div>
-                </div>
-              </article>`;
+            let statusColor = 'orange'; let cardClass = ''; let cancelButtonHtml = '';
+            if (parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) { statusMessage = `ATTENZIONE: Si sono liberati ${entry.eventPostiDisponibili} posti! Prenota ora. (Richiesti in coda: ${entry.numeroPostiInCoda})`; statusColor = 'var(--success, green)';
+            } else if (entry.eventFlagPrenotabile == 0) { statusMessage = `Evento non più prenotabile. (Richiesti in coda: ${entry.numeroPostiInCoda})`; statusColor = 'var(--gray-dark, grey)'; cardClass = 'waitlist-card-unavailable'; }
+            if (entry.eventFlagPrenotabile == 1) { cancelButtonHtml = `<button class="card-btn card-btn-danger btn-cancel-waitlist" data-event-id="${entry.idEvento}">Esci dalla Coda</button>`;}
+            const cardHtml = `<article class="card ${cardClass}"><div class="card-image-container"><img src="${normalizeIconPath(entry.eventFotoCopertina || defaultIconPath)}" alt="Evento: ${entry.eventTitolo}" class="card-image"></div><div class="card-content"><h3>${entry.eventTitolo || 'Evento Sconosciuto'}</h3><p class="card-info"><b>Data Evento:</b> ${formattedDate}<br><b style="color: ${statusColor};">Stato Coda:</b> <span style="color: ${statusColor};">${statusMessage}</span></p><div class="card-actions" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"><a href="evento_dettaglio_accesso.html?id=${entry.idEvento}" class="card-btn card-btn-secondary" style="flex-grow: 1;">Vedi Evento</a>${(parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) ? `<a href="eventiincorso.html" class="card-btn card-btn-primary" style="flex-grow: 1;">Prenota Ora</a>` : ''}${cancelButtonHtml}</div></div></article>`;
             waitlistGrid.insertAdjacentHTML('beforeend', cardHtml);
           });
-          attachCancelWaitlistListeners(); // Attach listeners after adding HTML
-        } else {
-          noWaitlistMsg.style.display = 'block';
-        }
-      } else {
-        waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento eventi in coda.'}</p>`;
-        noWaitlistMsg.style.display = 'none';
-      }
-    } catch (error) {
-      waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore caricamento eventi in coda: ${error.message}</p>`;
-      noWaitlistMsg.style.display = 'none';
-    }
+          attachCancelWaitlistListeners();
+        } else { noWaitlistMsg.style.display = 'block'; }
+      } else { waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento eventi in coda.'}</p>`; noWaitlistMsg.style.display = 'none';}
+    } catch (error) { waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore caricamento eventi in coda: ${error.message}</p>`; noWaitlistMsg.style.display = 'none';}
   }
 
-  function attachCancelBookingListeners() {
-    document.querySelectorAll('.btn-annulla-prenotazione').forEach(button => {
-      button.removeEventListener('click', handleCancelBooking); // Prevent multiple listeners
-      button.addEventListener('click', handleCancelBooking);
-    });
-  }
-
+  function attachCancelBookingListeners() { document.querySelectorAll('.btn-annulla-prenotazione').forEach(b => {b.removeEventListener('click', handleCancelBooking); b.addEventListener('click', handleCancelBooking);}); }
   async function handleCancelBooking(event) {
-    const button = event.target;
-    const bookingId = button.dataset.bookingId;
-    if (!currentUserDataFromStorage) {
-      alert('Devi essere autenticato per annullare una prenotazione.'); return;
-    }
-    if (confirm('Sei sicuro di voler annullare questa prenotazione? L\'azione non è reversibile.')) {
-      button.disabled = true; // Disable button during API call
-      button.textContent = 'Annullamento...';
+    const button = event.target; const bookingId = button.dataset.bookingId;
+    if (!currentUserDataFromStorage) { alert('Autenticazione richiesta.'); return; }
+    if (confirm('Sei sicuro di voler annullare questa prenotazione?')) {
+      button.disabled = true; button.textContent = 'Annullamento...';
       try {
         const response = await callApi('api/api_cancel_booking.php', 'POST', { idPrenotazione: bookingId });
-        if (response.success) {
-          alert(response.message || `Prenotazione annullata con successo.`);
-          loadUserBookings();
-          loadUserWaitlist();
-        } else {
-          alert(response.message || `Errore durante l'annullamento.`);
-          button.disabled = false;
-          button.textContent = 'Annulla Prenotazione';
-        }
-      } catch (error) {
-        alert(`Errore durante l'annullamento: ${error.message}`);
-        button.disabled = false;
-        button.textContent = 'Annulla Prenotazione';
-      }
+        if (response.success) { alert(response.message || 'Prenotazione annullata.'); loadUserBookings(); loadUserWaitlist(); }
+        else { alert(response.message || 'Errore annullamento.'); button.disabled = false; button.textContent = 'Annulla Prenotazione';}
+      } catch (error) { alert(`Errore: ${error.message}`); button.disabled = false; button.textContent = 'Annulla Prenotazione';}
     }
   }
-
-  function attachCancelWaitlistListeners() {
-    document.querySelectorAll('.btn-cancel-waitlist').forEach(button => {
-      button.removeEventListener('click', handleCancelWaitlist); // Prevent multiple listeners
-      button.addEventListener('click', handleCancelWaitlist);
-    });
-  }
-
+  function attachCancelWaitlistListeners() { document.querySelectorAll('.btn-cancel-waitlist').forEach(b => {b.removeEventListener('click', handleCancelWaitlist); b.addEventListener('click', handleCancelWaitlist);});}
   async function handleCancelWaitlist(event) {
-    const button = event.target;
-    const eventId = button.dataset.eventId;
-    if (!currentUserDataFromStorage) {
-      alert('Devi essere autenticato per uscire dalla lista d\'attesa.'); return;
-    }
-    if (confirm('Sei sicuro di voler uscire dalla lista d\'attesa per questo evento?')) {
-      button.disabled = true;
-      button.textContent = 'Rimozione...';
+    const button = event.target; const eventId = button.dataset.eventId;
+    if (!currentUserDataFromStorage) { alert('Autenticazione richiesta.'); return; }
+    if (confirm('Sei sicuro di voler uscire dalla lista d\'attesa?')) {
+      button.disabled = true; button.textContent = 'Rimozione...';
       try {
         const response = await callApi('api/api_cancel_waitlist.php', 'POST', { idEvento: eventId });
-        if (response.success) {
-          alert(response.message || 'Rimozione dalla lista d\'attesa effettuata.');
-          loadUserWaitlist(); // Reload waitlist
-        } else {
-          alert(response.message || 'Errore durante la rimozione dalla lista d\'attesa.');
-          button.disabled = false;
-          button.textContent = 'Esci dalla Coda';
-        }
-      } catch (error) {
-        alert(`Errore: ${error.message}`);
-        button.disabled = false;
-        button.textContent = 'Esci dalla Coda';
-      }
+        if (response.success) { alert(response.message || 'Rimosso dalla coda.'); loadUserWaitlist(); }
+        else { alert(response.message || 'Errore rimozione.'); button.disabled = false; button.textContent = 'Esci dalla Coda';}
+      } catch (error) { alert(`Errore: ${error.message}`); button.disabled = false; button.textContent = 'Esci dalla Coda';}
     }
   }
-
-
   async function handleDeleteAccount(event) {
-    event.preventDefault();
-    const confirmEmailInput = document.getElementById('confirm-delete-email');
-    const confirmEmail = confirmEmailInput.value;
-    const deleteButton = document.getElementById('btn-confirm-delete-account');
-
-    if (!currentUserDataFromStorage || !currentUserDataFromStorage.email) {
-      displayMessage('delete-account-message', 'Impossibile verificare l\'utente. Effettua nuovamente il login.', false);
-      return;
-    }
-
-    if (confirmEmail !== currentUserDataFromStorage.email) {
-      displayMessage('delete-account-message', 'L\'email inserita non corrisponde a quella del tuo account.', false);
-      return;
-    }
-
-    if (confirm('Sei assolutamente sicuro di voler eliminare il tuo account? Questa azione è IRREVERSIBILE e tutti i tuoi dati (profilo, prenotazioni, commenti, liste d\'attesa) verranno cancellati definitivamente.')) {
-      if (confirm('Conferma ulteriore: Sei consapevole che non potrai recuperare il tuo account o i tuoi dati?')) {
-        deleteButton.disabled = true;
-        deleteButton.textContent = 'Eliminazione in corso...';
+    event.preventDefault(); const confirmEmailInput = document.getElementById('confirm-delete-email');
+    const confirmEmail = confirmEmailInput.value; const deleteButton = document.getElementById('btn-confirm-delete-account');
+    if (!currentUserDataFromStorage || !currentUserDataFromStorage.email) { displayMessage('delete-account-message', 'Utente non verificato. Ricarica o effettua il login.', false); return;}
+    if (confirmEmail !== currentUserDataFromStorage.email) { displayMessage('delete-account-message', 'L\'email non corrisponde.', false); return;}
+    if (confirm('ATTENZIONE! Sei assolutamente sicuro di voler eliminare il tuo account? Questa azione è IRREVERSIBILE.')) {
+      if (confirm('CONFERMA FINALE: Tutti i tuoi dati (profilo, prenotazioni, commenti, code) verranno cancellati definitivamente. Non potranno essere recuperati. Procedere?')) {
+        deleteButton.disabled = true; deleteButton.textContent = 'Eliminazione...';
         try {
           const response = await callApi('api/api_delete_account.php', 'POST', { email: confirmEmail });
           if (response.success) {
-            displayMessage('delete-account-message', response.message, true);
-            alert(response.message); // Also alert for logout redirect
-            localStorage.removeItem('userDataEFF');
-            // Redirect to homepage after a short delay to allow message display
-            setTimeout(() => {
-              window.location.href = 'index.html';
-            }, 3000);
-          } else {
-            displayMessage('delete-account-message', response.message || 'Errore durante l\'eliminazione dell\'account.', false);
-            deleteButton.disabled = false;
-            deleteButton.textContent = 'Elimina il Mio Account Definitivamente';
-          }
+            displayMessage('delete-account-message', response.message, true); alert(response.message);
+            localStorage.removeItem('userDataEFF'); setTimeout(() => { window.location.href = 'index.html'; }, 3000);
+          } else { throw new Error(response.message || 'Errore eliminazione account.'); }
         } catch (error) {
           displayMessage('delete-account-message', `Errore: ${error.message}`, false);
-          deleteButton.disabled = false;
-          deleteButton.textContent = 'Elimina il Mio Account Definitivamente';
+          deleteButton.disabled = false; deleteButton.textContent = 'Elimina il Mio Account Definitivamente';
         }
       }
     }
   }
-
-
   function logout() {
     localStorage.removeItem('userDataEFF');
-    fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' }) // Call server-side logout
-            .then(() => {
+    fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' })
+            .finally(() => {
               alert('Logout effettuato. Verrai reindirizzato alla homepage.');
-              window.location.href = 'index.html';
-            })
-            .catch(error => {
-              console.error("Errore durante il logout server-side:", error);
-              alert('Logout effettuato (client-side). Verrai reindirizzato alla homepage.'); // Fallback
               window.location.href = 'index.html';
             });
   }
