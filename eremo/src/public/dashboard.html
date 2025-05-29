@@ -9,15 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Stili da style.css (riportati qui per completezza, ma idealmente in style.css) */
-        /* ----- Reset & Basic Styles ----- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
+        /* Stili Esistenti da dashboard.html (parzialmente mostrati per brevità) */
         :root {
             --primary: #365e51;
             --secondary: #8db187;
@@ -33,10 +25,22 @@
             --danger-rgb: 231, 76, 60;
             --success: #2ecc71;
             --success-rgb: 46, 204, 113;
+            --primary-dark: #2a4b40; /* Aggiunto per coerenza con stili eventiincorso */
+            --primary-light: #a5c2b9; /* Aggiunto */
+            --primary-lighter: #eef3f1; /* Aggiunto */
+            --secondary-rgb: 141, 177, 135; /* Aggiunto */
+            --background-light: #f8f9fa; /* Aggiunto */
+            --success-dark: #155724; /* Aggiunto */
+            --success-light: #d4edda; /* Aggiunto */
+            --danger-dark: #721c24; /* Aggiunto */
+            --danger-light: #f8d7da; /* Aggiunto */
+
             --warning: #f39c12;
             --info: #3498db;
             --shadow-light: 0 6px 20px rgba(0, 0, 0, 0.09);
             --shadow-medium: 0 10px 38px rgba(0, 0, 0, 0.13);
+            --shadow-strong: 0 10px 30px rgba(0,0,0,0.2); /* Aggiunto */
+            --shadow-medium-strong: 0 8px 25px rgba(0,0,0,0.12); /* Aggiunto */
             --border-radius-small: .25rem;
             --border-radius-medium: 15px;
             --border-radius-large: 24px;
@@ -60,12 +64,10 @@
         a:hover { color: var(--accent); text-decoration: none; }
         img { max-width: 100%; height: auto; display: block; }
 
-        /* ----- Utility Classes ----- */
         .container { max-width: 1400px; width: 97%; margin-left: auto; margin-right: auto; padding-left: 25px; padding-right: 25px; }
         .section-padding { padding-top: clamp(1.2rem, 3vw, 2rem); padding-bottom: clamp(1.2rem, 3vw, 2rem); }
         .text-center { text-align: center !important; }
 
-        /* ----- Navbar ----- */
         .navbar-container { position: fixed; top: 0; left: 0; width: 100%; background: var(--primary); box-shadow: var(--shadow-medium); z-index: 1000; transition: transform 0.3s ease-in-out; height: var(--navbar-height); display: flex; align-items: center; }
         .navbar-container.hidden { transform: translateY(-100%); }
         .navbar { display: flex; align-items: center; justify-content: space-between; color: var(--white); max-width: 1400px; width: 97%; margin: 0 auto; }
@@ -77,7 +79,7 @@
         .navbar .right-menu { display: flex; align-items: center; gap: 1.4rem; }
         .navbar .login-btn, .navbar .user-btn { background: rgba(255, 255, 255, 0.1); color: var(--white); padding: 0.8rem 1.4rem; border-radius: 10px; font-size: 1.15rem; font-weight: 500; border: 1px solid rgba(255, 255, 255, 0.2); transition: var(--transition-fast); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
         .navbar .login-btn:hover, .navbar .user-btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(0px); box-shadow: none; text-decoration: none; }
-        .hamburger { display: block; font-size: 2.1rem; cursor: pointer; background: none; border: none; color: var(--white); padding: 0.6rem; margin-left: 0.8rem; }
+        .hamburger { display: none !important; /* Nascondi hamburger come da dashboard.html */ }
         .mobile-menu { display: flex; flex-direction: column; position: fixed; top: var(--navbar-height); left: 0; width: 100%; height: auto; background: var(--primary); border-top: 1px solid rgba(255, 255, 255, 0.1); overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(0%); transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; z-index: 999; }
         .mobile-menu.open { opacity: 1; visibility: visible; transform: translateX(0%); }
         .mobile-menu a { color: var(--white); padding: 1.4rem 2rem; font-size: 1.3rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-decoration: none; transition: background-color var(--transition-fast); }
@@ -95,7 +97,6 @@
         .user-dropdown .dropdown-arrow { font-size: 0.9rem; transition: transform var(--transition-fast); }
         .user-dropdown.show .dropdown-arrow { transform: rotate(180deg); }
 
-        /* ----- Dashboard ----- */
         body.page-dashboard { background-color: var(--light); }
         body.page-dashboard main.dashboard-main { padding-top: calc(var(--navbar-height) + 1.5rem); padding-left: 1.5rem; padding-right: 1.5rem; padding-bottom: 2.5rem; }
         body.page-dashboard main.dashboard-main h1 { color: var(--primary); margin-bottom: 2rem; text-align: center; margin-top: 0; font-size: clamp(1.8rem, 3.5vw, 2.4rem); display: flex; align-items: center; justify-content: center; }
@@ -103,14 +104,20 @@
         .dashboard-section { background-color: var(--white); padding: 1.5rem; border-radius: var(--border-radius-medium); box-shadow: var(--shadow-light); margin-bottom: 2rem; }
         .dashboard-section h2 { color: var(--secondary); margin-top: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--gray-light); padding-bottom: 1rem; font-size: 1.6rem; text-align: left; display: flex; align-items: center; }
         .dashboard-section h2 i { margin-right: 0.6rem; font-size: 1em; }
+
         .form-message { padding: 0.75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: var(--border-radius-small, .25rem); font-size: 0.95rem; }
         .form-message.success { color: var(--success-dark, #155724); background-color: var(--success-light, #d4edda); border-color: var(--success, #c3e6cb); }
         .form-message.error { color: var(--danger-dark, #721c24); background-color: var(--danger-light, #f8d7da); border-color: var(--danger, #f5c6cb); }
-        .spinner-mini { display: inline-block; width: 1em; height: 1em; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-infinite; margin-right: 0.5em; vertical-align: middle; }
+
+        .spinner-mini, .spinner-mini-light { display: inline-block; width: 1em; height: 1em; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; }
+        .spinner-mini-light { border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: #fff; margin-left: 5px; }
+        .spinner-mini { border: 2px solid rgba(0,0,0,0.2); border-top-color: var(--primary); margin-right: 5px; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        .btn-popup .spinner-mini { border-top-color: #fff; } /* Specifico per spinner su bottoni popup */
         .btn-admin .spinner-mini { border-top-color: var(--primary-dark, #2c4a43); }
         button:disabled .spinner-mini { border-top-color: #ccc; }
-        .btn-popup .spinner-mini { border-top-color: #fff; }
+
         .event-controls-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0 !important; flex-wrap: wrap; position: relative; }
         .event-tabs-container-main { display: flex; flex-grow: 1; align-items: flex-end; }
         .filter-trigger-container-main { position: relative; margin-left: auto; align-self: flex-end; display: inline-block; }
@@ -138,35 +145,7 @@
         .event-view-controls label { font-size: 0.85rem; margin-bottom: 0.3rem; color: var(--primary); display: block; font-weight: 500; text-align: left; }
         .event-view-controls select.form-control { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--gray-medium); border-radius: 6px; font-size: 0.9rem; background-color: var(--white); line-height: 1.4; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23365e51%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.6rem center; background-size: 0.6em auto; padding-right: 2rem; cursor: pointer; }
         .event-view-controls select.form-control:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25); outline: none; }
-        .event-form-and-preview-container { display: flex; flex-wrap: wrap; gap: 2rem; margin-top: 1rem; }
-        #eventFormDashboard { flex: 2; min-width: 300px; background-color: #f9f9f9; padding: 1.5rem; border-radius: var(--border-radius-medium); border: 1px solid var(--gray-light); position: relative; } /* Aggiunto position relative */
-        #eventFormDashboard .form-row { margin-bottom: 1rem; }
-        #eventFormDashboard .form-row-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
-        #eventCardPreviewContainer { flex: 1; min-width: 300px; padding: 1.5rem; border: 1px dashed var(--gray-medium); border-radius: var(--border-radius-medium); background-color: #fdfdfd; height: fit-content; }
-        #eventCardPreviewContainer h4 { text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 1rem; font-size: 1.2rem; border-bottom: 1px solid var(--gray-light); padding-bottom: 0.5rem; }
-        .preview-card { background: var(--white); border-radius: var(--border-radius-medium); box-shadow: var(--shadow-light); overflow: hidden; border: 1px solid var(--gray-light); }
-        .preview-card-image-container { height: 180px; background-color: var(--gray-light); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .preview-card-image-container img { width: 100%; height: 100%; object-fit: cover; }
-        .preview-card-image-container .no-image-placeholder { font-size: 1rem; color: var(--gray-dark); }
-        .preview-card-content { padding: 1rem; }
-        .preview-card-content h5 { font-size: 1.3rem; color: var(--primary); margin: 0 0 0.5rem 0; font-weight: 600; min-height: 1.3em; word-break: break-word; }
-        .preview-card-content p { font-size: 0.9rem; color: var(--gray-dark); line-height: 1.5; margin-bottom: 0.5rem; min-height: 1em; word-break: break-word; }
-        .preview-card-content .preview-relatore { font-style: italic; }
-        .preview-card-content .preview-posti, .preview-card-content .preview-costo { font-weight: bold; }
-        #eventFormDashboard .form-group { margin-bottom: 1.2rem; position: relative; /* Necessario per il posizionamento assoluto del bottone AI */ }
-        #eventFormDashboard .form-group label { display: block; margin-bottom: 0.4rem; color: var(--primary); font-weight: 500; font-size: 0.95rem; }
-        #eventFormDashboard .form-control, #eventFormDashboard select.form-control { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-medium); border-radius: 8px; font-size: 1rem; background-color: var(--white); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
-        #eventFormDashboard .form-control:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25); outline: none; }
-        #eventFormDashboard textarea.form-control { min-height: 80px; resize: vertical; }
-        #eventFormDashboard .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        #eventFormDashboard .form-check-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-        #eventFormDashboard .form-check-group input[type="checkbox"] { width: auto; margin-right: 0.3rem; transform: scale(1.1); }
-        #eventFormDashboard .form-check-group label { font-weight: normal; font-size: 0.95rem; margin-bottom: 0; }
-        #eventFormDashboard .form-actions { margin-top: 1.5rem; text-align: right; }
-        #eventFormDashboard .btn-popup { padding: 0.8rem 1.5rem; }
-        #eventFormDashboard small { font-size: 0.8rem; color: var(--gray-dark); display: block; margin-top: 0.3rem; }
-        #current-event-image-preview-dashboard, #current-event-flyer-preview-dashboard { margin-top: 0.5rem; max-width: 150px; border: 1px solid var(--gray-light); padding: 5px; border-radius: 6px; }
-        #current-event-flyer-preview-dashboard a { font-size: 0.9rem; }
+
         footer { background: var(--dark); color: var(--light); padding: 3rem 2.2rem; text-align: center; margin-top: auto; font-size: 1.15rem; }
         footer p { margin: 0; opacity: 0.7; text-align: center; }
         .btn-admin { padding: 0.6rem 1.2rem; border-radius: var(--border-radius-medium); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: var(--transition-medium); border: 1px solid transparent; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.4em; line-height: 1.3; }
@@ -256,7 +235,7 @@
         .admin-event-card-actions .btn-edit { background-color: var(--accent); color: var(--white); border-color: var(--accent); }
         .admin-event-card-actions .btn-edit:hover { background-color: #b8734a; border-color: #b8734a; }
         .month-year-header { font-size: 1.45rem; color: var(--accent); margin-top: 1.5rem; margin-bottom: 1.2rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--accent); text-align: left; font-weight: 600; grid-column: 1 / -1 !important; width: 100%; }
-        .admin-event-grid > .add-event-bar + .month-year-header, .admin-event-grid > .month-year-header:first-child { margin-top: 0; }
+        .admin-event-grid > .add-event-btn-container-wrapper + .month-year-header, .admin-event-grid > .month-year-header:first-child { margin-top: 0; } /* Adjusted for new button */
         #manageBookingsModal .modal-content { max-width: 750px; }
         #bookingsListContainerModal .user-booking-group { border: 1px solid var(--gray-light); border-radius: 8px; padding: 0.8rem; margin-bottom: 0.8rem; background-color: #fdfdfd; }
         #bookingsListContainerModal .user-booking-group h5 { font-size: 1.05rem; color: var(--primary); margin-top: 0; margin-bottom: 0.8rem; padding-bottom: 0.5rem; border-bottom: 1px dotted var(--gray-medium); }
@@ -273,9 +252,49 @@
         .no-events-dashboard a { color: var(--accent); text-decoration: underline; }
         .no-events-dashboard a:hover { color: var(--primary); }
         .badge-admin-dashboard { display: inline-block; margin-left: 0.6em; padding: 0.2em 0.6em; font-size: 0.75em; font-weight: bold; color: var(--white); background-color: var(--primary); border-radius: 4px; line-height: 1.2; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px; }
-        .add-event-bar { grid-column: 1 / -1 !important; display: flex; align-items: center; justify-content: center; gap: 0.8rem; padding: 1rem; border: 2px dashed var(--secondary); border-radius: var(--border-radius-medium); background-color: var(--light); color: var(--secondary); font-size: 1.15rem; font-weight: 500; text-align: center; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; margin-bottom: 1.8rem; min-height: 60px; }
-        .add-event-bar:hover { background-color: #e8f0e7; border-color: var(--primary); color: var(--primary); }
-        .add-event-bar i { font-size: 1.3rem; }
+
+        /* === STILE PER BOTTONE "AGGIUNGI EVENTO" (STILE DA eventiincorso.html, adattato per dashboard) === */
+        .add-event-btn-container-wrapper {
+            width: 100%;
+            padding: 0 0 1.5rem 0; /* Meno padding superiore per dashboard */
+            display: flex;
+            justify-content: center;
+            grid-column: 1 / -1 !important; /* Per farlo span su tutta la griglia */
+        }
+        #adminAddEventBtn { /* ID usato per il bottone che apre il nuovo modal */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--success-dark, #155724);
+            background-color: var(--white, #fff);
+            border: 2px dashed var(--success, #28a745);
+            border-radius: var(--border-radius-large, 12px);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-decoration: none;
+            width: auto;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        #adminAddEventBtn:hover, #adminAddEventBtn:focus {
+            background-color: var(--success-light, #d4edda);
+            border-color: var(--success-dark, #155724);
+            color: var(--success-dark, #155724);
+            box-shadow: 0 4px 12px rgba(var(--success-rgb, 40, 167, 69), 0.2);
+            transform: translateY(-2px);
+        }
+        #adminAddEventBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(var(--success-rgb, 40, 167, 69), 0.15);
+        }
+        #adminAddEventBtn .plus-icon {
+            font-size: 1.3em;
+            margin-right: 0.6em;
+            font-weight: bold;
+        }
 
         @media (max-width: 767px) {
             .event-controls-header { flex-direction: column; align-items: stretch; }
@@ -292,109 +311,34 @@
             #eventManagementContent { border-radius: var(--border-radius-medium); margin-top: 1rem; border: 1px solid var(--gray-medium); }
             .admin-event-grid { grid-template-columns: 1fr; }
             .admin-event-card { max-width: none; min-height: auto; }
-            .add-event-bar { min-height: auto; padding: 1rem; margin-bottom: 1rem; }
-            .add-event-bar i { font-size: 1.5rem; }
-            .add-event-bar span { font-size: 1.1rem; }
+            .add-event-btn-container-wrapper { min-height: auto; padding: 1rem; margin-bottom: 1rem; } /* Adjusted for new button */
+            #adminAddEventBtn .plus-icon { font-size: 1.5rem; } /* Adjusted for new button */
+            #adminAddEventBtn .fab-text-label { font-size: 1.1rem; } /* Adjusted for new button */
             .admin-event-card-actions.top-actions, .admin-event-card-actions.bottom-actions { grid-template-columns: repeat(auto-fit, minmax(85px, 1fr)); }
         }
 
-        /* NUOVI STILI PER SLIDER E SIMULAZIONE CHAT */
-        .moderation-slider-group {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background-color: #f0f3f5;
-            border-radius: 8px;
-            border: 1px solid #dfe6e9;
-        }
-        .moderation-slider-label-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.8rem;
-        }
-        .moderation-slider-label-container label {
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 1.1rem;
-            margin-bottom: 0;
-        }
-        #moderationLevelLabel { /* Etichetta dinamica del livello */
-            font-weight: bold;
-            font-size: 1rem;
-            padding: 0.4em 0.8em;
-            border-radius: 6px;
-            color: var(--white); /* Testo bianco di default, modificato per level-1 */
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            min-width: 180px;
-            text-align: center;
-        }
-        /* Colori di sfondo per l'etichetta */
-        #moderationLevelLabel.level-0 { background-color: #2ecc71; } /* Verde */
-        #moderationLevelLabel.level-1 { background-color: #f1c40f; color: var(--dark); } /* Giallo, testo scuro */
-        #moderationLevelLabel.level-2 { background-color: #e67e22; } /* Arancione */
-        #moderationLevelLabel.level-3 { background-color: #e74c3c; } /* Rosso */
-
-        .moderation-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            height: 10px;
-            background: #dfe6e9;
-            border-radius: 5px;
-            outline: none;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        /* Pollice Slider Webkit */
-        .moderation-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--secondary); /* Default */
-            cursor: pointer;
-            border: 3px solid var(--white);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
-            margin-top: -6px; /* Allineamento verticale */
-            transition: background-color 0.3s ease, transform 0.15s ease;
-        }
+        .moderation-slider-group { margin-bottom: 1.5rem; padding: 1rem; background-color: #f0f3f5; border-radius: 8px; border: 1px solid #dfe6e9; }
+        .moderation-slider-label-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+        .moderation-slider-label-container label { font-weight: 600; color: var(--primary); font-size: 1.1rem; margin-bottom: 0; }
+        #moderationLevelLabel { font-weight: bold; font-size: 1rem; padding: 0.4em 0.8em; border-radius: 6px; color: var(--white); transition: background-color 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-width: 180px; text-align: center; }
+        #moderationLevelLabel.level-0 { background-color: #2ecc71; }
+        #moderationLevelLabel.level-1 { background-color: #f1c40f; color: var(--dark); }
+        #moderationLevelLabel.level-2 { background-color: #e67e22; }
+        #moderationLevelLabel.level-3 { background-color: #e74c3c; }
+        .moderation-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 10px; background: #dfe6e9; border-radius: 5px; outline: none; cursor: pointer; transition: background 0.3s ease; }
+        .moderation-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--secondary); cursor: pointer; border: 3px solid var(--white); box-shadow: 0 2px 5px rgba(0,0,0,0.25); margin-top: -6px; transition: background-color 0.3s ease, transform 0.15s ease; }
         .moderation-slider:active::-webkit-slider-thumb { transform: scale(1.1); }
         .moderation-slider.level-0::-webkit-slider-thumb { background-color: #2ecc71; }
         .moderation-slider.level-1::-webkit-slider-thumb { background-color: #f1c40f; }
         .moderation-slider.level-2::-webkit-slider-thumb { background-color: #e67e22; }
         .moderation-slider.level-3::-webkit-slider-thumb { background-color: #e74c3c; }
-
-        /* Pollice Slider Firefox */
-        .moderation-slider::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--secondary); /* Default */
-            cursor: pointer;
-            border: 3px solid var(--white);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
-            transition: background-color 0.3s ease, transform 0.15s ease;
-        }
+        .moderation-slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--secondary); cursor: pointer; border: 3px solid var(--white); box-shadow: 0 2px 5px rgba(0,0,0,0.25); transition: background-color 0.3s ease, transform 0.15s ease; }
         .moderation-slider:active::-moz-range-thumb { transform: scale(1.1); }
         .moderation-slider.level-0::-moz-range-thumb { background-color: #2ecc71; }
         .moderation-slider.level-1::-moz-range-thumb { background-color: #f1c40f; }
         .moderation-slider.level-2::-moz-range-thumb { background-color: #e67e22; }
         .moderation-slider.level-3::-moz-range-thumb { background-color: #e74c3c; }
-
-        #moderationLevelDescription {
-            font-size: 0.9rem;
-            color: var(--gray-dark);
-            text-align: center;
-            margin-top: 1rem;
-            padding: 0.5rem;
-            background-color: var(--white);
-            border-radius: 6px;
-            border: 1px solid var(--gray-light);
-            min-height: 1.5em;
-        }
-
+        #moderationLevelDescription { font-size: 0.9rem; color: var(--gray-dark); text-align: center; margin-top: 1rem; padding: 0.5rem; background-color: var(--white); border-radius: 6px; border: 1px solid var(--gray-light); min-height: 1.5em; }
         .moderation-preview-container { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-light); }
         .moderation-preview-container h5 { font-size: 1.2rem; color: var(--primary); margin-bottom: 1.2rem; text-align: center; font-weight: 600; }
         #moderationPreviewChat { background-color: #f0f3f5; border: 1px solid #dfe6e9; border-radius: 8px; padding: 1rem; max-height: 280px; overflow-y: auto; box-shadow: inset 0 2px 4px rgba(0,0,0,0.04); }
@@ -413,88 +357,652 @@
         #advancedOptionsModal .btn-admin-secondary { background-color: var(--gray-light); color: var(--dark); border-color: var(--gray-medium); }
         #advancedOptionsModal .btn-admin-secondary:hover { background-color: var(--gray-medium); }
         #advancedSettingsModalMessage { margin-top: 1rem; text-align: center; font-size: 0.95rem; }
+        .active-filters-display { padding: 1rem; margin-bottom: 1.5rem; background-color: #f0f8ff; border: 1px solid #b0e0e6; border-radius: var(--border-radius-medium); box-shadow: var(--shadow-light); }
+        .active-filters-display h4 { margin-top: 0; margin-bottom: 0.8rem; font-size: 1.1rem; color: var(--primary); padding-bottom: 0.5rem; border-bottom: 1px dotted var(--gray-medium); }
+        .active-filters-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .active-filters-list li { background-color: var(--secondary); color: var(--white); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; }
+        .active-filters-list li .filter-label { opacity: 0.8; margin-right: 0.3em; }
+        .active-filters-display .no-filters-active { font-style: italic; color: var(--gray-dark); font-size: 0.95rem; }
 
-        /* MODIFICA: Nascondi hamburger menu */
-        .navbar .hamburger {
-            display: none !important;
+        /* === STILI PER IL NUOVO POPUP ADMIN (da eventiincorso.html, per creazione/modifica eventi) === */
+        .dash-admin-event-popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.65); z-index: 1050; /* Stesso z-index di .modal */
+            display: none; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .dash-admin-event-popup-overlay.active { display: block; opacity: 1; }
+
+        .dash-admin-event-popup {
+            position: fixed; top: 50%; left: 50%;
+            background-color: var(--white, #fff);
+            padding: 0;
+            border-radius: var(--border-radius-large, 12px);
+            box-shadow: var(--shadow-strong, 0 10px 30px rgba(0,0,0,0.2));
+            z-index: 1051; /* Superiore a .modal e .dash-admin-event-popup-overlay */
+            width: 95%; max-width: 900px;
+            max-height: 90vh;
+            display: none; opacity: 0;
+            transform: translate(-50%, -50%) scale(0.95);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            overflow: hidden; /* Per contenere header/content */
+        }
+        .dash-admin-event-popup.active {
+            opacity: 1; transform: translate(-50%, -50%) scale(1);
+            display: flex; flex-direction: column; /* Per header fisso e content scrollabile */
         }
 
-        /* Stile per il pulsante AI Genera Descrizione Breve (DASHBOARD) */
-        .ai-generate-btn-dashboard {
+        .dash-admin-event-popup-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-light, #eee);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0; /* Impedisce al header di restringersi */
+        }
+        .dash-admin-event-popup-header h2 { margin: 0; color: var(--primary); font-size: 1.5rem; }
+        .dash-admin-event-popup .close-popup { /* Stile per il bottone di chiusura specifico del nuovo modal */
+            font-size: 1.8rem; color: var(--gray-dark, #777); background: none;
+            border: none; cursor: pointer; padding: 0.5rem; line-height: 1;
+        }
+        .dash-admin-event-popup .close-popup:hover { color: var(--dark, #333); }
+        .dash-admin-event-popup-content {
+            overflow-y: auto; /* Permette lo scroll solo del contenuto */
+            padding: 1.5rem;
+            display: flex; /* Per gestire le viste interne */
+            flex-direction: column; /* Le viste interne si impilano verticalmente */
+            flex-grow: 1; /* Occupa lo spazio rimanente */
+        }
+
+        /* === NUOVI STILI PER LA SELEZIONE DELLA MODALITÀ DI CREAZIONE === */
+        #creationModeSelectionView {
+            display: flex; /* Inizialmente flessibile per le opzioni */
+            flex-direction: row; /* Opzioni affiancate */
+            align-items: stretch; /* Opzioni alte uguali */
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 2rem 1rem;
+            width: 100%;
+            flex-grow: 1; /* Occupa spazio nel popup-content */
+        }
+        .creation-mode-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.8rem 1.5rem;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius-large);
+            background-color: var(--white);
+            box-shadow: var(--shadow-light);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            flex-basis: 0; /* Permette flex-grow di funzionare correttamente */
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        .creation-mode-option:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: var(--shadow-medium-strong, 0 8px 25px rgba(0,0,0,0.12));
+            border-color: var(--secondary);
+        }
+        .creation-mode-option .icon-container {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+        }
+        .creation-mode-option:hover .icon-container {
+            color: var(--primary);
+            transform: scale(1.15);
+        }
+        .ai-logo-text {
+            font-size: 0.6em;
+            font-weight: bold;
+            line-height: 1.1;
+            display: block;
+            color: var(--primary);
+        }
+        .ai-logo-text .line-1 { font-size: 0.9em; display: block; }
+        .ai-logo-text .line-2 { font-size: 1.15em; display: block; letter-spacing: 0.5px;}
+        .star {
             position: absolute;
-            top: -12px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 1.5s infinite ease-in-out;
+            width: 3px;
+            height: 3px;
+        }
+        .creation-mode-option#extractFromFlyerModeBtn:hover .star { opacity: 0.7; }
+        .star.s1 { top: 10%; left: 15%; animation-delay: 0s; width: 2px; height: 2px;}
+        .star.s2 { top: 20%; right: 10%; animation-delay: 0.3s; }
+        .star.s3 { bottom: 15%; left: 25%; animation-delay: 0.6s; width: 2px; height: 2px;}
+        .star.s4 { bottom: 25%; right: 20%; animation-delay: 0.9s; }
+        .star.s5 { top: 50%; left: 5%; animation-delay: 0.2s; }
+        .star.s6 { top: 5%; right: 30%; animation-delay: 0.7s; width: 1px; height: 1px;}
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .creation-mode-option h4 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            z-index: 1;
+        }
+        .creation-mode-option p {
+            font-size: 0.9rem;
+            color: var(--gray-dark);
+            line-height: 1.6;
+            margin-bottom: 0;
+            text-align: center;
+            z-index: 1;
+        }
+        .creation-mode-option#extractFromFlyerModeBtn {
+            border-color: var(--primary-light, #a5c2b9);
+            background: linear-gradient(145deg, var(--primary-lighter, #eef3f1), var(--white));
+        }
+        .creation-mode-option#extractFromFlyerModeBtn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                    to right,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    rgba(255, 255, 255, 0) 100%
+            );
+            transform: skewX(-25deg);
+            transition: left 0.85s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 0;
+        }
+        .creation-mode-option#extractFromFlyerModeBtn:hover::before {
+            left: 150%;
+        }
+        .creation-mode-option#extractFromFlyerModeBtn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
+        }
+        .creation-mode-option#extractFromFlyerModeBtn:hover .icon-container {
+            transform: scale(1.1);
+        }
+
+        /* === NUOVI STILI PER LA SEZIONE CARICAMENTO VOLANTINO === */
+        #flyerUploadView {
+            display: none; /* Nascosto di default */
+            padding: 2rem;
+            border: 2px dashed var(--gray-medium);
+            border-radius: var(--border-radius-large);
+            background-color: var(--background-light, #f8f9fa);
+            text-align: center;
+            margin-top: 1rem;
+            position: relative;
+        }
+        #flyerUploadView .form-group {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #flyerUploadView .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: var(--primary-dark, #333);
+            font-weight: 500;
+            font-size: 1rem;
+            text-align: center;
+        }
+        #flyerUploadView #flyerFile { /* Input file */
+            display: block;
+            margin: 0 auto 1.5rem auto;
+            max-width: 450px;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius-small);
+        }
+        #flyerUploadView #flyerPreviewContainer {
+            position: relative;
+            max-width: 100%;
+            max-height: 250px;
+            margin: 0 auto 1.5rem auto;
+            display: none; /* Nascosto finché non c'è un'immagine */
+            display: flex; /* Per centrare l'immagine */
+            align-items: center;
+            justify-content: center;
+        }
+        #flyerUploadView #flyerPreview { /* Immagine anteprima */
+            max-width: 100%;
+            max-height: 250px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius-medium);
+            display: block;
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+        }
+        #flyerUploadView #flyerPreviewContainer.pulsating-background::before {
+            content: '';
+            position: absolute;
+            top: -8px; left: -8px; right: -8px; bottom: -8px;
+            background-color: rgba(var(--primary-rgb), 0.08);
+            border-radius: calc(var(--border-radius-medium) + 8px);
+            animation: flyerPulseEffect 1.8s infinite ease-in-out;
+            z-index: 0;
+        }
+        @keyframes flyerPulseEffect {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.03); }
+        }
+        #flyerUploadView #processFlyerBtn.btn-popup .spinner-mini { /* Bottone Processa */
+            margin-right: 8px;
+        }
+        #flyerProcessingStatus { /* Messaggio di stato */
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            min-height: 1.2em;
+        }
+        #flyerProcessingStatus.error { color: var(--danger); }
+        #flyerProcessingStatus.success { color: var(--success); }
+
+        /* === STILI PER IL FORM MANUALE E ANTEPRIMA CARD (dentro il nuovo popup) === */
+        .dash-admin-event-form-and-preview-container {
+            display: none; /* Nascosto di default, mostrato dopo selezione modalità */
+            flex-wrap: wrap; gap: 2rem;
+        }
+        #dashAdminEventForm { flex: 2; min-width: 320px; }
+        #dashAdminEventCardPreviewContainer {
+            flex: 1; min-width: 280px; padding: 1rem; border: 1px dashed var(--gray-medium, #ccc);
+            border-radius: var(--border-radius-medium, 8px); background-color: var(--background-light, #f8f9fa);
+            height: fit-content; position: sticky; top: 1.5rem; /* Sticky per desktop */
+        }
+        @media (max-width: 768px) { /* Su mobile, l'anteprima va sotto */
+            .dash-admin-event-form-and-preview-container { flex-direction: column-reverse; }
+            #dashAdminEventCardPreviewContainer { position: static; margin-bottom: 2rem;}
+        }
+        #dashAdminEventCardPreviewContainer h4 {
+            text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 1rem;
+            font-size: 1.1rem; border-bottom: 1px solid var(--gray-light, #eee); padding-bottom: 0.5rem;
+        }
+        .dash-admin-preview-card { /* Card di anteprima */
+            background: var(--white); border-radius: var(--border-radius-medium);
+            box-shadow: var(--shadow-light); overflow: hidden; border: 1px solid var(--gray-light);
+        }
+        .dash-admin-preview-card-image-container {
+            height: 160px; background-color: var(--gray-lighter, #f0f0f0); display: flex;
+            align-items: center; justify-content: center; overflow: hidden;
+        }
+        .dash-admin-preview-card-image-container img { width: 100%; height: 100%; object-fit: cover; }
+        .dash-admin-preview-card-image-container .dash-admin-no-image-placeholder { font-size: 0.9rem; color: var(--gray-dark); }
+        .dash-admin-preview-card-content { padding: 0.8rem 1rem; }
+        .dash-admin-preview-card-content h5 { /* Titolo anteprima */
+            font-size: 1.15rem; color: var(--primary); margin: 0 0 0.4rem 0;
+            font-weight: 600; min-height: 1.2em; word-break: break-word;
+        }
+        .dash-admin-preview-card-content p { /* Paragrafi anteprima */
+            font-size: 0.85rem; color: var(--gray-dark); line-height: 1.4;
+            margin-bottom: 0.4rem; min-height: 1em; word-break: break-word;
+        }
+        .dash-admin-preview-card-content .dash-admin-preview-relatore { font-style: italic; }
+        .dash-admin-preview-card-content .dash-admin-preview-posti,
+        .dash-admin-preview-card-content .dash-admin-preview-costo { font-weight: bold; }
+
+        /* Stili per il form dashAdminEventForm */
+        #dashAdminEventForm .form-group { margin-bottom: 1rem; position: relative; }
+        #dashAdminEventForm .form-group label {
+            display: block; margin-bottom: 0.3rem; color: var(--primary-dark, #333);
+            font-weight: 500; font-size: 0.9rem;
+        }
+        #dashAdminEventForm .form-control, #dashAdminEventForm select.form-control {
+            width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--gray-medium, #ccc);
+            border-radius: 6px; font-size: 0.95rem; background-color: var(--white, #fff);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #dashAdminEventForm .form-control:focus {
+            border-color: var(--secondary, #8db187);
+            box-shadow: 0 0 0 2px rgba(var(--secondary-rgb, 141, 177, 135), 0.2);
+            outline: none;
+        }
+        #dashAdminEventForm textarea.form-control { min-height: 70px; resize: vertical; }
+        #dashAdminEventForm .form-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;
+        }
+        #dashAdminEventForm .form-check-group {
+            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;
+        }
+        #dashAdminEventForm .form-check-group input[type="checkbox"] {
+            width: auto; margin-right: 0.2rem; transform: scale(1.05);
+        }
+        #dashAdminEventForm .form-check-group label {
+            font-weight: normal; font-size: 0.9rem; margin-bottom: 0; color: var(--dark);
+        }
+        #dashAdminEventForm .form-actions { margin-top: 1.5rem; text-align: right; }
+        #dashAdminEventForm .form-actions .btn-popup { /* Bottone Salva Evento */
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius-medium);
+        }
+        #dashAdminEventForm .form-actions .btn-popup:hover {
+            background-color: var(--primary-dark);
+        }
+        #dashAdminEventForm small { /* Testo piccolo sotto gli input */
+            font-size: 0.8rem; color: var(--gray-dark); display: block; margin-top: 0.2rem;
+        }
+        #dashAdmin-current-event-image-preview { /* Anteprima immagine esistente */
+            margin-top: 0.5rem; max-width: 120px; border: 1px solid var(--gray-light, #eee);
+            padding: 4px; border-radius: 4px; display:none;
+        }
+        #dashAdmin-current-event-flyer-preview { /* Info volantino esistente */
+            margin-top: 0.5rem; padding: 4px; font-size: 0.85rem;
+        }
+        #dashAdmin-current-event-flyer-preview a { color: var(--primary); text-decoration: underline; }
+        #dashAdmin-current-event-flyer-preview span { color: var(--gray-dark); }
+        #dashAdminEventFormMessage.form-message { margin-top: 1rem; }
+
+        /* === NUOVI STILI PER BOTTONE AI "DYNAMIC ISLAND" (da eventiincorso.html) === */
+        .ai-generate-btn-container { /* Contenitore per posizionare il bottone AI */
+            position: relative;
+        }
+        .ai-generate-btn { /* Bottone AI stesso */
+            position: absolute;
+            top: -11px; /* Posizionamento sopra e a destra del label */
             right: 0px;
             background-color: var(--primary);
             color: white;
             border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            font-size: 1rem;
+            border-radius: 19px; /* Arrotondato */
+            min-width: 38px; /* Larghezza minima per icona */
+            height: 38px;
+            padding: 0 9px;
+            font-size: 1.05rem; /* Icona leggermente più grande */
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
+            z-index: 10; /* Sopra altri elementi del form */
+            opacity: 0; /* Inizialmente invisibile */
+            transform: scale(0.7) translateY(15px); /* Per animazione entrata */
+            pointer-events: none; /* Non cliccabile se invisibile */
+            overflow: hidden; /* Per animazione testo */
+            transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+            transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+            min-width 0.35s ease-in-out, /* Animazione espansione */
+            padding 0.35s ease-in-out,
+            background-color 0.2s ease;
         }
-        .ai-generate-btn-dashboard:hover {
+        .ai-generate-btn::before { /* Effetto cosmico */
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            border-radius: inherit;
+            background-image:
+                    radial-gradient(circle at 25% 25%, rgba(255,255,255,0.15) 0px, transparent 2px),
+                    radial-gradient(circle at 75% 15%, rgba(200,200,255,0.12) 0.5px, transparent 2.5px),
+                    radial-gradient(circle at 50% 75%, rgba(220,220,255,0.1) 1px, transparent 3px),
+                    radial-gradient(circle at 15% 85%, rgba(230,230,255,0.13) 0.5px, transparent 2px),
+                    radial-gradient(circle at 85% 60%, rgba(210,210,255,0.11) 0.75px, transparent 2.5px);
+            background-size: 50px 50px;
+            opacity: 0;
+            mix-blend-mode: screen;
+            transition: opacity 0.5s ease-in-out;
+            animation: cosmicFlow 20s linear infinite;
+            z-index: 0;
+            will-change: transform, background-position;
+        }
+        @keyframes cosmicFlow {
+            0% { background-position: 0% 0%; transform: rotate(0deg) scale(1); }
+            100% { background-position: 200px 200px; transform: rotate(360deg) scale(1.1); }
+        }
+        .ai-generate-btn.visible { /* Quando appare (es. se c'è testo nella descr. lunga) */
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            animation: aiButtonPulseMain 2.8s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.6s;
+        }
+        .ai-generate-btn.visible::before { opacity: 0.5; }
+        .ai-generate-btn.visible.expanded { /* Quando si espande per mostrare il testo */
+            min-width: 170px; /* Larghezza per contenere "Genera con AI" */
+            padding: 0 14px;
+        }
+        .ai-generate-btn:not(.loading):hover {
             background-color: var(--secondary);
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+            transform: scale(1.05) translateY(0);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            animation-play-state: paused; /* Ferma animazione pulse su hover */
         }
-        .ai-generate-btn-dashboard .ai-icon {
-            display: inline-block;
-            transition: transform 0.5s ease;
+        .ai-generate-btn:not(.loading):hover::before {
+            animation-play-state: paused;
+            opacity: 0.7;
         }
-        .ai-generate-btn-dashboard.loading .ai-icon {
-            animation: spin 1s linear infinite; /* spin è già definito */
+        .ai-generate-btn:not(.loading):active {
+            transform: scale(0.98) translateY(0);
+            background-color: var(--primary-dark, #2a4b40);
+        }
+        @keyframes aiButtonPulseMain {
+            0%, 100% { box-shadow: 0 4px 12px rgba(var(--primary-rgb, 54,94,81),0.1), 0 1px 3px rgba(0,0,0,0.08); transform: scale(1) translateY(0); }
+            50% { box-shadow: 0 7px 18px rgba(var(--primary-rgb, 54,94,81),0.18), 0 3px 7px rgba(0,0,0,0.12); transform: scale(1.02) translateY(0); }
+        }
+        .ai-btn-content-wrapper { /* Contenitore per icona e testo */
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%; position: relative; z-index: 2;
+        }
+        .ai-icon { display: inline-block; transition: opacity 0.2s ease, transform 0.3s ease; margin-right: 0; }
+        .ai-text { /* Testo "Genera con AI" */
+            opacity: 0; max-width: 0; overflow: hidden; white-space: nowrap;
+            font-size: 0.85rem;
+            font-weight: 500; margin-left: 0.4em;
+            transition: opacity 0.3s ease-in-out 0.1s, max-width 0.35s ease-in-out 0.05s;
+        }
+        .ai-generate-btn.visible.expanded .ai-text {
+            opacity: 1;
+            max-width: 140px; /* Abbastanza per il testo */
+        }
+        .ai-ripple-container { /* Per effetto ripple */
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit; overflow: hidden; z-index: 1;
+        }
+        .ai-ripple-container::before,
+        .ai-ripple-container::after {
+            content: ''; position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            background-color: rgba(var(--secondary-rgb, 141, 177, 135), 0.15);
+            opacity: 0; pointer-events: none;
+        }
+        .ai-generate-btn.visible:not(.loading):not(:hover) .ai-ripple-container::before {
+            width: 180%; height: 180%;
+            animation: rippleWave 2.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0s;
+        }
+        .ai-generate-btn.visible:not(.loading):not(:hover) .ai-ripple-container::after {
+            width: 180%; height: 180%;
+            animation: rippleWave 2.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0.9s;
+        }
+        .ai-generate-btn:hover .ai-ripple-container::before,
+        .ai-generate-btn:hover .ai-ripple-container::after {
+            animation-play-state: paused; /* Ferma ripple su hover */
+        }
+        @keyframes rippleWave {
+            0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0.6; }
+            70% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.15; }
+            100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+        }
+        .ai-spinner-container { /* Contenitore per spinner e testo "Genero..." */
+            display: none; align-items: center; justify-content: center;
+        }
+        .ai-spinner-container .spinner-mini { /* Spinner specifico per AI button */
+            width: 0.9em; height: 0.9em; border-width: 2px;
+            border-top-color: var(--white);
+            border-left-color: rgba(255,255,255,0.3);
+            border-right-color: rgba(255,255,255,0.3);
+            border-bottom-color: rgba(255,255,255,0.3);
+            margin: 0;
+        }
+        .ai-spinner-container .ai-loading-text { font-size: 0.8rem; font-weight: 500; color: white; margin-left: 8px; }
+        .ai-generate-btn.loading { /* Stato di caricamento */
+            min-width: 120px; /* Larghezza per "Genero..." */
+            padding: 0 14px;
+            background-color: var(--secondary); /* Cambia colore durante il caricamento */
+            animation-play-state: paused; /* Ferma pulse */
+            cursor: default;
+        }
+        .ai-generate-btn.loading::before { /* Nasconde effetto cosmico */
+            opacity: 0 !important;
+            animation: none !important;
+        }
+        .ai-generate-btn.loading .ai-btn-content-wrapper { display: none; } /* Nasconde icona/testo normale */
+        .ai-generate-btn.loading .ai-spinner-container { display: flex; } /* Mostra spinner */
+        .ai-generate-btn.loading .ai-ripple-container::before,
+        .ai-generate-btn.loading .ai-ripple-container::after {
+            animation: none; opacity: 0; /* Ferma ripple */
+        }
+        #aiShortDescStatus { /* Messaggio di stato sotto la textarea della descr. breve */
+            font-size: 0.75rem; color: var(--gray-dark); display: block; margin-top: 2px; height: 1em;
         }
 
-        /* Stili per l'area di visualizzazione dei filtri attivi */
-        .active-filters-display {
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            background-color: #f0f8ff; /* Azzurrino chiaro */
-            border: 1px solid #b0e0e6; /* Bordo azzurro */
+        /* === STILI NUOVO POPUP VOLANTINO (Design Ispirato Apple, da eventiincorso.html) === */
+        :root { /* Definisce variabili specifiche per questo modal, se necessario */
+            --flyer-text-primary: #1d1d1f;
+            --flyer-modal-bg: #f8f8fa; /* Sfondo modal leggermente diverso */
+            --flyer-overlay-bg: rgba(0, 0, 0, 0.65); /* Overlay più scuro */
+        }
+        .flyer-overlay-eff { /* Overlay per il popup del volantino */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--flyer-overlay-bg);
+            backdrop-filter: blur(16px) saturate(160%); /* Effetto vetro smerigliato */
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            z-index: 2000; /* Molto alto per essere sopra tutto */
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; /* Inizialmente nascosto */
+            transition: opacity 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95), visibility 0s linear 0.4s;
+        }
+        .flyer-overlay-eff.active { /* Quando attivo */
+            opacity: 1; visibility: visible;
+            transition-delay: 0s;
+        }
+        .flyer-modal-eff { /* Contenitore del volantino */
+            background-color: var(--flyer-modal-bg);
+            border-radius: 22px; /* Angoli arrotondati stile Apple */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 15px rgba(0, 0, 0, 0.1);
+            width: clamp(320px, 88vw, 1000px); /* Larghezza responsiva */
+            height: clamp(450px, 85vh, 750px); /* Altezza responsiva */
+            display: flex; flex-direction: column;
+            position: relative;
+            opacity: 0; transform: scale(0.92) translateY(15px); /* Animazione entrata */
+            transition: opacity 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.05s, transform 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.05s;
+            overflow: hidden; /* Per angoli arrotondati e contenuto */
+        }
+        .flyer-overlay-eff.active .flyer-modal-eff { /* Quando attivo */
+            opacity: 1; transform: scale(1) translateY(0px);
+        }
+        .flyer-close-btn-eff { /* Bottone chiusura volantino */
+            position: absolute; top: 8px; right: 12px;
+            font-size: 2rem; color: var(--gray-dark, #777); background: none;
+            border: none; cursor: pointer; padding: 0.5rem; line-height: 1;
+            z-index: 10; /* Sopra il contenuto del volantino */
+            transition: color 0.2s ease, transform 0.25s ease-out;
+        }
+        .flyer-close-btn-eff:hover, .flyer-close-btn-eff:focus-visible {
+            color: var(--dark, #333); transform: rotate(90deg); background: none;
+        }
+        .flyer-content-area-eff { /* Area che contiene l'immagine/pdf */
+            flex-grow: 1; width: 100%; height: 100%;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            border-radius: inherit; /* Mantiene gli angoli arrotondati del parent */
+        }
+        .flyer-media-container-eff { /* Contenitore diretto dell'immagine/pdf */
+            width: 100%; height: 100%; overflow: auto; /* Scroll se il contenuto è più grande */
+            display: flex; align-items: center; justify-content: center;
+            padding: 5px; box-sizing: border-box;
+        }
+        .flyer-media-container-eff img, .flyer-media-container-eff iframe {
+            display: block; max-width: 100%; max-height: 100%;
+            width: auto; height: auto; object-fit: contain; /* Adatta mantenendo proporzioni */
+            border: none; border-radius: 8px; /* Angoli arrotondati per il media stesso */
+        }
+        .flyer-media-container-eff iframe { /* Specifico per PDF */
+            width: 100%; height: 100%; min-height: 400px;
+        }
+        .flyer-message-display-eff { /* Per messaggi (es. volantino non trovato) */
+            text-align: center; padding: 3rem 1rem; font-size: 1.1rem;
+            color: var(--flyer-text-primary); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; width: 100%; height: 100%;
+        }
+        .flyer-message-display-eff p { margin-bottom: 1rem; }
+        .flyer-message-display-eff a {
+            color: var(--primary); text-decoration: underline; font-weight: 500;
+            padding: 0.6rem 1.2rem; background-color: rgba(0,0,0,0.05); border-radius: 8px;
+        }
+        .flyer-message-display-eff a:hover { background-color: rgba(0,0,0,0.08); }
+        body.flyer-popup-active-eff { overflow: hidden; } /* Blocca scroll pagina principale */
+
+        /* === STILI PER CUSTOM CONFIRM MODAL (da eventiincorso.html) === */
+        .custom-confirm-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 2000; /* Sopra il popup del volantino, se necessario */
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s ease-out;
+        }
+        .custom-confirm-overlay.active { display: flex; opacity: 1; }
+        .custom-confirm-modal {
+            background-color: var(--white); padding: 2rem;
             border-radius: var(--border-radius-medium);
-            box-shadow: var(--shadow-light);
+            box-shadow: var(--shadow-strong);
+            width: 90%; max-width: 450px;
+            text-align: center;
+            transform: scale(0.95); opacity: 0; /* Animazione entrata */
+            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
         }
-        .active-filters-display h4 {
-            margin-top: 0;
-            margin-bottom: 0.8rem;
-            font-size: 1.1rem;
-            color: var(--primary);
-            padding-bottom: 0.5rem;
-            border-bottom: 1px dotted var(--gray-medium);
+        .custom-confirm-overlay.active .custom-confirm-modal {
+            transform: scale(1); opacity: 1;
         }
-        .active-filters-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+        .custom-confirm-modal h3 {
+            font-size: 1.3rem; color: var(--primary);
+            margin-top: 0; margin-bottom: 1rem;
         }
-        .active-filters-list li {
-            background-color: var(--secondary);
+        .custom-confirm-modal p {
+            font-size: 1rem; color: var(--gray-dark);
+            margin-bottom: 1.5rem; line-height: 1.6;
+        }
+        .custom-confirm-actions {
+            display: flex; justify-content: center; gap: 1rem;
+        }
+        .custom-confirm-actions .btn-popup { /* Usa la classe btn-popup per coerenza */
+            min-width: 100px;
+            padding: 0.7rem 1.2rem; /* Leggermente più piccolo del btn-popup standard */
+            font-size: 0.9rem;
+        }
+        .custom-confirm-actions .btn-confirm-no { /* Bottone Annulla/No */
+            background-color: var(--gray-light);
+            color: var(--dark);
+            border: 1px solid var(--gray-medium);
+        }
+        .custom-confirm-actions .btn-confirm-no:hover {
+            background-color: var(--gray-medium);
+        }
+        .custom-confirm-actions .btn-confirm-yes { /* Bottone Conferma/Sì */
+            background-color: var(--primary); /* Usa colore primario per conferma */
             color: var(--white);
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
         }
-        .active-filters-list li .filter-label {
-            opacity: 0.8;
-            margin-right: 0.3em;
-        }
-        .active-filters-display .no-filters-active {
-            font-style: italic;
-            color: var(--gray-dark);
-            font-size: 0.95rem;
+        .custom-confirm-actions .btn-confirm-yes:hover {
+            background-color: var(--primary-dark);
         }
 
     </style>
@@ -518,19 +1026,11 @@
                 <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
                     <a href="dashboard.html">Dashboard</a>
                     <a href="areapersonale.html">Il mio profilo</a>
-                    <a href="eventiincorsoAdmin.html">Gestione Eventi Estesa</a>
-                    <a href="#" onclick="logout()">Esci</a>
+                    <a href="eventiincorsoAdmin.html">Gestione Eventi Estesa</a> <a href="#" onclick="logout()">Esci</a>
                 </div>
             </div>
-            <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
         </div>
     </nav>
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="dashboard.html" onclick="closeMobileMenu()">Dashboard</a>
-        <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
-        <a href="eventiincorsoAdmin.html" onclick="closeMobileMenu()">Gestione Eventi Estesa</a>
-        <a href="#" onclick="logout(); closeMobileMenu();">Esci</a>
-    </div>
 </header>
 
 <main class="dashboard-main">
@@ -614,6 +1114,13 @@
     </div>
 
     <div id="eventManagementContent" class="dashboard-section">
+        <div class="add-event-btn-container-wrapper">
+            <button id="adminAddEventBtn" aria-label="Aggiungi Nuovo Evento">
+                <span class="plus-icon">+</span>
+                <span class="fab-text-label">Aggiungi Nuovo Evento</span>
+            </button>
+        </div>
+
         <div class="event-tab-content active" id="upcomingEventsContainer">
             <div id="upcomingEventsGrid" class="admin-event-grid">
                 <p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>
@@ -632,7 +1139,6 @@
         <span class="close-modal-btn" data-modal-id="advancedOptionsModal">&times;</span>
         <h3><i class="fas fa-user-shield"></i> Impostazioni Moderazione Commenti</h3>
         <div class="modal-content-scrollable">
-
             <div class="moderation-slider-group">
                 <div class="moderation-slider-label-container">
                     <label for="moderationLevelSliderInput">Livello Filtro IA:</label>
@@ -641,7 +1147,6 @@
                 <input type="range" id="moderationLevelSliderInput" class="moderation-slider" min="0" max="3" value="2" step="1">
                 <p id="moderationLevelDescription" class="slider-level-description">Descrizione livello...</p>
             </div>
-
             <div class="moderation-preview-container">
                 <h5><i class="fas fa-comments"></i> Anteprima Effetto Moderazione</h5>
                 <div id="moderationPreviewChat">
@@ -698,116 +1203,185 @@
     </div>
 </div>
 
-<div class="event-popup-overlay" id="eventPopupOverlayDashboard"></div>
-<div class="event-popup" id="eventPopupDashboard">
-    <button class="close-popup" id="closeEventPopupBtnDashboard" aria-label="Chiudi popup">&times;</button>
-    <h2 id="eventPopupTitleDashboard">Aggiungi Nuovo Evento</h2>
 
-    <div class="event-form-and-preview-container">
-        <form id="eventFormDashboard" method="POST" enctype="multipart/form-data">
-            <input type="hidden" id="event-id-dashboard" name="event-id">
-            <div class="form-group">
-                <label for="event-title-dashboard">Titolo Evento*</label>
-                <input type="text" id="event-title-dashboard" name="event-title" class="form-control" required>
+<div class="dash-admin-event-popup-overlay" id="dashAdminEventPopupOverlay"></div>
+<div class="dash-admin-event-popup" id="dashAdminEventPopup">
+    <div class="dash-admin-event-popup-header">
+        <h2 id="dashAdminEventPopupTitle">Aggiungi Nuovo Evento</h2>
+        <button class="close-popup" id="closeDashAdminEventPopupBtn" aria-label="Chiudi popup">&times;</button>
+    </div>
+    <div class="dash-admin-event-popup-content">
+        <div id="creationModeSelectionView">
+            <div class="creation-mode-option" id="createManuallyModeBtn">
+                <div class="icon-container"><i class="fas fa-edit"></i></div>
+                <h4>Crea Manualmente</h4>
+                <p>Inserisci tutti i dettagli dell'evento compilando il modulo.</p>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="event-date-dashboard">Data Inizio*</label>
-                    <input type="date" id="event-date-dashboard" name="event-date" class="form-control" required>
+            <div class="creation-mode-option" id="extractFromFlyerModeBtn">
+                <div class="icon-container">
+                <span class="ai-logo-text">
+                    <span class="line-1">Eremo</span>
+                    <span class="line-2">Vision AI</span>
+                </span>
+                    <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span>
+                    <span class="star s4"></span><span class="star s5"></span><span class="star s6"></span>
                 </div>
+                <h4>Estrai da Volantino</h4>
+                <p>Carica un volantino e lascia che l'AI compili i campi per te.</p>
             </div>
-            <div class="form-row-grid">
-                <div class="form-group">
-                    <label for="event-start-time-dashboard">Orario Inizio (HH:MM)</label>
-                    <input type="time" id="event-start-time-dashboard" name="event-start-time" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="event-end-time-dashboard">Orario Fine (HH:MM)</label>
-                    <input type="time" id="event-end-time-dashboard" name="event-end-time" class="form-control">
-                </div>
-            </div>
+        </div>
 
+        <div id="flyerUploadView">
+            <h4>Carica Volantino Evento</h4>
             <div class="form-group">
-                <label for="event-long-desc-dashboard">Descrizione Estesa</label>
-                <textarea id="event-long-desc-dashboard" name="event-long-desc" class="form-control" rows="4"></textarea>
+                <label for="flyerFile">Seleziona immagine volantino (JPG, PNG, WEBP):</label>
+                <input type="file" id="flyerFile" class="form-control" accept="image/jpeg, image/png, image/webp">
             </div>
+            <div id="flyerPreviewContainer">
+                <img id="flyerPreview" src="#" alt="Anteprima Volantino" />
+            </div>
+            <button type="button" id="processFlyerBtn" class="btn-popup" disabled><i class="fas fa-cogs"></i> Processa Volantino con AI</button>
+            <div id="flyerProcessingStatus"></div>
+        </div>
 
-            <div class="form-group">
-                <label for="event-short-desc-dashboard">Descrizione Breve* (max 200 caratteri)</label>
-                <button type="button" id="generateShortDescBtnDashboard" class="ai-generate-btn-dashboard" title="Genera descrizione breve con AI">
-                    <span class="ai-icon">✨</span>
-                </button>
-                <textarea id="event-short-desc-dashboard" name="event-short-desc" class="form-control" rows="2" required maxlength="200"></textarea>
-                <small id="aiShortDescStatusDashboard" style="font-size: 0.75rem; color: var(--gray-dark); display: block; margin-top: 2px;"></small>
-            </div>
+        <div class="dash-admin-event-form-and-preview-container">
+            <form id="dashAdminEventForm" method="POST" enctype="multipart/form-data">
+                <input type="hidden" id="dashAdmin-event-id" name="event-id">
 
-            <div class="form-grid">
                 <div class="form-group">
-                    <label for="event-prefix-dashboard">Prefisso Relatore</label>
-                    <input type="text" id="event-prefix-dashboard" name="event-prefix" class="form-control" placeholder="Default: Relatore">
+                    <label for="dashAdmin-event-title">Titolo Evento*</label>
+                    <input type="text" id="dashAdmin-event-title" name="event-title" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label for="event-speaker-dashboard">Nome Relatore*</label>
-                    <input type="text" id="event-speaker-dashboard" name="event-speaker" class="form-control" required>
-                </div>
-            </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="event-association-dashboard">Associazione</label>
-                    <input type="text" id="event-association-dashboard" name="event-association" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="event-seats-dashboard">Posti Disponibili Iniziali*</label>
-                    <input type="number" id="event-seats-dashboard" name="event-seats" class="form-control" required min="0">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="event-image-dashboard">Immagine Copertina</label>
-                <input type="file" id="event-image-dashboard" name="event-image" class="form-control" accept="image/*">
-                <small>Lascia vuoto se non vuoi modificare l'immagine esistente.</small>
-                <img id="current-event-image-preview-dashboard" src="#" alt="Anteprima Immagine" style="max-width:150px; display:none; margin-top:5px;">
-            </div>
-            <div class="form-group">
-                <label for="event-flyer-dashboard">Volantino (PDF/Immagine)</label>
-                <input type="file" id="event-flyer-dashboard" name="event-flyer" class="form-control" accept="image/*,application/pdf">
-                <small>Lascia vuoto se non vuoi modificare il volantino esistente.</small>
-                <div id="current-event-flyer-preview-dashboard" style="margin-top:5px;"></div>
-            </div>
-            <div class="form-check-group">
-                <input type="checkbox" id="event-booking-dashboard" name="event-booking">
-                <label for="event-booking-dashboard">Prenotazioni aperte</label>
-            </div>
-            <div class="form-check-group">
-                <input type="checkbox" id="event-voluntary-dashboard" name="event-voluntary">
-                <label for="event-voluntary-dashboard">Offerta libera</label>
-            </div>
-            <div class="form-group" id="event-price-container-dashboard" style="display: block;">
-                <label for="event-price-dashboard">Prezzo (€)</label>
-                <input type="number" id="event-price-dashboard" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00">
-            </div>
-            <div id="eventFormMessageDashboard" class="form-message" style="display:none;"></div>
-            <div class="form-actions">
-                <button type="submit" class="btn-popup">Salva Evento</button>
-            </div>
-        </form>
 
-        <div id="eventCardPreviewContainer">
-            <h4>Anteprima Card Evento</h4>
-            <div class="preview-card">
-                <div class="preview-card-image-container">
-                    <img id="previewImage" src="images/default-event.jpg" alt="Anteprima copertina evento">
-                    <span class="no-image-placeholder" style="display:none;">Nessuna immagine</span>
+                <div class="form-group">
+                    <label for="dashAdmin-event-date">Data Inizio*</label>
+                    <input type="date" id="dashAdmin-event-date" name="event-date" class="form-control" required>
                 </div>
-                <div class="preview-card-content">
-                    <h5 id="previewTitle">Titolo Evento</h5>
-                    <p id="previewDate"><b>Data:</b> <span class="value">Seleziona data</span></p>
-                    <p id="previewTime" style="display:none;"><b>Orario:</b> <span class="value"></span></p>
-                    <p id="previewSpeaker" class="preview-relatore"><b>Relatore:</b> <span class="value">Nome Relatore</span></p>
-                    <p id="previewShortDesc">Descrizione breve dell'evento qui...</p>
-                    <p id="previewSeats" class="preview-posti"><b>Posti:</b> <span class="value">0</span></p>
-                    <p id="previewPrice" class="preview-costo"><b>Costo:</b> <span class="value">€ 0.00</span></p>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="dashAdmin-event-start-time">Orario Inizio (HH:MM)</label>
+                        <input type="time" id="dashAdmin-event-start-time" name="event-start-time" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="dashAdmin-event-end-time">Orario Fine (HH:MM)</label>
+                        <input type="time" id="dashAdmin-event-end-time" name="event-end-time" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dashAdmin-event-long-desc">Descrizione Estesa</label>
+                    <textarea id="dashAdmin-event-long-desc" name="event-long-desc" class="form-control" rows="4"></textarea>
+                </div>
+
+                <div class="form-group ai-generate-btn-container">
+                    <label for="dashAdmin-event-short-desc">Descrizione Breve* (max 200 caratteri)</label>
+                    <button type="button" id="generateShortDescBtn" class="ai-generate-btn" title="Genera descrizione breve con AI">
+            <span class="ai-btn-content-wrapper">
+                <span class="ai-icon">✨</span>
+                <span class="ai-text">Genera con AI</span>
+            </span>
+                        <span class="ai-ripple-container"></span>
+                        <span class="ai-spinner-container">
+                <span class="spinner-mini"></span>
+                <span class="ai-loading-text">Genero...</span>
+            </span>
+                    </button>
+                    <textarea id="dashAdmin-event-short-desc" name="event-short-desc" class="form-control" rows="2" required maxlength="200"></textarea>
+                    <small id="aiShortDescStatus" style="font-size: 0.75rem; color: var(--gray-dark); display: block; margin-top: 2px; height: 1em;"></small>
+                </div>
+
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="dashAdmin-event-prefix">Prefisso Relatore</label>
+                        <input type="text" id="dashAdmin-event-prefix" name="event-prefix" class="form-control" placeholder="Default: Relatore">
+                    </div>
+                    <div class="form-group">
+                        <label for="dashAdmin-event-speaker">Nome Relatore*</label>
+                        <input type="text" id="dashAdmin-event-speaker" name="event-speaker" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="dashAdmin-event-association">Associazione</label>
+                        <input type="text" id="dashAdmin-event-association" name="event-association" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="dashAdmin-event-seats">Posti Disponibili Iniziali*</label>
+                        <input type="number" id="dashAdmin-event-seats" name="event-seats" class="form-control" required min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dashAdmin-event-image">Immagine Copertina</label>
+                    <input type="file" id="dashAdmin-event-image" name="event-image" class="form-control" accept="image/*">
+                    <small>Lascia vuoto se non vuoi modificare l'immagine esistente.</small>
+                    <img id="dashAdmin-current-event-image-preview" src="#" alt="Anteprima Immagine">
+                </div>
+
+                <div class="form-group">
+                    <label for="dashAdmin-event-flyer">Volantino (PDF/Immagine)</label>
+                    <input type="file" id="dashAdmin-event-flyer" name="event-flyer" class="form-control" accept="image/*,application/pdf">
+                    <small>Lascia vuoto se non vuoi modificare il volantino esistente.</small>
+                    <div id="dashAdmin-current-event-flyer-preview">
+                    </div>
+                </div>
+
+                <div class="form-check-group">
+                    <input type="checkbox" id="dashAdmin-event-booking" name="event-booking" checked>
+                    <label for="dashAdmin-event-booking">Prenotazioni aperte</label>
+                </div>
+
+                <div class="form-check-group">
+                    <input type="checkbox" id="dashAdmin-event-voluntary" name="event-voluntary">
+                    <label for="dashAdmin-event-voluntary">Offerta libera</label>
+                </div>
+
+                <div class="form-group" id="dashAdmin-event-price-container" style="display: block;">
+                    <label for="dashAdmin-event-price">Prezzo (€)</label>
+                    <input type="number" id="dashAdmin-event-price" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00">
+                </div>
+
+                <div id="dashAdminEventFormMessage" class="form-message" style="display:none;"></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-popup">Salva Evento</button>
+                </div>
+            </form>
+
+            <div id="dashAdminEventCardPreviewContainer">
+                <h4>Anteprima Card Evento</h4>
+                <div class="dash-admin-preview-card">
+                    <div class="dash-admin-preview-card-image-container">
+                        <img id="dashAdmin_previewImage" src="images/default-event.jpg" alt="Anteprima copertina evento">
+                        <span class="dash-admin-no-image-placeholder" style="display:none;">Nessuna immagine</span>
+                    </div>
+                    <div class="dash-admin-preview-card-content">
+                        <h5 id="dashAdmin_previewTitle">Titolo Evento</h5>
+                        <p id="dashAdmin_previewDateFull"><b>Data:</b> <span class="value">Seleziona data</span></p>
+                        <p id="dashAdmin_previewTimeFull" style="display:none;"><b>Orario:</b> <span class="value"></span></p>
+                        <p id="dashAdmin_previewSpeakerFull" class="dash-admin-preview-relatore"><b><span id="dashAdmin_previewSpeakerPrefix">Relatore</span>:</b> <span id="dashAdmin_previewSpeakerName" class="value">Nome Relatore</span></p>
+                        <p id="dashAdmin_previewShortDesc">Descrizione breve dell'evento qui...</p>
+                        <p id="dashAdmin_previewSeatsFull" class="dash-admin-preview-posti"><b>Posti:</b> <span class="value">0</span></p>
+                        <p id="dashAdmin_previewPriceFull" class="dash-admin-preview-costo"><b>Costo:</b> <span class="value">€ 0.00</span></p>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="flyer-overlay-eff" id="globalFlyerOverlayEff">
+</div>
+
+<div class="custom-confirm-overlay" id="customConfirmOverlay">
+    <div class="custom-confirm-modal" id="customConfirmModal">
+        <h3>Conferma Azione</h3>
+        <p id="customConfirmMessage">Sei sicuro di voler procedere?</p>
+        <div class="custom-confirm-actions">
+            <button type="button" class="btn-popup btn-confirm-no" id="customConfirmNo">Annulla</button>
+            <button type="button" class="btn-popup btn-confirm-yes" id="customConfirmYes">Conferma</button>
         </div>
     </div>
 </div>
@@ -817,850 +1391,6 @@
     <p>© <span id="currentYear"></span> Eremo Frate Francesco. Operazioni Admin.</p>
 </footer>
 
-<script>
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
-
-    let allUpcomingEventsData = [];
-    let allPastEventsData = [];
-    const defaultUserIconPath = '/uploads/icons/default_user.png';
-    const adminAvatarPath = 'images/logo.png';
-    const adminNameGlobalJS = "Admin Eremo";
-
-    // Variabili per la moderazione/generazione Groq
-    let groqApiKey = null;
-    // let groqDecryptionKey = null; // Non più necessaria lato client se la chiave è già decifrata o gestita server-side per fetchAndPrepareGroqApiKey
-
-    const SnavbarContainer = document.getElementById('navbarContainer');
-    let SlastScroll = 0;
-    if (SnavbarContainer) {
-        window.addEventListener('scroll', function() {
-            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-            if (currentScroll <= 50) { SnavbarContainer.classList.remove('hidden'); SlastScroll = 0; return; }
-            if (currentScroll > SlastScroll && !SnavbarContainer.classList.contains('hidden')) {
-                SnavbarContainer.classList.add('hidden');
-            } else if (currentScroll < SlastScroll && SnavbarContainer.classList.contains('hidden')) {
-                SnavbarContainer.classList.remove('hidden');
-            }
-            SlastScroll = currentScroll <= 0 ? 0 : currentScroll;
-        });
-    }
-    function toggleMobileMenu() {
-        const mobileMenu = document.getElementById("mobileMenu");
-        const hamburger = document.querySelector(".navbar .hamburger");
-        if(mobileMenu && hamburger){
-            const isOpen = mobileMenu.classList.toggle("open");
-            hamburger.setAttribute("aria-expanded", isOpen.toString());
-            document.body.style.overflow = isOpen ? 'hidden' : '';
-        }
-    }
-    function closeMobileMenu() {
-        const mobileMenu = document.getElementById("mobileMenu");
-        const hamburger = document.querySelector(".navbar .hamburger");
-        if(mobileMenu && hamburger && mobileMenu.classList.contains("open")){
-            mobileMenu.classList.remove("open");
-            if (hamburger.classList.contains("open")) {
-                hamburger.classList.remove("open");
-            }
-            hamburger.setAttribute("aria-expanded", "false");
-            document.body.style.overflow = '';
-        }
-    }
-    function toggleUserMenu() {
-        const dropdown = document.querySelector('#userDropdownContainer .dropdown-menu');
-        const button = document.querySelector('#userDropdownContainer .user-btn');
-        if(dropdown && button){
-            const isOpen = dropdown.style.display === 'block';
-            dropdown.style.display = isOpen ? 'none' : 'block';
-            button.setAttribute('aria-expanded', String(!isOpen));
-        }
-    }
-    document.addEventListener('click', function(event) {
-        const dropdownContainer = document.getElementById('userDropdownContainer');
-        if (dropdownContainer && !dropdownContainer.contains(event.target)) {
-            const menu = dropdownContainer.querySelector('.dropdown-menu');
-            const btn = dropdownContainer.querySelector('.user-btn');
-            if (menu && menu.style.display === 'block') {
-                menu.style.display = 'none';
-                if(btn) btn.setAttribute('aria-expanded', 'false');
-            }
-        }
-        const mobileMenuEl = document.getElementById("mobileMenu");
-        const hamburgerEl = document.querySelector(".navbar .hamburger");
-        if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerEl && !hamburgerEl.contains(event.target) && !mobileMenuEl.contains(event.target)) {
-            closeMobileMenu();
-        }
-        const filterPanel = document.getElementById('filterPanelDropdown');
-        const filterToggle = document.getElementById('filterToggleButton');
-        if (filterPanel && filterPanel.classList.contains('active') && !filterPanel.contains(event.target) && filterToggle && !filterToggle.contains(event.target)) {
-            filterPanel.classList.remove('active');
-            filterToggle.classList.remove('active');
-            filterToggle.setAttribute('aria-expanded', 'false');
-        }
-    });
-    function logout() {
-        localStorage.removeItem('adminUserEFF');
-        alert('Logout effettuato.');
-        window.location.href = 'index.html';
-    }
-
-    function openModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-        document.body.style.overflow = 'hidden';
-    }
-    function closeModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.remove('active');
-            setTimeout(() => {
-                if (modal && !modal.classList.contains('active')) {
-                    modal.style.display = 'none';
-                }
-            }, 250);
-        }
-        const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active');
-        if (!anyModalActive) {
-            document.body.style.overflow = '';
-        }
-        if (modalId === 'uploadMediaModal') {
-            document.getElementById('uploadMediaForm')?.reset();
-            const uploadFeedback = document.getElementById('uploadMediaFeedback'); if (uploadFeedback) uploadFeedback.innerHTML = '';
-            const existingMedia = document.getElementById('existingMediaContainer'); if (existingMedia) existingMedia.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento media...</p>';
-        }
-        if (modalId === 'manageCommentsModal') {
-            let commentsListContainer = document.getElementById('commentsListContainer');
-            if (commentsListContainer && commentsListContainer.parentNode) {
-                const newClonedListContainer = commentsListContainer.cloneNode(false);
-                newClonedListContainer.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento commenti...</p></li>';
-                commentsListContainer.parentNode.replaceChild(newClonedListContainer, commentsListContainer);
-            }
-            const commentsFeedback = document.getElementById('commentsManagementFeedback'); if (commentsFeedback) commentsFeedback.innerHTML = '';
-        }
-        if (modalId === 'manageBookingsModal') {
-            const bookingsContainer = document.getElementById('bookingsListContainerModal'); if (bookingsContainer) bookingsContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento prenotazioni...</p>';
-            const bookingsFeedback = document.getElementById('bookingsManagementFeedbackModal'); if (bookingsFeedback) bookingsFeedback.innerHTML = '';
-        }
-        if (modalId === 'advancedOptionsModal') {
-            const msgArea = document.getElementById('advancedSettingsModalMessage');
-            if(msgArea) { msgArea.style.display = 'none'; msgArea.textContent = ''; msgArea.className = 'form-message'; }
-        }
-    }
-    window.onclick = function(event) {
-        const genericModals = document.querySelectorAll('.modal');
-        genericModals.forEach(modal => { if (event.target === modal && modal.classList.contains('active')) closeModal(modal.id); });
-
-        const eventPopupOverlay = document.getElementById('eventPopupOverlayDashboard');
-        if (eventPopupOverlay && event.target === eventPopupOverlay && eventPopupOverlay.classList.contains('active')) closeEventPopupDashboard();
-    };
-    function sanitizeText(text) {
-        if (text === null || typeof text === 'undefined') return '';
-        const element = document.createElement('div'); element.innerText = String(text); return element.innerHTML;
-    }
-    function sanitizeTextForHTML(str) {
-        if (typeof str !== 'string') str = String(str || '');
-        const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');
-    }
-    function sanitizeForAttribute(str) {
-        if (typeof str !== 'string' || str === null) return '';
-        return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-    }
-    function formatDbDate(dateString) {
-        if (!dateString) return 'N/D';
-        try {
-            const parts = dateString.substring(0, 10).split('-');
-            if (parts.length === 3) {
-                const year = parseInt(parts[0]);
-                const month = parseInt(parts[1]) -1;
-                const day = parseInt(parts[2]);
-                const date = new Date(Date.UTC(year, month, day));
-                if (isNaN(date.getTime())) return dateString;
-                return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
-            }
-            return dateString;
-        } catch (e) { console.warn("Errore formattazione data DB:", dateString, e); return dateString; }
-    }
-    function formatMonthYear(dateString) {
-        if (!dateString) return 'Data sconosciuta';
-        try {
-            const parts = dateString.substring(0, 10).split('-');
-            if (parts.length === 3) {
-                const year = parseInt(parts[0]);
-                const month = parseInt(parts[1]) -1;
-                const date = new Date(Date.UTC(year, month, 1));
-                if (isNaN(date.getTime())) return 'Data non valida';
-                const options = { month: 'long', year: 'numeric', timeZone: 'UTC' };
-                return new Intl.DateTimeFormat('it-IT', options).format(date);
-            } return 'Data non valida';
-        } catch (e) { console.warn("Errore formattazione Mese/Anno:", dateString, e); return 'Data non valida'; }
-    }
-    function getMonthIndexFromString(monthName) {
-        const months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
-        return months.indexOf(monthName.toLowerCase());
-    }
-
-    const eventPopupOverlayDashboard = document.getElementById('eventPopupOverlayDashboard');
-    const eventPopupDashboard = document.getElementById('eventPopupDashboard');
-    const closeEventPopupBtnDashboard = document.getElementById('closeEventPopupBtnDashboard');
-    const eventFormDashboard = document.getElementById('eventFormDashboard');
-    const eventPopupTitleDashboard = document.getElementById('eventPopupTitleDashboard');
-    const eventIdInputDashboard = document.getElementById('event-id-dashboard');
-    const voluntaryCheckboxDashboard = document.getElementById('event-voluntary-dashboard');
-    const priceContainerDashboard = document.getElementById('event-price-container-dashboard');
-    const eventPriceInputDashboard = document.getElementById('event-price-dashboard');
-    const eventFormMessageDashboard = document.getElementById('eventFormMessageDashboard');
-    const currentImagePreviewDashboard = document.getElementById('current-event-image-preview-dashboard');
-    const currentFlyerPreviewDashboard = document.getElementById('current-event-flyer-preview-dashboard');
-    const previewImageEl = document.getElementById('previewImage');
-    const previewNoImagePlaceholder = document.querySelector('#eventCardPreviewContainer .no-image-placeholder');
-    const previewTitleEl = document.getElementById('previewTitle');
-    const previewDateEl = document.querySelector('#previewDate .value');
-    const previewTimeEl = document.querySelector('#previewTime .value');
-    const previewTimeContainerEl = document.getElementById('previewTime');
-    const previewSpeakerEl = document.querySelector('#previewSpeaker .value');
-    const previewShortDescEl = document.getElementById('previewShortDesc');
-    const previewSeatsEl = document.querySelector('#previewSeats .value');
-    const previewPriceEl = document.querySelector('#previewPrice .value');
-
-    // Elementi per AI (Dashboard)
-    const generateShortDescBtnDashboard = document.getElementById('generateShortDescBtnDashboard');
-    const aiShortDescStatusDashboard = document.getElementById('aiShortDescStatusDashboard');
-    const eventLongDescDashboard = document.getElementById('event-long-desc-dashboard');
-    const eventShortDescDashboard = document.getElementById('event-short-desc-dashboard');
-
-
-    function updatePriceFieldVisibilityDashboard() {
-        if (voluntaryCheckboxDashboard && priceContainerDashboard && eventPriceInputDashboard) {
-            const isVoluntary = voluntaryCheckboxDashboard.checked;
-            priceContainerDashboard.style.display = isVoluntary ? 'none' : 'block';
-            eventPriceInputDashboard.required = !isVoluntary;
-            if (isVoluntary) eventPriceInputDashboard.value = '';
-            updateEventPreview();
-        }
-    }
-    if (voluntaryCheckboxDashboard) voluntaryCheckboxDashboard.addEventListener('change', updatePriceFieldVisibilityDashboard);
-
-    function updateEventPreview() {
-        if (!previewTitleEl) return;
-        previewTitleEl.textContent = document.getElementById('event-title-dashboard').value || 'Titolo Evento';
-        const dateValue = document.getElementById('event-date-dashboard').value;
-        previewDateEl.textContent = dateValue ? formatDbDate(dateValue) : 'Seleziona data';
-        const startTimeValue = document.getElementById('event-start-time-dashboard').value;
-        const endTimeValue = document.getElementById('event-end-time-dashboard').value;
-        let timeString = '';
-        if (startTimeValue && endTimeValue) timeString = `${startTimeValue} - ${endTimeValue}`;
-        else if (startTimeValue) timeString = startTimeValue;
-        if (timeString && previewTimeContainerEl && previewTimeEl) { previewTimeContainerEl.style.display = 'block'; previewTimeEl.textContent = timeString; }
-        else if (previewTimeContainerEl && previewTimeEl) { previewTimeContainerEl.style.display = 'none'; previewTimeEl.textContent = '';}
-        const speakerPrefix = document.getElementById('event-prefix-dashboard').value || 'Relatore';
-        const speakerName = document.getElementById('event-speaker-dashboard').value || 'Nome Relatore';
-        previewSpeakerEl.textContent = `${speakerPrefix}: ${speakerName}`;
-        previewShortDescEl.textContent = document.getElementById('event-short-desc-dashboard').value || 'Descrizione breve dell\'evento qui...';
-        previewSeatsEl.textContent = document.getElementById('event-seats-dashboard').value || '0';
-        const isVoluntary = document.getElementById('event-voluntary-dashboard').checked;
-        if (isVoluntary) { previewPriceEl.textContent = 'Offerta libera'; }
-        else { const priceValue = parseFloat(document.getElementById('event-price-dashboard').value); previewPriceEl.textContent = !isNaN(priceValue) && priceValue > 0 ? `€ ${priceValue.toFixed(2)}` : '€ 0.00';}
-        const imageInput = document.getElementById('event-image-dashboard');
-        if (imageInput.files && imageInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) { previewImageEl.src = e.target.result; previewImageEl.style.display = 'block'; if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none'; }
-            reader.readAsDataURL(imageInput.files[0]);
-        } else if (currentImagePreviewDashboard && currentImagePreviewDashboard.src !== '#' && currentImagePreviewDashboard.style.display !== 'none') {
-            previewImageEl.src = currentImagePreviewDashboard.src; previewImageEl.style.display = 'block'; if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none';
-        } else { previewImageEl.src = 'images/default-event.jpg'; previewImageEl.style.display = 'block'; if(previewNoImagePlaceholder) previewNoImagePlaceholder.style.display = 'none'; }
-    }
-
-    function attachPreviewListeners() {
-        const formElementsToWatch = ['event-title-dashboard', 'event-date-dashboard', 'event-start-time-dashboard', 'event-end-time-dashboard', 'event-short-desc-dashboard', 'event-prefix-dashboard', 'event-speaker-dashboard', 'event-seats-dashboard', 'event-price-dashboard', 'event-voluntary-dashboard', 'event-image-dashboard'];
-        formElementsToWatch.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) { element.addEventListener('input', updateEventPreview); if (element.type === 'checkbox' || element.type === 'file') { element.addEventListener('change', updateEventPreview);}}
-        });
-        if(eventLongDescDashboard) eventLongDescDashboard.addEventListener('input', updateEventPreview); // Ascolta anche la descrizione lunga per preview
-    }
-
-    function openEventPopupDashboard(eventData = null) {
-        if (!eventFormDashboard || !eventPopupTitleDashboard || !eventIdInputDashboard) { console.error("Elementi popup evento mancanti."); return; }
-        eventFormDashboard.reset();
-        updatePriceFieldVisibilityDashboard();
-        if(eventFormMessageDashboard) {eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';}
-        if(currentImagePreviewDashboard) {currentImagePreviewDashboard.style.display = 'none'; currentImagePreviewDashboard.src = '#';}
-        if(currentFlyerPreviewDashboard) currentFlyerPreviewDashboard.innerHTML = '';
-        document.getElementById('event-start-time-dashboard').value = '';
-        document.getElementById('event-end-time-dashboard').value = '';
-        if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "";
-
-
-        if (eventData) {
-            eventPopupTitleDashboard.textContent = 'Modifica Evento'; eventIdInputDashboard.value = eventData.IDEvento;
-            document.getElementById('event-title-dashboard').value = eventData.Titolo || '';
-            const eventDate = eventData.Data ? new Date(eventData.Data.replace(/-/g, '/')) : null;
-            document.getElementById('event-date-dashboard').value = (eventDate && !isNaN(eventDate)) ? eventDate.toISOString().split('T')[0] : '';
-            let startTime = ''; let endTime = ''; const durata = eventData.Durata || '';
-            if (durata.includes('-')) { const parts = durata.split('-'); startTime = parts[0].trim().match(/^\d{2}:\d{2}/) ? parts[0].trim().substring(0,5) : ''; endTime = parts[1].trim().match(/^\d{2}:\d{2}/) ? parts[1].trim().substring(0,5) : '';}
-            else if (durata.match(/^\d{2}:\d{2}/)) { startTime = durata.substring(0,5); }
-            document.getElementById('event-start-time-dashboard').value = startTime;
-            document.getElementById('event-end-time-dashboard').value = endTime;
-            document.getElementById('event-short-desc-dashboard').value = eventData.descrizione || '';
-            document.getElementById('event-long-desc-dashboard').value = eventData.descrizione_estesa || '';
-            document.getElementById('event-prefix-dashboard').value = eventData.prefisso_relatore || 'Relatore';
-            document.getElementById('event-speaker-dashboard').value = eventData.relatore || '';
-            document.getElementById('event-association-dashboard').value = eventData.associazione || '';
-            document.getElementById('event-seats-dashboard').value = eventData.posti_configurati_totali !== null ? eventData.posti_configurati_totali : '0';
-            document.getElementById('event-booking-dashboard').checked = !!parseInt(eventData.FlagPrenotabile);
-            voluntaryCheckboxDashboard.checked = eventData.costo !== null && parseFloat(eventData.costo) === 0;
-            updatePriceFieldVisibilityDashboard();
-            if (!voluntaryCheckboxDashboard.checked && eventData.costo !== null && parseFloat(eventData.costo) > 0) { eventPriceInputDashboard.value = parseFloat(eventData.costo).toFixed(2); }
-            else { eventPriceInputDashboard.value = ''; }
-            if (eventData.immagine_url) { currentImagePreviewDashboard.src = eventData.immagine_url; currentImagePreviewDashboard.style.display = 'block'; }
-            if (eventData.volantino_url) { const fileName = eventData.volantino_url.split('/').pop(); currentFlyerPreviewDashboard.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank">Vedi volantino (${sanitizeText(fileName)})</a>`; }
-        } else {
-            eventPopupTitleDashboard.textContent = 'Aggiungi Nuovo Evento'; eventIdInputDashboard.value = '';
-            document.getElementById('event-booking-dashboard').checked = true;
-            voluntaryCheckboxDashboard.checked = false; updatePriceFieldVisibilityDashboard();
-            document.getElementById('event-seats-dashboard').value = '50';
-            document.getElementById('event-prefix-dashboard').value = 'Relatore';
-            eventPriceInputDashboard.value = '';
-        }
-        updateEventPreview();
-        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.add('active');
-        if(eventPopupDashboard) eventPopupDashboard.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        const titleInput = document.getElementById('event-title-dashboard'); if(titleInput) titleInput.focus();
-    }
-
-    function closeEventPopupDashboard() {
-        if(eventPopupOverlayDashboard) eventPopupOverlayDashboard.classList.remove('active');
-        if(eventPopupDashboard) eventPopupDashboard.classList.remove('active');
-        const anyModalActive = document.querySelector('.modal.active, .event-popup-overlay.active');
-        if (!anyModalActive) document.body.style.overflow = '';
-    }
-    if (closeEventPopupBtnDashboard) closeEventPopupBtnDashboard.addEventListener('click', closeEventPopupDashboard);
-
-    document.addEventListener('keydown', function(event) {
-        if (event.key === "Escape") {
-            if (eventPopupDashboard && eventPopupDashboard.classList.contains('active')) closeEventPopupDashboard();
-            const activeModal = document.querySelector('.modal.active'); if (activeModal) closeModal(activeModal.id);
-        }
-    });
-
-    if(eventFormDashboard) eventFormDashboard.addEventListener('submit', async function(e) {
-        e.preventDefault(); const submitBtn = this.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
-        if(eventFormMessageDashboard) { eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';}
-        try {
-            const formData = new FormData(this);
-            formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
-            if (formData.get('event-voluntary') === 'on') formData.set('event-price', '0.00');
-            else if (!formData.get('event-price') && !formData.get('event-voluntary')) { formData.set('event-price', '0.00'); }
-            const startTime = formData.get('event-start-time'); const endTime = formData.get('event-end-time');
-            let durataString = '';
-            if (startTime && endTime) durataString = `${startTime}-${endTime}`; else if (startTime) durataString = startTime;
-            formData.append('event-time-combined', durataString); // Uso un nome diverso per evitare conflitti
-            formData.delete('event-start-time'); // Rimuovo i campi singoli
-            formData.delete('event-end-time');   // Rimuovo i campi singoli
-
-            const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
-            const responseText = await response.text();
-            let result; try { result = JSON.parse(responseText); } catch (jsonError) { console.error("Risposta non JSON:", responseText); throw new Error(`Risposta server non valida.`); }
-            if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
-            if (result.success) {
-                if(eventFormMessageDashboard) { eventFormMessageDashboard.textContent = result.message || 'Operazione completata!'; eventFormMessageDashboard.classList.remove('error'); eventFormMessageDashboard.classList.add('success');}
-                await fetchDashboardData(); setTimeout(closeEventPopupDashboard, 1500);
-            } else { throw new Error(result.message || 'Errore salvataggio.'); }
-        } catch (error) {
-            console.error('Errore form evento:', error);
-            if(eventFormMessageDashboard) { eventFormMessageDashboard.textContent = `Errore: ${error.message}`; eventFormMessageDashboard.classList.remove('success'); eventFormMessageDashboard.classList.add('error');}
-        } finally { if(eventFormMessageDashboard) eventFormMessageDashboard.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; }
-    });
-
-    const tabButtons = document.querySelectorAll('.event-tabs-container-main .event-tab-button');
-    const tabContents = document.querySelectorAll('#eventManagementContent .event-tab-content');
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            if (!button.id || !button.id.startsWith('filterToggle')) {
-                tabButtons.forEach(btn => { if (!btn.id || !btn.id.startsWith('filterToggle')) btn.classList.remove('active'); });
-                button.classList.add('active'); const targetTab = button.dataset.tab;
-                tabContents.forEach(content => { const isActiveTab = content.id === `${targetTab}EventsContainer`; content.style.display = isActiveTab ? 'block' : 'none'; if (isActiveTab) content.classList.add('active'); else content.classList.remove('active'); });
-            }
-        });
-    });
-
-    const filterToggleButton = document.getElementById('filterToggleButton');
-    const filterPanelDropdown = document.getElementById('filterPanelDropdown');
-    const applyFiltersFromPanelBtn = document.getElementById('applyFiltersFromPanelBtn');
-    const resetFiltersBtnPanel = document.getElementById('resetFiltersBtnPanel');
-    if (filterToggleButton && filterPanelDropdown) { filterToggleButton.addEventListener('click', function(event) { event.stopPropagation(); const isActive = filterPanelDropdown.classList.toggle('active'); filterToggleButton.classList.toggle('active', isActive); filterToggleButton.setAttribute('aria-expanded', isActive.toString()); });}
-    if (applyFiltersFromPanelBtn) applyFiltersFromPanelBtn.addEventListener('click', () => { applyFiltersAndRender(); if (filterPanelDropdown) filterPanelDropdown.classList.remove('active'); if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}});
-    if (resetFiltersBtnPanel) resetFiltersBtnPanel.addEventListener('click', () => {
-        const searchTitleInput = document.getElementById('searchTitleDashboard'); if(searchTitleInput) searchTitleInput.value = '';
-        const searchDateInput = document.getElementById('searchDateDashboard'); if(searchDateInput) searchDateInput.value = '';
-        const searchSpeakerInput = document.getElementById('searchSpeakerDashboard'); if(searchSpeakerInput) searchSpeakerInput.value = '';
-        applyFiltersAndRender();
-        updateActiveFiltersDisplay(); // Assicurati di pulire anche il display
-        if (filterPanelDropdown) filterPanelDropdown.classList.remove('active');
-        if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}
-    });
-
-    async function fetchDashboardData() {
-        const upcomingGrid = document.getElementById('upcomingEventsGrid');
-        const pastGrid = document.getElementById('pastEventsGrid');
-        if (!upcomingGrid || !pastGrid) { console.error("Elementi griglia eventi mancanti."); return; }
-        upcomingGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento eventi futuri...</p>';
-        pastGrid.innerHTML = '<p class="loading-message-dashboard"><i class="fas fa-spinner fa-spin"></i> Caricamento archivio eventi...</p>';
-        try {
-            const response = await fetch('get_dashboard_event_data.php');
-            if (!response.ok) throw new Error(`Errore HTTP: ${response.status} ${response.statusText}`);
-            const data = await response.json();
-            if (data.success) { allUpcomingEventsData = data.upcoming_events || []; allPastEventsData = data.past_events || []; applyFiltersAndRender(); }
-            else { const errorMsg = sanitizeText(data.message || 'Formato dati non corretto.'); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Errore nel caricamento: ${errorMsg}</p></div>`); }
-        } catch (error) { console.error('Errore fetchDashboardData:', error); const errorMsg = sanitizeText(error.message); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare i dati: ${errorMsg}</p> <button onclick="fetchDashboardData()" class="btn-admin">Riprova</button></div>`);}
-    }
-
-    function updateActiveFiltersDisplay() {
-        const displayContainer = document.getElementById('activeFiltersDisplayContainer');
-        const listElement = document.getElementById('activeFiltersList');
-        if (!displayContainer || !listElement) return;
-
-        listElement.innerHTML = ''; // Pulisci i filtri precedenti
-        let hasActiveFilters = false;
-
-        const titleFilter = document.getElementById('searchTitleDashboard').value.trim();
-        const dateFilter = document.getElementById('searchDateDashboard').value;
-        const speakerFilter = document.getElementById('searchSpeakerDashboard').value.trim();
-
-        if (titleFilter) {
-            const li = document.createElement('li');
-            li.innerHTML = `<span class="filter-label">Titolo:</span> ${sanitizeText(titleFilter)}`;
-            listElement.appendChild(li);
-            hasActiveFilters = true;
-        }
-        if (dateFilter) {
-            const li = document.createElement('li');
-            const dateObj = new Date(dateFilter + '-01T00:00:00'); // Per formattazione
-            const formattedDate = dateObj.toLocaleDateString('it-IT', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-            li.innerHTML = `<span class="filter-label">Mese/Anno:</span> ${sanitizeText(formattedDate)}`;
-            listElement.appendChild(li);
-            hasActiveFilters = true;
-        }
-        if (speakerFilter) {
-            const li = document.createElement('li');
-            li.innerHTML = `<span class="filter-label">Relatore:</span> ${sanitizeText(speakerFilter)}`;
-            listElement.appendChild(li);
-            hasActiveFilters = true;
-        }
-
-        if (hasActiveFilters) {
-            displayContainer.style.display = 'block';
-        } else {
-            displayContainer.style.display = 'none';
-        }
-    }
-
-
-    function applyFiltersAndRender() {
-        const titleFilter = document.getElementById('searchTitleDashboard').value.toLowerCase().trim();
-        const dateFilter = document.getElementById('searchDateDashboard').value;
-        const speakerFilter = document.getElementById('searchSpeakerDashboard').value.toLowerCase().trim();
-        const sortBy = document.getElementById('sortCriteria').value;
-        const sortDirection = document.getElementById('sortDirection').value;
-        const groupBy = document.getElementById('groupCriteria').value;
-        const filterEvent = (event) => { const eventTitle = event.Titolo?.toLowerCase() || ''; const eventDateStr = event.Data || ''; const eventSpeaker = event.relatore?.toLowerCase() || ''; let titleMatch = !titleFilter || eventTitle.includes(titleFilter); let dateMatch = !dateFilter || (eventDateStr && eventDateStr.substring(0, 7) === dateFilter); let speakerMatch = !speakerFilter || eventSpeaker.includes(speakerFilter); return titleMatch && dateMatch && speakerMatch; };
-        let filteredUpcoming = allUpcomingEventsData.filter(filterEvent);
-        let filteredPast = allPastEventsData.filter(filterEvent);
-        const compareFunction = (a, b) => { let valA, valB; let comparison = 0; switch (sortBy) { case 'mese': valA = new Date(a.Data); valB = new Date(b.Data); if (valA < valB) comparison = -1; if (valA > valB) comparison = 1; break; case 'titolo': valA = a.Titolo?.toLowerCase() || ''; valB = b.Titolo?.toLowerCase() || ''; comparison = valA.localeCompare(valB, 'it', { sensitivity: 'base' }); break; case 'relatore': valA = a.relatore?.toLowerCase() || ''; valB = b.relatore?.toLowerCase() || ''; comparison = valA.localeCompare(valB, 'it', { sensitivity: 'base' }); break; case 'prenotazioni': valA = parseInt(a.elenco_prenotazioni?.length) || 0; valB = parseInt(b.elenco_prenotazioni?.length) || 0; if (valA < valB) comparison = -1; if (valA > valB) comparison = 1; break; case 'post_occupati': valA = parseInt(a.posti_occupati) || 0; valB = parseInt(b.posti_occupati) || 0; if (valA < valB) comparison = -1; if (valA > valB) comparison = 1; break; case 'post_tot': valA = parseInt(a.posti_configurati_totali) || 0; valB = parseInt(b.posti_configurati_totali) || 0; if (valA < valB) comparison = -1; if (valA > valB) comparison = 1; break; default: valA = new Date(a.Data); valB = new Date(b.Data); if (valA < valB) comparison = -1; if (valA > valB) comparison = 1;} if (comparison === 0 && sortBy !== 'mese') { let dateA = new Date(a.Data); let dateB = new Date(b.Data); if (dateA < dateB) comparison = -1; if (dateA > valB) comparison = 1; } if (comparison === 0) { comparison = (parseInt(a.IDEvento) || 0) < (parseInt(b.IDEvento) || 0) ? -1 : 1; } return sortDirection === 'asc' ? comparison : -comparison; };
-        filteredUpcoming.sort(compareFunction); filteredPast.sort(compareFunction);
-        renderEventsSection(filteredUpcoming, 'upcomingEventsGrid', true, groupBy, sortDirection);
-        renderEventsSection(filteredPast, 'pastEventsGrid', false, groupBy, sortDirection);
-        updateActiveFiltersDisplay(); // Aggiorna la visualizzazione dei filtri attivi
-    }
-
-    function getWeekStartDate(dInput) { const parts = dInput.split('-'); const d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))); const day = d.getUTCDay(); const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1); return new Date(d.setUTCDate(diff)); }
-    function getWeekRangeString(dateStr) { if (!dateStr || !dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return 'Data non valida'; try { const weekStart = getWeekStartDate(dateStr); const weekEnd = new Date(weekStart); weekEnd.setUTCDate(weekStart.getUTCDate() + 6); const options = { day: '2-digit', month: 'short', timeZone: 'UTC' }; const year = weekStart.getUTCFullYear(); return `Sett. ${weekStart.toLocaleDateString('it-IT', options)} - ${weekEnd.toLocaleDateString('it-IT', options)} ${year}`; } catch (e) { console.warn("Errore getWeekRangeString:", dateStr, e); return 'Data non valida'; } }
-    function renderEventsSection(events, gridContainerId, isUpcoming, groupBy, sortDirection) {
-        const gridContainer = document.getElementById(gridContainerId); if (!gridContainer) return; gridContainer.innerHTML = '';
-        if (isUpcoming) { const addEventBar = document.createElement('div'); addEventBar.className = 'add-event-bar'; addEventBar.innerHTML = `<i class="fas fa-plus-circle"></i><span>Aggiungi Nuovo Evento</span>`; addEventBar.addEventListener('click', () => openEventPopupDashboard(null)); gridContainer.appendChild(addEventBar); }
-        if (events.length === 0) { if (!(isUpcoming && gridContainer.children.length === 1 && gridContainer.firstChild.classList.contains('add-event-bar'))) { gridContainer.innerHTML += `<p class="no-events-dashboard">Nessun evento ${isUpcoming ? 'futuro' : 'passato'} trovato.</p>`;} return; }
-        if (groupBy === "nessuno") { events.forEach(event => gridContainer.appendChild(createAdminEventCard(event))); return; }
-        const groupedEvents = events.reduce((acc, event) => { let groupKey = 'Non specificato'; try { switch (groupBy) { case 'giorno': groupKey = event.Data ? formatDbDate(event.Data) : 'Data sconosciuta'; break; case 'settimana': groupKey = event.Data ? getWeekRangeString(event.Data) : 'Data sconosciuta'; break; case 'mese': groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta'; break; case 'anno': groupKey = event.Data ? new Date(event.Data.replace(/-/g,'/')).getUTCFullYear().toString() : 'Anno sconosciuto'; break; case 'relatore': groupKey = sanitizeText(event.relatore || 'Senza Relatore'); break; default: groupKey = event.Data ? formatMonthYear(event.Data) : 'Data sconosciuta'; }} catch(e) { console.warn("Errore calcolo groupKey:", event, e); } if (!acc[groupKey]) acc[groupKey] = []; acc[groupKey].push(event); return acc; }, {});
-        let sortedGroupKeys = Object.keys(groupedEvents);
-        if (groupBy === 'giorno' || groupBy === 'settimana' || groupBy === 'mese' || groupBy === 'anno') { sortedGroupKeys.sort((a, b) => { let dateA, dateB; try { if (groupBy === 'giorno') { const pA = a.split('/'); dateA = new Date(Date.UTC(pA[2], pA[1]-1, pA[0])); const pB = b.split('/'); dateB = new Date(Date.UTC(pB[2], pB[1]-1, pB[0])); } else if (groupBy === 'settimana') { const matchA = a.match(/Sett\. (\d{2}) (\w+)/); const yearA = parseInt(a.substring(a.lastIndexOf(' ') + 1)); if (matchA) dateA = new Date(Date.UTC(yearA, getMonthIndexFromString(matchA[2]), parseInt(matchA[1]))); const matchB = b.match(/Sett\. (\d{2}) (\w+)/); const yearB = parseInt(b.substring(b.lastIndexOf(' ') + 1)); if (matchB) dateB = new Date(Date.UTC(yearB, getMonthIndexFromString(matchB[2]), parseInt(matchB[1]))); } else if (groupBy === 'mese') { const pA = a.split(' '); dateA = new Date(Date.UTC(pA[1], getMonthIndexFromString(pA[0]), 1)); const pB = b.split(' '); dateB = new Date(Date.UTC(pB[1], getMonthIndexFromString(pB[0]), 1)); } else if (groupBy === 'anno') { dateA = new Date(Date.UTC(a, 0, 1)); dateB = new Date(Date.UTC(b, 0, 1)); } } catch(e) { return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a)); } if (dateA && dateB && !isNaN(dateA) && !isNaN(dateB)) { return sortDirection === 'asc' ? dateA - dateB : dateB - dateA; } return sortDirection === 'asc' ? String(a).localeCompare(String(b)) : String(b).localeCompare(String(a)); });}
-        else if (groupBy === 'relatore') { sortedGroupKeys.sort((a,b) => sortDirection === 'asc' ? a.localeCompare(b,'it',{sensitivity:'base'}) : b.localeCompare(a,'it',{sensitivity:'base'})); }
-        for (const groupKey of sortedGroupKeys) { const headerEl = document.createElement('h3'); headerEl.className = 'month-year-header'; headerEl.textContent = groupKey; gridContainer.appendChild(headerEl); groupedEvents[groupKey].forEach(event => gridContainer.appendChild(createAdminEventCard(event)));}
-    }
-
-    function createAdminEventCard(event) {
-        const eventCard = document.createElement('article'); eventCard.className = 'admin-event-card'; eventCard.id = `admin-event-${event.IDEvento}`;
-        const numPrenotazioni = event.elenco_prenotazioni?.length || 0; const partecipanti = event.posti_occupati || 0; const postiConfigurati = event.posti_configurati_totali || 0; const commentCount = event.comment_count || 0; const mediaCount = event.media_count || 0;
-        let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-admin.jpg';
-        const relatoreDisplay = event.relatore ? `<span class="admin-event-date" style="display:block; margin-top:2px; font-style:italic;">${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>` : '';
-        eventCard.innerHTML = `<div class="admin-event-card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.Titolo)}" class="admin-event-card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div><div class="admin-event-card-content"><div class="admin-event-card-header"><h3 class="admin-event-title">${sanitizeText(event.Titolo)} <small>(ID: ${event.IDEvento})</small></h3><span class="admin-event-date">Data: ${formatDbDate(event.Data)} ${sanitizeText(event.Durata) || ''}</span>${relatoreDisplay}</div><div class="admin-event-card-quick-stats"><div class="stat-item" title="Prenotazioni"><i class="fas fa-ticket-alt"></i> ${numPrenotazioni} Pren.</div><div class="stat-item" title="Partecipanti / Posti Config."><i class="fas fa-users"></i> ${partecipanti}/${postiConfigurati}</div><div class="stat-item" title="Media"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div><div class="stat-item" title="Commenti"><i class="fas fa-comments"></i> ${commentCount} Comm.</div></div><div class="admin-event-card-actions top-actions"><button class="btn-admin btn-admin-warning" onclick="openManageMediaModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Media"><i class="fas fa-photo-video"></i> Media</button><button class="btn-admin btn-admin-info" onclick="openManageCommentsModal(${event.IDEvento}, '${sanitizeForAttribute(event.Titolo)}')" title="Commenti"><i class="fas fa-comments"></i> Commenti</button><button class="btn-admin btn-bookings" data-event-id="${event.IDEvento}" title="Prenotazioni"><i class="fas fa-list-alt"></i> Prenotazioni</button></div><div class="admin-event-card-actions bottom-actions"><button class="btn-admin btn-admin-secondary" onclick="window.open('generate_event_pdf.php?event_id=${event.IDEvento}', '_blank')" title="PDF"><i class="fas fa-file-pdf"></i> PDF</button><button class="btn-admin btn-edit" data-event-id="${event.IDEvento}" title="Modifica"><i class="fas fa-edit"></i> Modifica</button><button class="btn-admin btn-admin-danger btn-delete" data-event-id="${event.IDEvento}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div></div>`;
-        const editButton = eventCard.querySelector('.btn-edit'); if(editButton) editButton.addEventListener('click', function() { const eventToEdit = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); if (eventToEdit) openEventPopupDashboard(eventToEdit); else alert("Dati evento non trovati per la modifica."); });
-        const deleteButton = eventCard.querySelector('.btn-delete'); if(deleteButton) deleteButton.addEventListener('click', function() { const eventToDelete = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); confirmDeleteEvent(this.dataset.eventId, eventToDelete ? eventToDelete.Titolo : "evento sconosciuto"); });
-        const bookingsButton = eventCard.querySelector('.btn-bookings'); if(bookingsButton) bookingsButton.addEventListener('click', function() { const eventForBookings = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === this.dataset.eventId); if (eventForBookings) openManageBookingsModal(eventForBookings); else alert("Dati evento non trovati per le prenotazioni."); });
-        return eventCard;
-    }
-    function openManageBookingsModal(eventData) { const modalTitleEl = document.getElementById('bookingsEventTitle'); const bookingsContainerEl = document.getElementById('bookingsListContainerModal'); const feedbackEl = document.getElementById('bookingsManagementFeedbackModal'); if (modalTitleEl) modalTitleEl.textContent = sanitizeText(eventData.Titolo); if (feedbackEl) feedbackEl.innerHTML = ''; if (bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(eventData.elenco_prenotazioni || [], eventData.IDEvento); openModal('manageBookingsModal');}
-    function renderGroupedBookings(bookings, eventId) { if (!bookings || bookings.length === 0) return '<p style="text-align:center; margin:1rem 0;">Nessuna prenotazione.</p>'; let html = ''; bookings.forEach(booking => { const nomeCompletoUtente = `${sanitizeText(booking.NomeUtenteRegistrato || '')} ${sanitizeText(booking.CognomeUtenteRegistrato || '')}`.trim(); const displayNomeUtente = nomeCompletoUtente || sanitizeText(booking.Contatto); const partecipantiHTML = booking.partecipanti_della_prenotazione && booking.partecipanti_della_prenotazione.length > 0 ? `<ul class="participant-list-inline">${booking.partecipanti_della_prenotazione.map(p => `<li>${sanitizeText(p.Nome)} ${sanitizeText(p.Cognome)}</li>`).join('')}</ul>` : '<p><small>Nessun dettaglio partecipante.</small></p>'; html += `<div class="user-booking-group" id="booking-group-${booking.idPrenotazione}"><h5>Prenotazione di: ${displayNomeUtente} <small>(${sanitizeText(booking.Contatto)})</small></h5><div class="single-booking-details"><p><strong>ID Pren.: ${booking.idPrenotazione}</strong> - Posti: ${booking.NumeroPosti}</p><strong>Partecipanti:</strong>${partecipantiHTML}<button class="btn-admin btn-admin-danger btn-sm" onclick="confirmCancelBookingInModal(${booking.idPrenotazione}, ${eventId}, ${booking.NumeroPosti}, '${sanitizeForAttribute(displayNomeUtente)}')" title="Annulla"><i class="fas fa-times-circle"></i> Annulla</button></div></div>`; }); return html;}
-    function confirmCancelBookingInModal(idPrenotazione, eventId, numPosti, nomeUtente) { if (confirm(`Annullare prenotazione ID ${idPrenotazione} (${numPosti} posti) di ${nomeUtente}?`)) { cancelBookingInModal(idPrenotazione, eventId);}}
-    async function cancelBookingInModal(idPrenotazione, eventIdForModalReload) { const feedbackEl = document.getElementById('bookingsManagementFeedbackModal'); if(feedbackEl) feedbackEl.innerHTML = `<p><i class="fas fa-spinner fa-spin"></i> Annullamento...</p>`; try { const formData = new FormData(); formData.append('id_prenotazione', idPrenotazione); const response = await fetch('annulla_prenotazione_admin.php', { method: 'POST', body: formData }); const result = await response.json(); if (feedbackEl) { if (result.success) { feedbackEl.innerHTML = `<p class="success-message"><i class="fas fa-check-circle"></i> ${sanitizeText(result.message)}</p>`; await fetchDashboardData(); const updatedEventData = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento) === String(eventIdForModalReload)); if(updatedEventData) { const bookingsContainerEl = document.getElementById('bookingsListContainerModal'); if(bookingsContainerEl) bookingsContainerEl.innerHTML = renderGroupedBookings(updatedEventData.elenco_prenotazioni || [], updatedEventData.IDEvento);} else { closeModal('manageBookingsModal'); }} else { feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(result.message || 'Impossibile annullare.')}</p>`;}}} catch (error) { console.error("Errore AJAX annullamento prenotazione:", error); if (feedbackEl) feedbackEl.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-circle"></i> Errore: ${sanitizeText(error.message)}</p>`;}}
-    async function openManageMediaModal(eventId, eventTitle) { const eventIdInput = document.getElementById('uploadMediaEventId'); const eventTitleEl = document.getElementById('uploadMediaEventTitle'); const existingMediaContainer = document.getElementById('existingMediaContainer'); const feedbackDiv = document.getElementById('uploadMediaFeedback'); const uploadForm = document.getElementById('uploadMediaForm'); if(eventIdInput) eventIdInput.value = eventId; if(eventTitleEl) eventTitleEl.textContent = sanitizeText(eventTitle); if(uploadForm) uploadForm.reset(); if(feedbackDiv) feedbackDiv.innerHTML = ''; if(existingMediaContainer) existingMediaContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>'; openModal('uploadMediaModal'); try { const response = await fetch(`manage_event_media.php?action=get_event_media&event_id=${eventId}`); const result = await response.json(); if (result.success && result.media) { renderExistingMedia(result.media, eventId); } else if (existingMediaContainer) { existingMediaContainer.innerHTML = `<p>${sanitizeText(result.message || 'Nessun media o errore.')}</p>`; }} catch(error) { console.error('Errore recupero media:', error); if(existingMediaContainer) existingMediaContainer.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;}}
-    function renderExistingMedia(mediaItems, eventId) { const container = document.getElementById('existingMediaContainer'); if (!container) return; if (mediaItems.length === 0) { container.innerHTML = '<p>Nessun media caricato.</p>'; return; } let html = '<div class="existing-media-grid">'; mediaItems.forEach(item => { const filename = item.url_media ? item.url_media.split('/').pop() : 'File'; const itemDesc = sanitizeText(item.Descrizione || ''); let mediaPreviewHTML = ''; if (item.tipo_media === 'image') { mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Visualizza: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><img src="${sanitizeForAttribute(item.url_media)}" alt="${itemDesc || filename}" loading="lazy" onerror="this.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"></a><div class="media-icon-placeholder" style="display:none;" title="Immagine: ${sanitizeForAttribute(filename)}"><i class="fas fa-image"></i></div>`; } else if (item.tipo_media === 'video') { mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Guarda: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-video"></i></div></a>`; } else { mediaPreviewHTML = `<a href="${sanitizeForAttribute(item.url_media)}" target="_blank" title="Apri: ${sanitizeForAttribute(filename)}${itemDesc ? ' - ' + itemDesc : ''}"><div class="media-icon-placeholder"><i class="fas fa-file-alt"></i></div></a>`; } html += `<div class="existing-media-item">${mediaPreviewHTML}<p class="media-filename" title="${sanitizeForAttribute(item.url_media)}">${sanitizeText(filename)}</p>${itemDesc ? `<p class="media-description"><em>${itemDesc}</em></p>` : ''}<button class="btn-admin btn-admin-danger btn-sm btn-delete-media" data-media-id="${item.id_media}" data-event-id="${eventId}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div>`; }); html += '</div>'; container.innerHTML = html; container.querySelectorAll('.btn-delete-media').forEach(button => { button.addEventListener('click', function() { if (confirm('Eliminare questo media?')) { deleteMediaItem(this.dataset.mediaId, this.dataset.eventId);}});});}
-    async function deleteMediaItem(mediaId, eventId) { const feedbackDiv = document.getElementById('uploadMediaFeedback'); if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>'; try { const formData = new FormData(); formData.append('action', 'delete_event_media'); formData.append('media_id', mediaId); const response = await fetch('manage_event_media.php', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`; openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); fetchDashboardData(); } else { if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;}} catch(error) { console.error('Errore eliminazione media:', error); if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 4000);}
-    const eventUploadMediaForm = document.getElementById('uploadMediaForm'); if(eventUploadMediaForm) eventUploadMediaForm.addEventListener('submit', async function(e) { e.preventDefault(); const eventId = document.getElementById('uploadMediaEventId').value; const feedbackDiv = document.getElementById('uploadMediaFeedback'); const mediaFilesInput = document.getElementById('mediaFiles'); if (mediaFilesInput.files.length === 0) { if(feedbackDiv) feedbackDiv.innerHTML = '<p class="error-message">Seleziona file.</p>'; return; } if(feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p>'; const formData = new FormData(this); formData.set('action', 'upload_media'); formData.set('event_id', eventId); try { const response = await fetch('manage_event_media.php', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { if(feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`; this.reset(); openManageMediaModal(eventId, document.getElementById('uploadMediaEventTitle')?.textContent || "Evento"); fetchDashboardData(); } else { if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(result.message)}</p>`;}} catch(error) { console.error('Errore uploadMedia:', error); if(feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(() => { if(feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 5000);});
-    let currentEventIdForCommentsGl = null;
-    async function openManageCommentsModal(eventId, eventTitle) { currentEventIdForCommentsGl = eventId; const titleEl = document.getElementById('commentsEventTitle'); let listContainerEl = document.getElementById('commentsListContainer'); const feedbackEl = document.getElementById('commentsManagementFeedback'); if(titleEl) titleEl.textContent = sanitizeText(eventTitle); if(feedbackEl) feedbackEl.innerHTML = ''; if (listContainerEl && listContainerEl.parentNode) { const newClonedListContainer = listContainerEl.cloneNode(false); listContainerEl.parentNode.replaceChild(newClonedListContainer, listContainerEl); listContainerEl = newClonedListContainer; attachAdminCommentListeners(listContainerEl); } else { console.error("commentsListContainer non trovato."); if(feedbackEl) feedbackEl.innerHTML = '<p class="error-message">Errore UI.</p>'; openModal('manageCommentsModal'); return;} listContainerEl.innerHTML = '<li><p><i class="fas fa-spinner fa-spin"></i> Caricamento...</p></li>'; openModal('manageCommentsModal'); try { const response = await fetch(`manage_comments_admin.php?action=get_comments&event_id=${eventId}`); if (!response.ok) { let errTxt = `Errore HTTP ${response.status}`; try { const errData = await response.json(); errTxt = errData.message || errTxt; } catch(e) {} throw new Error(errTxt); } const result = await response.json(); if (result.success && result.comments) { renderCommentsForAdminThreaded(result.comments, eventId, listContainerEl); } else { listContainerEl.innerHTML = `<li><p>${sanitizeText(result.message || 'Nessun commento o errore.')}</p></li>`;}} catch(error) { console.error('Errore caricamento commenti:', error); listContainerEl.innerHTML = `<li><p class="error-message">Errore: ${sanitizeText(error.message)}</p></li>`;}}
-    function renderCommentsForAdminThreaded(comments, eventId, parentUlElement, depth = 0) { if (depth === 0) { parentUlElement.innerHTML = ''; if (!comments || comments.length === 0) { parentUlElement.innerHTML = '<li style="list-style-type:none;text-align:center;margin:1rem 0;"><p>Nessun commento.</p></li>'; return;}} comments.forEach(comment => { const commentItemLi = document.createElement('li'); commentItemLi.className = 'comment-item-admin-styled'; commentItemLi.id = `admin-comment-${comment.Progressivo}`; if (comment.is_admin_reply) { commentItemLi.classList.add('commento-admin-generale');} const commenterAvatar = comment.commenter_icon_path || defaultUserIconPath; const commenterName = sanitizeText(comment.utente_display_name || 'Anonimo'); const commentDate = sanitizeText(comment.data_creazione_formattata || 'N/D'); const commentText = sanitizeTextForHTML(comment.Descrizione); let adminBadgeHTML = comment.is_admin_reply ? '<span class="badge-admin-dashboard">(Admin)</span>' : ''; commentItemLi.innerHTML = `<div class="comment-header"><img src="${commenterAvatar}" alt="Avatar" class="user-avatar" onerror="this.onerror=null;this.src='${defaultUserIconPath}';"><div class="comment-meta"><strong>${commenterName}</strong> ${adminBadgeHTML}<small>${commentDate}</small><small class="comment-id-details">ID: ${comment.Progressivo}${comment.CodRisposta ? ` | Risposta a ID: ${comment.CodRisposta}` : ''}</small></div></div><div class="comment-text-admin">${commentText}</div><div class="comment-actions-admin"><button class="btn-admin btn-admin-reply btn-sm" data-comment-id="${comment.Progressivo}" title="Rispondi"><i class="fas fa-reply"></i> Rispondi</button><button class="btn-admin btn-admin-danger btn-admin-delete-comment btn-sm" data-comment-id="${comment.Progressivo}" title="Elimina"><i class="fas fa-trash-alt"></i> Elimina</button></div><div class="reply-form-admin" id="reply-form-admin-${comment.Progressivo}" style="display:none;"><form data-parent-comment-id="${comment.Progressivo}" data-event-id="${eventId}"><textarea name="Descrizione" placeholder="Rispondi come ${adminNameGlobalJS}..." rows="3" required class="form-control"></textarea><div class="form-actions-reply" style="text-align:right; margin-top:0.5rem;"><button type="submit" class="btn-admin btn-admin-primary btn-sm"><i class="fas fa-paper-plane"></i> Invia</button></div><div class="form-message-local" style="margin-top:0.5em; font-size:0.85rem;"></div></form></div>`; parentUlElement.appendChild(commentItemLi); if (comment.replies && comment.replies.length > 0) { const repliesUl = document.createElement('ul'); repliesUl.className = 'comment-replies-list-styled'; commentItemLi.appendChild(repliesUl); renderCommentsForAdminThreaded(comment.replies, eventId, repliesUl, depth + 1);}}); }
-    function attachAdminCommentListeners(commentsListContainerUL) { if (!commentsListContainerUL) return; commentsListContainerUL.addEventListener('click', handleCommentActionClick); commentsListContainerUL.addEventListener('submit', handleCommentFormSubmit); }
-    async function handleCommentActionClick(event) { const target = event.target; const replyButton = target.closest('.btn-admin-reply'); if (replyButton) { event.preventDefault(); const commentId = replyButton.dataset.commentId; const replyFormDiv = document.getElementById(`reply-form-admin-${commentId}`); if (replyFormDiv) { const isActive = replyFormDiv.style.display === 'block'; replyFormDiv.style.display = isActive ? 'none' : 'block'; if (!isActive) replyFormDiv.querySelector('textarea')?.focus(); const localMsg = replyFormDiv.querySelector('.form-message-local'); if (localMsg) { localMsg.textContent = ''; localMsg.style.display = 'none'; }} return; } const deleteButton = target.closest('.btn-admin-delete-comment'); if (deleteButton) { event.preventDefault(); const commentId = deleteButton.dataset.commentId; if (currentEventIdForCommentsGl) { deleteAdminComment(commentId, currentEventIdForCommentsGl); } else { alert("Errore: ID evento non specificato."); } return;}}
-    async function handleCommentFormSubmit(event) { const targetForm = event.target.closest('.reply-form-admin form'); if (targetForm) { event.preventDefault(); const eventId = targetForm.dataset.eventId; await handleAdminReplySubmit(targetForm, eventId);}}
-    async function handleAdminReplySubmit(formElement, eventId) { const parentCommentId = formElement.dataset.parentCommentId; const replyText = formElement.querySelector('textarea[name="Descrizione"]').value.trim(); const feedbackEl = formElement.querySelector('.form-message-local'); const submitBtn = formElement.querySelector('button[type="submit"]'); if (!replyText) { if (feedbackEl) { feedbackEl.textContent = 'Risposta vuota.'; feedbackEl.className = 'form-message-local error-message'; feedbackEl.style.display = 'block';} return;} const originalBtnHTML = submitBtn.innerHTML; if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-mini" style="border-top-color:white;"></span> Invio...'; } if (feedbackEl) { feedbackEl.textContent = ''; feedbackEl.style.display = 'none'; } try { const formData = new FormData(); formData.append('action', 'submit_admin_reply'); formData.append('event_id', eventId); formData.append('comment_id', parentCommentId); formData.append('reply_text', replyText); const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData }); if (!response.ok) { let errData = { message: `Errore HTTP ${response.status}` }; try { errData = await response.json(); } catch (e) {} throw new Error(errData.message || `Errore server.`);} const result = await response.json(); if (result.success) { if (feedbackEl) { feedbackEl.textContent = 'Risposta inviata!'; feedbackEl.className = 'form-message-local success-message'; feedbackEl.style.display = 'block'; setTimeout(() => { if (feedbackEl) { feedbackEl.style.display = 'none'; feedbackEl.textContent = ''; }}, 3000);} formElement.reset(); const replyFormDiv = formElement.closest('.reply-form-admin'); if (replyFormDiv) replyFormDiv.style.display = 'none'; await openManageCommentsModal(eventId, document.getElementById('commentsEventTitle')?.textContent || "Evento"); fetchDashboardData(); } else { throw new Error(result.message || 'Errore invio.');}} catch(error) { console.error("Errore invio risposta admin:", error); if (feedbackEl) { feedbackEl.textContent = `Errore: ${sanitizeText(error.message)}`; feedbackEl.className = 'form-message-local error-message'; feedbackEl.style.display = 'block';}} finally { if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnHTML;}}}
-    async function deleteAdminComment(commentId, eventIdForReload) { if (!confirm('Eliminare commento e risposte?')) return; const feedbackDiv = document.getElementById('commentsManagementFeedback'); if (feedbackDiv) feedbackDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Eliminazione...</p>'; try { const formData = new FormData(); formData.append('action', 'delete_comment'); formData.append('comment_id', commentId); const response = await fetch('manage_comments_admin.php', { method: 'POST', body: formData }); if (!response.ok) { let errData = { message: `Errore HTTP ${response.status}` }; try { errData = await response.json(); } catch (e) {} throw new Error(errData.message || `Errore server.`);} const result = await response.json(); if (result.success) { if (feedbackDiv) feedbackDiv.innerHTML = `<p class="success-message">${sanitizeText(result.message)}</p>`; await openManageCommentsModal(eventIdForReload, document.getElementById('commentsEventTitle')?.textContent || "Evento"); fetchDashboardData(); } else { throw new Error(result.message || "Errore eliminazione.");}} catch(error) { console.error('Errore deleteAdminComment:', error); if (feedbackDiv) feedbackDiv.innerHTML = `<p class="error-message">Errore: ${sanitizeText(error.message)}</p>`;} setTimeout(() => { if (feedbackDiv && !feedbackDiv.querySelector('.error-message')) feedbackDiv.innerHTML = ''; }, 3000);}
-    async function confirmDeleteEvent(eventId, eventTitle) { if (!confirm(`ATTENZIONE: Eliminare evento "${sanitizeText(eventTitle)}" (ID: ${eventId}) e tutti i dati associati? L'azione è IRREVERSIBILE.`)) return; const cardEl = document.getElementById(`admin-event-${eventId}`); if (cardEl) cardEl.style.opacity = '0.5'; try { const formData = new FormData(); formData.append('action', 'delete_event'); formData.append('event_id', eventId); const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData }); const result = await response.json(); alert(sanitizeText(result.message)); if (result.success) { fetchDashboardData(); } else { if (cardEl) cardEl.style.opacity = '1';}} catch(error) { console.error('Errore deleteEvent:', error); alert(`Errore eliminazione: ${sanitizeText(error.message)}`); if (cardEl) cardEl.style.opacity = '1';}}
-
-    // --- NUOVA LOGICA PER OPZIONI AVANZATE MODAL ---
-    const openAdvancedOptionsModalBtn = document.getElementById('openAdvancedOptionsModalBtn');
-    const advancedOptionsModal = document.getElementById('advancedOptionsModal');
-    const moderationSlider = document.getElementById('moderationLevelSliderInput');
-    const moderationLevelLabel = document.getElementById('moderationLevelLabel');
-    const moderationLevelDescription = document.getElementById('moderationLevelDescription');
-    const moderationPreviewChat = document.getElementById('moderationPreviewChat');
-    const saveAdvancedSettingsModalBtn = document.getElementById('saveAdvancedSettingsModalBtn');
-    const advancedSettingsModalMessage = document.getElementById('advancedSettingsModalMessage');
-
-    const moderationLevels = [
-        { label: "Nessuna Moderazione", threshold: 10, colorClass: "level-0", description: "Commenti sempre pubblicati (salvo filtri server per casi estremi)." },
-        { label: "Moderazione Leggera", threshold: 6, colorClass: "level-1", description: "Blocca commenti con punteggio offensività IA ≥ 6." },
-        { label: "Moderazione Standard", threshold: 4, colorClass: "level-2", description: "Blocca commenti con punteggio offensività IA ≥ 4. (Raccomandato)" },
-        { label: "Moderazione Rigorosa", threshold: 2, colorClass: "level-3", description: "Blocca commenti con punteggio offensività IA ≥ 2." }
-    ];
-
-    const exampleComments = [
-        { text: "Ciao, sono felice di essere parte di questa fraternità! Un saluto a tutti.", offensiveness: 1, id: "ex_comm_1" },
-        { text: "Bello il nuovo logo del gruppo, ci sta un sacco!", offensiveness: 2, id: "ex_comm_2" },
-        { text: "Attendo con ansia la festa di sabato, speriamo sia divertente.", offensiveness: 3, id: "ex_comm_3" },
-        { text: "L'organizzazione dell'ultimo evento lasciava un po' a desiderare, spero si possa fare meglio la prossima volta.", offensiveness: 4, id: "ex_comm_4" },
-        { text: "Francamente, alcuni membri dovrebbero impegnarsi di più invece di fare solo presenza e chiacchiere.", offensiveness: 5, id: "ex_comm_5" },
-        { text: "Ma come diavolo ha fatto certa gente ad entrare qui? Non capiscono nulla dello spirito del gruppo. Pazzesco.", offensiveness: 6, id: "ex_comm_6" },
-        { text: "Questo posto è pieno di superficiali ipocriti che pensano solo a sé stessi. La vera fratellanza è un'altra cosa, sveglia!", offensiveness: 7, id: "ex_comm_7" },
-        { text: "Una massa di idioti presuntuosi, ecco cos'è diventata questa fraternità. Solo apparenza e zero sostanza. Che schifo!", offensiveness: 8, id: "ex_comm_8" },
-        { text: "Quel cretino di Tizio e quell'incapace di Caio stanno mandando tutto a rotoli con le loro decisioni stupide. Via subito, incompetenti!", offensiveness: 9, id: "ex_comm_9" },
-        { text: "Questo posto fa vomitare, è un covo di gente spregevole e malintenzionata. Andatevene affanc**o tutti quanti!", offensiveness: 10, id: "ex_comm_10" }
-    ];
-
-    function updateModerationSliderUI(sliderValue) {
-        const value = parseInt(sliderValue);
-        if (isNaN(value) || value < 0 || value >= moderationLevels.length) { console.warn("Valore slider non valido:", sliderValue); return; }
-        const level = moderationLevels[value];
-        if (moderationLevelLabel) { moderationLevelLabel.textContent = level.label; moderationLevelLabel.className = 'slider-level-label ' + level.colorClass; }
-        if (moderationSlider) { moderationSlider.className = 'moderation-slider ' + level.colorClass; }
-        if (moderationLevelDescription) { moderationLevelDescription.textContent = level.description; }
-        renderChatSimulation(level.threshold);
-    }
-
-    function renderChatSimulation(currentThreshold) {
-        if (!moderationPreviewChat) return;
-        moderationPreviewChat.innerHTML = '';
-        exampleComments.forEach(comment => {
-            const isEffectivelyBlocked = currentThreshold < 10 && comment.offensiveness >= currentThreshold;
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'chat-message-example';
-            messageDiv.dataset.offensiveness = comment.offensiveness;
-            if (isEffectivelyBlocked) { messageDiv.classList.add('blocked'); }
-            messageDiv.innerHTML = `
-                <span class="chat-user">Utente Esempio:</span>
-                <span class="chat-text">${sanitizeText(comment.text)}</span>
-                <div class="blocked-overlay">
-                    <span class="blocked-icon"><i class="fas fa-ban"></i></span>
-                    <span class="blocked-text">Messaggio filtrato dall'IA</span>
-                </div>`;
-            moderationPreviewChat.appendChild(messageDiv);
-        });
-    }
-
-    if (openAdvancedOptionsModalBtn) {
-        openAdvancedOptionsModalBtn.addEventListener('click', () => {
-            loadAdvancedSettings();
-            openModal('advancedOptionsModal');
-        });
-    }
-
-    document.querySelectorAll('#advancedOptionsModal .close-modal-btn, #advancedOptionsModal .close-modal-btn-alt').forEach(btn => {
-        btn.addEventListener('click', function() { closeModal(this.dataset.modalId); });
-    });
-
-    if (moderationSlider) {
-        moderationSlider.addEventListener('input', function() { updateModerationSliderUI(this.value); });
-    }
-
-    async function loadAdvancedSettings() {
-        if (!moderationSlider) return;
-        try {
-            const response = await fetch('manage_global_settings.php?action=get_setting&key=comment_moderation_level');
-            if (!response.ok) throw new Error(`Errore HTTP! status: ${response.status}`);
-            const result = await response.json();
-            let sliderValueToSet = '2';
-            if (result.success && result.value !== null && typeof moderationLevels[parseInt(result.value)] !== 'undefined') {
-                sliderValueToSet = result.value;
-            } else if (result.value === null) { console.log("Livello moderazione non trovato, si usa default 'Standard'.");
-            } else if(!result.success && advancedSettingsModalMessage){ advancedSettingsModalMessage.textContent = `Errore caricamento: ${result.message}`; advancedSettingsModalMessage.className = 'form-message error'; advancedSettingsModalMessage.style.display = 'block'; }
-            moderationSlider.value = sliderValueToSet;
-            updateModerationSliderUI(sliderValueToSet);
-        } catch (error) {
-            console.error('Fallimento fetch impostazioni avanzate:', error);
-            if(advancedSettingsModalMessage){ advancedSettingsModalMessage.textContent = `Errore caricamento: ${error.message}`; advancedSettingsModalMessage.className = 'form-message error'; advancedSettingsModalMessage.style.display = 'block'; }
-            moderationSlider.value = '2'; updateModerationSliderUI('2');
-        }
-    }
-
-    async function saveAdvancedSettingsFromModal() {
-        if (!moderationSlider || !saveAdvancedSettingsModalBtn || !advancedSettingsModalMessage) return;
-        const selectedLevelValue = moderationSlider.value;
-        saveAdvancedSettingsModalBtn.disabled = true;
-        saveAdvancedSettingsModalBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
-        advancedSettingsModalMessage.style.display = 'none'; advancedSettingsModalMessage.className = 'form-message';
-        try {
-            const formData = new FormData();
-            formData.append('action', 'update_setting');
-            formData.append('key', 'comment_moderation_level');
-            formData.append('value', selectedLevelValue);
-            const response = await fetch('manage_global_settings.php', { method: 'POST', body: formData });
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const result = await response.json();
-            if (result.success) {
-                advancedSettingsModalMessage.textContent = result.message || 'Impostazioni salvate!';
-                advancedSettingsModalMessage.classList.add('success');
-                advancedSettingsModalMessage.style.display = 'block';
-                setTimeout(() => { closeModal('advancedOptionsModal'); }, 1500);
-            } else { throw new Error(result.message || 'Errore durante il salvataggio.'); }
-        } catch (error) {
-            console.error('Errore salvataggio impostazioni avanzate:', error);
-            advancedSettingsModalMessage.textContent = `Errore: ${error.message}`;
-            advancedSettingsModalMessage.classList.add('error');
-            advancedSettingsModalMessage.style.display = 'block';
-        } finally { saveAdvancedSettingsModalBtn.disabled = false; saveAdvancedSettingsModalBtn.innerHTML = '<i class="fas fa-save"></i> Salva Impostazioni'; }
-    }
-
-    if (saveAdvancedSettingsModalBtn) {
-        saveAdvancedSettingsModalBtn.addEventListener('click', saveAdvancedSettingsFromModal);
-    }
-
-    // Funzioni AI (copiate e adattate da eventiincorso.html)
-    async function callApi(url, method = 'GET', data = null) { // Definizione di callApi se non già presente globalmente
-        const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
-        const options = { method, headers, credentials: 'same-origin' };
-        if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
-            options.body = JSON.stringify(data);
-        }
-        try {
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                let errorData = { message: `Errore HTTP ${response.status} (${response.statusText})` };
-                try {
-                    const potentialErrorJson = await response.text();
-                    errorData = JSON.parse(potentialErrorJson);
-                } catch (e) {
-                    errorData.rawError = potentialErrorJson;
-                }
-                throw new Error(errorData.message || `Errore server: ${response.status}`);
-            }
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.indexOf("application/json") !== -1) {
-                return response.json();
-            } else {
-                return response.text().then(text => text ? {success: true, message: text} : {});
-            }
-        } catch (error) {
-            console.error(`Fallimento API a ${url}:`, error);
-            throw error;
-        }
-    }
-
-    function simpleXorDecryptClient(base64String, key) {
-        try {
-            const encryptedText = atob(base64String);
-            let outText = '';
-            for(let i = 0; i < encryptedText.length; i++) {
-                outText += String.fromCharCode(encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-            }
-            return outText;
-        } catch (e) {
-            console.error("Fallimento decifratura API key:", e);
-            return null;
-        }
-    }
-
-    async function fetchAndPrepareGroqApiKey() {
-        if (groqApiKey) return true; // Già caricata
-        try {
-            // Assumiamo che get_groq_config.php sia accessibile dalla root del sito
-            const result = await callApi('api/get_groq_config.php');
-            if (result.success && result.obfuscatedApiKey && result.decryptionKey) {
-                const decryptedKey = simpleXorDecryptClient(result.obfuscatedApiKey, result.decryptionKey);
-                if (decryptedKey) {
-                    groqApiKey = decryptedKey;
-                    console.log("Chiave API Groq pronta per l'uso (Dashboard).");
-                    return true;
-                } else {
-                    console.error("Fallimento decifratura API Key Groq (Dashboard).");
-                    if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Errore config. AI (dec.).";
-                    return false;
-                }
-            } else {
-                console.error('Fallimento recupero componenti API key Groq (Dashboard):', result.message || 'Dati mancanti.');
-                if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Errore config. AI (fetch).";
-                return false;
-            }
-        } catch (error) {
-            console.error('Errore recupero API key Groq (Dashboard):', error);
-            if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Errore connessione AI.";
-            return false;
-        }
-    }
-
-    async function generateShortDescriptionAI(longDescription) {
-        if (!groqApiKey) {
-            const keyReady = await fetchAndPrepareGroqApiKey();
-            if (!keyReady || !groqApiKey) {
-                console.error("API Key Groq non disponibile per la generazione della descrizione (Dashboard).");
-                return { success: false, description: null, error: "Chiave API per AI non disponibile." };
-            }
-        }
-
-        if (!longDescription || longDescription.trim().length < 20) {
-            return { success: false, description: null, error: "La descrizione estesa è troppo corta per generare un riassunto." };
-        }
-
-        const groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
-        const promptSystem = "Sei un assistente AI specializzato nella creazione di contenuti per eventi. Data una descrizione estesa, il tuo compito è generare una descrizione breve, concisa e accattivante, ideale per essere visualizzata su una card promozionale dell'evento. La descrizione breve non deve superare i 190 caratteri. Rispondi solo con la descrizione breve generata, senza alcuna introduzione o testo aggiuntivo.";
-
-        const payload = {
-            "messages": [
-                { "role": "system", "content": promptSystem },
-                { "role": "user", "content": `Descrizione estesa da riassumere:\n\n${longDescription}` }
-            ],
-            "model": "meta-llama/Llama-4-scout-17b-16e-instruct", // o altro modello Groq
-            "temperature": 0.7,
-            "max_tokens": 65, // Abbastanza per ~200 caratteri
-            "top_p": 1,
-            "stream": false
-        };
-
-        try {
-            const response = await fetch(groqApiUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${groqApiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: { message: response.statusText } }));
-                console.error("Errore API Groq per descrizione (Dashboard):", response.status, errorData);
-                return { success: false, description: null, error: `Errore AI (${response.status}): ${errorData.error?.message || 'Servizio non raggiungibile'}` };
-            }
-
-            const data = await response.json();
-            if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
-                let generatedText = data.choices[0].message.content.trim();
-                generatedText = generatedText.replace(/^["']|["']$/g, ""); // Rimuove virgolette esterne
-                return { success: true, description: generatedText, error: null };
-            } else {
-                console.warn("Struttura risposta Groq non valida per descrizione (Dashboard):", data);
-                return { success: false, description: null, error: "Risposta AI non valida (struttura)." };
-            }
-        } catch (error) {
-            console.error('Errore chiamata API Groq per descrizione (Dashboard):', error);
-            return { success: false, description: null, error: "Errore comunicazione con servizio AI." };
-        }
-    }
-
-    if (generateShortDescBtnDashboard) {
-        generateShortDescBtnDashboard.addEventListener('click', async () => {
-            const longDesc = eventLongDescDashboard.value;
-            if (!longDesc.trim()) {
-                if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Inserisci prima una descrizione estesa.";
-                setTimeout(() => { if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = ""; }, 3000);
-                return;
-            }
-            generateShortDescBtnDashboard.classList.add('loading');
-            generateShortDescBtnDashboard.disabled = true;
-            if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Genero descrizione breve...";
-
-            const result = await generateShortDescriptionAI(longDesc);
-
-            generateShortDescBtnDashboard.classList.remove('loading');
-            generateShortDescBtnDashboard.disabled = false;
-
-            if (result.success && result.description) {
-                eventShortDescDashboard.value = result.description;
-                eventShortDescDashboard.dispatchEvent(new Event('input', { bubbles: true })); // Per aggiornare la preview
-                if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Descrizione breve generata!";
-            } else {
-                console.error("Errore generazione descrizione AI (Dashboard):", result.error);
-                if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = `Errore AI: ${result.error || 'Sconosciuto'}`;
-            }
-            setTimeout(() => { if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = ""; }, 4000);
-        });
-    }
-
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const adminUserString = localStorage.getItem('adminUserEFF');
-        let isAdmin = false;
-        if (adminUserString) {
-            try {
-                const adminUser = JSON.parse(adminUserString);
-                isAdmin = adminUser && (adminUser.is_admin === true || adminUser.is_admin === 1);
-                const navUsernameEl = document.getElementById('navbar-username');
-                if (navUsernameEl && adminUser.nome) navUsernameEl.textContent = adminUser.nome;
-                else if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
-                const navAvatarImgEl = document.querySelector('#navbar-avatar img');
-                if (navAvatarImgEl && adminUser.iconPath) navAvatarImgEl.src = adminUser.iconPath;
-                else if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
-            } catch(e) {
-                console.error("Errore parsing localStorage adminUserEFF:", e);
-                const navUsernameEl = document.getElementById('navbar-username'); if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
-                const navAvatarImgEl = document.querySelector('#navbar-avatar img'); if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
-            }
-        } else {
-            const navUsernameEl = document.getElementById('navbar-username'); if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
-            const navAvatarImgEl = document.querySelector('#navbar-avatar img'); if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
-        }
-
-        if(isAdmin && generateShortDescBtnDashboard) { // Abilita il bottone AI solo per admin
-            fetchAndPrepareGroqApiKey().then(ready => {
-                if (ready) {
-                    generateShortDescBtnDashboard.disabled = false;
-                    console.log("Sistema AI per descrizione breve pronto (Dashboard).");
-                } else {
-                    generateShortDescBtnDashboard.disabled = true;
-                    console.warn("Sistema AI per descrizione breve non inizializzato correttamente (Dashboard).");
-                }
-            });
-        } else if (generateShortDescBtnDashboard) {
-            generateShortDescBtnDashboard.style.display = 'none'; // Nascondi se non admin
-        }
-
-
-        updatePriceFieldVisibilityDashboard();
-        attachPreviewListeners();
-        const sortCriteriaSelect = document.getElementById('sortCriteria');
-        const sortDirectionSelect = document.getElementById('sortDirection');
-        const groupCriteriaSelect = document.getElementById('groupCriteria');
-        if(sortDirectionSelect) sortDirectionSelect.value = 'asc';
-        if(sortCriteriaSelect) sortCriteriaSelect.value = 'mese';
-        if(groupCriteriaSelect) groupCriteriaSelect.value = 'mese';
-        if(sortCriteriaSelect) sortCriteriaSelect.addEventListener('change', applyFiltersAndRender);
-        if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender);
-        if(groupCriteriaSelect) groupCriteriaSelect.addEventListener('change', applyFiltersAndRender);
-        fetchDashboardData();
-        updateActiveFiltersDisplay(); // Chiamata iniziale per mostrare/nascondere il box filtri
-    });
-</script>
+<script src="dashboard.js" defer></script>
 </body>
 </html>
