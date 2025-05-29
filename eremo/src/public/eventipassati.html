@@ -345,10 +345,11 @@
   }
 
   async function fetchAndUpdateUserDisplayData() {
-    if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
+    if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) { // Admin data might not need this refresh for profile icon/name if managed differently
       updateNavbarUI();
       return;
     }
+    // For standard users, refresh potentially stale name/icon from localStorage
     try {
       const response = await fetch(`api/api_get_user_profile.php?email=${encodeURIComponent(currentUserData.email)}`);
       if (!response.ok) throw new Error('Errore fetch profilo utente');
@@ -361,47 +362,50 @@
         localStorage.setItem('userDataEFF', JSON.stringify(currentUserData));
       }
     } catch (error) {
-      // Non fare nulla in caso di errore, l'UI si aggiornerà con i dati esistenti
+      console.warn("Impossibile aggiornare i dati del profilo utente:", error);
     }
     updateNavbarUI();
   }
 
   function updateNavbarUI() {
     const logoLink = gebi('logoLink');
-    if (logoLink) logoLink.href = "index.html"; // Assicurati che il logo punti sempre alla home
+    if (logoLink) logoLink.href = "index.html";
     const navbarTitle = gebi('navbarTitle');
     const loginBtnDesktop = gebi('login-btn-desktop');
     const userDropdownContainer = gebi('userDropdownContainer');
-    const navbarAvatarSpan = gebi('navbar-avatar'); // Span che contiene l'img
+    const navbarAvatarSpan = gebi('navbar-avatar');
     const navbarUsername = gebi('navbar-username');
+
+    // Link nel dropdown desktop
     const dropdownProfilo = gebi('dropdownProfilo');
     const dropdownPrenotazioni = gebi('dropdownPrenotazioni');
     const dropdownDashboard = gebi('dropdownDashboard');
-    const dropdownGestioneEventi = gebi('dropdownGestioneEventi'); // Aggiunto
-    const dropdownLogout = gebi('dropdownLogout');
+    const dropdownGestioneEventi = gebi('dropdownGestioneEventi');
 
+    // Link nel menu mobile
     const loginBtnMobile = gebi('login-btn-mobile');
     const mobileNavProfilo = gebi('mobileNavProfilo');
     const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni');
-    const mobileNavDashboard = gebi('mobileNavDashboard'); // Da aggiungere se non c'è
-    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); // Aggiunto
+    const mobileNavDashboard = gebi('mobileNavDashboard');
+    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin');
     const mobileLogoutLink = gebi('mobileLogoutLink');
     const mobileMenuSeparator = gebi('mobileMenuSeparator');
-    const mainPageTitle = gebi('mainPageTitle'); // Titolo H1 della pagina
+    const mainPageTitle = gebi('mainPageTitle');
 
-    // Reset initial states to ensure clean UI update
+    // Reset initial states for all role-specific links
     if(loginBtnDesktop) loginBtnDesktop.style.display = 'none';
     if(userDropdownContainer) userDropdownContainer.style.display = 'none';
+
     if(dropdownProfilo) dropdownProfilo.style.display = 'none';
     if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none';
     if(dropdownDashboard) dropdownDashboard.style.display = 'none';
-    if(dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none'; // Aggiunto
+    if(dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none';
 
     if(loginBtnMobile) loginBtnMobile.style.display = 'none';
     if(mobileNavProfilo) mobileNavProfilo.style.display = 'none';
     if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
     if(mobileNavDashboard) mobileNavDashboard.style.display = 'none';
-    if(mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none'; // Aggiunto
+    if(mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none';
     if(mobileLogoutLink) mobileLogoutLink.style.display = 'none';
     if(mobileMenuSeparator) mobileMenuSeparator.style.display = 'none';
 
@@ -420,25 +424,42 @@
       if(mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
 
       if (currentUserData.isAdmin) {
+        // Admin: "Il mio profilo", "Dashboard Admin", "Gestione Eventi" (link)
         if(navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
-        if(mainPageTitle) mainPageTitle.textContent = "Gestione Archivio Attività"; // Titolo specifico per admin
-        if(dropdownDashboard) dropdownDashboard.style.display = 'block';
-        if(dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'block'; // Mostra Gestione Eventi
-        if(mobileNavDashboard) mobileNavDashboard.style.display = 'block';
-        if(mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'block'; // Mostra Gestione Eventi
-      } else {
-        if(navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
-        if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate"; // Titolo per utenti normali
+        if(mainPageTitle) mainPageTitle.textContent = "Gestione Archivio Attività";
+
         if(dropdownProfilo) dropdownProfilo.style.display = 'block';
-        if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block';
         if(mobileNavProfilo) mobileNavProfilo.style.display = 'block';
+
+        if(dropdownDashboard) dropdownDashboard.style.display = 'block';
+        if(mobileNavDashboard) mobileNavDashboard.style.display = 'block';
+
+        if(dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'block';
+        if(mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'block';
+
+        if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none';
+        if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
+
+      } else {
+        // Utente Standard: "Il mio profilo", "Le mie prenotazioni"
+        if(navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+        if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate";
+
+        if(dropdownProfilo) dropdownProfilo.style.display = 'block';
+        if(mobileNavProfilo) mobileNavProfilo.style.display = 'block';
+
+        if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block';
         if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
+
+        // dropdownDashboard, dropdownGestioneEventi (e versioni mobile) rimangono 'none'
+        // come da reset iniziale, quindi non serve nasconderli esplicitamente qui.
       }
     } else { // Utente non loggato
       if(loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
       if(loginBtnMobile) loginBtnMobile.style.display = 'block';
       if(navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
       if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate";
+      // Tutti i link specifici del dropdown/mobile menu rimangono 'none' come da reset iniziale.
     }
   }
 
@@ -630,28 +651,21 @@
         }
       });
     } else {
-      minYear = currentYr - 4;
+      minYear = currentYr - 4; // Default fallback if no events
     }
     if (searchYearEl) {
-      searchYearEl.innerHTML = '';
+      searchYearEl.innerHTML = '<option value="">Tutti gli anni</option>'; // Start with "Tutti gli anni"
       for (let y = currentYr; y >= minYear; y--) {
         const option = document.createElement('option');
         option.value = y;
         option.textContent = y;
-        if (y === currentYr) {
-          // option.selected = true; // Non selezionare di default per permettere "Tutti gli anni"
-        }
         searchYearEl.appendChild(option);
       }
-      // Aggiungi opzione "Tutti gli anni" come prima e selezionala
-      const allYearsOption = document.createElement('option');
-      allYearsOption.value = "";
-      allYearsOption.textContent = "Tutti gli anni";
-      allYearsOption.selected = false;
-      searchYearEl.insertBefore(allYearsOption, searchYearEl.firstChild);
-
+      // Default to current year if needed, or leave "Tutti gli anni" as default
+      // searchYearEl.value = currentYr.toString();
     }
   }
+
 
   function createPastEventCard(event) {
     const card = document.createElement("article");
@@ -684,9 +698,8 @@
       const result = await response.json();
       if (result.success && result.data) {
         allPastEventsData = result.data;
-        populateYearFilter(); // Popola il filtro anno dopo aver caricato i dati
-        // Imposta i filtri ai valori di default e filtra
-        if (searchYearEl) searchYearEl.value = new Date().getFullYear().toString(); // Default all'anno corrente
+        populateYearFilter();
+        if (searchYearEl) searchYearEl.value = ""; // Default a "Tutti gli anni"
         if (searchMonthEl) searchMonthEl.value = ""; // Default a "Tutti i mesi"
         if (searchTitleEl) searchTitleEl.value = "";
         if (searchSpeakerEl) searchSpeakerEl.value = "";
@@ -703,15 +716,15 @@
     if (!eventiPassatiGridEl) return;
     const titleFilter = searchTitleEl ? searchTitleEl.value.toLowerCase().trim() : "";
     const monthFilter = searchMonthEl ? searchMonthEl.value : "";
-    const yearFilterStr = searchYearEl ? searchYearEl.value : ""; // Ottieni come stringa
+    const yearFilterStr = searchYearEl ? searchYearEl.value : "";
     const speakerFilter = searchSpeakerEl ? searchSpeakerEl.value.toLowerCase().trim() : "";
     eventiPassatiGridEl.innerHTML = '';
     let visibleCardsCount = 0;
     const filteredEvents = allPastEventsData.filter(event => {
       const eventTitle = event.titolo?.toLowerCase() || "";
       const eventDateStr = event.datainizio || "";
-      let eventMatchesYear = (yearFilterStr === ""); // True se "Tutti gli anni" è selezionato
-      let eventMatchesMonth = (monthFilter === ""); // True se "Tutti i mesi" è selezionato
+      let eventMatchesYear = (yearFilterStr === "");
+      let eventMatchesMonth = (monthFilter === "");
 
       if (eventDateStr) {
         const eventYear = parseInt(eventDateStr.substring(0, 4));
@@ -737,11 +750,13 @@
       const p = document.createElement("p");
       p.id = "noResultsMessage";
       p.className = "no-events";
-      if (allPastEventsData.length === 0) {
+      if (allPastEventsData.length === 0 && !titleFilter && !monthFilter && !yearFilterStr && !speakerFilter) { // Mostra solo se non ci sono filtri e nessun dato
         p.textContent = "Nessun evento passato trovato in archivio.";
-      } else {
+      } else if (titleFilter || monthFilter || yearFilterStr || speakerFilter) { // Mostra se ci sono filtri attivi
         p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
       }
+      // Non mostrare nulla se non ci sono filtri e ci sono eventi (ma non corrispondono, caso strano)
+      // o se non ci sono eventi e non ci sono filtri (già coperto sopra)
       if (p.textContent) eventiPassatiGridEl.appendChild(p);
     }
   }
@@ -750,25 +765,23 @@
     const currentYearEl = gebi("currentYear");
     if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
     loadUserData();
-    await fetchAndUpdateUserDisplayData(); // Chiama per aggiornare la UI della navbar
+    await fetchAndUpdateUserDisplayData();
     searchTitleEl?.addEventListener("input", filterEvents);
     searchMonthEl?.addEventListener("change", filterEvents);
     searchYearEl?.addEventListener("change", filterEvents);
     searchSpeakerEl?.addEventListener("input", filterEvents);
-    await loadPastEvents(); // Questo ora popola anche il filtro anno e applica filtri default
+    await loadPastEvents();
     gebi('dropdownLogout')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
     gebi('mobileLogoutLink')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenu(); });
 
-    // INIZIO MODIFICA: Event listener per ESC aggiornato
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         if (loginPopupEl?.classList.contains("active")) closeLoginPopup();
-        if (gebi('forgotPasswordPopup')?.classList.contains("active")) closeForgotPasswordPopup(); // NUOVA RIGA
+        if (gebi('forgotPasswordPopup')?.classList.contains("active")) closeForgotPasswordPopup();
         if (loginRequiredPopupEl?.classList.contains("active")) closeLoginRequiredPopup();
         if (eventPopupAdminEl?.classList.contains("active")) closeEditPastEventPopup();
       }
     });
-    // FINE MODIFICA: Event listener per ESC aggiornato
 
     if (currentUserData && currentUserData.isAdmin && typeof updateAdminPriceFieldVisibility === 'function') {
       updateAdminPriceFieldVisibility();

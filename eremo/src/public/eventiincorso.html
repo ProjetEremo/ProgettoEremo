@@ -293,7 +293,8 @@
       transform: translate(-50%, -50%) scale(0.95) !important; /* Coerente con stato iniziale per chiusura */
     }
 
-    #bookingForm .form-content-wrapper.swept-away {
+    #bookingForm .form-content-wrapper.swept-away,
+    #waitlistForm .form-content-wrapper.swept-away { /* Aggiunto selettore per waitlistForm */
       transition: opacity 0.4s ease-out, max-height 0.5s ease-in-out, transform 0.4s ease-out;
       opacity: 0;
       max-height: 0 !important;
@@ -301,7 +302,10 @@
       overflow: hidden;
       margin:0; padding:0; border:0;
     }
-    #bookingSuccessAnimation { text-align: center; padding: 20px 0; }
+    #bookingSuccessAnimation,
+    #waitlistSuccessAnimation { /* Aggiunto selettore per waitlistSuccessAnimation */
+      text-align: center; padding: 20px 0;
+    }
     .animated-check-icon {
       width: 80px; height: 80px;
       border-radius: 50%;
@@ -334,7 +338,8 @@
     @keyframes check_scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
     @keyframes check_fill { 100% { box-shadow: inset 0px 0px 0px 45px var(--success, #4CAF50); } }
 
-    #bookingSuccessAnimation p {
+    #bookingSuccessAnimation p,
+    #waitlistSuccessAnimation p { /* Aggiunto selettore per waitlistSuccessAnimation */
       font-size: 1.3em;
       color: var(--success-dark, #155724);
       margin-top: 15px;
@@ -633,18 +638,25 @@
 </div>
 
 <div class="booking-popup-overlay" id="waitlistPopupOverlay"></div>
-<div class="booking-popup" id="waitlistPopup"> <button class="close-popup" id="closeWaitlistPopupBtn" aria-label="Chiudi popup">&times;</button>
+<div class="booking-popup" id="waitlistPopup">
+  <button class="close-popup" id="closeWaitlistPopupBtn" aria-label="Chiudi popup">&times;</button>
   <h2 id="waitlistPopupTitle">Entra in Lista d'Attesa</h2>
   <form id="waitlistForm">
-    <input type="hidden" id="waitlistEventId" name="eventId">
-    <p id="waitlistEventInfo" style="text-align:center; margin-bottom:1rem; font-size: 1.1rem; color: var(--primary);"></p>
-    <div class="form-group">
-      <label for="waitlistNumeroPosti">Numero posti richiesti (max <span id="maxSeatsAllowedWaitlist">5</span>)</label>
-      <input type="number" id="waitlistNumeroPosti" name="numeroPosti" class="form-control" min="1" value="1" required>
-      <small id="infoPostiCoda" style="display: block; margin-top: 0.3rem; font-size: 0.85rem;"></small>
+    <div class="form-content-wrapper"> <input type="hidden" id="waitlistEventId" name="eventId">
+      <p id="waitlistEventInfo" style="text-align:center; margin-bottom:1rem; font-size: 1.1rem; color: var(--primary);"></p>
+      <div class="form-group">
+        <label for="waitlistNumeroPosti">Numero posti richiesti (max <span id="maxSeatsAllowedWaitlist">5</span>)</label>
+        <input type="number" id="waitlistNumeroPosti" name="numeroPosti" class="form-control" min="1" value="1" required>
+        <small id="infoPostiCoda" style="display: block; margin-top: 0.3rem; font-size: 0.85rem;"></small>
+      </div>
+      <div class="form-actions"><button type="submit" class="btn-popup">Mettiti in Coda</button></div>
     </div>
-    <div id="waitlistResponseMessage" class="form-message"></div>
-    <div class="form-actions"><button type="submit" class="btn-popup">Mettiti in Coda</button></div>
+    <div id="waitlistResponseMessage" class="form-message"></div> <div id="waitlistSuccessAnimation" style="display: none;"> <svg class="animated-check-icon" viewBox="0 0 52 52">
+    <circle class="animated-check-icon__circle" cx="26" cy="26" r="25" fill="none"/>
+    <path class="animated-check-icon__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+  </svg>
+    <p>Richiesta inviata!</p>
+  </div>
   </form>
 </div>
 
@@ -913,7 +925,7 @@
       ],
       "model": "meta-llama/Llama-4-scout-17b-16e-instruct",
       "temperature": 0.7,
-      "max_tokens": 65,  // MODIFICATO: da 100 a 65 per incoraggiare brevità
+      "max_tokens": 65,
       "top_p": 1,
       "stream": false
     };
@@ -938,9 +950,6 @@
       if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
         let generatedText = data.choices[0].message.content.trim();
         generatedText = generatedText.replace(/^["']|["']$/g, "");
-        // RIMOSSA la logica di troncamento client-side che aggiungeva "..."
-        // La textarea con maxlength="200" gestirà il taglio secco se l'AI supera.
-        // L'AI è istruita a rimanere sotto i 190 caratteri.
         return { success: true, description: generatedText, error: null };
       } else {
         console.warn("Struttura risposta Groq non valida per descrizione (non-streaming):", data);
@@ -972,18 +981,28 @@
 
   function updateNavbarUI() {
     const el = {
-      loginBtnDesktop: gebi('login-btn-desktop'), loginBtnMobile: gebi('login-btn-mobile'),
-      userDropdownContainer: gebi('userDropdownContainer'), navbarUsername: gebi('navbar-username'),
-      navbarAvatarImg: document.querySelector('#navbar-avatar img'), navDashboard: gebi('nav-dashboard'),
-      mobileNavDashboard: gebi('mobile-nav-dashboard'), mobileNavProfilo: gebi('mobile-nav-profilo'),
-      mobileNavMiePrenotazioni: gebi('mobile-nav-mie-prenotazioni'), mobileLogoutLink: gebi('mobile-logout-link'),
-      mobileMenuSeparator: gebi('mobile-menu-separator'), navbarTitle: gebi('navbar-title'),
-      navGestioneEventiAdmin: gebi('nav-gestione-eventi-admin'),
-      mobileNavGestioneEventiAdmin: gebi('mobile-nav-gestione-eventi-admin'),
+      loginBtnDesktop: gebi('login-btn-desktop'),
+      loginBtnMobile: gebi('login-btn-mobile'),
+      userDropdownContainer: gebi('userDropdownContainer'),
+      navbarUsername: gebi('navbar-username'),
+      navbarAvatarImg: document.querySelector('#navbar-avatar img'),
+      navProfilo: gebi('nav-profilo'), // Desktop: Il mio profilo
+      navMiePrenotazioni: gebi('nav-mie-prenotazioni'), // Desktop: Le mie prenotazioni
+      navDashboard: gebi('nav-dashboard'), // Desktop: Dashboard Admin
+      navGestioneEventiAdmin: gebi('nav-gestione-eventi-admin'), // Desktop: Gestione Eventi
+      mobileNavProfilo: gebi('mobile-nav-profilo'), // Mobile: Il mio profilo
+      mobileNavMiePrenotazioni: gebi('mobile-nav-mie-prenotazioni'), // Mobile: Le mie prenotazioni
+      mobileNavDashboard: gebi('mobile-nav-dashboard'), // Mobile: Dashboard Admin
+      mobileNavGestioneEventiAdmin: gebi('mobile-nav-gestione-eventi-admin'), // Mobile: Gestione Eventi
+      mobileLogoutLink: gebi('mobile-logout-link'),
+      mobileMenuSeparator: gebi('mobile-menu-separator'),
+      navbarTitle: gebi('navbar-title'),
       mainPageTitle: gebi('mainPageTitle'),
       addEventFabContainerWrapper: gebi('addEventFabContainerWrapper')
     };
 
+    // Nascondi sempre i link specifici di "Gestione Eventi" perché o la pagina è già quella
+    // o l'admin usa la Dashboard, e l'utente standard non deve vederli.
     if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
     if(el.mobileNavGestioneEventiAdmin) el.mobileNavGestioneEventiAdmin.style.display = 'none';
 
@@ -997,45 +1016,56 @@
         el.navbarAvatarImg.alt = `Avatar di ${currentUserData.nome || 'utente'}`;
         el.navbarAvatarImg.onerror = function () { this.src = defaultUserIconPath; };
       }
+      if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
+      if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
 
       if (currentUserData.isAdmin) {
+        // Admin: "Il mio profilo", "Dashboard Admin"
+        if (el.navProfilo) el.navProfilo.style.display = 'block'; // VISIBILE per Admin
+        if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block'; // VISIBILE per Admin
+
         if (el.navDashboard) el.navDashboard.style.display = 'block';
+        if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
+
+        if (el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none'; // NASCOSTO per Admin
+        if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none'; // NASCOSTO per Admin
+
         if (el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
         if (el.mainPageTitle) el.mainPageTitle.textContent = "Gestione Calendario Attività";
         if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'flex';
-        if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
-        if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
-        if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
-        if (gebi('nav-profilo')) gebi('nav-profilo').style.display = 'none';
-        if (gebi('nav-mie-prenotazioni')) gebi('nav-mie-prenotazioni').style.display = 'none';
-        if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
-        if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
       } else {
+        // Utente Standard: "Il mio profilo", "Le mie prenotazioni"
+        if (el.navProfilo) el.navProfilo.style.display = 'block';
+        if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
+
+        if (el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block';
+        if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
+
         if (el.navDashboard) el.navDashboard.style.display = 'none';
+        if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
+
         if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
         if (el.mainPageTitle) el.mainPageTitle.textContent = "Calendario Attività";
         if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none';
-        if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
-        if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
-        if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
-        if (gebi('nav-profilo')) gebi('nav-profilo').style.display = 'block';
-        if (gebi('nav-mie-prenotazioni')) gebi('nav-mie-prenotazioni').style.display = 'block';
-        if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
-        if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
       }
     } else {
+      // Nessun utente loggato
       if (el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'inline-block';
       if (el.loginBtnMobile) el.loginBtnMobile.style.display = 'block';
       if (el.userDropdownContainer) el.userDropdownContainer.style.display = 'none';
+
+      if (el.navProfilo) el.navProfilo.style.display = 'none';
+      if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
+      if (el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
+      if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
       if (el.navDashboard) el.navDashboard.style.display = 'none';
       if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
+
+      if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
+      if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
       if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
       if (el.mainPageTitle) el.mainPageTitle.textContent = "Calendario Attività";
       if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none';
-      if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
-      if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
-      if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
-      if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
     }
   }
 
@@ -1067,7 +1097,14 @@
   if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
   if (forgotPasswordForm) forgotPasswordForm.addEventListener('submit', async (e) => { e.preventDefault(); if (forgotPasswordMessage) { forgotPasswordMessage.style.display = 'none'; forgotPasswordMessage.className = 'form-message'; } const sB = forgotPasswordForm.querySelector('button[type="submit"]'); const oT = sB.innerHTML; sB.disabled = true; sB.innerHTML = 'Invio...<div class="spinner-mini-light"></div>'; try { const fD = new FormData(forgotPasswordForm); const rsp = await fetch('richiesta_recupero_password.php', { method: 'POST', body: fD }); const res = await rsp.json(); if (res.success) { forgotPasswordMessage.textContent = res.message; forgotPasswordMessage.classList.add('success'); gebi('forgot-email').value = ''; } else { forgotPasswordMessage.textContent = res.message || "Si è verificato un errore."; forgotPasswordMessage.classList.add('error'); } } catch (err) { console.error('Errore recupero password:', err); forgotPasswordMessage.textContent = "Errore di connessione o del server."; forgotPasswordMessage.classList.add('error'); } finally { if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block'; sB.disabled = false; sB.innerHTML = oT; } });
 
-  function handleLogout() { localStorage.removeItem('userDataEFF'); currentUserData = null; updateNavbarUI(); loadEvents(); alert('Logout effettuato.'); }
+  function handleLogout() {
+    localStorage.removeItem('userDataEFF');
+    localStorage.removeItem('pending_action_eff'); // Rimuove azioni pendenti al logout
+    currentUserData = null;
+    updateNavbarUI();
+    loadEvents();
+    alert('Logout effettuato.');
+  }
   gebi('logout-link-desktop')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
   gebi('mobile-logout-link')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenuOnLinkClick(); });
 
@@ -1431,8 +1468,21 @@
 
   function initializeWaitlistPopupHandlers() {
     const wO = gebi('waitlistPopupOverlay'); const wP = gebi('waitlistPopup'); const cB = gebi('closeWaitlistPopupBtn'); const wF = gebi('waitlistForm'); const wNPI = gebi('waitlistNumeroPosti'); const wEII = gebi('waitlistEventId'); const wPT = gebi('waitlistPopupTitle'); const wEI = gebi('waitlistEventInfo'); const wRM = gebi('waitlistResponseMessage'); const mSEW = gebi('maxSeatsAllowedWaitlist'); const iCEl = gebi('infoPostiCoda');
+    const wFormContentWrapper = wF ? wF.querySelector('.form-content-wrapper') : null;
+    const wSuccessAnimationContainer = gebi('waitlistSuccessAnimation');
+
     window.openWaitlistPopup = function (id, t, pGiaP) {
       if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: 'waitlist', eventId: id, eventTitle: t, postiGiaPren: pGiaP })); return; }
+
+      if (wFormContentWrapper) {
+        wFormContentWrapper.classList.remove('swept-away');
+        wFormContentWrapper.style.display = 'block';
+        wFormContentWrapper.style.maxHeight = 'none';
+      }
+      if (wSuccessAnimationContainer) wSuccessAnimationContainer.style.display = 'none';
+      if (wRM) { wRM.style.display = 'none'; wRM.className = 'form-message'; }
+      if (wF) wF.reset();
+
       if(wEII) wEII.value = id;
       if(wPT) wPT.textContent = `Entra in Lista d'Attesa`;
       if(wEI) wEI.textContent = `Evento: ${t}`;
@@ -1442,24 +1492,44 @@
       if (wNPI) { wNPI.max = maxPC; wNPI.value = 1; }
       if (mSEW) mSEW.textContent = maxPC;
       if (iCEl) iCEl.textContent = `Puoi richiedere da 1 a ${maxPC} posti. (Già prenotati/in coda da te: ${pGPN}/${MAX_TOTAL_SEATS_PER_USER})`;
-      if (wRM) { wRM.style.display = 'none'; wRM.className = 'form-message'; }
-      if (wO) wO.classList.add('active'); if (wP) wP.classList.add('active'); // Dovrebbe ereditare l'animazione se .waitlistPopup ha stili simili a .booking-popup
+
+      if (wO) { wO.classList.remove('fading-out'); wO.classList.add('active'); }
+      if (wP) { wP.classList.remove('fading-out'); wP.classList.add('active'); }
       document.body.style.overflow = 'hidden';
     };
-    function cWP() {
-      if (wO) wO.classList.remove('active'); if (wP) wP.classList.remove('active');
+
+    function cWP_actualClose() {
+      if (wO) wO.classList.remove('active', 'fading-out');
+      if (wP) wP.classList.remove('active', 'fading-out');
       if (!isAnyPopupActive()) document.body.style.overflow = '';
+
+      if (wFormContentWrapper) {
+        wFormContentWrapper.classList.remove('swept-away');
+        wFormContentWrapper.style.display = 'block';
+        wFormContentWrapper.style.maxHeight = 'none';
+      }
+      if (wSuccessAnimationContainer) wSuccessAnimationContainer.style.display = 'none';
       if (wF) wF.reset();
       if (iCEl) iCEl.textContent = '';
+      if (wRM) { wRM.style.display = 'none'; wRM.className = 'form-message';}
     }
-    if (cB) cB.addEventListener('click', cWP);
-    if (wO) wO.addEventListener('click', (e) => { if (e.target === wO) cWP(); });
+
+    function cWP_withAnimation() {
+      if (wO) wO.classList.add('fading-out');
+      if (wP) wP.classList.add('fading-out');
+      setTimeout(cWP_actualClose, 300);
+    }
+
+    if (cB) cB.addEventListener('click', cWP_withAnimation);
+    if (wO) wO.addEventListener('click', (e) => { if (e.target === wO) cWP_withAnimation(); });
+
     if (wNPI) wNPI.addEventListener('input', (e) => {
       const currentVal = parseInt(e.target.value);
       const maxVal = parseInt(wNPI.max);
       if (currentVal > maxVal) { e.target.value = maxVal; }
       if (currentVal < 1 && e.target.value !== "") { e.target.value = 1; }
     });
+
     if (wF) wF.addEventListener('submit', async function (e) {
       e.preventDefault();
       if (!currentUserData || !currentUserData.email) { alert("Sessione scaduta o utente non valido. Effettua nuovamente il login."); handleLogout(); return; }
@@ -1475,15 +1545,34 @@
         let j;
         try { j = JSON.parse(rt); }
         catch (err) { throw new Error("Risposta non valida dal server: " + rt.substring(0, 150)); }
+
         if (j.success) {
-          if (wRM) { wRM.textContent = j.message || "Richiesta di inserimento in coda inviata con successo!"; wRM.className = 'form-message success'; }
+          if (wFormContentWrapper) {
+            wFormContentWrapper.style.maxHeight = wFormContentWrapper.scrollHeight + 'px';
+            setTimeout(() => {
+              wFormContentWrapper.classList.add('swept-away');
+            }, 10);
+          }
+          if (wRM) wRM.style.display = 'none';
+          if (wSuccessAnimationContainer) {
+            wSuccessAnimationContainer.style.display = 'block';
+            const checkMarkIcon = wSuccessAnimationContainer.querySelector('.animated-check-icon');
+            if(checkMarkIcon) {
+              const newCheckMark = checkMarkIcon.cloneNode(true);
+              checkMarkIcon.parentNode.replaceChild(newCheckMark, checkMarkIcon);
+            }
+          }
           loadEvents();
-          setTimeout(cWP, 2000);
+          setTimeout(cWP_withAnimation, 3000);
         } else { throw new Error(j.message || "Errore durante la richiesta di inserimento in coda."); }
       } catch (err) {
         if (wRM) { wRM.textContent = `Errore: ${err.message}`; wRM.className = 'form-message error'; }
       } finally {
-        if (wRM && !wRM.classList.contains('success')) wRM.style.display = 'block';
+        if (wSuccessAnimationContainer && wSuccessAnimationContainer.style.display === 'block') {
+          if (wRM) wRM.style.display = 'none';
+        } else if (wRM && !wRM.classList.contains('success')) {
+          wRM.style.display = 'block';
+        }
         btn.disabled = false; btn.innerHTML = oT;
       }
     });
@@ -1850,18 +1939,22 @@
     const pAction = localStorage.getItem("pending_action_eff");
     if (pAction && currentUserData) {
       const aD = JSON.parse(pAction);
-      if (aD.action === 'book' && typeof window.openBookingPopup === 'function') window.openBookingPopup(aD.eventId, aD.eventTitle, aD.postiDisp, aD.postiGiaPren);
-      else if (aD.action === 'waitlist' && typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(aD.eventId, aD.eventTitle, aD.postiGiaPren);
       localStorage.removeItem("pending_action_eff");
+      if (aD.action === 'book' && typeof window.openBookingPopup === 'function') {
+        window.openBookingPopup(aD.eventId, aD.eventTitle, aD.postiDisp, aD.postiGiaPren);
+      } else if (aD.action === 'waitlist' && typeof window.openWaitlistPopup === 'function') {
+        window.openWaitlistPopup(aD.eventId, aD.eventTitle, aD.postiGiaPren);
+      }
     }
+
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         if (gebi('loginPopup')?.classList.contains("active")) closeLoginPopup();
         if (gebi('forgotPasswordPopup')?.classList.contains("active")) closeForgotPasswordPopup();
         if (gebi('bookingPopup')?.classList.contains("active")) {
-          const closeBtn = gebi('closeBookingPopupBtn');
-          if (closeBtn) closeBtn.click();
+          const closeBtnBooking = gebi('closeBookingPopupBtn');
+          if (closeBtnBooking) closeBtnBooking.click();
         }
         if (gebi('waitlistPopup')?.classList.contains("active")) {
           const closeWaitlistBtn = gebi('closeWaitlistPopupBtn');
