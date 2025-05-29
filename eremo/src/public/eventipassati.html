@@ -43,7 +43,7 @@
       box-sizing: border-box;
     }
     .event-filters select {
-      height: calc(0.7rem * 2 + 0.95rem * 1.5 + 2px);
+      height: calc(0.7rem * 2 + 0.95rem * 1.5 + 2px); /* Adjusted to match input height better */
       line-height: 1.5;
     }
     .event-filters button {
@@ -54,7 +54,7 @@
       border-radius: 8px;
       cursor: pointer;
       transition: var(--transition-medium);
-      height: fit-content;
+      height: fit-content; /* Align with bottom of taller inputs */
     }
     .event-filters button:hover {
       background-color: var(--primary);
@@ -70,7 +70,7 @@
       z-index: 10;
       visibility: hidden; opacity: 0;
       transition: opacity 0.3s, visibility 0.3s;
-      border-radius: inherit;
+      border-radius: inherit; /* Inherit border radius from parent if any */
     }
     .loading-overlay.visible { visibility: visible; opacity: 1; }
     .loading-overlay .spinner {
@@ -88,6 +88,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .no-events { text-align: center; padding: 2rem; color: var(--gray-dark); }
+    /* Stili per popup login, messaggi errore, etc. */
     .login-popup input.form-control.error-border { border-color: var(--danger, red) !important; }
     .login-popup input:-webkit-autofill,
     .login-popup input:-webkit-autofill:hover,
@@ -114,11 +115,12 @@
     .card-actions.admin-actions .card-btn { flex-grow: 1; }
     .card-actions .btn-delete { background-color: var(--danger) !important; color: white !important; }
     .card-actions .btn-delete:hover { background-color: darkred !important; }
-    .event-popup .form-message.success { color: var(--dark); }
-    .event-popup .form-message.error { color: var(--dark); }
+    .event-popup .form-message.success { color: var(--dark); } /* Specific for event popup messages */
+    .event-popup .form-message.error { color: var(--dark); } /* Specific for event popup messages */
     #current-event-image-preview { max-width:100px; max-height:100px; display:none; margin-top:5px; border-radius: 4px; border: 1px solid var(--gray-light); }
     #current-event-flyer-preview a { color: var(--primary); text-decoration: underline; }
     #current-event-flyer-preview a:hover { color: var(--accent); }
+
   </style>
 </head>
 <body>
@@ -208,13 +210,13 @@
         <label for="searchSpeaker">Relatore</label>
         <input type="text" id="searchSpeaker" class="form-control" placeholder="Nome relatore..."/>
       </div>
+      <!-- Potrebbe essere utile un bottone per applicare i filtri se non si vuole il filtraggio live
+           <button id="applyFiltersBtn">Applica Filtri</button> -->
     </div>
 
-    <div id="eventiGridContainer" style="position: relative">
-      <div id="loadingIndicator" class="loading-overlay">
-        <div class="spinner"></div>
-        <p>Caricamento eventi...</p>
-      </div>
+    <div id="eventiGridContainer" style="position: relative"> <div id="loadingIndicator" class="loading-overlay"> <div class="spinner"></div>
+      <p>Caricamento eventi...</p>
+    </div>
       <div class="card-grid" id="eventiPassatiGrid">
       </div>
     </div>
@@ -319,24 +321,33 @@
 
 
 <script>
+  // Percorso dell'icona utente di default
   const defaultUserIconPath = 'uploads/icons/default_user.png';
+  // Variabile globale per i dati dell'utente corrente
   let currentUserData = null;
+  // Array per memorizzare tutti gli eventi passati caricati
   let allPastEventsData = [];
 
+  // Elementi del DOM per i filtri
   const searchTitleEl = document.getElementById("searchTitle");
   const searchMonthEl = document.getElementById("searchMonth");
   const searchYearEl = document.getElementById("searchYear");
   const searchSpeakerEl = document.getElementById("searchSpeaker");
+  // Elemento del DOM per la griglia degli eventi
   const eventiPassatiGridEl = document.getElementById("eventiPassatiGrid");
+  // Elemento del DOM per l'indicatore di caricamento
   const loadingIndicatorEl = document.getElementById("loadingIndicator");
 
+  // Funzione abbreviata per getElementById
   function gebi(id) { return document.getElementById(id); }
 
+  // Carica i dati dell'utente dal localStorage
   function loadUserData() {
     const uds = localStorage.getItem('userDataEFF');
     if (uds) {
       try {
         currentUserData = JSON.parse(uds);
+        // Validazione base dei dati utente
         if (!currentUserData || typeof currentUserData.email === 'undefined') {
           currentUserData = null; localStorage.removeItem('userDataEFF');
         }
@@ -344,12 +355,13 @@
     } else { currentUserData = null; }
   }
 
+  // Aggiorna i dati dell'utente (nome, icona) dalla API se necessario e aggiorna la UI della navbar
   async function fetchAndUpdateUserDisplayData() {
-    if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) { // Admin data might not need this refresh for profile icon/name if managed differently
-      updateNavbarUI();
+    if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
+      updateNavbarUI(); // Aggiorna UI anche per admin o non loggato
       return;
     }
-    // For standard users, refresh potentially stale name/icon from localStorage
+    // Per utenti standard, aggiorna i dati potenzialmente obsoleti da localStorage
     try {
       const response = await fetch(`api/api_get_user_profile.php?email=${encodeURIComponent(currentUserData.email)}`);
       if (!response.ok) throw new Error('Errore fetch profilo utente');
@@ -358,8 +370,8 @@
         const freshData = apiResult.data;
         currentUserData.nome = freshData.nome || currentUserData.nome;
         currentUserData.iconPath = freshData.icon || defaultUserIconPath;
-        currentUserData.cognome = freshData.cognome || (currentUserData.cognome || '');
-        localStorage.setItem('userDataEFF', JSON.stringify(currentUserData));
+        currentUserData.cognome = freshData.cognome || (currentUserData.cognome || ''); // Aggiunto cognome
+        localStorage.setItem('userDataEFF', JSON.stringify(currentUserData)); // Salva i dati aggiornati
       }
     } catch (error) {
       console.warn("Impossibile aggiornare i dati del profilo utente:", error);
@@ -367,9 +379,10 @@
     updateNavbarUI();
   }
 
+  // Aggiorna l'interfaccia utente della navbar in base allo stato di login e al ruolo dell'utente
   function updateNavbarUI() {
     const logoLink = gebi('logoLink');
-    if (logoLink) logoLink.href = "index.html";
+    if (logoLink) logoLink.href = "index.html"; // Link logo sempre a index.html
     const navbarTitle = gebi('navbarTitle');
     const loginBtnDesktop = gebi('login-btn-desktop');
     const userDropdownContainer = gebi('userDropdownContainer');
@@ -390,9 +403,9 @@
     const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin');
     const mobileLogoutLink = gebi('mobileLogoutLink');
     const mobileMenuSeparator = gebi('mobileMenuSeparator');
-    const mainPageTitle = gebi('mainPageTitle');
+    const mainPageTitle = gebi('mainPageTitle'); // Titolo principale della pagina
 
-    // Reset initial states for all role-specific links
+    // Reset degli stati iniziali per tutti i link specifici del ruolo
     if(loginBtnDesktop) loginBtnDesktop.style.display = 'none';
     if(userDropdownContainer) userDropdownContainer.style.display = 'none';
 
@@ -410,23 +423,23 @@
     if(mobileMenuSeparator) mobileMenuSeparator.style.display = 'none';
 
 
-    if (currentUserData) {
+    if (currentUserData) { // Utente loggato
       if(userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
-      if(navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
+      if(navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0]; // Mostra nome o parte email
       const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
       if(avatarImgEl) {
         avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath;
         avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`;
-        avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };
+        avatarImgEl.onerror = function() { this.src = defaultUserIconPath; }; // Fallback icona default
       }
 
-      if(mobileLogoutLink) mobileLogoutLink.style.display = 'block';
-      if(mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
+      if(mobileLogoutLink) mobileLogoutLink.style.display = 'block'; // Mostra logout mobile
+      if(mobileMenuSeparator) mobileMenuSeparator.style.display = 'block'; // Mostra separatore mobile
 
       if (currentUserData.isAdmin) {
         // Admin: "Il mio profilo", "Dashboard Admin", "Gestione Eventi" (link)
         if(navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
-        if(mainPageTitle) mainPageTitle.textContent = "Gestione Archivio Attività";
+        if(mainPageTitle) mainPageTitle.textContent = "Gestione Archivio Attività"; // Titolo pagina per Admin
 
         if(dropdownProfilo) dropdownProfilo.style.display = 'block';
         if(mobileNavProfilo) mobileNavProfilo.style.display = 'block';
@@ -437,13 +450,14 @@
         if(dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'block';
         if(mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'block';
 
+        // Nascondi link non pertinenti per admin (prenotazioni utente)
         if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none';
         if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
 
       } else {
         // Utente Standard: "Il mio profilo", "Le mie prenotazioni"
         if(navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
-        if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate";
+        if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate"; // Titolo pagina per Utente
 
         if(dropdownProfilo) dropdownProfilo.style.display = 'block';
         if(mobileNavProfilo) mobileNavProfilo.style.display = 'block';
@@ -451,65 +465,80 @@
         if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block';
         if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
 
-        // dropdownDashboard, dropdownGestioneEventi (e versioni mobile) rimangono 'none'
+        // I link admin (dropdownDashboard, dropdownGestioneEventi e versioni mobile) rimangono 'none'
         // come da reset iniziale, quindi non serve nasconderli esplicitamente qui.
       }
     } else { // Utente non loggato
-      if(loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
-      if(loginBtnMobile) loginBtnMobile.style.display = 'block';
+      if(loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block'; // Mostra Accedi desktop
+      if(loginBtnMobile) loginBtnMobile.style.display = 'block'; // Mostra Accedi mobile
       if(navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
-      if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate";
+      if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate"; // Titolo pagina per non loggato
       // Tutti i link specifici del dropdown/mobile menu rimangono 'none' come da reset iniziale.
     }
   }
 
 
+  // Gestisce il logout dell'utente
   function handleLogout() {
     localStorage.removeItem('userDataEFF');
     currentUserData = null;
     updateNavbarUI();
     loadPastEvents(); // Ricarica gli eventi per mostrare la vista da non loggato/admin
-    alert('Logout effettuato.');
+    // Potrebbe essere utile un messaggio di conferma logout, ma alert() è bloccante.
+    // Considerare un messaggio non bloccante se necessario.
+    alert('Logout effettuato.'); // Semplice alert per ora
   }
 
+  // Gestione navbar che scompare allo scroll (invariata)
   let lastScrollNav = 0; const navbarContainerEl = gebi("navbarContainer"); if (navbarContainerEl) { window.addEventListener("scroll", function () { const cS = window.pageYOffset || document.documentElement.scrollTop; if (cS <= 50) { navbarContainerEl.classList.remove("hidden"); lastScrollNav = 0; return; } if (cS > lastScrollNav && !navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.add("hidden"); else if (cS < lastScrollNav && navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.remove("hidden"); lastScrollNav = cS <= 0 ? 0 : cS; }, false); }
+  // Gestione menu mobile (hamburger) (invariata)
   const mobileMenuEl = gebi("mobileMenu"); const hamburgerButton = gebi("hamburgerBtn"); function toggleMobileMenu() { if (mobileMenuEl && hamburgerButton) { const iO = mobileMenuEl.classList.toggle("open"); hamburgerButton.classList.toggle("open"); hamburgerButton.setAttribute("aria-expanded", String(iO)); document.body.style.overflow = iO ? "hidden" : ""; } } function closeMobileMenu() { if (mobileMenuEl && hamburgerButton && mobileMenuEl.classList.contains("open")) { mobileMenuEl.classList.remove("open"); hamburgerButton.classList.remove("open"); hamburgerButton.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; } }
   if (hamburgerButton) hamburgerButton.addEventListener("click", toggleMobileMenu);
-  document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobileLogoutLink') { l.addEventListener("click", closeMobileMenu); }});
-  document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) closeMobileMenu(); });
+  document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobileLogoutLink') { l.addEventListener("click", closeMobileMenu); }}); // Chiude menu mobile al click su link (escluso login/logout)
+  document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) closeMobileMenu(); }); // Chiude menu se si clicca fuori
+  // Gestione dropdown utente (invariata)
   const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iS = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iS ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iS)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl && userDropdownMenuEl.style.display === 'block' && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
+  // Elementi del DOM per il popup di login/registrazione
   const loginOverlayEl = gebi("loginOverlay"); const loginPopupEl = gebi("loginPopup"); const closePopupBtnEl = gebi("closeLoginPopupBtn"); const loginTabsEls = document.querySelectorAll(".login-tab"); const loginFormsEls = document.querySelectorAll("#loginPopup .login-form"); // Specifica per popup login
   const loginErrorMessagePopupEl = gebi('login-error-message-popup'); const registerErrorMessagePopupEl = gebi('register-error-message-popup');
 
+  // Apre il popup di login/registrazione
   function openLoginPopup() {
-    if(loginRequiredPopupEl?.classList.contains('active')) closeLoginRequiredPopup(); // Chiudi popup accesso richiesto
+    if(loginRequiredPopupEl?.classList.contains('active')) closeLoginRequiredPopup(); // Chiudi popup accesso richiesto se aperto
     if (loginOverlayEl) loginOverlayEl.classList.add("active");
     if (loginPopupEl) loginPopupEl.classList.add("active");
-    document.body.style.overflow = "hidden";
-    resetFormErrors();
+    document.body.style.overflow = "hidden"; // Impedisce scroll pagina sottostante
+    resetFormErrors(); // Resetta errori form
+    // Attiva tab login e focus sul primo input
     const loginTabToActivate = loginPopupEl.querySelector('.login-tab[data-tab="login"]');
     if (loginTabToActivate) loginTabToActivate.click();
     const firstInput = loginPopupEl.querySelector('#login-email-popup');
     if (firstInput) firstInput.focus();
   }
+  // Chiude il popup di login/registrazione
   function closeLoginPopup() {
     if (loginOverlayEl) loginOverlayEl.classList.remove("active");
     if (loginPopupEl) loginPopupEl.classList.remove("active");
-    if (!loginRequiredPopupEl?.classList.contains('active') && !eventPopupAdminEl?.classList.contains('active') && !forgotPasswordPopup?.classList.contains('active') ) { // MODIFICATO
+    // Ripristina scroll solo se nessun altro popup modale principale è attivo
+    if (!loginRequiredPopupEl?.classList.contains('active') && !eventPopupAdminEl?.classList.contains('active') && !forgotPasswordPopup?.classList.contains('active') ) {
       document.body.style.overflow = "";
     }
     resetFormErrors();
   }
+  // Resetta i messaggi di errore e i bordi rossi nei form del popup
   function resetFormErrors() {
     loginFormsEls.forEach(form => { form.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border')); });
     if (loginErrorMessagePopupEl) loginErrorMessagePopupEl.style.display = 'none';
     if (registerErrorMessagePopupEl) registerErrorMessagePopupEl.style.display = 'none';
   }
+  // Event listener per aprire il popup di login
   gebi("login-btn-desktop")?.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); });
   gebi("login-btn-mobile")?.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); closeMobileMenu(); });
+  // Event listener per chiudere il popup
   if (closePopupBtnEl) closePopupBtnEl.addEventListener("click", closeLoginPopup);
-  if (loginOverlayEl) loginOverlayEl.addEventListener("click", (e) => { if (e.target === loginOverlayEl) closeLoginPopup(); });
+  if (loginOverlayEl) loginOverlayEl.addEventListener("click", (e) => { if (e.target === loginOverlayEl) closeLoginPopup(); }); // Chiude cliccando sull'overlay
 
+  // Gestione tab Login/Registrazione nel popup
   loginTabsEls.forEach((tab) => {
     tab.addEventListener("click", () => {
       const tabId = tab.getAttribute("data-tab");
@@ -519,17 +548,19 @@
         form.classList.remove("active");
         if (form.id === `${tabId}FormPopup`) {
           form.classList.add("active");
-          form.querySelector('input:not([type="hidden"])')?.focus();
+          form.querySelector('input:not([type="hidden"])')?.focus(); // Focus sul primo input visibile
         }
       });
-      resetFormErrors();
+      resetFormErrors(); // Resetta errori al cambio tab
     });
   });
 
-  gebi("loginFormPopup")?.addEventListener("submit", async (e) => { e.preventDefault(); const loginButton = e.target.querySelector('button[type="submit"]'); const originalButtonText = loginButton.textContent; loginButton.disabled = true; loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>'; const emailInput = gebi('login-email-popup'); const passwordInput = gebi('login-password-popup'); emailInput.classList.remove('error-border'); passwordInput.classList.remove('error-border'); if(loginErrorMessagePopupEl) loginErrorMessagePopupEl.style.display = 'none'; try { const response = await fetch('login.php', { method: 'POST', body: new FormData(e.target) }); if (!response.ok) { let errorData = { message: `Errore HTTP: ${response.status}` }; try { errorData = await response.json(); } catch (parseError) {} throw new Error(errorData.message || `Errore HTTP: ${response.status}`); } const result = await response.json(); if (result.success) { currentUserData = { nome: result.nome, email: result.email, iconPath: result.iconPath, isAdmin: result.is_admin === true || result.is_admin === 1 }; localStorage.setItem('userDataEFF', JSON.stringify(currentUserData)); await fetchAndUpdateUserDisplayData(); closeLoginPopup(); loadPastEvents(); } else { emailInput.classList.add('error-border'); passwordInput.classList.add('error-border'); if(loginErrorMessagePopupEl) { loginErrorMessagePopupEl.textContent = result.message || "Credenziali non valide."; loginErrorMessagePopupEl.style.display = 'block'; } } } catch (error) { emailInput.classList.add('error-border'); passwordInput.classList.add('error-border'); if(loginErrorMessagePopupEl) { loginErrorMessagePopupEl.textContent = "Errore di connessione o risposta non valida."; loginErrorMessagePopupEl.style.display = 'block'; } } finally { loginButton.disabled = false; loginButton.innerHTML = originalButtonText; } });
-  gebi("registerFormPopup")?.addEventListener("submit", async (e) => { e.preventDefault(); const registerButton = e.target.querySelector('button[type="submit"]'); const originalButtonText = registerButton.textContent; registerButton.disabled = true; registerButton.innerHTML = 'Registrazione... <div class="spinner-mini-light"></div>'; if(registerErrorMessagePopupEl) registerErrorMessagePopupEl.style.display = 'none'; e.target.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border')); try { const response = await fetch('registrati.php', { method: 'POST', body: new FormData(e.target) }); if (!response.ok) { let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`; try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; } catch(err) {} throw new Error(errorMsg); } const result = await response.json(); if (result.success) { alert(result.message || "Registrazione completata! Ora puoi effettuare il login."); const loginTabButton = document.querySelector('#loginPopup .login-tab[data-tab="login"]'); if (loginTabButton) loginTabButton.click(); const loginEmailPopup = gebi('login-email-popup'); const registerEmailPopup = gebi('register-email-popup'); if (loginEmailPopup && registerEmailPopup) loginEmailPopup.value = registerEmailPopup.value; e.target.reset(); } else { if(registerErrorMessagePopupEl) { registerErrorMessagePopupEl.textContent = result.message || "Errore durante la registrazione."; registerErrorMessagePopupEl.style.display = 'block'; } if (result.errors) { for (const fieldNameFromError in result.errors) { const inputElement = e.target.elements[fieldNameFromError] || gebi(`register-${fieldNameFromError}-popup`); if (inputElement) inputElement.classList.add('error-border'); } } } } catch (error) { if(registerErrorMessagePopupEl) { registerErrorMessagePopupEl.textContent = "Errore: " + error.message; registerErrorMessagePopupEl.style.display = 'block'; } } finally { registerButton.disabled = false; registerButton.innerHTML = originalButtonText; } });
+  // Gestione submit form di login
+  gebi("loginFormPopup")?.addEventListener("submit", async (e) => { e.preventDefault(); const loginButton = e.target.querySelector('button[type="submit"]'); const originalButtonText = loginButton.textContent; loginButton.disabled = true; loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>'; const emailInput = gebi('login-email-popup'); const passwordInput = gebi('login-password-popup'); emailInput.classList.remove('error-border'); passwordInput.classList.remove('error-border'); if(loginErrorMessagePopupEl) loginErrorMessagePopupEl.style.display = 'none'; try { const response = await fetch('login.php', { method: 'POST', body: new FormData(e.target) }); if (!response.ok) { let errorData = { message: `Errore HTTP: ${response.status}` }; try { errorData = await response.json(); } catch (parseError) {} throw new Error(errorData.message || `Errore HTTP: ${response.status}`); } const result = await response.json(); if (result.success) { currentUserData = { nome: result.nome, email: result.email, iconPath: result.iconPath, isAdmin: result.is_admin === true || result.is_admin === 1 }; localStorage.setItem('userDataEFF', JSON.stringify(currentUserData)); await fetchAndUpdateUserDisplayData(); closeLoginPopup(); loadPastEvents(); /* Ricarica eventi per UI admin/utente */ } else { emailInput.classList.add('error-border'); passwordInput.classList.add('error-border'); if(loginErrorMessagePopupEl) { loginErrorMessagePopupEl.textContent = result.message || "Credenziali non valide."; loginErrorMessagePopupEl.style.display = 'block'; } } } catch (error) { emailInput.classList.add('error-border'); passwordInput.classList.add('error-border'); if(loginErrorMessagePopupEl) { loginErrorMessagePopupEl.textContent = "Errore di connessione o risposta non valida."; loginErrorMessagePopupEl.style.display = 'block'; } } finally { loginButton.disabled = false; loginButton.innerHTML = originalButtonText; } });
+  // Gestione submit form di registrazione
+  gebi("registerFormPopup")?.addEventListener("submit", async (e) => { e.preventDefault(); const registerButton = e.target.querySelector('button[type="submit"]'); const originalButtonText = registerButton.textContent; registerButton.disabled = true; registerButton.innerHTML = 'Registrazione... <div class="spinner-mini-light"></div>'; if(registerErrorMessagePopupEl) registerErrorMessagePopupEl.style.display = 'none'; e.target.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border')); try { const response = await fetch('registrati.php', { method: 'POST', body: new FormData(e.target) }); if (!response.ok) { let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`; try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; } catch(err) {} throw new Error(errorMsg); } const result = await response.json(); if (result.success) { alert(result.message || "Registrazione completata! Ora puoi effettuare il login."); const loginTabButton = document.querySelector('#loginPopup .login-tab[data-tab="login"]'); if (loginTabButton) loginTabButton.click(); const loginEmailPopup = gebi('login-email-popup'); const registerEmailPopup = gebi('register-email-popup'); if (loginEmailPopup && registerEmailPopup) loginEmailPopup.value = registerEmailPopup.value; /* Precompila email login */ e.target.reset(); } else { if(registerErrorMessagePopupEl) { registerErrorMessagePopupEl.textContent = result.message || "Errore durante la registrazione."; registerErrorMessagePopupEl.style.display = 'block'; } if (result.errors) { /* Evidenzia campi con errori specifici */ for (const fieldNameFromError in result.errors) { const inputElement = e.target.elements[fieldNameFromError] || gebi(`register-${fieldNameFromError}-popup`); if (inputElement) inputElement.classList.add('error-border'); } } } } catch (error) { if(registerErrorMessagePopupEl) { registerErrorMessagePopupEl.textContent = "Errore: " + error.message; registerErrorMessagePopupEl.style.display = 'block'; } } finally { registerButton.disabled = false; registerButton.innerHTML = originalButtonText; } });
 
-  // === INIZIO FUNZIONALITÀ RECUPERO PASSWORD (per eventipassati.html) ===
+  // === INIZIO FUNZIONALITÀ RECUPERO PASSWORD ===
   const forgotPasswordLink = document.getElementById('forgotPasswordLink');
   const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
   const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
@@ -539,26 +570,26 @@
 
   function openForgotPasswordPopup() {
     if (typeof closeLoginPopup === 'function' && loginPopupEl?.classList.contains('active')) {
-      closeLoginPopup();
+      closeLoginPopup(); // Chiude popup login se aperto
     }
     if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active');
     if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active');
     document.body.style.overflow = 'hidden';
-    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
+    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; // Resetta messaggio
     const forgotEmailInput = document.getElementById('forgot-email');
-    if(forgotEmailInput) forgotEmailInput.focus();
+    if(forgotEmailInput) forgotEmailInput.focus(); // Focus sull'input email
   }
 
   function closeForgotPasswordPopup() {
     if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active');
     if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active');
-
+    // Ripristina scroll solo se nessun altro popup modale principale è attivo
     let anyOtherPagePopupActive = document.querySelector('#loginPopup.active, #loginRequiredPopup.active, #eventPopupAdmin.active');
     if (!anyOtherPagePopupActive) {
       document.body.style.overflow = '';
     }
     if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
-    if(forgotPasswordForm) forgotPasswordForm.reset();
+    if(forgotPasswordForm) forgotPasswordForm.reset(); // Resetta il form
   }
 
   if (forgotPasswordLink) {
@@ -575,7 +606,7 @@
       e.preventDefault();
       if (forgotPasswordMessage) {
         forgotPasswordMessage.style.display = 'none';
-        forgotPasswordMessage.className = 'form-message';
+        forgotPasswordMessage.className = 'form-message'; // Resetta classi messaggio
       }
       const emailInput = document.getElementById('forgot-email');
       const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]');
@@ -594,7 +625,7 @@
         if (result.success) {
           forgotPasswordMessage.textContent = result.message;
           forgotPasswordMessage.classList.add('success');
-          if(emailInput) emailInput.value = '';
+          if(emailInput) emailInput.value = ''; // Pulisce campo email
         } else {
           forgotPasswordMessage.textContent = result.message || "Si è verificato un errore.";
           forgotPasswordMessage.classList.add('error');
@@ -610,37 +641,60 @@
       }
     });
   }
-  // === FINE FUNZIONALITÀ RECUPERO PASSWORD (per eventipassati.html) ===
+  // === FINE FUNZIONALITÀ RECUPERO PASSWORD ===
 
+  // Elementi del DOM per il popup "Accesso Richiesto"
   const loginRequiredOverlayEl = gebi("loginRequiredOverlay"); const loginRequiredPopupEl = gebi("loginRequiredPopup"); const closeLoginRequiredPopupBtnEl = gebi("closeLoginRequiredPopupBtn"); const loginRequiredLoginBtnEl = gebi("loginRequiredLoginBtn");
-  function showLoginRequiredPopup(event) { if (event) event.preventDefault(); if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.add("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.add("active"); document.body.style.overflow = "hidden"; } function closeLoginRequiredPopup() { if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.remove("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.remove("active"); if (!loginPopupEl?.classList.contains('active') && !eventPopupAdminEl?.classList.contains('active') && !forgotPasswordPopup?.classList.contains('active')) { document.body.style.overflow = ""; } } // MODIFICATO
-  if (closeLoginRequiredPopupBtnEl) closeLoginRequiredPopupBtnEl.addEventListener("click", closeLoginRequiredPopup); if (loginRequiredOverlayEl) loginRequiredOverlayEl.addEventListener("click", (e) => { if (e.target === loginRequiredOverlayEl) closeLoginRequiredPopup(); }); if (loginRequiredLoginBtnEl) { loginRequiredLoginBtnEl.addEventListener("click", () => { closeLoginRequiredPopup(); openLoginPopup(); }); }
+  // Mostra il popup "Accesso Richiesto"
+  function showLoginRequiredPopup(event) { if (event) event.preventDefault(); if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.add("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.add("active"); document.body.style.overflow = "hidden"; }
+  // Chiude il popup "Accesso Richiesto"
+  function closeLoginRequiredPopup() { if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.remove("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.remove("active"); if (!loginPopupEl?.classList.contains('active') && !eventPopupAdminEl?.classList.contains('active') && !forgotPasswordPopup?.classList.contains('active')) { document.body.style.overflow = ""; } }
+  // Event listener per chiudere il popup "Accesso Richiesto"
+  if (closeLoginRequiredPopupBtnEl) closeLoginRequiredPopupBtnEl.addEventListener("click", closeLoginRequiredPopup);
+  if (loginRequiredOverlayEl) loginRequiredOverlayEl.addEventListener("click", (e) => { if (e.target === loginRequiredOverlayEl) closeLoginRequiredPopup(); });
+  if (loginRequiredLoginBtnEl) { loginRequiredLoginBtnEl.addEventListener("click", () => { closeLoginRequiredPopup(); openLoginPopup(); }); } // Apre popup login al click
+
+  // Elementi del DOM per il popup di modifica evento (Admin)
   const eventPopupOverlayAdminEl = gebi('eventPopupOverlayAdmin'); const eventPopupAdminEl = gebi('eventPopupAdmin'); const closeEventPopupBtnAdminEl = gebi('closeEventPopupBtnAdmin'); const editPastEventFormAdminEl = gebi('editPastEventFormAdmin'); const eventPopupTitleAdminEl = gebi('eventPopupTitleAdmin'); const adminEventIdInput = gebi('admin-event-id'); const adminVoluntaryCheckbox = gebi('admin-event-voluntary'); const adminPriceContainer = gebi('admin-event-price-container'); const adminEventPriceInput = gebi('admin-event-price'); const editPastEventFormMessageAdminEl = gebi('editPastEventFormMessageAdmin'); const adminCurrentImagePreview = gebi('current-event-image-preview'); const adminCurrentFlyerPreview = gebi('current-event-flyer-preview');
+  // Aggiorna visibilità campo prezzo in base a checkbox "offerta libera"
   function updateAdminPriceFieldVisibility() { if (adminVoluntaryCheckbox && adminPriceContainer && adminEventPriceInput) { const isVoluntary = adminVoluntaryCheckbox.checked; adminPriceContainer.style.display = isVoluntary ? 'none' : 'block'; adminEventPriceInput.required = !isVoluntary; if (isVoluntary) adminEventPriceInput.value = ''; } } if (adminVoluntaryCheckbox) adminVoluntaryCheckbox.addEventListener('change', updateAdminPriceFieldVisibility);
+  // Apre il popup per modificare un evento passato (solo Admin)
   function openEditPastEventPopup(eventData) { if (!currentUserData || !currentUserData.isAdmin) return; if (!editPastEventFormAdminEl || !eventPopupAdminEl || !eventPopupOverlayAdminEl) return; editPastEventFormAdminEl.reset(); if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.style.display = 'none'; editPastEventFormMessageAdminEl.className = 'form-message'; } if(adminCurrentImagePreview) { adminCurrentImagePreview.style.display = 'none'; adminCurrentImagePreview.src = '#';} if(adminCurrentFlyerPreview) adminCurrentFlyerPreview.innerHTML = ''; if(eventPopupTitleAdminEl) eventPopupTitleAdminEl.textContent = 'Modifica Evento Passato'; if(adminEventIdInput) adminEventIdInput.value = eventData.idevento; gebi('admin-event-title').value = eventData.titolo || ''; gebi('admin-event-date').value = eventData.datainizio ? eventData.datainizio.substring(0,10) : ''; gebi('admin-event-time').value = eventData.durata || ''; gebi('admin-event-short-desc').value = eventData.descrizione || ''; gebi('admin-event-long-desc').value = eventData.descrizione_estesa || ''; gebi('admin-event-prefix').value = eventData.prefisso_relatore || ''; gebi('admin-event-speaker').value = eventData.relatore || ''; gebi('admin-event-association').value = eventData.associazione || ''; gebi('admin-event-seats').value = eventData.posti_disponibili !== null ? eventData.posti_disponibili : ''; gebi('admin-event-booking').checked = !!eventData.flagprenotabile; if(adminVoluntaryCheckbox) adminVoluntaryCheckbox.checked = parseFloat(eventData.costo) === 0.00; updateAdminPriceFieldVisibility(); if (adminEventPriceInput && !adminVoluntaryCheckbox.checked && eventData.costo && parseFloat(eventData.costo) > 0) { adminEventPriceInput.value = parseFloat(eventData.costo).toFixed(2); } else if (adminEventPriceInput) { adminEventPriceInput.value = ''; } if (adminCurrentImagePreview && eventData.immagine_url) { adminCurrentImagePreview.src = eventData.immagine_url; adminCurrentImagePreview.style.display = 'block'; } if (adminCurrentFlyerPreview && eventData.volantino_url) { const fileName = eventData.volantino_url.split('/').pop(); adminCurrentFlyerPreview.innerHTML = `<p>Volantino attuale: <a href="${eventData.volantino_url}" target="_blank">${fileName}</a></p>`; } eventPopupOverlayAdminEl.style.display = 'block'; eventPopupAdminEl.style.display = 'block'; setTimeout(() => { eventPopupOverlayAdminEl.classList.add('active'); eventPopupAdminEl.classList.add('active'); }, 10); document.body.style.overflow = 'hidden'; gebi('admin-event-title').focus(); }
-  function closeEditPastEventPopup() { if (!eventPopupAdminEl || !eventPopupOverlayAdminEl) return; eventPopupOverlayAdminEl.classList.remove('active'); eventPopupAdminEl.classList.remove('active'); setTimeout(() => { eventPopupOverlayAdminEl.style.display = 'none'; eventPopupAdminEl.style.display = 'none'; if (!loginPopupEl?.classList.contains('active') && !loginRequiredPopupEl?.classList.contains('active') && !forgotPasswordPopup?.classList.contains('active')) { document.body.style.overflow = ''; } }, 300); } // MODIFICATO
+  // Chiude il popup di modifica evento
+  function closeEditPastEventPopup() { if (!eventPopupAdminEl || !eventPopupOverlayAdminEl) return; eventPopupOverlayAdminEl.classList.remove('active'); eventPopupAdminEl.classList.remove('active'); setTimeout(() => { eventPopupOverlayAdminEl.style.display = 'none'; eventPopupAdminEl.style.display = 'none'; if (!loginPopupEl?.classList.contains('active') && !loginRequiredPopupEl?.classList.contains('active') && !forgotPasswordPopup?.classList.contains('active')) { document.body.style.overflow = ''; } }, 300); }
   if (closeEventPopupBtnAdminEl) closeEventPopupBtnAdminEl.addEventListener('click', closeEditPastEventPopup); if (eventPopupOverlayAdminEl) eventPopupOverlayAdminEl.addEventListener('click', (e) => { if (e.target === eventPopupOverlayAdminEl) closeEditPastEventPopup(); });
+  // Gestione submit form modifica evento (Admin)
   editPastEventFormAdminEl?.addEventListener('submit', async function(e) { e.preventDefault(); if (!currentUserData || !currentUserData.isAdmin) return; const submitBtn = this.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML; submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...'; if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.style.display = 'none'; editPastEventFormMessageAdminEl.className = 'form-message'; } try { const formData = new FormData(this); formData.append('action', 'update_event'); const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData }); const responseText = await response.text(); let result; try { result = JSON.parse(responseText); } catch (jsonError) { throw new Error(`Risposta non JSON: ${responseText.substring(0,200)}`); } if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`); if (result.success) { if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.textContent = result.message || 'Evento aggiornato!'; editPastEventFormMessageAdminEl.classList.add('success'); } loadPastEvents(); setTimeout(closeEditPastEventPopup, 1500); } else { throw new Error(result.message || 'Errore aggiornamento.'); } } catch (error) { if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.textContent = `Errore: ${error.message}`; editPastEventFormMessageAdminEl.classList.add('error'); } } finally { if(editPastEventFormMessageAdminEl) editPastEventFormMessageAdminEl.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } });
 
+  // Formatta una stringa data (YYYY-MM-DD o ISO) in formato leggibile (es. "1 gennaio 2023")
   function formatDate(dateString) {
     if (!dateString) return "Data non disponibile";
     try {
+      // Prova a normalizzare la stringa data per una migliore compatibilità con new Date()
+      // Se è solo YYYY-MM-DD, aggiungi T00:00:00Z per considerarla UTC
       const normalizedDateString = dateString.length === 10 ? dateString + "T00:00:00Z" : dateString.replace(" ", "T") + (dateString.endsWith("Z") ? "" : "Z");
       const date = new Date(normalizedDateString);
-      if (isNaN(date.getTime())) {
+      if (isNaN(date.getTime())) { // Se la data non è valida
+        // Fallback per formati YYYY-MM-DD semplici che potrebbero non essere interpretati come UTC da tutti i browser
         if (/^\d{4}-\d{2}-\d{2}$/.test(dateString.substring(0,10))) {
           const parts = dateString.substring(0,10).split('-');
           const utcDate = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
           if (!isNaN(utcDate.getTime())) return utcDate.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
-        } return dateString;
+        }
+        return dateString; // Ritorna la stringa originale se non parsabile
       }
-      return date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
-    } catch (e) { return dateString; }
+      return date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' }); // Specifica timeZone UTC per consistenza
+    } catch (e) {
+      return dateString; // Fallback in caso di errore
+    }
   }
 
+  // Popola il filtro degli anni dinamicamente
   function populateYearFilter() {
     const currentYr = new Date().getFullYear();
-    let minYear = currentYr;
+    let minYear = currentYr; // Inizia con l'anno corrente come minimo
+
+    // Trova l'anno minimo tra gli eventi passati
     if (allPastEventsData && allPastEventsData.length > 0) {
       allPastEventsData.forEach(event => {
         if (event.datainizio) {
@@ -651,84 +705,122 @@
         }
       });
     } else {
-      minYear = currentYr - 4; // Default fallback if no events
+      minYear = currentYr - 4; // Fallback se non ci sono eventi, mostra gli ultimi 5 anni
     }
+
     if (searchYearEl) {
-      searchYearEl.innerHTML = '<option value="">Tutti gli anni</option>'; // Start with "Tutti gli anni"
+      searchYearEl.innerHTML = '<option value="">Tutti gli anni</option>'; // Opzione default "Tutti gli anni"
       for (let y = currentYr; y >= minYear; y--) {
         const option = document.createElement('option');
         option.value = y;
         option.textContent = y;
         searchYearEl.appendChild(option);
       }
-      // Default to current year if needed, or leave "Tutti gli anni" as default
-      // searchYearEl.value = currentYr.toString();
+      // MODIFICA: Imposta l'anno corrente come selezionato di default
+      searchYearEl.value = currentYr.toString();
     }
   }
 
 
+  // Crea una card HTML per un evento passato
   function createPastEventCard(event) {
     const card = document.createElement("article");
     card.className = "card";
-    if (currentUserData && currentUserData.isAdmin) card.classList.add('admin-card');
+    if (currentUserData && currentUserData.isAdmin) card.classList.add('admin-card'); // Classe per admin
+    // Aggiungi data-attributes per facilitare il filtraggio client-side se necessario (non usati attivamente qui)
     card.dataset.title = event.titolo?.toLowerCase() || '';
     card.dataset.date = event.datainizio || '';
     card.dataset.speaker = event.relatore?.toLowerCase() || '';
-    let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event-past.jpg";
-    if (currentUserData && currentUserData.isAdmin) {
+
+    let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event-past.jpg"; // Immagine di default
+
+    if (currentUserData && currentUserData.isAdmin) { // Vista Admin
       let volantinoAdminLinkHTML = '';
       if (event.volantino_url && event.volantino_url.trim() !== "") { volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em;"><b>Volantino:</b> <a href="${event.volantino_url}" target="_blank">Visualizza volantino</a></p>`; }
-      card.innerHTML = ` <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div> <div class="card-content"> <h3>${event.titolo || "Titolo N/D"}</h3> <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ""}</p> <p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}`: ""}</p> <p class="card-description" style="font-size:0.95em; min-height: 4.5em;">${event.descrizione || "N/D"}</p> ${volantinoAdminLinkHTML} <div class="card-actions admin-actions"> <button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button> <button class="card-btn btn-delete card-btn-primary" data-event-id="${event.idevento}">Elimina</button> </div> </div>`;
-      card.querySelector('.btn-edit').addEventListener('click', function() { const eventToEdit = allPastEventsData.find(e => e.idevento == this.dataset.eventId); if (eventToEdit) openEditPastEventPopup(eventToEdit); else alert("Dettagli non trovati."); });
-      card.querySelector('.btn-delete').addEventListener('click', async function() { const eventId = this.dataset.eventId; const eventToDelete = allPastEventsData.find(e => e.idevento == eventId); if (confirm(`Eliminare "${eventToDelete?.titolo || "questo evento"}"? L'azione è irreversibile.`)) { const btn = this; const oldTxt = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini" style="border-top-color:white;"></div>'; try { const fd = new FormData(); fd.append('action', 'delete_event'); fd.append('event_id', eventId); const r = await fetch('gestione_eventi.php', { method: 'POST', body: fd }); const rt = await r.text(); let res; try { res = JSON.parse(rt); } catch { throw new Error("Risposta non JSON (delete)"); } if (!r.ok || !res.success) throw new Error(res.message || "Eliminazione fallita."); alert(res.message || 'Eliminato.'); loadPastEvents(); } catch (err) { alert(`Errore: ${err.message}`); } finally { btn.disabled = false; btn.innerHTML = oldTxt; } } });
-    } else {
-      const actionsHTML = currentUserData ? ` <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Dettagli</a> <a href="evento_dettaglio_accesso.html?id=${event.idevento}#event-comments" class="card-btn card-btn-primary">Commenti</a>` : ` <a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Dettagli</a> <a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Commenti</a>`;
-      card.innerHTML = ` <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div> <div class="card-content"> <h3>${event.titolo || "Titolo N/D"}</h3> <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ""}</p> <p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}`: ""}</p> <p class="card-description">${event.descrizione || "Nessuna descrizione."}</p> <div class="card-actions">${actionsHTML}</div> </div>`;
+      card.innerHTML = `
+        <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+        <div class="card-content">
+          <h3>${event.titolo || "Titolo N/D"}</h3>
+          <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ""}</p>
+          <p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}`: ""}</p>
+          <p class="card-description" style="font-size:0.95em; min-height: 4.5em;">${event.descrizione || "N/D"}</p>
+          ${volantinoAdminLinkHTML}
+          <div class="card-actions admin-actions">
+            <button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
+            <button class="card-btn btn-delete card-btn-primary" data-event-id="${event.idevento}">Elimina</button>
+          </div>
+        </div>`;
+      // Aggiungi event listener per i bottoni admin
+      card.querySelector('.btn-edit').addEventListener('click', function() { const eventToEdit = allPastEventsData.find(e => e.idevento == this.dataset.eventId); if (eventToEdit) openEditPastEventPopup(eventToEdit); else alert("Dettagli evento non trovati per la modifica."); });
+      card.querySelector('.btn-delete').addEventListener('click', async function() { const eventId = this.dataset.eventId; const eventToDelete = allPastEventsData.find(e => e.idevento == eventId); if (confirm(`Sei sicuro di voler eliminare l'evento "${eventToDelete?.titolo || "questo evento"}"? L'azione è irreversibile.`)) { const btn = this; const oldTxt = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini" style="border-top-color:white;"></div>'; try { const fd = new FormData(); fd.append('action', 'delete_event'); fd.append('event_id', eventId); const r = await fetch('gestione_eventi.php', { method: 'POST', body: fd }); const rt = await r.text(); let res; try { res = JSON.parse(rt); } catch { throw new Error("Risposta non JSON dal server durante l'eliminazione."); } if (!r.ok || !res.success) throw new Error(res.message || "Eliminazione fallita."); alert(res.message || 'Evento eliminato con successo.'); loadPastEvents(); /* Ricarica la lista */ } catch (err) { alert(`Errore durante l'eliminazione: ${err.message}`); } finally { btn.disabled = false; btn.innerHTML = oldTxt; } } });
+    } else { // Vista Utente Standard / Non Loggato
+      const actionsHTML = currentUserData ?
+              ` <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Dettagli</a>
+          <a href="evento_dettaglio_accesso.html?id=${event.idevento}#event-comments" class="card-btn card-btn-primary">Commenti</a>` :
+              ` <a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Dettagli</a>
+          <a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Commenti</a>`;
+      card.innerHTML = `
+        <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+        <div class="card-content">
+          <h3>${event.titolo || "Titolo N/D"}</h3>
+          <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ""}</p>
+          <p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}`: ""}</p>
+          <p class="card-description">${event.descrizione || "Nessuna descrizione breve disponibile."}</p>
+          <div class="card-actions">${actionsHTML}</div>
+        </div>`;
     }
     return card;
   }
 
+  // Carica gli eventi passati dalla API
   async function loadPastEvents() {
     if (!eventiPassatiGridEl || !loadingIndicatorEl) return;
-    loadingIndicatorEl.classList.add("visible");
-    eventiPassatiGridEl.innerHTML = "";
+    loadingIndicatorEl.classList.add("visible"); // Mostra indicatore di caricamento
+    eventiPassatiGridEl.innerHTML = ""; // Pulisce la griglia
     try {
-      const response = await fetch("get_past_events.php");
+      const response = await fetch("get_past_events.php"); // Chiamata API
       if (!response.ok) throw new Error( `Errore HTTP: ${response.status} ${response.statusText}` );
       const result = await response.json();
       if (result.success && result.data) {
-        allPastEventsData = result.data;
-        populateYearFilter();
-        if (searchYearEl) searchYearEl.value = ""; // Default a "Tutti gli anni"
-        if (searchMonthEl) searchMonthEl.value = ""; // Default a "Tutti i mesi"
-        if (searchTitleEl) searchTitleEl.value = "";
-        if (searchSpeakerEl) searchSpeakerEl.value = "";
-        filterEvents();
-      } else { throw new Error( result.message || "Errore caricamento eventi." ); }
+        allPastEventsData = result.data; // Salva i dati globalmente
+        populateYearFilter(); // Popola il filtro anni (ora imposterà il default)
+        // Non resettare i filtri qui, così se l'utente aveva già filtrato e ricarica, i filtri rimangono
+        // Se si vuole resettare i filtri ad ogni loadPastEvents, decommentare:
+        // if (searchYearEl) searchYearEl.value = new Date().getFullYear().toString(); // Default all'anno corrente
+        // if (searchMonthEl) searchMonthEl.value = "";
+        // if (searchTitleEl) searchTitleEl.value = "";
+        // if (searchSpeakerEl) searchSpeakerEl.value = "";
+        filterEvents(); // Applica i filtri (ora con l'anno corrente pre-selezionato)
+      } else { throw new Error( result.message || "Errore nel caricamento degli eventi passati." ); }
     } catch (error) {
-      if(eventiPassatiGridEl) eventiPassatiGridEl.innerHTML = `<p class="no-events error-message" style="text-align:center; padding:20px;">Errore caricamento. (${error.message}) <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>`;
+      // Mostra messaggio di errore nella griglia
+      if(eventiPassatiGridEl) eventiPassatiGridEl.innerHTML = `<p class="no-events error-message" style="text-align:center; padding:20px;">Errore durante il caricamento degli eventi. (${error.message}) <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>`;
     } finally {
-      if(loadingIndicatorEl) loadingIndicatorEl.classList.remove("visible");
+      if(loadingIndicatorEl) loadingIndicatorEl.classList.remove("visible"); // Nasconde indicatore
     }
   }
 
+  // Filtra e visualizza gli eventi in base ai valori dei filtri
   function filterEvents() {
     if (!eventiPassatiGridEl) return;
     const titleFilter = searchTitleEl ? searchTitleEl.value.toLowerCase().trim() : "";
     const monthFilter = searchMonthEl ? searchMonthEl.value : "";
-    const yearFilterStr = searchYearEl ? searchYearEl.value : "";
+    const yearFilterStr = searchYearEl ? searchYearEl.value : ""; // Questo sarà l'anno corrente al primo caricamento
     const speakerFilter = searchSpeakerEl ? searchSpeakerEl.value.toLowerCase().trim() : "";
-    eventiPassatiGridEl.innerHTML = '';
+
+    eventiPassatiGridEl.innerHTML = ''; // Pulisce la griglia
     let visibleCardsCount = 0;
+
     const filteredEvents = allPastEventsData.filter(event => {
       const eventTitle = event.titolo?.toLowerCase() || "";
       const eventDateStr = event.datainizio || "";
-      let eventMatchesYear = (yearFilterStr === "");
-      let eventMatchesMonth = (monthFilter === "");
+      let eventMatchesYear = (yearFilterStr === ""); // True se "Tutti gli anni" è selezionato
+      let eventMatchesMonth = (monthFilter === ""); // True se "Tutti i mesi" è selezionato
 
       if (eventDateStr) {
         const eventYear = parseInt(eventDateStr.substring(0, 4));
-        const eventMonthNum = eventDateStr.substring(5, 7);
+        const eventMonthNum = eventDateStr.substring(5, 7); // Formato MM
+
         if (yearFilterStr !== "" && !isNaN(eventYear) && eventYear === parseInt(yearFilterStr)) {
           eventMatchesYear = true;
         }
@@ -736,21 +828,27 @@
           eventMatchesMonth = true;
         }
       }
+
       const titleMatch = !titleFilter || eventTitle.includes(titleFilter);
       const speakerMatch = !speakerFilter || (event.relatore?.toLowerCase() || "").includes(speakerFilter);
+
       return titleMatch && speakerMatch && eventMatchesYear && eventMatchesMonth;
     });
+
     if (filteredEvents.length > 0) {
       filteredEvents.forEach(event => eventiPassatiGridEl.appendChild(createPastEventCard(event)));
       visibleCardsCount = filteredEvents.length;
     }
+
+    // Gestione messaggio "Nessun risultato"
     const existingNoResultsMessage = gebi("noResultsMessage");
     if (existingNoResultsMessage) existingNoResultsMessage.remove();
+
     if (visibleCardsCount === 0) {
       const p = document.createElement("p");
       p.id = "noResultsMessage";
       p.className = "no-events";
-      if (allPastEventsData.length === 0 && !titleFilter && !monthFilter && !yearFilterStr && !speakerFilter) { // Mostra solo se non ci sono filtri e nessun dato
+      if (allPastEventsData.length === 0 && !titleFilter && !monthFilter && !yearFilterStr && !speakerFilter) {
         p.textContent = "Nessun evento passato trovato in archivio.";
       } else if (titleFilter || monthFilter || yearFilterStr || speakerFilter) { // Mostra se ci sono filtri attivi
         p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
@@ -761,19 +859,27 @@
     }
   }
 
+  // Event listener al caricamento del DOM
   document.addEventListener("DOMContentLoaded", async () => {
-    const currentYearEl = gebi("currentYear");
+    const currentYearEl = gebi("currentYear"); // Per il footer
     if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
-    loadUserData();
-    await fetchAndUpdateUserDisplayData();
+
+    loadUserData(); // Carica dati utente da localStorage
+    await fetchAndUpdateUserDisplayData(); // Aggiorna UI navbar
+
+    // Aggiungi event listener ai filtri per il filtraggio "live"
     searchTitleEl?.addEventListener("input", filterEvents);
     searchMonthEl?.addEventListener("change", filterEvents);
     searchYearEl?.addEventListener("change", filterEvents);
     searchSpeakerEl?.addEventListener("input", filterEvents);
-    await loadPastEvents();
+
+    await loadPastEvents(); // Carica e visualizza gli eventi passati (con anno corrente pre-selezionato)
+
+    // Event listener per il logout
     gebi('dropdownLogout')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
     gebi('mobileLogoutLink')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenu(); });
 
+    // Event listener per chiudere i popup con il tasto ESC
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         if (loginPopupEl?.classList.contains("active")) closeLoginPopup();
@@ -783,6 +889,7 @@
       }
     });
 
+    // Inizializza visibilità campo prezzo per admin (se già loggato come admin)
     if (currentUserData && currentUserData.isAdmin && typeof updateAdminPriceFieldVisibility === 'function') {
       updateAdminPriceFieldVisibility();
     }
