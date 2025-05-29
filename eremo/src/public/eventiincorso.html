@@ -125,7 +125,7 @@
       display: none; opacity: 0;
       transform: translate(-50%, -50%) scale(0.95);
       transition: opacity 0.3s ease, transform 0.3s ease;
-      overflow: hidden; /* Changed from visible to hidden */
+      overflow: hidden;
     }
     .dash-admin-event-popup.active {
       opacity: 1; transform: translate(-50%, -50%) scale(1);
@@ -151,14 +151,13 @@
     }
 
     /* === NUOVI STILI PER LA SELEZIONE DELLA MODALITÀ DI CREAZIONE === */
-    /* MODIFICATO: flex-direction e gap per layout orizzontale */
     #creationModeSelectionView {
       display: flex;
-      flex-direction: row; /* MODIFICATO */
-      align-items: stretch; /* MODIFICATO per altezza uguale */
+      flex-direction: row;
+      align-items: stretch;
       justify-content: center;
-      gap: 1rem; /* MODIFICATO */
-      padding: 2rem 1rem; /* MODIFICATO per padding laterale */
+      gap: 1.5rem;
+      padding: 2rem 1rem;
       width: 100%;
       flex-grow: 1;
     }
@@ -167,97 +166,198 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 1.5rem; /* MODIFICATO */
-      border: 2px solid var(--gray-light);
-      border-radius: var(--border-radius-medium);
+      padding: 1.8rem 1.5rem;
+      border: 1px solid var(--gray-light);
+      border-radius: var(--border-radius-large);
       background-color: var(--white);
       box-shadow: var(--shadow-light);
       cursor: pointer;
-      transition: all 0.25s ease-in-out;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       width: 100%;
-      max-width: 300px; /* MODIFICATO per adattarsi meglio orizzontalmente */
+      max-width: 320px;
       text-align: center;
-      flex-basis: 0; /* MODIFICATO per flex-grow */
-      flex-grow: 1; /* MODIFICATO per riempire spazio */
+      flex-basis: 0;
+      flex-grow: 1;
+      position: relative;
+      overflow: hidden;
     }
     .creation-mode-option:hover {
-      transform: translateY(-4px) scale(1.02); /* MODIFICATO: aggiunto scale */
-      box-shadow: var(--shadow-medium);
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: var(--shadow-medium-strong, 0 8px 25px rgba(0,0,0,0.12));
       border-color: var(--secondary);
     }
-    .creation-mode-option i {
-      font-size: 2.2rem; /* MODIFICATO */
+    .creation-mode-option .icon-container { /* MODIFICATO: Contenitore per icona/logo */
+      font-size: 2.5rem;
       color: var(--secondary);
-      margin-bottom: 0.8rem;
-      transition: color 0.25s ease-in-out, transform 0.25s ease-in-out; /* MODIFICATO */
+      margin-bottom: 1rem;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      z-index: 1;
+      position: relative; /* Per posizionare le stelle */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px; /* Altezza minima per contenere testo o icona */
     }
-    .creation-mode-option:hover i {
+    .creation-mode-option:hover .icon-container {
       color: var(--primary);
-      transform: scale(1.1); /* MODIFICATO */
+      transform: scale(1.15);
     }
-    /* MODIFICATO: Assicura centratura testo per h4 */
-    .creation-mode-option h4 {
-      font-size: 1.15rem; /* MODIFICATO */
+    /* MODIFICATO: Stile per il logo testuale AI */
+    .ai-logo-text {
+      font-size: 0.6em; /* Relativo a .icon-container font-size */
+      font-weight: bold;
+      line-height: 1.1;
+      display: block;
       color: var(--primary);
-      margin-bottom: 0.3rem;
-      font-weight: 600;
-      text-align: center; /* MODIFICATO */
     }
-    /* MODIFICATO: Assicura centratura testo per p */
-    .creation-mode-option p {
-      font-size: 0.85rem; /* MODIFICATO */
-      color: var(--gray-dark);
-      line-height: 1.5;
-      margin-bottom: 0;
-      text-align: center; /* MODIFICATO */
+    .ai-logo-text .line-1 { font-size: 0.9em; display: block; }
+    .ai-logo-text .line-2 { font-size: 1.15em; display: block; letter-spacing: 0.5px;}
+
+    /* MODIFICATO: Stelle per animazione bottone AI */
+    .star {
+      position: absolute;
+      background-color: var(--primary);
+      border-radius: 50%;
+      opacity: 0;
+      animation: twinkle 1.5s infinite ease-in-out;
+      width: 3px;
+      height: 3px;
+    }
+    .creation-mode-option#extractFromFlyerModeBtn:hover .star { opacity: 0.7; }
+    .star.s1 { top: 10%; left: 15%; animation-delay: 0s; width: 2px; height: 2px;}
+    .star.s2 { top: 20%; right: 10%; animation-delay: 0.3s; }
+    .star.s3 { bottom: 15%; left: 25%; animation-delay: 0.6s; width: 2px; height: 2px;}
+    .star.s4 { bottom: 25%; right: 20%; animation-delay: 0.9s; }
+    .star.s5 { top: 50%; left: 5%; animation-delay: 0.2s; }
+    .star.s6 { top: 5%; right: 30%; animation-delay: 0.7s; width: 1px; height: 1px;}
+
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: 1; transform: scale(1.2); }
     }
 
-    /* MODIFICATO: Stile specifico per il pulsante AI */
+
+    .creation-mode-option h4 {
+      font-size: 1.25rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      text-align: center;
+      z-index: 1;
+    }
+    .creation-mode-option p {
+      font-size: 0.9rem;
+      color: var(--gray-dark);
+      line-height: 1.6;
+      margin-bottom: 0;
+      text-align: center;
+      z-index: 1;
+    }
+
     .creation-mode-option#extractFromFlyerModeBtn {
       border-color: var(--primary-light, #a5c2b9);
-      background-color: var(--primary-lighter, #eef3f1); /* Sfondo leggermente diverso */
+      background: linear-gradient(145deg, var(--primary-lighter, #eef3f1), var(--white));
+    }
+    .creation-mode-option#extractFromFlyerModeBtn::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -150%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+              to right,
+              rgba(255, 255, 255, 0) 0%,
+              rgba(255, 255, 255, 0.3) 50%, /* Shimmer più sottile */
+              rgba(255, 255, 255, 0) 100%
+      );
+      transform: skewX(-25deg);
+      transition: left 0.85s cubic-bezier(0.25, 0.8, 0.25, 1); /* Leggermente più lento */
+      z-index: 0;
+    }
+    .creation-mode-option#extractFromFlyerModeBtn:hover::before {
+      left: 150%;
     }
     .creation-mode-option#extractFromFlyerModeBtn:hover {
       border-color: var(--primary);
-      background-color: var(--white); /* Ritorna bianco su hover per contrasto */
+      box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
     }
-    .creation-mode-option#extractFromFlyerModeBtn i {
-      color: var(--primary); /* Icona già del colore primario */
-    }
-    .creation-mode-option#extractFromFlyerModeBtn:hover i {
-      color: var(--secondary-dark); /* Cambio colore icona su hover */
+    .creation-mode-option#extractFromFlyerModeBtn:hover .icon-container {
+      transform: scale(1.1); /* Scalatura più contenuta per il testo */
     }
 
 
     /* === NUOVI STILI PER LA SEZIONE CARICAMENTO VOLANTINO === */
     #flyerUploadView {
       display: none;
-      padding: 1.5rem;
-      border: 1px dashed var(--gray-medium);
-      border-radius: var(--border-radius-medium);
+      padding: 2rem;
+      border: 2px dashed var(--gray-medium);
+      border-radius: var(--border-radius-large);
       background-color: var(--background-light, #f8f9fa);
       text-align: center;
       margin-top: 1rem;
+      position: relative;
     }
-    #flyerUploadView h4 {
-      color: var(--primary);
-      margin-top: 0;
-      margin-bottom: 1rem;
+    #flyerUploadView .form-group {
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    #flyerUploadView .form-group { margin-bottom: 1rem; }
+    #flyerUploadView .form-group label {
+      display: block;
+      margin-bottom: 0.8rem;
+      color: var(--primary-dark, #333);
+      font-weight: 500;
+      font-size: 1rem;
+      text-align: center;
+    }
     #flyerUploadView #flyerFile {
       display: block;
-      margin: 0 auto 1rem auto;
-      max-width: 400px;
+      margin: 0 auto 1.5rem auto;
+      max-width: 450px;
+      padding: 0.5rem;
+      border: 1px solid var(--gray-light);
+      border-radius: var(--border-radius-small);
+    }
+    #flyerUploadView #flyerPreviewContainer {
+      position: relative;
+      max-width: 100%;
+      max-height: 250px;
+      margin: 0 auto 1.5rem auto;
+      display: none;
+      /* MODIFICATO: Aggiunto flex per centrare l'immagine */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #flyerUploadView #flyerPreview {
       max-width: 100%;
-      max-height: 200px;
-      margin: 0 auto 1rem auto;
+      max-height: 250px;
       border: 1px solid var(--gray-light);
-      border-radius: 4px;
-      display: none;
+      border-radius: var(--border-radius-medium);
+      display: block;
+      box-shadow: var(--shadow-light);
+      position: relative;
+      z-index: 1;
+      /* MODIFICATO: Rimosso margin: 0 auto; perché il parent ora è flex */
     }
+    #flyerUploadView #flyerPreviewContainer.pulsating-background::before {
+      content: '';
+      position: absolute;
+      top: -8px; left: -8px; right: -8px; bottom: -8px; /* Leggermente ridotto per essere più stretto */
+      background-color: rgba(var(--primary-rgb), 0.08); /* Più tenue */
+      border-radius: calc(var(--border-radius-medium) + 8px);
+      animation: flyerPulseEffect 1.8s infinite ease-in-out; /* MODIFICATO: Animazione più veloce e nome diverso */
+      z-index: 0;
+    }
+    /* MODIFICATO: Animazione sfondo più "lampeggiante" */
+    @keyframes flyerPulseEffect {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.03); }
+    }
+
     #flyerUploadView #processFlyerBtn.btn-popup .spinner-mini {
       margin-right: 8px;
     }
@@ -987,12 +1087,20 @@
   <div class="dash-admin-event-popup-content">
     <div id="creationModeSelectionView">
       <div class="creation-mode-option" id="createManuallyModeBtn">
-        <i class="fas fa-edit"></i>
+        <div class="icon-container"><i class="fas fa-edit"></i></div>
         <h4>Crea Manualmente</h4>
         <p>Inserisci tutti i dettagli dell'evento compilando il modulo.</p>
       </div>
       <div class="creation-mode-option" id="extractFromFlyerModeBtn">
-        <i class="fas fa-file-invoice"></i> <h4>Estrai da Volantino (AI)</h4>
+        <div class="icon-container">
+                <span class="ai-logo-text">
+                    <span class="line-1">Eremo</span>
+                    <span class="line-2">Vision AI</span>
+                </span>
+          <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span>
+          <span class="star s4"></span><span class="star s5"></span><span class="star s6"></span>
+        </div>
+        <h4>Estrai da Volantino</h4>
         <p>Carica un volantino e lascia che l'AI compili i campi per te.</p>
       </div>
     </div>
@@ -1003,7 +1111,9 @@
         <label for="flyerFile">Seleziona immagine volantino (JPG, PNG, WEBP):</label>
         <input type="file" id="flyerFile" class="form-control" accept="image/jpeg, image/png, image/webp">
       </div>
-      <img id="flyerPreview" src="#" alt="Anteprima Volantino" />
+      <div id="flyerPreviewContainer">
+        <img id="flyerPreview" src="#" alt="Anteprima Volantino" />
+      </div>
       <button type="button" id="processFlyerBtn" class="btn-popup" disabled><i class="fas fa-cogs"></i> Processa Volantino con AI</button>
       <div id="flyerProcessingStatus"></div>
     </div>
@@ -1162,7 +1272,7 @@
   // Elementi DOM per la selezione della modalità di creazione
   let creationModeSelectionViewEl, createManuallyModeBtnEl, extractFromFlyerModeBtnEl;
   // Elementi DOM per il caricamento del volantino
-  let flyerUploadViewEl, flyerFileEl, flyerPreviewEl, processFlyerBtnEl, flyerProcessingStatusEl;
+  let flyerUploadViewEl, flyerFileEl, flyerPreviewEl, processFlyerBtnEl, flyerProcessingStatusEl, flyerPreviewContainerEl;
 
   let adminAddEventBtnEl, dashAdminEventPopupOverlayEl, dashAdminEventPopupEl, closeDashAdminEventPopupBtnEl,
           dashAdminEventFormEl, dashAdminEventPopupTitleEl, dashAdminEventIdInputEl, dashAdminEventTitleEl,
@@ -1275,7 +1385,6 @@
     }
 
     const groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
-    // MODIFICATO: Prompt aggiornato per essere più robusto e richiedere JSON pulito
     const flyerPrompt = `Analizza l'immagine del volantino fornita e estrai le seguenti informazioni strutturate.
 Formatta l'output ESCLUSIVAMENTE come un oggetto JSON valido. Non includere testo prima o dopo l'oggetto JSON.
 Se un'informazione non è chiaramente presente o deducibile, usa 'null' per il valore del campo corrispondente.
@@ -1315,11 +1424,9 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
           ]
         }
       ],
-      // MODIFICATO: Utilizzo del modello specificato dall'utente
       model: "meta-llama/llama-4-scout-17b-16e-instruct",
-      temperature: 0.2, // Leggermente ridotta per output JSON più consistente
-      max_tokens: 2500, // Aumentato per sicurezza con descrizioni più lunghe
-      // response_format: { type: "json_object" }, // Se supportato dal modello e endpoint, aiuta a forzare JSON
+      temperature: 0.2,
+      max_tokens: 2500,
     };
 
     try {
@@ -1345,7 +1452,6 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
       const data = await response.json();
       if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
         let content = data.choices[0].message.content;
-        // Tentativo di pulire il JSON da eventuali ```json ... ``` o testo extra
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (jsonMatch && jsonMatch[0]) {
           try {
@@ -1356,7 +1462,6 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
             return { success: false, error: "Risposta AI non è un JSON valido dopo pulizia." };
           }
         } else {
-          // Se non trova un JSON pulito, prova a parsare direttamente, potrebbe funzionare se il modello è bravo
           try {
             const extractedJson = JSON.parse(content);
             return { success: true, data: extractedJson };
@@ -1397,13 +1502,9 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
         { "role": "system", "content": promptSystem },
         { "role": "user", "content": `Descrizione estesa da riassumere:\n\n${longDescription}` }
       ],
-      // MODIFICATO: Utilizzo del modello specificato dall'utente, anche se Llama-3-8b è testuale e va bene qui.
-      // Per coerenza con la richiesta di usare "Llama 4 Scout" per immagini, e dato che questo è un task testuale,
-      // potrei usare un modello testuale forte come Llama-3-70b se disponibile o mantenere Llama-3-8b.
-      // Dato che l'utente ha specificato Llama 4 Scout per "immagini", userò un modello testuale Groq standard per questo.
-      "model": "llama3-8b-8192", // Modello testuale Groq standard (ex llama3-8b-chat-hf)
+      "model": "llama3-8b-8192",
       "temperature": 0.7,
-      "max_tokens": 70, // Aumentato leggermente per sicurezza
+      "max_tokens": 70,
       "top_p": 1,
       "stream": false
     };
@@ -1427,7 +1528,7 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
       const data = await response.json();
       if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
         let generatedText = data.choices[0].message.content.trim();
-        generatedText = generatedText.replace(/^["']|["']$/g, ""); // Rimuove virgolette esterne
+        generatedText = generatedText.replace(/^["']|["']$/g, "");
         return { success: true, description: generatedText, error: null };
       } else {
         console.warn("Struttura risposta Groq non valida per descrizione (non-streaming):", data);
@@ -1916,12 +2017,12 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     customConfirmYesBtn = gebi('customConfirmYes');
     customConfirmNoBtn = gebi('customConfirmNo');
 
-    // Nuovi elementi per la selezione modalità e caricamento volantino
     creationModeSelectionViewEl = gebi('creationModeSelectionView');
     createManuallyModeBtnEl = gebi('createManuallyModeBtn');
     extractFromFlyerModeBtnEl = gebi('extractFromFlyerModeBtn');
     flyerUploadViewEl = gebi('flyerUploadView');
     flyerFileEl = gebi('flyerFile');
+    flyerPreviewContainerEl = gebi('flyerPreviewContainer');
     flyerPreviewEl = gebi('flyerPreview');
     processFlyerBtnEl = gebi('processFlyerBtn');
     flyerProcessingStatusEl = gebi('flyerProcessingStatus');
@@ -1933,13 +2034,11 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     if (dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.addEventListener('click', (e) => { if (e.target === dashAdminEventPopupOverlayEl) tryCloseDashAdminEventPopup(); });
     if (dashAdminEventVoluntaryCheckbox) dashAdminEventVoluntaryCheckbox.addEventListener('change', updateDashAdminPriceFieldVisibility);
 
-    // Listener per la selezione della modalità di creazione
     if(createManuallyModeBtnEl) createManuallyModeBtnEl.addEventListener('click', () => {
       if(creationModeSelectionViewEl) creationModeSelectionViewEl.style.display = 'none';
       if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'none';
       if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'flex';
-      // openDashAdminEventPopup(); // NON chiamare qui, ma solo dopo aver resettato il form
-      resetAndPrepareManualForm(); // Funzione helper per resettare e mostrare il form
+      resetAndPrepareManualForm();
       if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Aggiungi Nuovo Evento Manualmente';
       if(dashAdminEventTitleEl) dashAdminEventTitleEl.focus();
       storeInitialFormData();
@@ -1950,32 +2049,35 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
       if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'block';
       if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'none';
       if(flyerFileEl) flyerFileEl.value = '';
-      if(flyerPreviewEl) { flyerPreviewEl.style.display = 'none'; flyerPreviewEl.src = '#'; }
+      if(flyerPreviewContainerEl) flyerPreviewContainerEl.style.display = 'none';
+      if(flyerPreviewEl) flyerPreviewEl.src = '#';
+      if(flyerPreviewContainerEl) flyerPreviewContainerEl.classList.remove('pulsating-background');
       if(processFlyerBtnEl) processFlyerBtnEl.disabled = true;
       if(flyerProcessingStatusEl) flyerProcessingStatusEl.textContent = '';
       if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Estrai da Volantino';
-      resetAndPrepareManualForm(); // Resetta il form anche se non visibile subito, per pulizia
+      resetAndPrepareManualForm();
     });
 
-    // Listener per il caricamento del volantino
     if(flyerFileEl) flyerFileEl.addEventListener('change', (event) => {
       const file = event.target.files[0];
       if (file && file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          if(flyerPreviewEl) {
-            flyerPreviewEl.src = e.target.result;
-            flyerPreviewEl.style.display = 'block';
+          if(flyerPreviewEl) flyerPreviewEl.src = e.target.result;
+          if(flyerPreviewContainerEl) {
+            flyerPreviewContainerEl.style.display = 'flex'; // MODIFICATO da block a flex
+            flyerPreviewContainerEl.classList.add('pulsating-background');
           }
         }
         reader.readAsDataURL(file);
         if(processFlyerBtnEl) processFlyerBtnEl.disabled = false;
         if(flyerProcessingStatusEl) flyerProcessingStatusEl.textContent = '';
       } else {
-        if(flyerPreviewEl) {
-          flyerPreviewEl.style.display = 'none';
-          flyerPreviewEl.src = '#';
+        if(flyerPreviewContainerEl) {
+          flyerPreviewContainerEl.style.display = 'none';
+          flyerPreviewContainerEl.classList.remove('pulsating-background');
         }
+        if(flyerPreviewEl) flyerPreviewEl.src = '#';
         if(processFlyerBtnEl) processFlyerBtnEl.disabled = true;
         if(flyerProcessingStatusEl && file) flyerProcessingStatusEl.textContent = 'Per favore, seleziona un file immagine (JPG, PNG, WEBP).';
       }
@@ -2055,8 +2157,9 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     }
     if(flyerProcessingStatusEl) {
       flyerProcessingStatusEl.textContent = 'Estrazione informazioni dal volantino in corso...';
-      flyerProcessingStatusEl.className = ''; // Reset classi
+      flyerProcessingStatusEl.className = '';
     }
+    if(flyerPreviewContainerEl) flyerPreviewContainerEl.classList.remove('pulsating-background');
 
 
     try {
@@ -2078,6 +2181,17 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
         if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'none';
         if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'flex';
         if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Verifica Evento da Volantino';
+
+        if (dashAdminEventFlyerEl && flyerFileEl.files.length > 0) {
+          const uploadedFlyerFile = flyerFileEl.files[0];
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(uploadedFlyerFile);
+          dashAdminEventFlyerEl.files = dataTransfer.files;
+          if (dashAdminCurrentFlyerPreviewEl) {
+            dashAdminCurrentFlyerPreviewEl.innerHTML = `<a href="${URL.createObjectURL(uploadedFlyerFile)}" target="_blank" title="Visualizza il volantino caricato">${sanitizeText(uploadedFlyerFile.name)}</a> (Appena caricato)`;
+          }
+          dashAdminEventFlyerEl.dispatchEvent(new Event('change', { bubbles: true }));
+        }
         storeInitialFormData();
       } else {
         throw new Error(extractionResult.error || "Estrazione fallita.");
@@ -2164,14 +2278,7 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     if (keys1.length !== keys2.length) return false;
     for (let key of keys1) {
       if (data1[key] !== data2[key]) {
-        const el = dashAdminEventFormEl.elements[key];
-        if (el && el.type === 'file') {
-          if ((data1[key] && !data2[key]) || (!data1[key] && data2[key]) || (data1[key] && data2[key] && data1[key] !== data2[key])) {
-            return false;
-          }
-        } else {
-          return false;
-        }
+        return false;
       }
     }
     return true;
@@ -2255,13 +2362,21 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
         }
       }
     });
+    if (dashAdminEventFlyerEl && dashAdminCurrentFlyerPreviewEl) {
+      dashAdminEventFlyerEl.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          dashAdminCurrentFlyerPreviewEl.innerHTML = `<a href="${URL.createObjectURL(this.files[0])}" target="_blank" title="Visualizza il volantino selezionato">${sanitizeText(this.files[0].name)}</a>`;
+        } else if (!dashAdminEventIdInputEl.value) {
+          dashAdminCurrentFlyerPreviewEl.innerHTML = '<span>Nessun volantino caricato.</span>';
+        }
+      });
+    }
   }
 
-  // Funzione helper per resettare e preparare il form per l'inserimento manuale
   function resetAndPrepareManualForm() {
     if (!dashAdminEventFormEl) return;
     dashAdminEventFormEl.reset();
-    if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = ''; // Assicura che l'ID sia vuoto per nuovo evento
+    if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = '';
     updateDashAdminPriceFieldVisibility();
     if(dashAdminEventFormMessageEl) { dashAdminEventFormMessageEl.style.display = 'none'; dashAdminEventFormMessageEl.className = 'form-message';}
     if(dashAdminCurrentImagePreviewEl) { dashAdminCurrentImagePreviewEl.style.display = 'none'; dashAdminCurrentImagePreviewEl.src = '#';}
@@ -2272,23 +2387,23 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     if(dashAdminEventEndTimeEl) dashAdminEventEndTimeEl.value = '';
     if(aiShortDescStatusEl) aiShortDescStatusEl.textContent = "";
     if(generateShortDescBtnEl) generateShortDescBtnEl.classList.remove('visible', 'loading', 'expanded');
-    updateDashAdminEventPreview(); // Aggiorna l'anteprima con i valori resettati
+    updateDashAdminEventPreview();
   }
 
 
   function openDashAdminEventPopup(eventData = null) {
     if (!dashAdminEventFormEl) return;
 
-    // Logica di visualizzazione iniziale
     if(creationModeSelectionViewEl) creationModeSelectionViewEl.style.display = 'flex';
     if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'none';
+    if(flyerPreviewContainerEl) flyerPreviewContainerEl.style.display = 'none';
+    if(flyerPreviewContainerEl) flyerPreviewContainerEl.classList.remove('pulsating-background');
     if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'none';
     if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Come vuoi creare l\'evento?';
 
-    if (!eventData) { // Nuovo evento: resetta il form (ma non lo mostra subito)
+    if (!eventData) {
       resetAndPrepareManualForm();
-      // Non chiamare storeInitialFormData qui, ma quando il form manuale viene effettivamente mostrato
-    } else { // Modifica evento: popola e mostra subito il form
+    } else {
       if(creationModeSelectionViewEl) creationModeSelectionViewEl.style.display = 'none';
       if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'none';
       if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'flex';
@@ -2329,8 +2444,9 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
         dashAdminCurrentImagePreviewEl.style.display = 'none';
         dashAdminCurrentImagePreviewEl.src = '#';
       }
+      if(dashAdminEventFlyerEl) dashAdminEventFlyerEl.value = '';
       if (dashAdminCurrentFlyerPreviewEl && eventData.volantino_url) {
-        dashAdminCurrentFlyerPreviewEl.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank" title="Visualizza il volantino attuale">Visualizza volantino attuale</a>`;
+        dashAdminCurrentFlyerPreviewEl.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank" title="Visualizza il volantino attuale">${sanitizeText(eventData.volantino_url.split('/').pop())}</a>`;
       } else if (dashAdminCurrentFlyerPreviewEl) {
         dashAdminCurrentFlyerPreviewEl.innerHTML = `<span>Nessun volantino caricato.</span>`;
       }
@@ -2339,7 +2455,7 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
       if(dashAdminEventTitleEl) dashAdminEventTitleEl.focus();
     }
 
-    if (dashAdminLongDescElForAI && generateShortDescBtnEl) { // Aggiorna visibilità bottone AI
+    if (dashAdminLongDescElForAI && generateShortDescBtnEl) {
       const hasText = dashAdminLongDescElForAI.value.trim().length > 0;
       generateShortDescBtnEl.classList.toggle('visible', hasText);
       generateShortDescBtnEl.classList.toggle('expanded', hasText && !generateShortDescBtnEl.classList.contains('loading'));
@@ -2360,7 +2476,11 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
   async function tryCloseDashAdminEventPopup() {
     if (dashAdminFormAndPreviewContainerEl && dashAdminFormAndPreviewContainerEl.style.display === 'flex') {
       const currentFormData = getAdminEventFormData(dashAdminEventFormEl);
-      isEventFormDirty = !compareAdminEventFormData(initialAdminEventFormData, currentFormData);
+      const imageFileChanged = dashAdminEventImageEl.files.length > 0 && initialAdminEventFormData['event-image'] !== dashAdminEventImageEl.files[0].name;
+      const flyerFileChanged = dashAdminEventFlyerEl.files.length > 0 && initialAdminEventFormData['event-flyer'] !== dashAdminEventFlyerEl.files[0].name;
+
+      isEventFormDirty = !compareAdminEventFormData(initialAdminEventFormData, currentFormData) || imageFileChanged || flyerFileChanged;
+
 
       if (isEventFormDirty) {
         const confirmed = await showCustomConfirm("Hai modifiche non salvate. Sei sicuro di voler uscire?");
@@ -2378,9 +2498,10 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     if(dashAdminEventPopupEl) dashAdminEventPopupEl.classList.remove('active');
     if (!isAnyPopupActive()) document.body.style.overflow = '';
     isEventFormDirty = false;
-    // Riporta alla vista di selezione modalità
     if(creationModeSelectionViewEl) creationModeSelectionViewEl.style.display = 'flex';
     if(flyerUploadViewEl) flyerUploadViewEl.style.display = 'none';
+    if(flyerPreviewContainerEl) flyerPreviewContainerEl.style.display = 'none';
+    if(flyerPreviewContainerEl) flyerPreviewContainerEl.classList.remove('pulsating-background');
     if(dashAdminFormAndPreviewContainerEl) dashAdminFormAndPreviewContainerEl.style.display = 'none';
     if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Come vuoi creare l\'evento?';
   }
@@ -2402,6 +2523,7 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
       formData.delete('event-start-time'); formData.delete('event-end-time');
       if (dashAdminEventVoluntaryCheckbox.checked) formData.set('event-price', '0.00');
       else if (!formData.get('event-price')) formData.set('event-price', '0.00');
+
       const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
       const responseText = await response.text();
       let result; try { result = JSON.parse(responseText); }
@@ -2414,7 +2536,7 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
           dashAdminEventFormMessageEl.style.display = 'block';
         }
         loadEvents();
-        storeInitialFormData(); // Aggiorna lo stato "pulito" del form
+        isEventFormDirty = false;
         setTimeout(closeDashAdminEventPopup_actual, 1500);
       } else { throw new Error(result.message || 'Errore durante il salvataggio dell\'evento.'); }
     } catch (error) {
