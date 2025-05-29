@@ -139,7 +139,7 @@
         .event-view-controls select.form-control { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--gray-medium); border-radius: 6px; font-size: 0.9rem; background-color: var(--white); line-height: 1.4; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23365e51%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.6rem center; background-size: 0.6em auto; padding-right: 2rem; cursor: pointer; }
         .event-view-controls select.form-control:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25); outline: none; }
         .event-form-and-preview-container { display: flex; flex-wrap: wrap; gap: 2rem; margin-top: 1rem; }
-        #eventFormDashboard { flex: 2; min-width: 300px; background-color: #f9f9f9; padding: 1.5rem; border-radius: var(--border-radius-medium); border: 1px solid var(--gray-light); }
+        #eventFormDashboard { flex: 2; min-width: 300px; background-color: #f9f9f9; padding: 1.5rem; border-radius: var(--border-radius-medium); border: 1px solid var(--gray-light); position: relative; } /* Aggiunto position relative */
         #eventFormDashboard .form-row { margin-bottom: 1rem; }
         #eventFormDashboard .form-row-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
         #eventCardPreviewContainer { flex: 1; min-width: 300px; padding: 1.5rem; border: 1px dashed var(--gray-medium); border-radius: var(--border-radius-medium); background-color: #fdfdfd; height: fit-content; }
@@ -153,7 +153,7 @@
         .preview-card-content p { font-size: 0.9rem; color: var(--gray-dark); line-height: 1.5; margin-bottom: 0.5rem; min-height: 1em; word-break: break-word; }
         .preview-card-content .preview-relatore { font-style: italic; }
         .preview-card-content .preview-posti, .preview-card-content .preview-costo { font-weight: bold; }
-        #eventFormDashboard .form-group { margin-bottom: 1.2rem; }
+        #eventFormDashboard .form-group { margin-bottom: 1.2rem; position: relative; /* Necessario per il posizionamento assoluto del bottone AI */ }
         #eventFormDashboard .form-group label { display: block; margin-bottom: 0.4rem; color: var(--primary); font-weight: 500; font-size: 0.95rem; }
         #eventFormDashboard .form-control, #eventFormDashboard select.form-control { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-medium); border-radius: 8px; font-size: 1rem; background-color: var(--white); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
         #eventFormDashboard .form-control:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 141, 177, 135), 0.25); outline: none; }
@@ -418,6 +418,85 @@
         .navbar .hamburger {
             display: none !important;
         }
+
+        /* Stile per il pulsante AI Genera Descrizione Breve (DASHBOARD) */
+        .ai-generate-btn-dashboard {
+            position: absolute;
+            top: -12px;
+            right: 0px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            z-index: 10;
+        }
+        .ai-generate-btn-dashboard:hover {
+            background-color: var(--secondary);
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+        }
+        .ai-generate-btn-dashboard .ai-icon {
+            display: inline-block;
+            transition: transform 0.5s ease;
+        }
+        .ai-generate-btn-dashboard.loading .ai-icon {
+            animation: spin 1s linear infinite; /* spin è già definito */
+        }
+
+        /* Stili per l'area di visualizzazione dei filtri attivi */
+        .active-filters-display {
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            background-color: #f0f8ff; /* Azzurrino chiaro */
+            border: 1px solid #b0e0e6; /* Bordo azzurro */
+            border-radius: var(--border-radius-medium);
+            box-shadow: var(--shadow-light);
+        }
+        .active-filters-display h4 {
+            margin-top: 0;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+            color: var(--primary);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dotted var(--gray-medium);
+        }
+        .active-filters-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .active-filters-list li {
+            background-color: var(--secondary);
+            color: var(--white);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+        .active-filters-list li .filter-label {
+            opacity: 0.8;
+            margin-right: 0.3em;
+        }
+        .active-filters-display .no-filters-active {
+            font-style: italic;
+            color: var(--gray-dark);
+            font-size: 0.95rem;
+        }
+
     </style>
 </head>
 <body class="page-dashboard">
@@ -526,6 +605,12 @@
                 <option value="nessuno">Nessun raggruppamento</option>
             </select>
         </div>
+    </div>
+
+    <div id="activeFiltersDisplayContainer" class="active-filters-display" style="display: none;">
+        <h4>Filtri Attivi:</h4>
+        <ul id="activeFiltersList" class="active-filters-list">
+        </ul>
     </div>
 
     <div id="eventManagementContent" class="dashboard-section">
@@ -641,14 +726,21 @@
                     <input type="time" id="event-end-time-dashboard" name="event-end-time" class="form-control">
                 </div>
             </div>
-            <div class="form-group">
-                <label for="event-short-desc-dashboard">Descrizione Breve* (max 255 caratteri)</label>
-                <textarea id="event-short-desc-dashboard" name="event-short-desc" class="form-control" rows="2" required maxlength="255"></textarea>
-            </div>
+
             <div class="form-group">
                 <label for="event-long-desc-dashboard">Descrizione Estesa</label>
                 <textarea id="event-long-desc-dashboard" name="event-long-desc" class="form-control" rows="4"></textarea>
             </div>
+
+            <div class="form-group">
+                <label for="event-short-desc-dashboard">Descrizione Breve* (max 200 caratteri)</label>
+                <button type="button" id="generateShortDescBtnDashboard" class="ai-generate-btn-dashboard" title="Genera descrizione breve con AI">
+                    <span class="ai-icon">✨</span>
+                </button>
+                <textarea id="event-short-desc-dashboard" name="event-short-desc" class="form-control" rows="2" required maxlength="200"></textarea>
+                <small id="aiShortDescStatusDashboard" style="font-size: 0.75rem; color: var(--gray-dark); display: block; margin-top: 2px;"></small>
+            </div>
+
             <div class="form-grid">
                 <div class="form-group">
                     <label for="event-prefix-dashboard">Prefisso Relatore</label>
@@ -734,6 +826,10 @@
     const adminAvatarPath = 'images/logo.png';
     const adminNameGlobalJS = "Admin Eremo";
 
+    // Variabili per la moderazione/generazione Groq
+    let groqApiKey = null;
+    // let groqDecryptionKey = null; // Non più necessaria lato client se la chiave è già decifrata o gestita server-side per fetchAndPrepareGroqApiKey
+
     const SnavbarContainer = document.getElementById('navbarContainer');
     let SlastScroll = 0;
     if (SnavbarContainer) {
@@ -762,7 +858,7 @@
         const hamburger = document.querySelector(".navbar .hamburger");
         if(mobileMenu && hamburger && mobileMenu.classList.contains("open")){
             mobileMenu.classList.remove("open");
-            if (hamburger.classList.contains("open")) { // Controlla se hamburger ha la classe open prima di rimuoverla
+            if (hamburger.classList.contains("open")) {
                 hamburger.classList.remove("open");
             }
             hamburger.setAttribute("aria-expanded", "false");
@@ -928,6 +1024,13 @@
     const previewSeatsEl = document.querySelector('#previewSeats .value');
     const previewPriceEl = document.querySelector('#previewPrice .value');
 
+    // Elementi per AI (Dashboard)
+    const generateShortDescBtnDashboard = document.getElementById('generateShortDescBtnDashboard');
+    const aiShortDescStatusDashboard = document.getElementById('aiShortDescStatusDashboard');
+    const eventLongDescDashboard = document.getElementById('event-long-desc-dashboard');
+    const eventShortDescDashboard = document.getElementById('event-short-desc-dashboard');
+
+
     function updatePriceFieldVisibilityDashboard() {
         if (voluntaryCheckboxDashboard && priceContainerDashboard && eventPriceInputDashboard) {
             const isVoluntary = voluntaryCheckboxDashboard.checked;
@@ -975,17 +1078,21 @@
             const element = document.getElementById(id);
             if (element) { element.addEventListener('input', updateEventPreview); if (element.type === 'checkbox' || element.type === 'file') { element.addEventListener('change', updateEventPreview);}}
         });
+        if(eventLongDescDashboard) eventLongDescDashboard.addEventListener('input', updateEventPreview); // Ascolta anche la descrizione lunga per preview
     }
 
     function openEventPopupDashboard(eventData = null) {
         if (!eventFormDashboard || !eventPopupTitleDashboard || !eventIdInputDashboard) { console.error("Elementi popup evento mancanti."); return; }
         eventFormDashboard.reset();
         updatePriceFieldVisibilityDashboard();
-        eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';
-        currentImagePreviewDashboard.style.display = 'none'; currentImagePreviewDashboard.src = '#';
-        currentFlyerPreviewDashboard.innerHTML = '';
+        if(eventFormMessageDashboard) {eventFormMessageDashboard.style.display = 'none'; eventFormMessageDashboard.className = 'form-message';}
+        if(currentImagePreviewDashboard) {currentImagePreviewDashboard.style.display = 'none'; currentImagePreviewDashboard.src = '#';}
+        if(currentFlyerPreviewDashboard) currentFlyerPreviewDashboard.innerHTML = '';
         document.getElementById('event-start-time-dashboard').value = '';
         document.getElementById('event-end-time-dashboard').value = '';
+        if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "";
+
+
         if (eventData) {
             eventPopupTitleDashboard.textContent = 'Modifica Evento'; eventIdInputDashboard.value = eventData.IDEvento;
             document.getElementById('event-title-dashboard').value = eventData.Titolo || '';
@@ -1051,7 +1158,10 @@
             const startTime = formData.get('event-start-time'); const endTime = formData.get('event-end-time');
             let durataString = '';
             if (startTime && endTime) durataString = `${startTime}-${endTime}`; else if (startTime) durataString = startTime;
-            formData.append('event-time-combined', durataString);
+            formData.append('event-time-combined', durataString); // Uso un nome diverso per evitare conflitti
+            formData.delete('event-start-time'); // Rimuovo i campi singoli
+            formData.delete('event-end-time');   // Rimuovo i campi singoli
+
             const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
             const responseText = await response.text();
             let result; try { result = JSON.parse(responseText); } catch (jsonError) { console.error("Risposta non JSON:", responseText); throw new Error(`Risposta server non valida.`); }
@@ -1084,7 +1194,15 @@
     const resetFiltersBtnPanel = document.getElementById('resetFiltersBtnPanel');
     if (filterToggleButton && filterPanelDropdown) { filterToggleButton.addEventListener('click', function(event) { event.stopPropagation(); const isActive = filterPanelDropdown.classList.toggle('active'); filterToggleButton.classList.toggle('active', isActive); filterToggleButton.setAttribute('aria-expanded', isActive.toString()); });}
     if (applyFiltersFromPanelBtn) applyFiltersFromPanelBtn.addEventListener('click', () => { applyFiltersAndRender(); if (filterPanelDropdown) filterPanelDropdown.classList.remove('active'); if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}});
-    if (resetFiltersBtnPanel) resetFiltersBtnPanel.addEventListener('click', () => { const searchTitleInput = document.getElementById('searchTitleDashboard'); if(searchTitleInput) searchTitleInput.value = ''; const searchDateInput = document.getElementById('searchDateDashboard'); if(searchDateInput) searchDateInput.value = ''; const searchSpeakerInput = document.getElementById('searchSpeakerDashboard'); if(searchSpeakerInput) searchSpeakerInput.value = ''; applyFiltersAndRender(); if (filterPanelDropdown) filterPanelDropdown.classList.remove('active'); if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}});
+    if (resetFiltersBtnPanel) resetFiltersBtnPanel.addEventListener('click', () => {
+        const searchTitleInput = document.getElementById('searchTitleDashboard'); if(searchTitleInput) searchTitleInput.value = '';
+        const searchDateInput = document.getElementById('searchDateDashboard'); if(searchDateInput) searchDateInput.value = '';
+        const searchSpeakerInput = document.getElementById('searchSpeakerDashboard'); if(searchSpeakerInput) searchSpeakerInput.value = '';
+        applyFiltersAndRender();
+        updateActiveFiltersDisplay(); // Assicurati di pulire anche il display
+        if (filterPanelDropdown) filterPanelDropdown.classList.remove('active');
+        if (filterToggleButton) { filterToggleButton.classList.remove('active'); filterToggleButton.setAttribute('aria-expanded', 'false');}
+    });
 
     async function fetchDashboardData() {
         const upcomingGrid = document.getElementById('upcomingEventsGrid');
@@ -1101,6 +1219,47 @@
         } catch (error) { console.error('Errore fetchDashboardData:', error); const errorMsg = sanitizeText(error.message); [upcomingGrid, pastGrid].forEach(g => g.innerHTML = `<div class="error-message-dashboard"><p>Impossibile caricare i dati: ${errorMsg}</p> <button onclick="fetchDashboardData()" class="btn-admin">Riprova</button></div>`);}
     }
 
+    function updateActiveFiltersDisplay() {
+        const displayContainer = document.getElementById('activeFiltersDisplayContainer');
+        const listElement = document.getElementById('activeFiltersList');
+        if (!displayContainer || !listElement) return;
+
+        listElement.innerHTML = ''; // Pulisci i filtri precedenti
+        let hasActiveFilters = false;
+
+        const titleFilter = document.getElementById('searchTitleDashboard').value.trim();
+        const dateFilter = document.getElementById('searchDateDashboard').value;
+        const speakerFilter = document.getElementById('searchSpeakerDashboard').value.trim();
+
+        if (titleFilter) {
+            const li = document.createElement('li');
+            li.innerHTML = `<span class="filter-label">Titolo:</span> ${sanitizeText(titleFilter)}`;
+            listElement.appendChild(li);
+            hasActiveFilters = true;
+        }
+        if (dateFilter) {
+            const li = document.createElement('li');
+            const dateObj = new Date(dateFilter + '-01T00:00:00'); // Per formattazione
+            const formattedDate = dateObj.toLocaleDateString('it-IT', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+            li.innerHTML = `<span class="filter-label">Mese/Anno:</span> ${sanitizeText(formattedDate)}`;
+            listElement.appendChild(li);
+            hasActiveFilters = true;
+        }
+        if (speakerFilter) {
+            const li = document.createElement('li');
+            li.innerHTML = `<span class="filter-label">Relatore:</span> ${sanitizeText(speakerFilter)}`;
+            listElement.appendChild(li);
+            hasActiveFilters = true;
+        }
+
+        if (hasActiveFilters) {
+            displayContainer.style.display = 'block';
+        } else {
+            displayContainer.style.display = 'none';
+        }
+    }
+
+
     function applyFiltersAndRender() {
         const titleFilter = document.getElementById('searchTitleDashboard').value.toLowerCase().trim();
         const dateFilter = document.getElementById('searchDateDashboard').value;
@@ -1115,6 +1274,7 @@
         filteredUpcoming.sort(compareFunction); filteredPast.sort(compareFunction);
         renderEventsSection(filteredUpcoming, 'upcomingEventsGrid', true, groupBy, sortDirection);
         renderEventsSection(filteredPast, 'pastEventsGrid', false, groupBy, sortDirection);
+        updateActiveFiltersDisplay(); // Aggiorna la visualizzazione dei filtri attivi
     }
 
     function getWeekStartDate(dInput) { const parts = dInput.split('-'); const d = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))); const day = d.getUTCDay(); const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1); return new Date(d.setUTCDate(diff)); }
@@ -1287,11 +1447,175 @@
         saveAdvancedSettingsModalBtn.addEventListener('click', saveAdvancedSettingsFromModal);
     }
 
+    // Funzioni AI (copiate e adattate da eventiincorso.html)
+    async function callApi(url, method = 'GET', data = null) { // Definizione di callApi se non già presente globalmente
+        const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+        const options = { method, headers, credentials: 'same-origin' };
+        if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
+            options.body = JSON.stringify(data);
+        }
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                let errorData = { message: `Errore HTTP ${response.status} (${response.statusText})` };
+                try {
+                    const potentialErrorJson = await response.text();
+                    errorData = JSON.parse(potentialErrorJson);
+                } catch (e) {
+                    errorData.rawError = potentialErrorJson;
+                }
+                throw new Error(errorData.message || `Errore server: ${response.status}`);
+            }
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return response.text().then(text => text ? {success: true, message: text} : {});
+            }
+        } catch (error) {
+            console.error(`Fallimento API a ${url}:`, error);
+            throw error;
+        }
+    }
+
+    function simpleXorDecryptClient(base64String, key) {
+        try {
+            const encryptedText = atob(base64String);
+            let outText = '';
+            for(let i = 0; i < encryptedText.length; i++) {
+                outText += String.fromCharCode(encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+            }
+            return outText;
+        } catch (e) {
+            console.error("Fallimento decifratura API key:", e);
+            return null;
+        }
+    }
+
+    async function fetchAndPrepareGroqApiKey() {
+        if (groqApiKey) return true; // Già caricata
+        try {
+            // Assumiamo che get_groq_config.php sia accessibile dalla root del sito
+            const result = await callApi('api/get_groq_config.php');
+            if (result.success && result.obfuscatedApiKey && result.decryptionKey) {
+                const decryptedKey = simpleXorDecryptClient(result.obfuscatedApiKey, result.decryptionKey);
+                if (decryptedKey) {
+                    groqApiKey = decryptedKey;
+                    console.log("Chiave API Groq pronta per l'uso (Dashboard).");
+                    return true;
+                } else {
+                    console.error("Fallimento decifratura API Key Groq (Dashboard).");
+                    if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Errore config. AI (dec.).";
+                    return false;
+                }
+            } else {
+                console.error('Fallimento recupero componenti API key Groq (Dashboard):', result.message || 'Dati mancanti.');
+                if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Errore config. AI (fetch).";
+                return false;
+            }
+        } catch (error) {
+            console.error('Errore recupero API key Groq (Dashboard):', error);
+            if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Errore connessione AI.";
+            return false;
+        }
+    }
+
+    async function generateShortDescriptionAI(longDescription) {
+        if (!groqApiKey) {
+            const keyReady = await fetchAndPrepareGroqApiKey();
+            if (!keyReady || !groqApiKey) {
+                console.error("API Key Groq non disponibile per la generazione della descrizione (Dashboard).");
+                return { success: false, description: null, error: "Chiave API per AI non disponibile." };
+            }
+        }
+
+        if (!longDescription || longDescription.trim().length < 20) {
+            return { success: false, description: null, error: "La descrizione estesa è troppo corta per generare un riassunto." };
+        }
+
+        const groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+        const promptSystem = "Sei un assistente AI specializzato nella creazione di contenuti per eventi. Data una descrizione estesa, il tuo compito è generare una descrizione breve, concisa e accattivante, ideale per essere visualizzata su una card promozionale dell'evento. La descrizione breve non deve superare i 190 caratteri. Rispondi solo con la descrizione breve generata, senza alcuna introduzione o testo aggiuntivo.";
+
+        const payload = {
+            "messages": [
+                { "role": "system", "content": promptSystem },
+                { "role": "user", "content": `Descrizione estesa da riassumere:\n\n${longDescription}` }
+            ],
+            "model": "meta-llama/Llama-4-scout-17b-16e-instruct", // o altro modello Groq
+            "temperature": 0.7,
+            "max_tokens": 65, // Abbastanza per ~200 caratteri
+            "top_p": 1,
+            "stream": false
+        };
+
+        try {
+            const response = await fetch(groqApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${groqApiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: { message: response.statusText } }));
+                console.error("Errore API Groq per descrizione (Dashboard):", response.status, errorData);
+                return { success: false, description: null, error: `Errore AI (${response.status}): ${errorData.error?.message || 'Servizio non raggiungibile'}` };
+            }
+
+            const data = await response.json();
+            if (data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
+                let generatedText = data.choices[0].message.content.trim();
+                generatedText = generatedText.replace(/^["']|["']$/g, ""); // Rimuove virgolette esterne
+                return { success: true, description: generatedText, error: null };
+            } else {
+                console.warn("Struttura risposta Groq non valida per descrizione (Dashboard):", data);
+                return { success: false, description: null, error: "Risposta AI non valida (struttura)." };
+            }
+        } catch (error) {
+            console.error('Errore chiamata API Groq per descrizione (Dashboard):', error);
+            return { success: false, description: null, error: "Errore comunicazione con servizio AI." };
+        }
+    }
+
+    if (generateShortDescBtnDashboard) {
+        generateShortDescBtnDashboard.addEventListener('click', async () => {
+            const longDesc = eventLongDescDashboard.value;
+            if (!longDesc.trim()) {
+                if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Inserisci prima una descrizione estesa.";
+                setTimeout(() => { if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = ""; }, 3000);
+                return;
+            }
+            generateShortDescBtnDashboard.classList.add('loading');
+            generateShortDescBtnDashboard.disabled = true;
+            if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Genero descrizione breve...";
+
+            const result = await generateShortDescriptionAI(longDesc);
+
+            generateShortDescBtnDashboard.classList.remove('loading');
+            generateShortDescBtnDashboard.disabled = false;
+
+            if (result.success && result.description) {
+                eventShortDescDashboard.value = result.description;
+                eventShortDescDashboard.dispatchEvent(new Event('input', { bubbles: true })); // Per aggiornare la preview
+                if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = "Descrizione breve generata!";
+            } else {
+                console.error("Errore generazione descrizione AI (Dashboard):", result.error);
+                if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = `Errore AI: ${result.error || 'Sconosciuto'}`;
+            }
+            setTimeout(() => { if(aiShortDescStatusDashboard) aiShortDescStatusDashboard.textContent = ""; }, 4000);
+        });
+    }
+
+
     document.addEventListener('DOMContentLoaded', () => {
         const adminUserString = localStorage.getItem('adminUserEFF');
+        let isAdmin = false;
         if (adminUserString) {
             try {
                 const adminUser = JSON.parse(adminUserString);
+                isAdmin = adminUser && (adminUser.is_admin === true || adminUser.is_admin === 1);
                 const navUsernameEl = document.getElementById('navbar-username');
                 if (navUsernameEl && adminUser.nome) navUsernameEl.textContent = adminUser.nome;
                 else if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
@@ -1307,6 +1631,22 @@
             const navUsernameEl = document.getElementById('navbar-username'); if (navUsernameEl) navUsernameEl.textContent = adminNameGlobalJS;
             const navAvatarImgEl = document.querySelector('#navbar-avatar img'); if (navAvatarImgEl) navAvatarImgEl.src = adminAvatarPath;
         }
+
+        if(isAdmin && generateShortDescBtnDashboard) { // Abilita il bottone AI solo per admin
+            fetchAndPrepareGroqApiKey().then(ready => {
+                if (ready) {
+                    generateShortDescBtnDashboard.disabled = false;
+                    console.log("Sistema AI per descrizione breve pronto (Dashboard).");
+                } else {
+                    generateShortDescBtnDashboard.disabled = true;
+                    console.warn("Sistema AI per descrizione breve non inizializzato correttamente (Dashboard).");
+                }
+            });
+        } else if (generateShortDescBtnDashboard) {
+            generateShortDescBtnDashboard.style.display = 'none'; // Nascondi se non admin
+        }
+
+
         updatePriceFieldVisibilityDashboard();
         attachPreviewListeners();
         const sortCriteriaSelect = document.getElementById('sortCriteria');
@@ -1319,6 +1659,7 @@
         if(sortDirectionSelect) sortDirectionSelect.addEventListener('change', applyFiltersAndRender);
         if(groupCriteriaSelect) groupCriteriaSelect.addEventListener('change', applyFiltersAndRender);
         fetchDashboardData();
+        updateActiveFiltersDisplay(); // Chiamata iniziale per mostrare/nascondere il box filtri
     });
 </script>
 </body>
