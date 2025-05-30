@@ -915,7 +915,15 @@
 <body>
 <header class="navbar-container" id="navbarContainer">
   <nav class="navbar">
-    <div class="logo"><a href="index.html"><span class="emoji">🏔️</span><h2 id="navbar-title">Eremo Frate Francesco</h2></a></div>
+    <div class="logo">
+      <a href="index.html">
+        <div class="editable-image-wrapper navbar-logo-wrapper">
+          <img src="images/Logo_eremo.png" alt="Logo Eremo Frate Francesco" class="navbar-logo-img" id="content-navbarLogo" data-content-key="navbarLogo">
+          <span class="edit-icon-image" data-key="navbarLogo" data-type="image" title="Modifica logo" style="top: 2px; right: 2px; width:18px; height:18px; font-size:0.6em;">&#9998;</span>
+        </div>
+        <h2 id="navbar-title">Eremo Frate Francesco</h2>
+      </a>
+    </div>
     <div class="menu" id="main-menu">
       <a href="eventiincorso.html" class="active" id="nav-calendario">Calendario attività</a>
       <a href="eventipassati.html" id="nav-archivio">Archivio attività</a>
@@ -1248,7 +1256,7 @@
 
 <div class="custom-confirm-overlay" id="customConfirmOverlay">
   <div class="custom-confirm-modal" id="customConfirmModal">
-    <h3>Conferma Uscita</h3>
+    <h3 id="customConfirmTitle">Conferma Uscita</h3>
     <p id="customConfirmMessage">Hai modifiche non salvate. Sei sicuro di voler uscire senza salvare?</p>
     <div class="custom-confirm-actions">
       <button type="button" class="btn-popup btn-confirm-no" id="customConfirmNo">Annulla</button>
@@ -1289,7 +1297,7 @@
 
   let initialAdminEventFormData = {};
   let isEventFormDirty = false;
-  let customConfirmOverlayEl, customConfirmModalEl, customConfirmMessageEl,
+  let customConfirmOverlayEl, customConfirmModalEl, customConfirmTitleEl, customConfirmMessageEl,
           customConfirmYesBtn, customConfirmNoBtn;
   let confirmResolve = null;
 
@@ -2011,8 +2019,10 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     generateShortDescBtnEl = gebi('generateShortDescBtn');
     aiShortDescStatusEl = gebi('aiShortDescStatus');
     dashAdminLongDescElForAI = dashAdminEventLongDescEl;
+
     customConfirmOverlayEl = gebi('customConfirmOverlay');
     customConfirmModalEl = gebi('customConfirmModal');
+    customConfirmTitleEl = gebi('customConfirmTitle'); // Aggiunto per il titolo del modal
     customConfirmMessageEl = gebi('customConfirmMessage');
     customConfirmYesBtn = gebi('customConfirmYes');
     customConfirmNoBtn = gebi('customConfirmNo');
@@ -2065,7 +2075,7 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
         reader.onload = (e) => {
           if(flyerPreviewEl) flyerPreviewEl.src = e.target.result;
           if(flyerPreviewContainerEl) {
-            flyerPreviewContainerEl.style.display = 'flex'; // MODIFICATO da block a flex
+            flyerPreviewContainerEl.style.display = 'flex';
             flyerPreviewContainerEl.classList.add('pulsating-background');
           }
         }
@@ -2243,10 +2253,13 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     updateDashAdminEventPreview();
   }
 
-
-  function showCustomConfirm(message) {
+  function showCustomConfirm(title, message, confirmBtnText = "Sì", cancelBtnText = "Annulla") {
     return new Promise((resolve) => {
+      if(customConfirmTitleEl) customConfirmTitleEl.textContent = title || "Conferma";
       if(customConfirmMessageEl) customConfirmMessageEl.textContent = message || "Sei sicuro di voler procedere?";
+      if(customConfirmYesBtn) customConfirmYesBtn.textContent = confirmBtnText;
+      if(customConfirmNoBtn) customConfirmNoBtn.textContent = cancelBtnText;
+
       if(customConfirmOverlayEl) customConfirmOverlayEl.classList.add('active');
       confirmResolve = resolve;
     });
@@ -2483,7 +2496,12 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
 
 
       if (isEventFormDirty) {
-        const confirmed = await showCustomConfirm("Hai modifiche non salvate. Sei sicuro di voler uscire?");
+        const confirmed = await showCustomConfirm(
+                "Conferma Uscita",
+                "Hai modifiche non salvate. Sei sicuro di voler uscire senza salvare?",
+                "Esci",
+                "Annulla"
+        );
         if (confirmed) {
           closeDashAdminEventPopup_actual();
         }
@@ -2554,7 +2572,21 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
   async function handleDeleteEvent(eventId) {
     const eventToDelete = currentEventsData.find(e => e.idevento == eventId);
     const eventTitle = eventToDelete ? eventToDelete.titolo : "questo evento";
-    const userConfirmed = await showCustomConfirm(`Sei sicuro di voler eliminare l'evento "${sanitizeForAttribute(eventTitle)}"? L'azione è irreversibile.`);
+
+    let confirmDialogTitle = "Conferma eliminazione";
+    let confirmDialogMessage;
+    let confirmDialogYesText = "Elimina";
+    let confirmDialogNoText = "Annulla";
+
+    if (currentUserData && currentUserData.isAdmin) {
+      confirmDialogMessage = `Sei sicuro di voler eliminare l'evento "${sanitizeForAttribute(eventTitle)}"?`;
+    } else {
+      // Per utenti non admin, anche se questo scenario è meno probabile per il delete
+      confirmDialogMessage = `Sei sicuro di voler eliminare l'evento "${sanitizeForAttribute(eventTitle)}"? L'azione è irreversibile.`;
+    }
+
+    const userConfirmed = await showCustomConfirm(confirmDialogTitle, confirmDialogMessage, confirmDialogYesText, confirmDialogNoText);
+
     if (userConfirmed) {
       const deleteButton = document.querySelector(`.btn-delete[data-event-id="${eventId}"]`);
       let originalButtonHTML = '';
