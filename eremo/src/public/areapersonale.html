@@ -7,266 +7,62 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
-    .avatar-options-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-      gap: 10px;
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-    }
-    .avatar-option-image {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      object-fit: cover;
-      cursor: pointer;
-      border: 3px solid transparent;
-      transition: border-color 0.3s ease;
-    }
-    .avatar-option-image.selected {
-      border-color: var(--primary);
-      box-shadow: 0 0 10px rgba(141, 177, 135, 0.5);
-    }
-    .avatar-container#main-avatar img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid var(--white);
-      box-shadow: var(--shadow-light);
-    }
-    .user-avatar#navbar-avatar img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .profile-header .avatar-container {
-      width: 120px;
-      height: 120px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-    .prenotazione-card-past, .waitlist-card-unavailable {
-      opacity: 0.7;
-      background-color: #f9f9f9;
-    }
-    .prenotazione-card-past h3 {
-      /* text-decoration: line-through; */
-    }
-    .form-message {
-      margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem;
-      text-align: center; display: none;
-    }
-    .form-message.success {
-      background-color: rgba(46, 204, 113, 0.15); border: 1px solid var(--success, green); color: var(--dark, black);
-    }
-    .form-message.error {
-      background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--danger, red); color: var(--dark, black);
-    }
-    .profile-section form:has(button:disabled) {
-      opacity: 0.7;
-      pointer-events: none;
-    }
-    .profile-section form button:disabled {
-      background-color: var(--gray-medium) !important;
-      cursor: not-allowed;
-    }
-    .profile-section form input:disabled {
-      background-color: #e9ecef !important;
-    }
-    .btn-danger { /* Stile per bottoni pericolosi */
-      background-color: var(--danger);
-      color: white;
-      border: none;
-      padding: 1rem 2.2rem;
-      border-radius: 10px;
-      font-size: 1.25rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition-medium);
-      display: block;
-      width: fit-content;
-      margin: 2.6rem auto 0;
-    }
-    .btn-danger:hover {
-      background-color: #c0392b; /* Darker red on hover */
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-light);
-    }
-    .card-btn-danger { /* Per i bottoni "Esci dalla coda" */
-      background-color: var(--danger);
-      color: white !important; /* Forza colore testo bianco */
-      border-color: var(--danger);
-    }
-    .card-btn-danger:hover:not(:disabled) {
-      background-color: #c0392b !important; /* Darker red */
-      border-color: #c0392b !important;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.13);
-      color: var(--white) !important;
-    }
+    /* Stili CSS di base minimi - Assicurati che quelli completi e i nuovi per le animazioni
+       siano nel tuo file style.css come da istruzioni precedenti */
+    .avatar-options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; margin-top: 1rem; margin-bottom: 1rem; }
+    .avatar-option-image { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 3px solid transparent; transition: border-color 0.3s ease; }
+    .avatar-option-image.selected { border-color: var(--primary); box-shadow: 0 0 10px rgba(141, 177, 135, 0.5); }
+    .avatar-container#main-avatar img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--white); box-shadow: var(--shadow-light); }
+    .user-avatar#navbar-avatar img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; } /* Stile per icona navbar */
+    .profile-header .avatar-container { width: 120px; height: 120px; display: flex; justify-content: center; align-items: center; margin-bottom: 0.5rem; }
+    .form-message { margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem; text-align: center; display: none; }
+    .form-message.success { background-color: rgba(46, 204, 113, 0.15); border: 1px solid var(--success, green); color: var(--dark, black); }
+    .form-message.error { background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--danger, red); color: var(--dark, black); }
+    .btn-danger { background-color: var(--danger); color: white; border: none; padding: 1rem 2.2rem; border-radius: 10px; font-size: 1.25rem; font-weight: 500; cursor: pointer; transition: var(--transition-medium); display: block; width: fit-content; margin: 2.6rem auto 0; }
+    .btn-danger:hover { background-color: #c0392b; transform: translateY(-3px); box-shadow: var(--shadow-light); }
 
-    /* STILI PER SEZIONE AI ICON GENERATOR */
-    .ai-icon-generator-section {
-      position: relative;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px dashed var(--gray-medium);
-    }
-    .ai-icon-generator-section h3 {
-      font-size: 1.5rem;
-      color: var(--secondary);
-      margin-bottom: 1.5rem;
-      text-align: left;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .ai-icon-generator-section h3 i {
-      font-size: 1.1em;
-    }
-    .ai-icon-generator-section .form-group label {
-      font-size: 1.1rem;
-      color: var(--primary);
-      font-weight: 500;
-    }
-    .ai-icon-generator-section textarea#ai-icon-prompt {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      border: 1px solid var(--gray-medium);
-      border-radius: 8px;
-      font-size: 1rem;
-      min-height: 70px;
-      resize: vertical;
-      margin-bottom: 0.5rem;
-      background-color: var(--white);
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .ai-icon-generator-section textarea#ai-icon-prompt:focus {
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 3.5px rgba(141, 177, 135, 0.3);
-      outline: none;
-    }
-    .ai-icon-generator-section .btn-ai-generate {
-      background-color: var(--accent);
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition-medium);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5em;
-      margin-top: 0.5rem;
-    }
-    .ai-icon-generator-section .btn-ai-generate.loading .fa-lightbulb {
-      display: none;
-    }
-    .ai-icon-generator-section .btn-ai-generate:hover:not(:disabled) {
-      background-color: #b8734a;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-light);
-    }
-    .ai-icon-generator-section .btn-ai-generate:disabled {
-      background-color: var(--gray-medium) !important;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    /* Overlay di Caricamento per la Sezione AI */
-    .ai-section-loading-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(248, 245, 239, 0.85);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      border-radius: var(--border-radius-medium);
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.35s;
-    }
-    .ai-section-loading-overlay.active {
-      opacity: 1;
-      visibility: visible;
-      transition-delay: 0s;
-    }
-    /* Spinner Moderno */
-    .modern-spinner {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      display: inline-block;
-      position: relative;
-      border: 3px solid;
-      border-color: var(--secondary) var(--secondary) transparent transparent;
-      box-sizing: border-box;
-      animation: spin 1s linear infinite;
-      margin-bottom: 1.2rem;
-    }
-    .modern-spinner::after,
-    .modern-spinner::before {
-      content: ''; box-sizing: border-box; position: absolute; left: 0; right: 0; top: 0; bottom: 0;
-      margin: auto; border: 3px solid; border-color: transparent transparent var(--primary) var(--primary);
-      width: 40px; height: 40px; border-radius: 50%; animation: spinBack 0.7s linear infinite; transform-origin: center center;
-    }
-    .modern-spinner::before {
-      width: 32px; height: 32px; border-color: var(--accent) var(--accent) transparent transparent;
-      animation: spin 1.5s linear infinite;
-    }
+    /* STILI PER SEZIONE AI ICON GENERATOR (assicurati siano in style.css o qui) */
+    .ai-icon-generator-section { position: relative; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed var(--gray-medium); }
+    .ai-title-container { position: relative; display: inline-block; margin-bottom: 1.8rem; }
+    .ai-icon-generator-section h3 { font-family: 'Segoe UI', sans-serif; font-size: 1.6rem; color: var(--secondary); text-align: left; display: flex; align-items: center; gap: 10px; font-weight: 600; margin-bottom: 0; }
+    .ai-icon-generator-section h3 i.fa-magic { font-size: 1.2em; color: var(--secondary); margin-right: 8px; }
+    .star-title { position: absolute; background-color: var(--accent); border-radius: 50%; opacity: 0; animation: twinkleAround 2s infinite ease-in-out; box-shadow: 0 0 5px var(--accent), 0 0 10px var(--accent); }
+    @keyframes twinkleAround { 0%, 100% { opacity: 0.3; transform: scale(0.5) rotate(0deg); } 50% { opacity: 1; transform: scale(1.1) rotate(180deg); } 75% { opacity: 0.7; transform: scale(0.8) rotate(270deg); }}
+    .star-title.s1 { width: 3px; height: 3px; top: -5px; left: -10px; animation-delay: 0s; }
+    .star-title.s2 { width: 4px; height: 4px; top: 0px; right: -15px; animation-delay: 0.3s; }
+    .star-title.s3 { width: 3px; height: 3px; bottom: -5px; left: 20%; animation-delay: 0.6s; }
+    .star-title.s4 { width: 4px; height: 4px; bottom: 0px; right: 15%; animation-delay: 0.9s; }
+    .star-title.s5 { width: 3px; height: 3px; top: 50%; left: -20px; transform: translateY(-50%); animation-delay: 1.2s; }
+    .star-title.s6 { width: 2px; height: 2px; top: 20%; right: -25px; animation-delay: 1.5s; }
+    .ai-icon-generator-section .form-group label { font-size: 1.1rem; color: var(--primary); font-weight: 500; }
+    .ai-icon-generator-section textarea#ai-icon-prompt { width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--gray-medium); border-radius: 8px; font-size: 1rem; min-height: 70px; resize: vertical; margin-bottom: 0.5rem; background-color: var(--white); transition: border-color 0.3s ease, box-shadow 0.3s ease;}
+    .ai-icon-generator-section textarea#ai-icon-prompt:focus { border-color: var(--secondary); box-shadow: 0 0 0 3.5px rgba(141, 177, 135, 0.3); outline: none; }
+    .ai-icon-generator-section .btn-ai-generate { background: linear-gradient(145deg, var(--secondary), var(--primary)); color: white; border: none; padding: 0.9rem 1.8rem; border-radius: 10px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: inline-flex; align-items: center; gap: 0.6em; margin-top: 0.5rem; box-shadow: 0 4px 15px rgba(var(--dark-rgb, 30, 59, 47), 0.2), 0 2px 8px rgba(var(--dark-rgb, 30, 59, 47), 0.15); text-shadow: 1px 1px 2px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
+    .ai-icon-generator-section .btn-ai-generate i.fa-lightbulb { transition: transform 0.3s ease; }
+    .ai-icon-generator-section .btn-ai-generate:hover:not(:disabled) { background: linear-gradient(145deg, var(--primary), var(--secondary)); transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 25px rgba(var(--dark-rgb, 30, 59, 47), 0.25), 0 4px 12px rgba(var(--dark-rgb, 30, 59, 47), 0.2); }
+    .ai-icon-generator-section .btn-ai-generate:hover:not(:disabled) i.fa-lightbulb { transform: scale(1.2) rotate(-15deg); }
+    .ai-icon-generator-section .btn-ai-generate:active:not(:disabled) { transform: translateY(-1px) scale(0.99); box-shadow: 0 2px 10px rgba(var(--dark-rgb, 30, 59, 47), 0.2); }
+    .ai-icon-generator-section .btn-ai-generate::before { content: ""; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255, 255, 255, 0.2); border-radius: 50%; transform: translate(-50%, -50%); opacity: 0; transition: width 0.4s ease, height 0.4s ease, opacity 0.4s ease; }
+    .ai-icon-generator-section .btn-ai-generate:hover:not(:disabled)::before { width: 250%; height: 250%; opacity: 0.3; }
+    .ai-icon-generator-section .btn-ai-generate:disabled { background: var(--gray-medium) !important; color: var(--gray-dark) !important; box-shadow: none !important; transform: none !important; cursor: not-allowed; }
+    .ai-icon-generator-section .btn-ai-generate:disabled i.fa-lightbulb { transform: none; }
+    .ai-section-loading-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(248, 245, 239, 0.85); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; border-radius: var(--border-radius-medium); opacity: 0; visibility: hidden; transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.35s; }
+    .ai-section-loading-overlay.active { opacity: 1; visibility: visible; transition-delay: 0s; }
+    .modern-spinner { width: 48px; height: 48px; border-radius: 50%; display: inline-block; position: relative; border: 3px solid; border-color: var(--secondary) var(--secondary) transparent transparent; box-sizing: border-box; animation: spin 1s linear infinite; margin-bottom: 1.2rem; }
+    .modern-spinner::after, .modern-spinner::before { content: ''; box-sizing: border-box; position: absolute; left: 0; right: 0; top: 0; bottom: 0; margin: auto; border: 3px solid; border-color: transparent transparent var(--primary) var(--primary); width: 40px; height: 40px; border-radius: 50%; animation: spinBack 0.7s linear infinite; transform-origin: center center; }
+    .modern-spinner::before { width: 32px; height: 32px; border-color: var(--accent) var(--accent) transparent transparent; animation: spin 1.5s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes spinBack { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
     .ai-section-loading-overlay p { font-size: 1.05rem; color: var(--primary); font-weight: 500; letter-spacing: 0.5px; }
+    #ai-generated-icon-preview-container { margin-top: 2rem; border: 1px solid var(--gray-light); box-shadow: 0 6px 18px rgba(0,0,0,0.08); padding: 1.5rem; background-color: var(--white); opacity: 0; transform: translateY(15px) scale(0.98); transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
+    #ai-generated-icon-preview-container.revealed { opacity: 1; transform: translateY(0) scale(1); }
+    #ai-generated-icon-preview-container p { font-size: 0.95rem; color: var(--gray-dark); margin-bottom: 0.8rem; text-align: center; }
+    #ai-generated-icon-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--gray-light); box-shadow: 0 4px 10px rgba(0,0,0,0.12); cursor: pointer; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease, box-shadow 0.3s ease; display: block; margin-left: auto; margin-right: auto;}
+    #ai-generated-icon-preview.selected { border-color: var(--primary); box-shadow: 0 0 0 4px var(--white), 0 0 0 7px var(--primary), 0 8px 20px rgba(var(--primary-rgb, 54, 94, 81), 0.4); transform: scale(1.1); }
+    #ai-icon-message.form-message { margin-top: 1rem; }
 
-    /* Display Immagine Generata */
-    #ai-generated-icon-preview-container {
-      margin-top: 2rem;
-      border: 1px solid var(--gray-light);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-      padding: 1.5rem;
-      background-color: var(--white);
-      opacity: 0;
-      transform: translateY(15px) scale(0.98);
-      transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-    }
-    #ai-generated-icon-preview-container.revealed {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    #ai-generated-icon-preview-container p {
-      font-size: 0.95rem; color: var(--gray-dark); margin-bottom: 0.8rem; text-align: center;
-    }
-    #ai-generated-icon-preview {
-      width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
-      border: 4px solid var(--gray-light);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-      cursor: pointer;
-      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease, box-shadow 0.3s ease;
-      display: block; margin-left: auto; margin-right: auto;
-    }
-    #ai-generated-icon-preview:hover {
-      transform: scale(1.08);
-      border-color: var(--secondary);
-    }
-    #ai-generated-icon-preview.selected {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px var(--white), 0 0 0 7px var(--primary), 0 8px 20px rgba(var(--primary-rgb, 54, 94, 81), 0.4);
-      transform: scale(1.1);
-    }
-    #ai-icon-message.form-message { margin-top: 1rem;  }
-
-    /* Animazione salvataggio bottone */
-    .btn-save#save-icon-btn { position: relative; overflow: hidden; transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.15s ease-out, box-shadow 0.2s ease-in-out;}
+    /* ANIMAZIONE BOTTONE SALVATAGGIO */
+    .btn-save#save-icon-btn { position: relative; overflow: hidden; }
     .btn-save#save-icon-btn .btn-text { display: inline-block; transition: opacity 0.2s ease, transform 0.2s ease; }
     .btn-save#save-icon-btn .btn-icon-fa { transition: opacity 0.2s ease, transform 0.2s ease; margin-right: 8px; }
     .btn-save#save-icon-btn.saving { background-color: var(--accent) !important; color: white !important; cursor: wait; }
@@ -313,7 +109,7 @@
     <div class="right-menu">
       <div class="user-dropdown" id="userDropdownContainer">
         <button class="user-btn" onclick="toggleUserMenu(event)" aria-haspopup="true" aria-expanded="false">
-          <span class="user-avatar" id="navbar-avatar"><img src="uploads/icons/default_user.png" alt="User"></span>
+          <span class="user-avatar" id="navbar-avatar"><img src="/uploads/icons/default_user.png" alt="User"></span>
           <span class="user-name" id="navbar-username">Ospite</span>
           <span class="dropdown-arrow">▼</span>
         </button>
@@ -341,7 +137,7 @@
 <main>
   <div class="profile-header">
     <div class="avatar-container" id="main-avatar">
-      <img src="uploads/icons/default_user.png" alt="Icona Profilo Utente">
+      <img src="/uploads/icons/default_user.png" alt="Icona Profilo Utente">
     </div>
     <h1 id="profile-greeting">Area Personale</h1>
     <p>Gestisci le tue informazioni personali e le preferenze.</p>
@@ -385,10 +181,10 @@
           <textarea id="ai-icon-prompt" rows="3" class="form-control" placeholder="Max 250 caratteri..."></textarea>
         </div>
         <button type="button" class="btn-ai-generate cool-ai-btn" id="btn-generate-ai-icon">
-    <span class="ai-btn-content-wrapper">
-        <span class="ai-icon-btn"><i class="fas fa-lightbulb"></i></span>
-        <span class="ai-text-btn">Genera Icona</span>
-    </span>
+          <span class="ai-btn-content-wrapper">
+              <span class="ai-icon-btn"><i class="fas fa-lightbulb"></i></span>
+              <span class="ai-text-btn">Genera Icona</span>
+          </span>
           <span class="ai-ripple-container-btn"></span>
         </button>
         <div id="ai-generated-icon-preview-container" style="display:none;">
@@ -461,45 +257,12 @@
   const navbarContainer = document.getElementById('navbarContainer');
   const mobileMenu = document.getElementById("mobileMenu");
   const hamburger = document.querySelector(".navbar .hamburger");
-  const defaultIconPath = 'uploads/icons/default_user.png'; // Senza slash iniziale
-  let selectedIconPath = defaultIconPath; // Internamente, manteniamo senza slash iniziale
+  const defaultIconPath = 'uploads/icons/default_user.png';
+  let selectedIconPath = defaultIconPath;
   let currentUserDataFromStorage = null;
-  let stabilityApiKey = null;
 
   let aiSectionLoaderEl, aiPreviewContainerEl, saveIconBtnEl, saveIconBtnOriginalText;
   let loadAvailableIconsCallCount = 0;
-
-  function simpleXorDecryptClient(base64String, key) {
-    try {
-      const encryptedText = atob(base64String);
-      let outText = '';
-      for(let i = 0; i < encryptedText.length; i++) {
-        outText += String.fromCharCode(encryptedText.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-      }
-      return outText;
-    } catch (e) { console.error("Fallimento decifratura API key (client):", e); return null; }
-  }
-
-  async function fetchAndPrepareStabilityApiKey() {
-    if (stabilityApiKey) return true;
-    try {
-      const result = await callApi('api/api_get_image_gen_config.php');
-      if (result.success && result.obfuscatedStabilityApiKey && result.decryptionKey) {
-        const decryptedKey = simpleXorDecryptClient(result.obfuscatedStabilityApiKey, result.decryptionKey);
-        if (decryptedKey) {
-          stabilityApiKey = decryptedKey;
-          console.log("Chiave API Stability AI pronta.");
-          return true;
-        } else {
-          displayMessage('ai-icon-message', "Errore config. AI (decifratura).", false); return false;
-        }
-      } else {
-        displayMessage('ai-icon-message', `Errore config. AI: ${result.message || 'Dati mancanti.'}`, false); return false;
-      }
-    } catch (error) {
-      displayMessage('ai-icon-message', `Errore connessione config. AI: ${error.message}`, false); return false;
-    }
-  }
 
   if (navbarContainer) {
     window.addEventListener('scroll', function() {
@@ -609,7 +372,7 @@
         return { success: true, data: textResponse, message: textResponse };
       }
     } catch (error) {
-      console.error(`Fallimento chiamata API a ${url}:`, error.message);
+      console.error(`Fallimento chiamata API PHP ${url}:`, error.message);
       throw error;
     }
   }
@@ -619,7 +382,7 @@
     const navbarAvatarImg = document.querySelector('#navbar-avatar img');
     const navbarUsername = document.getElementById('navbar-username');
     const profileGreeting = document.getElementById('profile-greeting');
-    if(mainAvatarImg) mainAvatarImg.src = defaultIconPath;
+    if(mainAvatarImg) mainAvatarImg.src = defaultIconPath; // Usa direttamente il path senza slash iniziale
     if(navbarAvatarImg) navbarAvatarImg.src = defaultIconPath;
     if(navbarUsername) navbarUsername.textContent = 'Ospite';
     if(profileGreeting) profileGreeting.textContent = 'Area Personale';
@@ -645,12 +408,22 @@
   }
 
   function normalizeIconPath(path) {
-    if (!path) return defaultIconPath; // Ritorna il default se il path è nullo o vuoto
+    if (!path) return defaultIconPath; // defaultIconPath è già 'uploads/icons/...'
+    if (path.startsWith('data:image/')) return path;
     if (path.startsWith('/')) {
-      return path.substring(1);
+      return path.substring(1); // Rimuove lo slash iniziale
     }
-    return path;
+    return path; // Già nel formato 'uploads/icons/...'
   }
+
+  // Funzione per ottenere il path corretto per l'attributo src dell'immagine
+  function getDisplayIconPath(normalizedPath) {
+    if (!normalizedPath) return '/' + defaultIconPath;
+    if (normalizedPath.startsWith('data:image/')) return normalizedPath;
+    if (normalizedPath.startsWith('http')) return normalizedPath; // Se è un URL completo
+    return '/' + normalizedPath; // Aggiunge lo slash per path relativi alla root
+  }
+
 
   document.addEventListener('DOMContentLoaded', async () => {
     aiSectionLoaderEl = document.getElementById('ai-section-loader');
@@ -678,13 +451,10 @@
       if (!checkIcon && iconNode && iconNode.classList.contains('fa-save') ) {
         checkIcon = document.createElement('i');
         checkIcon.className = 'fas fa-check btn-icon-fa';
-        // Inserisci DOPO l'icona di salvataggio, ma prima dello span del testo se presente
         const existingTextSpan = saveIconBtnEl.querySelector('.btn-text');
-        if(existingTextSpan) {
-          iconNode.parentNode.insertBefore(checkIcon, existingTextSpan);
-        } else {
-          iconNode.parentNode.appendChild(checkIcon);
-        }
+        if(existingTextSpan) { iconNode.parentNode.insertBefore(checkIcon, existingTextSpan); }
+        else if (iconNode.nextSibling) { iconNode.parentNode.insertBefore(checkIcon, iconNode.nextSibling); }
+        else { iconNode.parentNode.appendChild(checkIcon); }
       }
       if(checkIcon) checkIcon.style.display = 'none';
     }
@@ -708,15 +478,14 @@
 
         selectedIconPath = normalizeIconPath(currentUserDataFromStorage.iconPath || defaultIconPath);
 
-        if (navbarAvatarImg) navbarAvatarImg.src = selectedIconPath;
-        if (mainAvatarImg) mainAvatarImg.src = selectedIconPath;
+        if (navbarAvatarImg) navbarAvatarImg.src = getDisplayIconPath(selectedIconPath);
+        if (mainAvatarImg) mainAvatarImg.src = getDisplayIconPath(selectedIconPath);
 
         if (profileGreeting) profileGreeting.textContent = `Ciao, ${currentUserDataFromStorage.nome || 'Utente'}!`;
         if (emailInput) emailInput.value = currentUserDataFromStorage.email || '';
         if(nomeInput) nomeInput.value = currentUserDataFromStorage.nome || '';
         if(cognomeInput) cognomeInput.value = currentUserDataFromStorage.cognome || '';
 
-        if (currentUserDataFromStorage) { await fetchAndPrepareStabilityApiKey(); }
       } catch(e) {
         currentUserDataFromStorage = null;
         initializeUIForGuest("Errore nel caricamento dei dati locali. Prova a ricaricare o effettua nuovamente il login.");
@@ -725,7 +494,6 @@
       initializeUIForGuest("Effettua il login per accedere a tutte le funzionalità.");
     }
 
-    // Blocco try-catch per il setup iniziale asincrono
     try {
       if (currentUserDataFromStorage) {
         await loadUserProfileFromServer();
@@ -742,7 +510,6 @@
       console.error("Errore durante il setup iniziale della pagina (DOMContentLoaded):", error);
       const profileInfoMessage = document.getElementById('profile-info-message');
       if (profileInfoMessage) displayMessage('profile-info-message', 'Si è verificato un errore critico durante il caricamento della pagina. Riprova più tardi.', false, false);
-      // Potresti voler disabilitare ulteriormente l'interfaccia qui se il caricamento fallisce gravemente
       initializeUIForGuest('Errore caricamento dati profilo. Riprova.');
     }
 
@@ -775,8 +542,8 @@
         let serverIconPath = data.icon || defaultIconPath;
         selectedIconPath = normalizeIconPath(serverIconPath);
 
-        if(mainAvatarImg) mainAvatarImg.src = selectedIconPath;
-        if(navbarAvatarImg) navbarAvatarImg.src = selectedIconPath;
+        if(mainAvatarImg) mainAvatarImg.src = getDisplayIconPath(selectedIconPath);
+        if(navbarAvatarImg) navbarAvatarImg.src = getDisplayIconPath(selectedIconPath);
         if(navbarUsername) navbarUsername.textContent = data.nome || 'Utente';
         if(profileGreeting) profileGreeting.textContent = `Ciao, ${data.nome || 'Utente'}!`;
 
@@ -785,16 +552,13 @@
           iconPath: selectedIconPath
         };
         localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
-        // updateIconSelectionVisual(); // Rimossa chiamata duplicata, loadAvailableIcons la chiama già
       } else {
         console.error("loadUserProfileFromServer: Errore API o dati mancanti", apiUserData);
         displayMessage('profile-info-message', (apiUserData && apiUserData.message) ? apiUserData.message : "Errore recupero profilo.", false);
-        // initializeUIForGuest((apiUserData && apiUserData.message) ? apiUserData.message : "Errore recupero profilo."); // Evita loop se questo causa ricaricamento
       }
     } catch (error) {
       console.error("loadUserProfileFromServer: Errore CATCH", error);
       displayMessage('profile-info-message', `Errore caricamento profilo: ${error.message}.`, false);
-      // initializeUIForGuest(`Impossibile caricare i dati del profilo. ${error.message}`);
     }
   }
 
@@ -804,7 +568,7 @@
     const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
     if (aiPreviewImg) aiPreviewImg.classList.remove('selected');
 
-    const normalizedComparePath = normalizeIconPath(selectedIconPath); // selectedIconPath è già normalizzato
+    const normalizedComparePath = normalizeIconPath(selectedIconPath);
 
     const currentSelectedPredefinedImg = document.querySelector(`.avatar-option-image[data-path="${normalizedComparePath}"]`);
     if (currentSelectedPredefinedImg) {
@@ -815,7 +579,12 @@
       aiPreviewImg.classList.add('selected');
       console.log("Icona AI (base64) selezionata.");
     } else {
-      console.log("Nessuna icona corrisponde a selectedIconPath per la selezione visiva:", selectedIconPath);
+      if(aiPreviewImg && selectedIconPath && aiPreviewImg.src.endsWith(selectedIconPath)){
+        aiPreviewImg.classList.add('selected');
+        console.log("Icona AI (da server) selezionata nell'anteprima.");
+      } else {
+        console.log("Nessuna icona corrisponde a selectedIconPath per la selezione visiva:", selectedIconPath);
+      }
     }
   }
 
@@ -838,7 +607,7 @@
           iconsData.icons.forEach(path => {
             const normalizedPath = normalizeIconPath(path);
             const img = document.createElement('img');
-            img.src = normalizedPath;
+            img.src = getDisplayIconPath(normalizedPath);
             img.alt = 'Icona profilo';
             img.classList.add('avatar-option-image');
             img.setAttribute('data-path', normalizedPath);
@@ -847,13 +616,13 @@
               selectedIconPath = normalizedPath;
               updateIconSelectionVisual();
               const mainAvatarPreview = document.querySelector('#main-avatar img');
-              if(mainAvatarPreview) mainAvatarPreview.src = selectedIconPath;
+              if(mainAvatarPreview) mainAvatarPreview.src = getDisplayIconPath(selectedIconPath);
               const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
               if (aiPreviewImg) aiPreviewImg.classList.remove('selected');
             });
             container.appendChild(img);
           });
-          updateIconSelectionVisual(); // Chiamata dopo aver aggiunto tutte le immagini
+          updateIconSelectionVisual();
         } else {
           container.innerHTML = `<p>${iconsData.message || 'Nessuna icona disponibile al momento.'}</p>`;
         }
@@ -869,10 +638,7 @@
 
   async function handleGenerateAiIcon() {
     if (!currentUserDataFromStorage) { displayMessage('ai-icon-message', 'Autenticazione richiesta.', false); return; }
-    if (!stabilityApiKey) {
-      const keyReady = await fetchAndPrepareStabilityApiKey();
-      if (!keyReady) { displayMessage('ai-icon-message', "Errore chiave API AI. Riprova.", false); return; }
-    }
+
     const promptInput = document.getElementById('ai-icon-prompt');
     const promptText = promptInput.value.trim();
     if (!promptText) { displayMessage('ai-icon-message', 'Inserisci una descrizione.', false); return; }
@@ -889,40 +655,52 @@
     }
     displayMessage('ai-icon-message', '', true, false);
 
-    const STABILITY_API_ENDPOINT = 'https://api.stability.ai/v1/generation/stable-diffusion-v1-6/text-to-image';
-    const stabilityPayload = {
-      text_prompts: [{ "text": promptText + ", icon style, simple vector, clear background, 2d flat", "weight": 1 }],
-      cfg_scale: 7, height: 512, width: 512, samples: 1, steps: 25,
-    };
+    const CLOUDFLARE_WORKER_URL = 'https://text-to-image-template.tnt-teambom.workers.dev';
 
     try {
-      const response = await fetch(STABILITY_API_ENDPOINT, {
+      console.log(`Chiamata al Worker Cloudflare: ${CLOUDFLARE_WORKER_URL} con prompt: "${promptText}"`);
+      const response = await fetch(CLOUDFLARE_WORKER_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${stabilityApiKey}`},
-        body: JSON.stringify(stabilityPayload)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: promptText })
       });
+
+      console.log("Risposta dal Worker - Status:", response.status);
       if (!response.ok) {
-        const errorText = await response.text(); let errorData;
-        try { errorData = JSON.parse(errorText); } catch (e) { errorData = { message: errorText || `Errore HTTP ${response.status}` }; }
-        throw new Error(errorData.message || errorData.name || `Errore da Stability AI: ${response.statusText}`);
+        const errorText = await response.text();
+        let errorDetail = errorText;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorDetail = errorJson.error || errorJson.message || errorText;
+        } catch(e) { /* usa errorText */ }
+        console.error("Errore dal Cloudflare Worker:", response.status, errorDetail);
+        throw new Error(errorDetail || `Errore dal Worker AI: ${response.statusText}`);
       }
-      const result = await response.json();
-      if (result.artifacts && result.artifacts.length > 0 && result.artifacts[0].base64) {
-        const base64ImageData = result.artifacts[0].base64;
-        aiPreviewImg.src = `data:image/png;base64,${base64ImageData}`;
-        if (aiPreviewContainerEl) {
-          aiPreviewContainerEl.style.display = 'block';
-          void aiPreviewContainerEl.offsetWidth;
-          aiPreviewContainerEl.classList.add('revealed');
+
+      const imageBlob = await response.blob();
+      console.log("Risposta dal Worker - Blob ricevuto:", imageBlob);
+
+      if (imageBlob.type && imageBlob.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = function() {
+          aiPreviewImg.src = reader.result;
+          if (aiPreviewContainerEl) {
+            aiPreviewContainerEl.style.display = 'block';
+            void aiPreviewContainerEl.offsetWidth;
+            aiPreviewContainerEl.classList.add('revealed');
+          }
+          aiPreviewImg.classList.remove('selected');
+          displayMessage('ai-icon-message', 'Icona generata! Cliccala per selezionarla e poi salvala.', true);
         }
-        aiPreviewImg.classList.remove('selected');
-        displayMessage('ai-icon-message', 'Icona generata! Cliccala per selezionarla e poi salvala.', true);
+        reader.readAsDataURL(imageBlob);
       } else {
-        console.warn("Risposta da Stability AI non conforme:", result);
-        displayMessage('ai-icon-message', 'Nessuna immagine da Stability AI o formato non valido.', false);
+        const errorText = await imageBlob.text();
+        console.warn("Risposta dal Worker non è un'immagine valida:", imageBlob, "Testo risposta:", errorText);
+        displayMessage('ai-icon-message', `Risposta non valida dal servizio AI (formato non immagine). Dettagli: ${errorText.substring(0,100)}`, false);
       }
+
     } catch (error) {
-      console.error("Errore chiamata Stability AI:", error);
+      console.error("Errore chiamata Cloudflare Worker:", error);
       displayMessage('ai-icon-message', `Errore generazione AI: ${error.message}.`, false);
     } finally {
       generateBtn.disabled = false;
@@ -945,7 +723,7 @@
   async function handleSaveIcon() {
     if (!currentUserDataFromStorage || !saveIconBtnEl) return;
 
-    let finalIconPathToServer = selectedIconPath; // Mantiene formato normalizzato (senza / iniziale) o base64
+    let finalIconPathToServer = selectedIconPath;
     const textSpan = saveIconBtnEl.querySelector('.btn-text');
     const saveIcon = saveIconBtnEl.querySelector('.btn-icon-fa.fa-save');
     const checkIcon = saveIconBtnEl.querySelector('.btn-icon-fa.fa-check');
@@ -997,7 +775,7 @@
 
     let pathToSaveForDB = finalIconPathToServer;
     if (pathToSaveForDB && !pathToSaveForDB.startsWith('/') && pathToSaveForDB.startsWith('uploads/icons/')) {
-      pathToSaveForDB = '/' + pathToSaveForDB; // Aggiungi slash per il DB
+      pathToSaveForDB = '/' + pathToSaveForDB;
     }
 
     try {
@@ -1014,8 +792,13 @@
         const mainAvatarImg = document.querySelector('#main-avatar img');
         const cacheBuster = '?t=' + new Date().getTime();
 
-        if (navbarAvatarImg) navbarAvatarImg.src = finalIconPathToServer + cacheBuster;
-        if (mainAvatarImg) mainAvatarImg.src = finalIconPathToServer + cacheBuster;
+        let displayPathForUIAfterSave = finalIconPathToServer;
+        if (!displayPathForUIAfterSave.startsWith('http') && !displayPathForUIAfterSave.startsWith('data:image') && !displayPathForUIAfterSave.startsWith('/')) {
+          displayPathForUIAfterSave = '/' + displayPathForUIAfterSave;
+        }
+
+        if (navbarAvatarImg) navbarAvatarImg.src = displayPathForUIAfterSave + cacheBuster;
+        if (mainAvatarImg) mainAvatarImg.src = displayPathForUIAfterSave + cacheBuster;
 
         selectedIconPath = finalIconPathToServer;
 
@@ -1102,7 +885,9 @@
           bookings.forEach(booking => {
             const formattedDate = booking.eventDataInizio ? new Date(booking.eventDataInizio.replace(/-/g, '/')).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Data non definita';
             const isPastOrCancelled = booking.statoPrenotazione === 'Concluso' || booking.statoPrenotazione === 'Annullata';
-            const cardHtml = `<article class="card ${isPastOrCancelled ? 'prenotazione-card-past' : ''}"><div class="card-image-container"> <img src="${normalizeIconPath(booking.eventFotoCopertina || defaultIconPath)}" alt="Evento: ${booking.eventTitolo}" class="card-image"> </div><div class="card-content"><h3>${booking.eventTitolo || 'Evento Sconosciuto'}</h3><p class="card-info"><b>Data Evento:</b> ${formattedDate}<br><b>Posti Prenotati:</b> ${booking.numeroPostiPrenotati || 'N/D'}<br><b>Stato:</b> <span style="font-weight: bold; color: ${booking.statoPrenotazione === 'Confermata' ? 'var(--success, green)' : (isPastOrCancelled ? 'var(--gray-dark, grey)' : 'orange')};">${booking.statoPrenotazione || 'Sconosciuto'}</span></p><div class="card-actions"><a href="evento_dettaglio_accesso.html?id=${booking.idEvento}" class="card-btn card-btn-secondary">Vedi Evento</a>${booking.statoPrenotazione === 'Confermata' ? `<button class="card-btn card-btn-secondary btn-annulla-prenotazione" data-booking-id="${booking.idPrenotazione}">Annulla Prenotazione</button>` : ''}</div></div></article>`;
+            let iconSrc = normalizeIconPath(booking.eventFotoCopertina || defaultIconPath);
+            iconSrc = getDisplayIconPath(iconSrc); // Assicura lo slash per il display
+            const cardHtml = `<article class="card ${isPastOrCancelled ? 'prenotazione-card-past' : ''}"><div class="card-image-container"> <img src="${iconSrc}" alt="Evento: ${booking.eventTitolo}" class="card-image"> </div><div class="card-content"><h3>${booking.eventTitolo || 'Evento Sconosciuto'}</h3><p class="card-info"><b>Data Evento:</b> ${formattedDate}<br><b>Posti Prenotati:</b> ${booking.numeroPostiPrenotati || 'N/D'}<br><b>Stato:</b> <span style="font-weight: bold; color: ${booking.statoPrenotazione === 'Confermata' ? 'var(--success, green)' : (isPastOrCancelled ? 'var(--gray-dark, grey)' : 'orange')};">${booking.statoPrenotazione || 'Sconosciuto'}</span></p><div class="card-actions"><a href="evento_dettaglio_accesso.html?id=${booking.idEvento}" class="card-btn card-btn-secondary">Vedi Evento</a>${booking.statoPrenotazione === 'Confermata' ? `<button class="card-btn card-btn-secondary btn-annulla-prenotazione" data-booking-id="${booking.idPrenotazione}">Annulla Prenotazione</button>` : ''}</div></div></article>`;
             bookingsGrid.insertAdjacentHTML('beforeend', cardHtml);
           });
           attachCancelBookingListeners();
@@ -1130,7 +915,9 @@
             if (parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) { statusMessage = `ATTENZIONE: Si sono liberati ${entry.eventPostiDisponibili} posti! Prenota ora. (Richiesti in coda: ${entry.numeroPostiInCoda})`; statusColor = 'var(--success, green)';
             } else if (entry.eventFlagPrenotabile == 0) { statusMessage = `Evento non più prenotabile. (Richiesti in coda: ${entry.numeroPostiInCoda})`; statusColor = 'var(--gray-dark, grey)'; cardClass = 'waitlist-card-unavailable'; }
             if (entry.eventFlagPrenotabile == 1) { cancelButtonHtml = `<button class="card-btn card-btn-danger btn-cancel-waitlist" data-event-id="${entry.idEvento}">Esci dalla Coda</button>`;}
-            const cardHtml = `<article class="card ${cardClass}"><div class="card-image-container"><img src="${normalizeIconPath(entry.eventFotoCopertina || defaultIconPath)}" alt="Evento: ${entry.eventTitolo}" class="card-image"></div><div class="card-content"><h3>${entry.eventTitolo || 'Evento Sconosciuto'}</h3><p class="card-info"><b>Data Evento:</b> ${formattedDate}<br><b style="color: ${statusColor};">Stato Coda:</b> <span style="color: ${statusColor};">${statusMessage}</span></p><div class="card-actions" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"><a href="evento_dettaglio_accesso.html?id=${entry.idEvento}" class="card-btn card-btn-secondary" style="flex-grow: 1;">Vedi Evento</a>${(parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) ? `<a href="eventiincorso.html" class="card-btn card-btn-primary" style="flex-grow: 1;">Prenota Ora</a>` : ''}${cancelButtonHtml}</div></div></article>`;
+            let iconSrc = normalizeIconPath(entry.eventFotoCopertina || defaultIconPath);
+            iconSrc = getDisplayIconPath(iconSrc); // Assicura lo slash per il display
+            const cardHtml = `<article class="card ${cardClass}"><div class="card-image-container"><img src="${iconSrc}" alt="Evento: ${entry.eventTitolo}" class="card-image"></div><div class="card-content"><h3>${entry.eventTitolo || 'Evento Sconosciuto'}</h3><p class="card-info"><b>Data Evento:</b> ${formattedDate}<br><b style="color: ${statusColor};">Stato Coda:</b> <span style="color: ${statusColor};">${statusMessage}</span></p><div class="card-actions" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"><a href="evento_dettaglio_accesso.html?id=${entry.idEvento}" class="card-btn card-btn-secondary" style="flex-grow: 1;">Vedi Evento</a>${(parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) ? `<a href="eventiincorso.html" class="card-btn card-btn-primary" style="flex-grow: 1;">Prenota Ora</a>` : ''}${cancelButtonHtml}</div></div></article>`;
             waitlistGrid.insertAdjacentHTML('beforeend', cardHtml);
           });
           attachCancelWaitlistListeners();
