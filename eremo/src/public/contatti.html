@@ -61,7 +61,10 @@
 <header class="navbar-container" id="navbarContainer">
   <nav class="navbar">
     <div class="logo">
-      <a href="index.html" id="logoLink"><span class="emoji">🏔️</span><h2 id="navbarTitle">Eremo Frate Francesco</h2></a>
+      <a href="index.html" id="logoLink">
+        <img src="images/Logo_eremo.png" alt="Logo Eremo Frate Francesco" class="navbar-logo-img" id="navbarLogoImgTag">
+        <h2 id="navbarTitle">Eremo Frate Francesco</h2>
+      </a>
     </div>
     <div class="menu" id="mainMenu">
       <a href="eventiincorso.html" id="navCalendarioAttivita">Calendario attività</a>
@@ -262,10 +265,29 @@
   </div>
 </div>
 
+<div id="ai-assistant-fab" title="Assistente Virtuale Eremo">
+  <i class="fas fa-headset"></i>
+</div>
+
+<div id="ai-chat-popup">
+  <div id="ai-chat-header">
+    <h3>Assistente Eremo <i class="fas fa-robot"></i></h3>
+    <button id="ai-chat-close-btn" aria-label="Chiudi Chat">&times;</button>
+  </div>
+  <div id="ai-chat-messages">
+    <div class="ai-message">Ciao! Sono l'assistente virtuale dell'Eremo. Come posso aiutarti oggi riguardo il sito?</div>
+  </div>
+  <div id="ai-chat-input-container">
+    <textarea id="ai-chat-input" placeholder="Scrivi la tua domanda..." rows="2"></textarea>
+    <button id="ai-chat-send-btn" aria-label="Invia Messaggio"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
 <footer>
   <p>© <span id="currentYear"></span> Eremo Frate Francesco ODV. Tutti i diritti riservati.</p>
 </footer>
 
+<script src="assistenteAI.js" defer></script>
 <script>
   const PAGE_NAME_FOR_CONTENT = 'contatti';
   const defaultUserIconPath = 'uploads/icons/default_user.png';
@@ -638,23 +660,51 @@
     });
   }
 
+  async function loadNavbarLogo() {
+    const logoImgTag = document.getElementById('navbarLogoImgTag');
+    if (!logoImgTag) {
+      console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in contatti.html.");
+      return;
+    }
+
+    const defaultLogoPath = 'images/Logo_eremo.png'; // Assicurati che questo percorso sia corretto
+
+    try {
+      const response = await fetch('api_get_page_content.php?page=index'); // Recupera i contenuti di 'index'
+      if (!response.ok) {
+        throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
+      }
+      const data = await response.json();
+
+      if (data.success && data.contents && data.contents.navbarLogo) {
+        logoImgTag.src = data.contents.navbarLogo;
+      } else {
+        console.warn("URL del logo navbar non trovato o errore API. Uso il logo di default.");
+        logoImgTag.src = defaultLogoPath;
+      }
+    } catch (error) {
+      console.error("Errore nel caricare dinamicamente il logo navbar:", error);
+      logoImgTag.src = defaultLogoPath; // Fallback in caso di errore
+    }
+  }
+
   document.addEventListener('DOMContentLoaded',async()=>{
     const c=gebi('currentYear');if(c)c.textContent=new Date().getFullYear();
     loadUserData();
+    await loadNavbarLogo(); // <<< AGGIUNGI QUESTA CHIAMATA QUI
     await loadPageContentsFromServer();
     await fetchAndUpdateUserDisplayDataFromApi();
     if(!isEditModeActive||!currentUserData?.isAdmin){document.querySelectorAll('.edit-icon-text,.edit-icon-iframe,.edit-icon-href').forEach(i=>i.style.display='none');}
-    toggleEditMode(false);
+    toggleEditMode(false); // Assicura che la modalità edit sia inizializzata correttamente
 
-    // INIZIO MODIFICA: Event listener per ESC aggiornato
+    // Event listener per ESC aggiornato
     document.addEventListener('keydown',(e)=>{
       if(e.key==='Escape'){
         if(loginPopup?.classList.contains('active')) closeLoginPopup();
-        if(gebi('forgotPasswordPopup')?.classList.contains('active')) closeForgotPasswordPopup(); // NUOVA RIGA
+        if(gebi('forgotPasswordPopup')?.classList.contains('active')) closeForgotPasswordPopup();
         if(editContentModal?.style.display==='flex') closeEditContentModal();
       }
     });
-    // FINE MODIFICA: Event listener per ESC aggiornato
   });
 </script>
 
