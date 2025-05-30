@@ -16,8 +16,8 @@
     .user-avatar#navbar-avatar img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; } /* Stile per icona navbar */
     .profile-header .avatar-container { width: 120px; height: 120px; display: flex; justify-content: center; align-items: center; margin-bottom: 0.5rem; }
     .form-message { margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem; text-align: center; display: none; }
-    .form-message.success { background-color: rgba(46, 204, 113, 0.15); border: 1px solid var(--success, green); color: var(--dark, black); }
-    .form-message.error { background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--danger, red); color: var(--dark, black); }
+    .form-message.success { background-color: rgba(46, 204, 113, 0.15); border: 1px solid var(--success, green); color: var(--text-dark, black); }
+    .form-message.error { background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--danger, red); color: var(--text-dark, black); }
     .btn-danger { background-color: var(--danger); color: white; border: none; padding: 1rem 2.2rem; border-radius: 10px; font-size: 1.25rem; font-weight: 500; cursor: pointer; transition: var(--transition-medium); display: block; width: fit-content; margin: 2.6rem auto 0; }
     .btn-danger:hover { background-color: #c0392b; transform: translateY(-3px); box-shadow: var(--shadow-light); }
 
@@ -84,7 +84,6 @@
     #icon-save-message.form-message.toast-style.show { opacity: 1; bottom: 25px; }
     #icon-save-message.form-message.toast-style.success { background-color: var(--success) !important; color: white !important; border: 1px solid rgba(255,255,255,0.2) !important; }
     #icon-save-message.form-message.toast-style.error { background-color: var(--danger) !important; color: white !important; border: 1px solid rgba(255,255,255,0.2) !important; }
-
   </style>
 </head>
 <body>
@@ -253,17 +252,19 @@
 <footer> <p>&copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati. Via della Spiritualità 123, Nembro (BG) - Italia</p> </footer>
 
 <script>
+  // Variabili globali per elementi UI e dati utente
   let lastScroll = 0;
   const navbarContainer = document.getElementById('navbarContainer');
   const mobileMenu = document.getElementById("mobileMenu");
   const hamburger = document.querySelector(".navbar .hamburger");
-  const defaultIconPath = 'uploads/icons/default_user.png';
+  const defaultIconPath = 'uploads/icons/default_user.png'; // Path normalizzato
   let selectedIconPath = defaultIconPath;
   let currentUserDataFromStorage = null;
 
   let aiSectionLoaderEl, aiPreviewContainerEl, saveIconBtnEl, saveIconBtnOriginalText;
-  let loadAvailableIconsCallCount = 0;
+  let loadAvailableIconsCallCount = 0; // Contatore per debug
 
+  // Gestione scroll navbar
   if (navbarContainer) {
     window.addEventListener('scroll', function() {
       const currentScroll = window.pageYOffset;
@@ -273,6 +274,8 @@
       lastScroll = currentScroll;
     });
   }
+
+  // Funzioni per menu mobile e dropdown utente
   function toggleMobileMenu() {
     const isOpen = mobileMenu.classList.toggle('open');
     if (hamburger) { hamburger.classList.toggle('open'); hamburger.setAttribute('aria-expanded', String(isOpen));}
@@ -293,6 +296,8 @@
       btn.setAttribute('aria-expanded', String(!isOpen));
     }
   }
+
+  // Chiusura menu al click esterno
   document.addEventListener('click', function(event) {
     const userDropdownContainer = document.getElementById('userDropdownContainer');
     const dropdownMenu = document.querySelector('.user-dropdown .dropdown-menu');
@@ -310,19 +315,21 @@
     }
   });
 
+  // Funzione helper per mostrare messaggi (form e toast)
   function displayMessage(elementId, message, isSuccess, clearAfter = true, isToast = false) {
     const el = document.getElementById(elementId);
     if (el) {
       el.innerHTML = message;
-      el.className = 'form-message';
+      el.className = 'form-message'; // Reset classi
       if (isSuccess) el.classList.add('success'); else el.classList.add('error');
 
       if (isToast) {
         el.classList.add('toast-style');
+        // Forza reflow per riattivare animazione se il messaggio è lo stesso
         void el.offsetWidth;
         requestAnimationFrame(() => { el.classList.add('show'); });
       } else {
-        el.classList.remove('toast-style', 'show');
+        el.classList.remove('toast-style', 'show'); // Rimuove stili toast se non è toast
       }
       el.style.display = 'block';
 
@@ -332,19 +339,25 @@
           if(el) {
             if (isToast && el.classList.contains('toast-style')) {
               el.classList.remove('show');
+              // Attende la fine della transizione per nascondere l'elemento
               el.addEventListener('transitionend', () => {
-                if (el.classList.contains('toast-style')) { el.style.display = 'none'; }
+                if (el.classList.contains('toast-style')) { // Controlla di nuovo per evitare race conditions
+                  el.style.display = 'none';
+                }
               }, { once: true });
-            } else if (!isToast) { el.style.display = 'none'; }
+            } else if (!isToast) { // Se non è toast, nascondi direttamente
+              el.style.display = 'none';
+            }
           }
         }, timeoutDuration);
       }
     }
   }
 
+  // Funzione helper per chiamate API
   async function callApi(url, method = 'GET', data = null) {
     const headers = { 'Content-Type': 'application/json' };
-    const options = { method, headers, credentials: 'same-origin' };
+    const options = { method, headers, credentials: 'same-origin' }; // Necessario per sessioni PHP
     if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
       options.body = JSON.stringify(data);
     }
@@ -354,54 +367,67 @@
         let errorData = { message: `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
         let rawErrorText = '';
         try {
-          rawErrorText = await response.text();
+          rawErrorText = await response.text(); // Prova a leggere come testo prima
           console.debug("Raw error response from callApi to " + url + ":", rawErrorText);
-          errorData = JSON.parse(rawErrorText);
+          errorData = JSON.parse(rawErrorText); // Poi prova a parsare come JSON
         } catch (e) {
+          // Se il parsing fallisce, usa il testo grezzo se disponibile, altrimenti il messaggio di default
           errorData.message = rawErrorText || errorData.message;
         }
         const finalErrorMessage = errorData.message || `Errore del server: ${response.status} per ${url}`;
         throw new Error(finalErrorMessage);
       }
-      if (response.status === 204) return {};
+      // Gestione risposta vuota (es. 204 No Content)
+      if (response.status === 204) return {}; // Ritorna un oggetto vuoto
+      // Controlla il content-type per decidere come processare la risposta
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.indexOf("application/json") !== -1) {
         return await response.json();
       } else {
+        // Se non è JSON, ritorna come testo (utile per debug o risposte non JSON)
         const textResponse = await response.text();
-        return { success: true, data: textResponse, message: textResponse };
+        return { success: true, data: textResponse, message: textResponse }; // Incapsula in un oggetto standard
       }
     } catch (error) {
       console.error(`Fallimento chiamata API PHP ${url}:`, error.message);
-      throw error;
+      throw error; // Rilancia l'errore per gestione a livello superiore
     }
   }
 
+  // Inizializzazione UI per utente ospite o errore caricamento
   function initializeUIForGuest(errorMessage = "Funzionalità non disponibile. Effettua il login.") {
     const mainAvatarImg = document.querySelector('#main-avatar img');
     const navbarAvatarImg = document.querySelector('#navbar-avatar img');
     const navbarUsername = document.getElementById('navbar-username');
     const profileGreeting = document.getElementById('profile-greeting');
+
     if(mainAvatarImg) mainAvatarImg.src = defaultIconPath; // Usa direttamente il path senza slash iniziale
     if(navbarAvatarImg) navbarAvatarImg.src = defaultIconPath;
     if(navbarUsername) navbarUsername.textContent = 'Ospite';
     if(profileGreeting) profileGreeting.textContent = 'Area Personale';
+
     const emailInput = document.getElementById('email');
     if(emailInput) emailInput.value = '';
+
     document.querySelectorAll('#profile-info-form input:not(#email), #profile-info-form button, #save-icon-btn, #password-change-form input, #password-change-form button, #delete-account-form input, #delete-account-form button, #btn-generate-ai-icon, #ai-icon-prompt').forEach(el => el.disabled = true);
+
     const avatarContainer = document.getElementById('avatar-options-container');
     if(avatarContainer) avatarContainer.innerHTML = `<p>${errorMessage}</p>`;
     const bookingsGrid = document.getElementById('user-bookings-grid');
     if(bookingsGrid) bookingsGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
     const waitlistGrid = document.getElementById('user-waitlist-grid');
     if(waitlistGrid) waitlistGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
+
     const aiIconMessageEl = document.getElementById('ai-icon-message');
     if(aiIconMessageEl) displayMessage('ai-icon-message', errorMessage, false, false);
+
     const noBookingsMsg = document.getElementById('no-bookings-message');
     if(noBookingsMsg) noBookingsMsg.style.display = 'none';
     const noWaitlistMsg = document.getElementById('no-waitlist-message');
     if(noWaitlistMsg) noWaitlistMsg.style.display = 'none';
+
     if(aiSectionLoaderEl) aiSectionLoaderEl.classList.remove('active');
+
     if(errorMessage !== "Funzionalità non disponibile. Effettua il login.") {
       displayMessage('profile-info-message', errorMessage, false);
     }
@@ -429,6 +455,7 @@
     aiSectionLoaderEl = document.getElementById('ai-section-loader');
     aiPreviewContainerEl = document.getElementById('ai-generated-icon-preview-container');
     saveIconBtnEl = document.getElementById('save-icon-btn');
+
     if (saveIconBtnEl) {
       const textSpan = saveIconBtnEl.querySelector('.btn-text');
       saveIconBtnOriginalText = textSpan ? textSpan.textContent : "Salva Icona Selezionata";
@@ -576,17 +603,21 @@
       console.log("Icona predefinita selezionata:", normalizedComparePath);
     }
     else if (selectedIconPath && selectedIconPath.startsWith('data:image/') && aiPreviewImg) {
-      aiPreviewImg.classList.add('selected');
-      console.log("Icona AI (base64) selezionata.");
-    } else {
-      if(aiPreviewImg && selectedIconPath && aiPreviewImg.src.endsWith(selectedIconPath)){
+      // Se l'anteprima AI ha lo stesso src (base64), selezionala
+      if (aiPreviewImg.src === selectedIconPath) {
         aiPreviewImg.classList.add('selected');
-        console.log("Icona AI (da server) selezionata nell'anteprima.");
-      } else {
-        console.log("Nessuna icona corrisponde a selectedIconPath per la selezione visiva:", selectedIconPath);
+        console.log("Icona AI (base64) selezionata nell'anteprima.");
       }
     }
+    // Se l'icona selezionata è un path (potrebbe essere un'icona AI già salvata)
+    else if (aiPreviewImg && selectedIconPath && aiPreviewImg.src === getDisplayIconPath(selectedIconPath)) {
+      aiPreviewImg.classList.add('selected');
+      console.log("Icona AI (da server) selezionata nell'anteprima.");
+    } else {
+      console.log("Nessuna icona corrisponde a selectedIconPath per la selezione visiva:", selectedIconPath);
+    }
   }
+
 
   async function loadAvailableIcons() {
     loadAvailableIconsCallCount++;
@@ -637,11 +668,10 @@
   }
 
   async function handleGenerateAiIcon() {
-    if (!currentUserDataFromStorage) { displayMessage('ai-icon-message', 'Autenticazione richiesta.', false); return; }
-
+    if (!currentUserDataFromStorage) { displayMessage('ai-icon-message', 'Autenticazione richiesta per generare icone.', false); return; }
     const promptInput = document.getElementById('ai-icon-prompt');
     const promptText = promptInput.value.trim();
-    if (!promptText) { displayMessage('ai-icon-message', 'Inserisci una descrizione.', false); return; }
+    if (!promptText) { displayMessage('ai-icon-message', 'Inserisci una descrizione per l\'icona.', false); return; }
 
     const generateBtn = document.getElementById('btn-generate-ai-icon');
     const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
@@ -656,23 +686,23 @@
     displayMessage('ai-icon-message', '', true, false);
 
     const CLOUDFLARE_WORKER_URL = 'https://text-to-image-template.tnt-teambom.workers.dev';
+    const stylisticKeywords = "colorful flat icon design, vibrant sticker style, vector art, 2d illustration, clean lines, simple shading, profile avatar, bright colors, detailed";
+    const augmentedPrompt = `${promptText}, ${stylisticKeywords}`;
 
     try {
-      console.log(`Chiamata al Worker Cloudflare: ${CLOUDFLARE_WORKER_URL} con prompt: "${promptText}"`);
+      console.log(`Chiamata al Worker Cloudflare: ${CLOUDFLARE_WORKER_URL} con prompt (augmented): "${augmentedPrompt}"`);
       const response = await fetch(CLOUDFLARE_WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptText })
+        body: JSON.stringify({ prompt: augmentedPrompt })
       });
 
       console.log("Risposta dal Worker - Status:", response.status);
       if (!response.ok) {
         const errorText = await response.text();
         let errorDetail = errorText;
-        try {
-          const errorJson = JSON.parse(errorText);
-          errorDetail = errorJson.error || errorJson.message || errorText;
-        } catch(e) { /* usa errorText */ }
+        try { const errorJson = JSON.parse(errorText); errorDetail = errorJson.error || errorJson.message || errorText; }
+        catch(e) { /* usa errorText se non è JSON */ }
         console.error("Errore dal Cloudflare Worker:", response.status, errorDetail);
         throw new Error(errorDetail || `Errore dal Worker AI: ${response.statusText}`);
       }
@@ -696,12 +726,12 @@
       } else {
         const errorText = await imageBlob.text();
         console.warn("Risposta dal Worker non è un'immagine valida:", imageBlob, "Testo risposta:", errorText);
-        displayMessage('ai-icon-message', `Risposta non valida dal servizio AI (formato non immagine). Dettagli: ${errorText.substring(0,100)}`, false);
+        displayMessage('ai-icon-message', `Risposta non valida dal servizio AI (formato non immagine). Dettagli: ${errorText.substring(0,100)}...`, false);
       }
 
     } catch (error) {
       console.error("Errore chiamata Cloudflare Worker:", error);
-      displayMessage('ai-icon-message', `Errore generazione AI: ${error.message}.`, false);
+      displayMessage('ai-icon-message', `Errore generazione AI: ${error.message}. Riprova.`, false);
     } finally {
       generateBtn.disabled = false;
       promptInput.disabled = false;
@@ -713,7 +743,7 @@
     if (!currentUserDataFromStorage) return;
     const aiPreviewImg = event.target;
     if (aiPreviewImg.src && aiPreviewImg.src.startsWith('data:image/')) {
-      selectedIconPath = aiPreviewImg.src; // È base64
+      selectedIconPath = aiPreviewImg.src;
       updateIconSelectionVisual();
       const mainAvatarPreview = document.querySelector('#main-avatar img');
       if(mainAvatarPreview) mainAvatarPreview.src = selectedIconPath;
@@ -738,14 +768,16 @@
     if(spinnerOverlay) spinnerOverlay.style.display = 'flex';
 
     if (selectedIconPath && selectedIconPath.startsWith('data:image/')) {
-      displayMessage('icon-save-message', 'Salvataggio icona AI sul server...', true, false, true);
+      displayMessage('icon-save-message', 'Salvataggio icona AI personalizzata sul server...', true, false, true);
       try {
         const saveResponse = await callApi('api/api_save_ai_icon.php', 'POST', { imageBase64: selectedIconPath });
         if (saveResponse.success && saveResponse.iconPath) {
           finalIconPathToServer = normalizeIconPath(saveResponse.iconPath);
-        } else { throw new Error(saveResponse.message || 'Errore salvataggio file icona AI.'); }
+        } else {
+          throw new Error(saveResponse.message || 'Errore salvataggio file icona AI sul server.');
+        }
       } catch (error) {
-        displayMessage('icon-save-message', `Errore salvataggio file: ${error.message}`, false, true, true);
+        displayMessage('icon-save-message', `Errore salvataggio file icona AI: ${error.message}`, false, true, true);
         saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
         if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
         if(saveIcon) saveIcon.style.display = 'inline-block';
@@ -755,7 +787,7 @@
     } else if (!selectedIconPath || (selectedIconPath === normalizeIconPath(defaultIconPath) && !document.querySelector(`.avatar-option-image[data-path="${normalizeIconPath(defaultIconPath)}"].selected`))) {
       const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
       if (!document.querySelector('.avatar-option-image.selected') && !(aiPreviewImg && aiPreviewImg.classList.contains('selected'))) {
-        displayMessage('icon-save-message', 'Seleziona un\'icona prima di salvare.', false, true, true);
+        displayMessage('icon-save-message', 'Nessuna nuova icona selezionata per il salvataggio.', false, true, true);
         saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
         if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
         if(saveIcon) saveIcon.style.display = 'inline-block';
@@ -765,7 +797,7 @@
     }
 
     if (finalIconPathToServer && finalIconPathToServer.startsWith('data:image/')) {
-      displayMessage('icon-save-message', 'Errore: percorso icona non valido per aggiornamento.', false, true, true);
+      displayMessage('icon-save-message', 'Errore: il percorso dell\'icona da salvare nel profilo non è valido (ancora base64).', false, true, true);
       saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
       if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
       if(saveIcon) saveIcon.style.display = 'inline-block';
@@ -774,9 +806,12 @@
     }
 
     let pathToSaveForDB = finalIconPathToServer;
-    if (pathToSaveForDB && !pathToSaveForDB.startsWith('/') && pathToSaveForDB.startsWith('uploads/icons/')) {
+    // Non anteporre '/' se è già un path assoluto o default
+    if (pathToSaveForDB && !pathToSaveForDB.startsWith('/') && pathToSaveForDB !== defaultIconPath && !pathToSaveForDB.startsWith('http') && !pathToSaveForDB.startsWith('data:image')) {
+      // Se il backend gestisce 'uploads/icons/...' non serve aggiungere lo slash iniziale
       pathToSaveForDB = '/' + pathToSaveForDB;
     }
+
 
     try {
       const response = await callApi('api/api_update_user_icon.php', 'PUT', { icon: pathToSaveForDB });
@@ -791,39 +826,28 @@
         const navbarAvatarImg = document.querySelector('#navbar-avatar img');
         const mainAvatarImg = document.querySelector('#main-avatar img');
         const cacheBuster = '?t=' + new Date().getTime();
-
-        let displayPathForUIAfterSave = finalIconPathToServer;
-        if (!displayPathForUIAfterSave.startsWith('http') && !displayPathForUIAfterSave.startsWith('data:image') && !displayPathForUIAfterSave.startsWith('/')) {
-          displayPathForUIAfterSave = '/' + displayPathForUIAfterSave;
-        }
+        let displayPathForUIAfterSave = getDisplayIconPath(finalIconPathToServer);
 
         if (navbarAvatarImg) navbarAvatarImg.src = displayPathForUIAfterSave + cacheBuster;
         if (mainAvatarImg) mainAvatarImg.src = displayPathForUIAfterSave + cacheBuster;
-
         selectedIconPath = finalIconPathToServer;
-
         if(currentUserDataFromStorage) {
           currentUserDataFromStorage.iconPath = finalIconPathToServer;
           localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
         }
-
-        const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
-        if (aiPreviewImg && aiPreviewImg.classList.contains('selected')) {
-          aiPreviewImg.classList.remove('selected');
-        }
-        updateIconSelectionVisual();
-        displayMessage('icon-save-message', response.message || 'Icona profilo aggiornata!', true, true, true);
-
+        await loadAvailableIcons();
+        displayMessage('icon-save-message', response.message || 'Icona profilo aggiornata con successo!', true, true, true);
         setTimeout(() => {
           saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saved-success');
           if(textSpan) textSpan.textContent = saveIconBtnOriginalText;
           if(saveIcon) saveIcon.style.display = 'inline-block';
           if(checkIcon) checkIcon.style.display = 'none';
         }, 2500);
-
-      } else { throw new Error(response.message || 'Errore salvataggio icona nel profilo.'); }
+      } else {
+        throw new Error(response.message || 'Errore durante l\'aggiornamento dell\'icona nel profilo utente.');
+      }
     } catch (error) {
-      displayMessage('icon-save-message', `Errore: ${error.message} (Path inviato: ${pathToSaveForDB})`, false, true, true);
+      displayMessage('icon-save-message', `Errore aggiornamento profilo: ${error.message} (Path inviato: ${pathToSaveForDB})`, false, true, true);
       saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
       if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
       if(saveIcon) saveIcon.style.display = 'inline-block';
@@ -848,8 +872,8 @@
           currentUserDataFromStorage.cognome = updatedInfo.cognome;
           localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
         }
-        displayMessage('profile-info-message', response.message || 'Informazioni personali aggiornate!', true);
-      } else { displayMessage('profile-info-message', response.message || 'Errore aggiornamento profilo.', false); }
+        displayMessage('profile-info-message', response.message || 'Informazioni personali aggiornate con successo!', true);
+      } else { displayMessage('profile-info-message', response.message || 'Errore durante l\'aggiornamento del profilo.', false); }
     } catch (error) { displayMessage('profile-info-message', `Errore aggiornamento profilo: ${error.message}`, false); }
   });
 
@@ -859,14 +883,14 @@
     const oldPassword = document.getElementById('vecchia-password').value;
     const newPassword = document.getElementById('nuova-password').value;
     const confirmPassword = document.getElementById('conferma-password').value;
-    if (newPassword !== confirmPassword) { displayMessage('password-change-message', 'Le nuove password non coincidono!', false); return; }
+    if (newPassword !== confirmPassword) { displayMessage('password-change-message', 'Le nuove password non coincidono.', false); return; }
     if (newPassword.length < 8) { displayMessage('password-change-message', 'La nuova password deve essere di almeno 8 caratteri.', false); return; }
     try {
       const response = await callApi('api/api_change_password.php', 'POST', { oldPassword, newPassword });
       if (response.success) {
         displayMessage('password-change-message', response.message || 'Password aggiornata con successo!', true);
         e.target.reset();
-      } else { displayMessage('password-change-message', response.message || 'Errore cambio password.', false); }
+      } else { displayMessage('password-change-message', response.message || 'Errore durante il cambio password.', false); }
     } catch (error) { displayMessage('password-change-message', `Errore cambio password: ${error.message}`, false); }
   });
 
@@ -886,14 +910,39 @@
             const formattedDate = booking.eventDataInizio ? new Date(booking.eventDataInizio.replace(/-/g, '/')).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Data non definita';
             const isPastOrCancelled = booking.statoPrenotazione === 'Concluso' || booking.statoPrenotazione === 'Annullata';
             let iconSrc = normalizeIconPath(booking.eventFotoCopertina || defaultIconPath);
-            iconSrc = getDisplayIconPath(iconSrc); // Assicura lo slash per il display
-            const cardHtml = `<article class="card ${isPastOrCancelled ? 'prenotazione-card-past' : ''}"><div class="card-image-container"> <img src="${iconSrc}" alt="Evento: ${booking.eventTitolo}" class="card-image"> </div><div class="card-content"><h3>${booking.eventTitolo || 'Evento Sconosciuto'}</h3><p class="card-info"><b>Data Evento:</b> ${formattedDate}<br><b>Posti Prenotati:</b> ${booking.numeroPostiPrenotati || 'N/D'}<br><b>Stato:</b> <span style="font-weight: bold; color: ${booking.statoPrenotazione === 'Confermata' ? 'var(--success, green)' : (isPastOrCancelled ? 'var(--gray-dark, grey)' : 'orange')};">${booking.statoPrenotazione || 'Sconosciuto'}</span></p><div class="card-actions"><a href="evento_dettaglio_accesso.html?id=${booking.idEvento}" class="card-btn card-btn-secondary">Vedi Evento</a>${booking.statoPrenotazione === 'Confermata' ? `<button class="card-btn card-btn-secondary btn-annulla-prenotazione" data-booking-id="${booking.idPrenotazione}">Annulla Prenotazione</button>` : ''}</div></div></article>`;
+            iconSrc = getDisplayIconPath(iconSrc);
+            const cardHtml = `
+              <article class="card ${isPastOrCancelled ? 'prenotazione-card-past' : ''}">
+                <div class="card-image-container">
+                  <img src="${iconSrc}" alt="Evento: ${booking.eventTitolo || 'Evento Sconosciuto'}" class="card-image" onerror="this.src='/${defaultIconPath}'; this.onerror=null;">
+                </div>
+                <div class="card-content">
+                  <h3>${booking.eventTitolo || 'Evento Sconosciuto'}</h3>
+                  <p class="card-info">
+                    <b>Data Evento:</b> ${formattedDate}<br>
+                    <b>Posti Prenotati:</b> ${booking.numeroPostiPrenotati || 'N/D'}<br>
+                    <b>Stato:</b> <span style="font-weight: bold; color: ${booking.statoPrenotazione === 'Confermata' ? 'var(--success, green)' : (isPastOrCancelled ? 'var(--gray-dark, grey)' : 'orange')};">${booking.statoPrenotazione || 'Sconosciuto'}</span>
+                  </p>
+                  <div class="card-actions">
+                    <a href="evento_dettaglio_accesso.html?id=${booking.idEvento}" class="card-btn card-btn-secondary">Vedi Evento</a>
+                    ${booking.statoPrenotazione === 'Confermata' ? `<button class="card-btn card-btn-danger btn-annulla-prenotazione" data-booking-id="${booking.idPrenotazione}">Annulla Prenotazione</button>` : ''}
+                  </div>
+                </div>
+              </article>`;
             bookingsGrid.insertAdjacentHTML('beforeend', cardHtml);
           });
           attachCancelBookingListeners();
-        } else { noBookingsMsg.style.display = 'block'; }
-      } else { bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento prenotazioni.'}</p>`; noBookingsMsg.style.display = 'none'; }
-    } catch (error) { bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore caricamento prenotazioni: ${error.message}</p>`; noBookingsMsg.style.display = 'none'; }
+        } else {
+          noBookingsMsg.style.display = 'block';
+        }
+      } else {
+        bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento prenotazioni.'}</p>`;
+        noBookingsMsg.style.display = 'none';
+      }
+    } catch (error) {
+      bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore caricamento prenotazioni: ${error.message}</p>`;
+      noBookingsMsg.style.display = 'none';
+    }
   }
 
   async function loadUserWaitlist() {
@@ -912,60 +961,122 @@
             const formattedDate = entry.eventDataInizio ? new Date(entry.eventDataInizio.replace(/-/g, '/')).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Data non definita';
             let statusMessage = `Sei in coda per ${entry.numeroPostiInCoda} posto/i.`;
             let statusColor = 'orange'; let cardClass = ''; let cancelButtonHtml = '';
-            if (parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) { statusMessage = `ATTENZIONE: Si sono liberati ${entry.eventPostiDisponibili} posti! Prenota ora. (Richiesti in coda: ${entry.numeroPostiInCoda})`; statusColor = 'var(--success, green)';
-            } else if (entry.eventFlagPrenotabile == 0) { statusMessage = `Evento non più prenotabile. (Richiesti in coda: ${entry.numeroPostiInCoda})`; statusColor = 'var(--gray-dark, grey)'; cardClass = 'waitlist-card-unavailable'; }
-            if (entry.eventFlagPrenotabile == 1) { cancelButtonHtml = `<button class="card-btn card-btn-danger btn-cancel-waitlist" data-event-id="${entry.idEvento}">Esci dalla Coda</button>`;}
+            if (parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) {
+              statusMessage = `ATTENZIONE: Si sono liberati ${entry.eventPostiDisponibili} posti! Prenota ora. (Richiesti in coda: ${entry.numeroPostiInCoda})`;
+              statusColor = 'var(--success, green)';
+            } else if (entry.eventFlagPrenotabile == 0) {
+              statusMessage = `Evento non più prenotabile. (Richiesti in coda: ${entry.numeroPostiInCoda})`;
+              statusColor = 'var(--gray-dark, grey)'; cardClass = 'waitlist-card-unavailable';
+            }
+            if (entry.eventFlagPrenotabile == 1) {
+              cancelButtonHtml = `<button class="card-btn card-btn-danger btn-cancel-waitlist" data-event-id="${entry.idEvento}">Esci dalla Coda</button>`;
+            }
             let iconSrc = normalizeIconPath(entry.eventFotoCopertina || defaultIconPath);
-            iconSrc = getDisplayIconPath(iconSrc); // Assicura lo slash per il display
-            const cardHtml = `<article class="card ${cardClass}"><div class="card-image-container"><img src="${iconSrc}" alt="Evento: ${entry.eventTitolo}" class="card-image"></div><div class="card-content"><h3>${entry.eventTitolo || 'Evento Sconosciuto'}</h3><p class="card-info"><b>Data Evento:</b> ${formattedDate}<br><b style="color: ${statusColor};">Stato Coda:</b> <span style="color: ${statusColor};">${statusMessage}</span></p><div class="card-actions" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"><a href="evento_dettaglio_accesso.html?id=${entry.idEvento}" class="card-btn card-btn-secondary" style="flex-grow: 1;">Vedi Evento</a>${(parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) ? `<a href="eventiincorso.html" class="card-btn card-btn-primary" style="flex-grow: 1;">Prenota Ora</a>` : ''}${cancelButtonHtml}</div></div></article>`;
+            iconSrc = getDisplayIconPath(iconSrc);
+            const cardHtml = `
+              <article class="card ${cardClass}">
+                <div class="card-image-container">
+                  <img src="${iconSrc}" alt="Evento: ${entry.eventTitolo}" class="card-image" onerror="this.src='/${defaultIconPath}'; this.onerror=null;">
+                </div>
+                <div class="card-content">
+                  <h3>${entry.eventTitolo || 'Evento Sconosciuto'}</h3>
+                  <p class="card-info">
+                    <b>Data Evento:</b> ${formattedDate}<br>
+                    <b style="color: ${statusColor};">Stato Coda:</b> <span style="color: ${statusColor};">${statusMessage}</span>
+                  </p>
+                  <div class="card-actions" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <a href="evento_dettaglio_accesso.html?id=${entry.idEvento}" class="card-btn card-btn-secondary" style="flex-grow: 1;">Vedi Evento</a>
+                    ${(parseInt(entry.eventPostiDisponibili) > 0 && entry.eventFlagPrenotabile == 1) ? `<a href="eventiincorso.html#evento-${entry.idEvento}" class="card-btn card-btn-primary" style="flex-grow: 1;">Prenota Ora</a>` : ''}
+                    ${cancelButtonHtml}
+                  </div>
+                </div>
+              </article>`;
             waitlistGrid.insertAdjacentHTML('beforeend', cardHtml);
           });
           attachCancelWaitlistListeners();
         } else { noWaitlistMsg.style.display = 'block'; }
-      } else { waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento eventi in coda.'}</p>`; noWaitlistMsg.style.display = 'none';}
-    } catch (error) { waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore caricamento eventi in coda: ${error.message}</p>`; noWaitlistMsg.style.display = 'none';}
+      } else {
+        waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento eventi in coda.'}</p>`;
+        noWaitlistMsg.style.display = 'none';}
+    } catch (error) {
+      waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore caricamento eventi in coda: ${error.message}</p>`;
+      noWaitlistMsg.style.display = 'none';}
   }
 
-  function attachCancelBookingListeners() { document.querySelectorAll('.btn-annulla-prenotazione').forEach(b => {b.removeEventListener('click', handleCancelBooking); b.addEventListener('click', handleCancelBooking);}); }
+  function attachCancelBookingListeners() {
+    document.querySelectorAll('.btn-annulla-prenotazione').forEach(b => {
+      b.removeEventListener('click', handleCancelBooking);
+      b.addEventListener('click', handleCancelBooking);
+    });
+  }
   async function handleCancelBooking(event) {
     const button = event.target; const bookingId = button.dataset.bookingId;
     if (!currentUserDataFromStorage) { alert('Autenticazione richiesta.'); return; }
-    if (confirm('Sei sicuro di voler annullare questa prenotazione?')) {
+    if (confirm('Sei sicuro di voler annullare questa prenotazione? L\'azione potrebbe essere irreversibile.')) {
       button.disabled = true; button.textContent = 'Annullamento...';
       try {
         const response = await callApi('api/api_cancel_booking.php', 'POST', { idPrenotazione: bookingId });
-        if (response.success) { alert(response.message || 'Prenotazione annullata.'); loadUserBookings(); loadUserWaitlist(); }
-        else { alert(response.message || 'Errore annullamento.'); button.disabled = false; button.textContent = 'Annulla Prenotazione';}
-      } catch (error) { alert(`Errore: ${error.message}`); button.disabled = false; button.textContent = 'Annulla Prenotazione';}
+        if (response.success) {
+          alert(response.message || 'Prenotazione annullata con successo.');
+          loadUserBookings();
+          loadUserWaitlist();
+        } else {
+          alert(response.message || 'Errore durante l\'annullamento della prenotazione.');
+          button.disabled = false; button.textContent = 'Annulla Prenotazione';}
+      } catch (error) {
+        alert(`Errore: ${error.message}`);
+        button.disabled = false; button.textContent = 'Annulla Prenotazione';}
     }
   }
-  function attachCancelWaitlistListeners() { document.querySelectorAll('.btn-cancel-waitlist').forEach(b => {b.removeEventListener('click', handleCancelWaitlist); b.addEventListener('click', handleCancelWaitlist);});}
+
+  function attachCancelWaitlistListeners() {
+    document.querySelectorAll('.btn-cancel-waitlist').forEach(b => {
+      b.removeEventListener('click', handleCancelWaitlist);
+      b.addEventListener('click', handleCancelWaitlist);
+    });
+  }
   async function handleCancelWaitlist(event) {
     const button = event.target; const eventId = button.dataset.eventId;
     if (!currentUserDataFromStorage) { alert('Autenticazione richiesta.'); return; }
-    if (confirm('Sei sicuro di voler uscire dalla lista d\'attesa?')) {
+    if (confirm('Sei sicuro di voler uscire dalla lista d\'attesa per questo evento?')) {
       button.disabled = true; button.textContent = 'Rimozione...';
       try {
         const response = await callApi('api/api_cancel_waitlist.php', 'POST', { idEvento: eventId });
-        if (response.success) { alert(response.message || 'Rimosso dalla coda.'); loadUserWaitlist(); }
-        else { alert(response.message || 'Errore rimozione.'); button.disabled = false; button.textContent = 'Esci dalla Coda';}
-      } catch (error) { alert(`Errore: ${error.message}`); button.disabled = false; button.textContent = 'Esci dalla Coda';}
+        if (response.success) {
+          alert(response.message || 'Rimosso dalla lista d\'attesa con successo.');
+          loadUserWaitlist();
+        } else {
+          alert(response.message || 'Errore durante la rimozione dalla lista d\'attesa.');
+          button.disabled = false; button.textContent = 'Esci dalla Coda';}
+      } catch (error) {
+        alert(`Errore: ${error.message}`);
+        button.disabled = false; button.textContent = 'Esci dalla Coda';}
     }
   }
+
   async function handleDeleteAccount(event) {
-    event.preventDefault(); const confirmEmailInput = document.getElementById('confirm-delete-email');
-    const confirmEmail = confirmEmailInput.value; const deleteButton = document.getElementById('btn-confirm-delete-account');
-    if (!currentUserDataFromStorage || !currentUserDataFromStorage.email) { displayMessage('delete-account-message', 'Utente non verificato. Ricarica o effettua il login.', false); return;}
-    if (confirmEmail !== currentUserDataFromStorage.email) { displayMessage('delete-account-message', 'L\'email non corrisponde.', false); return;}
-    if (confirm('ATTENZIONE! Sei assolutamente sicuro di voler eliminare il tuo account? Questa azione è IRREVERSIBILE.')) {
-      if (confirm('CONFERMA FINALE: Tutti i tuoi dati (profilo, prenotazioni, commenti, code) verranno cancellati definitivamente. Non potranno essere recuperati. Procedere?')) {
-        deleteButton.disabled = true; deleteButton.textContent = 'Eliminazione...';
+    event.preventDefault();
+    const confirmEmailInput = document.getElementById('confirm-delete-email');
+    const confirmEmail = confirmEmailInput.value;
+    const deleteButton = document.getElementById('btn-confirm-delete-account');
+
+    if (!currentUserDataFromStorage || !currentUserDataFromStorage.email) {
+      displayMessage('delete-account-message', 'Utente non verificato. Ricarica la pagina o effettua nuovamente il login.', false); return;
+    }
+    if (confirmEmail !== currentUserDataFromStorage.email) {
+      displayMessage('delete-account-message', 'L\'email inserita non corrisponde a quella del tuo account.', false); return;
+    }
+    if (confirm('ATTENZIONE! Sei assolutamente sicuro di voler eliminare il tuo account? Questa azione è IRREVERSIBILE e tutti i tuoi dati verranno persi.')) {
+      if (confirm('CONFERMA FINALE: Tutti i tuoi dati (profilo, prenotazioni, commenti, partecipazioni a code) verranno cancellati definitivamente. Non potranno essere recuperati in alcun modo. Procedere con l\'eliminazione?')) {
+        deleteButton.disabled = true; deleteButton.textContent = 'Eliminazione in corso...';
         try {
           const response = await callApi('api/api_delete_account.php', 'POST', { email: confirmEmail });
           if (response.success) {
-            displayMessage('delete-account-message', response.message, true); alert(response.message);
-            localStorage.removeItem('userDataEFF'); setTimeout(() => { window.location.href = 'index.html'; }, 3000);
-          } else { throw new Error(response.message || 'Errore eliminazione account.'); }
+            displayMessage('delete-account-message', response.message || "Account eliminato con successo. Verrai reindirizzato.", true);
+            alert(response.message || "Account eliminato con successo. Verrai reindirizzato alla homepage.");
+            logout(false);
+            setTimeout(() => { window.location.href = 'index.html'; }, 3000);
+          } else { throw new Error(response.message || 'Errore durante l\'eliminazione dell\'account.'); }
         } catch (error) {
           displayMessage('delete-account-message', `Errore: ${error.message}`, false);
           deleteButton.disabled = false; deleteButton.textContent = 'Elimina il Mio Account Definitivamente';
@@ -973,11 +1084,24 @@
       }
     }
   }
-  function logout() {
+
+  function logout(showAlert = true) {
     localStorage.removeItem('userDataEFF');
     fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' })
+            .then(response => response.json())
+            .then(data => {
+              if(data.success && showAlert) {
+                alert('Logout effettuato con successo. Verrai reindirizzato alla homepage.');
+              } else if (!data.success && showAlert) {
+                alert('Logout dal server fallito, ma i dati locali sono stati rimossi. Verrai reindirizzato.');
+              }
+            })
+            .catch(error => {
+              console.error("Errore durante la chiamata API di logout:", error);
+              if(showAlert) alert('Errore durante il logout. Verrai reindirizzato alla homepage.');
+            })
             .finally(() => {
-              alert('Logout effettuato. Verrai reindirizzato alla homepage.');
+              if (!showAlert) { return; }
               window.location.href = 'index.html';
             });
   }
