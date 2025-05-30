@@ -36,10 +36,9 @@
     .editable-text-wrapper { position: relative; display: inline-block; width:100%; }
     .editable-image-wrapper { position: relative; display: block; /* o inline-block a seconda del layout */ }
 
-    /* Visibilità icone modifica */
     .editable-text-wrapper:hover .edit-icon-text,
     .editable-image-wrapper:hover .edit-icon-image,
-    .hero-section:hover .edit-icon-banner-bg { /* Aggiunto per banner */
+    .hero-section:hover .edit-icon-banner-bg {
       display: inline-flex; align-items: center; justify-content: center;
     }
 
@@ -51,17 +50,8 @@
     }
     .edit-icon-text { top: -8px; right: -8px; }
     .edit-icon-image { top: -8px; right: -8px; }
-    .edit-icon-banner-bg { /* Posizionamento specifico per icona banner */
-      bottom: 20px; /* MODIFICATO da top a bottom */
-      right: 20px;
-    }
-
-
-    img.editable-image-target { /* Classe aggiunta da JS in modalità modifica */
-      border: 3px dashed var(--accent) !important;
-      cursor: pointer;
-      opacity: 0.85;
-    }
+    .edit-icon-banner-bg { bottom: 20px; right: 20px; }
+    img.editable-image-target { border: 3px dashed var(--accent) !important; cursor: pointer; opacity: 0.85; }
 
     .edit-content-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(var(--dark-rgb, 30, 59, 47), 0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center;}
     .edit-content-modal-content { background-color: var(--white); padding: 25px; border-radius: var(--border-radius-medium); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;}
@@ -74,59 +64,188 @@
     .close-modal-content-btn { position: absolute; top: 10px; right: 15px; font-size: 1.8rem; color: var(--gray-medium); background: none; border: none; cursor: pointer; line-height: 1;}
     .close-modal-content-btn:hover { color: var(--dark); }
     #pageOverallStatus { position: fixed; bottom: 70px; right: 20px; background-color: var(--primary); color: white; padding: 8px 15px; border-radius: 5px; z-index: 1000; display: none; font-size: 0.9em; }
-
-    /* NUOVI STILI PER SPINNER CARICAMENTO IMMAGINE */
-    .image-loading-spinner {
-      display: flex; /* Visibile di default */
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 100%; /* Occupa l'altezza del contenitore .chi-siamo-image-container */
-      position: absolute;
-      top: 0;
-      left: 0;
-      background-color: var(--gray-light); /* Sfondo placeholder */
-      border-radius: var(--border-radius-large); /* Stesso raggio del contenitore immagine */
-      z-index: 1; /* Sopra l'immagine nascosta */
-    }
-    .image-loading-spinner .spinner { /* Stili copiati da .loading-overlay .spinner in style.css */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: auto;
-      height: 58px;
-    }
-    .image-loading-spinner .spinner > div {
-      width: 17px;
-      height: 17px;
-      background-color: var(--primary);
-      border-radius: 100%;
-      display: inline-block;
-      animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-      margin: 0 5.5px;
-    }
+    .image-loading-spinner { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-color: var(--gray-light); border-radius: var(--border-radius-large); z-index: 1; }
+    .image-loading-spinner .spinner { display: flex; justify-content: center; align-items: center; width: auto; height: 58px; }
+    .image-loading-spinner .spinner > div { width: 17px; height: 17px; background-color: var(--primary); border-radius: 100%; display: inline-block; animation: sk-bouncedelay 1.4s infinite ease-in-out both; margin: 0 5.5px; }
     .image-loading-spinner .spinner .bounce1 { animation-delay: -0.32s; }
     .image-loading-spinner .spinner .bounce2 { animation-delay: -0.16s; }
-    /* @keyframes sk-bouncedelay è definito in style.css */
+    .image-load-error-display { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-color: var(--gray-light); border-radius: var(--border-radius-large); color: var(--gray-dark); text-align: center; padding: 1rem; z-index: 1; }
+    .image-load-error-display p { margin: 0.2rem 0; font-size: 0.9em;}
+    .navbar-logo-wrapper { display: inline-block; vertical-align: middle; position: relative; }
+    .navbar-logo-img { height: 45px; width: auto; margin-right: 10px; display: inline-block; vertical-align: middle; }
+    .navbar-logo-wrapper .edit-icon-image { top: 0px; right: -5px; width: 18px; height: 18px; font-size: 0.6em; line-height: 18px; }
+    .navbar .logo a { display: flex; align-items: center; text-decoration: none; color: inherit; }
 
-    .image-load-error-display { /* Stile per il messaggio di errore caricamento immagine */
+    /* Stili per Assistente AI */
+    #ai-assistant-fab {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 60px;
+      height: 60px;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px; /* Icona leggermente più piccola */
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1002; /* Sopra editPageBtnContainer se presente */
+      transition: transform 0.2s ease-in-out, background-color 0.2s ease;
+    }
+    #ai-assistant-fab:hover {
+      transform: scale(1.1);
+      background-color: var(--accent);
+    }
+
+    #ai-chat-popup {
+      position: fixed;
+      bottom: 95px; /* Appena sopra il FAB */
+      right: 25px;
+      width: 360px;
+      max-width: calc(100vw - 40px); /* Responsività */
+      height: 520px;
+      max-height: calc(100vh - 120px); /* Responsività */
+      background-color: var(--white);
+      border-radius: var(--border-radius-large); /* Stondatura maggiore */
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      z-index: 1001;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--gray-light);
+      transform-origin: bottom right;
+    }
+    #ai-chat-popup.active {
+      display: flex;
+      animation: chatPopupEnter 0.35s cubic-bezier(0.175, 0.885, 0.320, 1.275); /* Animazione più elastica */
+    }
+    @keyframes chatPopupEnter {
+      from { opacity: 0; transform: translateY(30px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    #ai-chat-header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary)); /* Gradiente nell'header */
+      color: white;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    #ai-chat-header h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
+      color: white;
+    }
+    #ai-chat-header h3 i { opacity: 0.9; }
+    #ai-chat-close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.6rem;
+      cursor: pointer;
+      opacity: 0.8;
+      padding: 5px;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    #ai-chat-close-btn:hover { opacity: 1; transform: rotate(90deg); }
+
+    #ai-chat-messages {
+      flex-grow: 1;
+      padding: 18px;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 100%; /* Occupa l'altezza del contenitore .chi-siamo-image-container */
-      position: absolute;
-      top: 0;
-      left: 0;
-      background-color: var(--gray-light);
-      border-radius: var(--border-radius-large);
-      color: var(--gray-dark);
-      text-align: center;
-      padding: 1rem;
-      z-index: 1;
+      gap: 12px;
+      background-color: var(--light);
     }
-    .image-load-error-display p { margin: 0.2rem 0; font-size: 0.9em;}
+    .user-message, .ai-message {
+      padding: 10px 15px;
+      border-radius: 20px; /* Più arrotondati */
+      max-width: 85%;
+      word-wrap: break-word;
+      font-size: 0.98rem;
+      line-height: 1.55;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .user-message {
+      background-color: var(--secondary);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 6px; /* Taglio caratteristico */
+    }
+    .ai-message {
+      background-color: var(--white);
+      color: var(--dark);
+      align-self: flex-start;
+      border: 1px solid var(--gray-light);
+      border-bottom-left-radius: 6px; /* Taglio caratteristico */
+    }
+    .ai-message.thinking {
+      font-style: italic;
+      color: var(--gray-dark);
+    }
+    .ai-message.thinking span.dots { display: inline-block; }
+    .ai-message.thinking span.dots::after {
+      content: '.';
+      animation: thinkingDotsAnimation 1.2s infinite;
+      display: inline-block; /* Necessario per la larghezza dell'animazione */
+      width: 1.5em; /* Spazio per i puntini */
+      text-align: left;
+    }
+    @keyframes thinkingDotsAnimation {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    #ai-chat-input-container {
+      display: flex;
+      padding: 12px 15px;
+      border-top: 1px solid var(--gray-light);
+      background-color: #f5f5f5; /* Sfondo leggermente diverso per l'input area */
+      align-items: center; /* Allinea verticalmente textarea e bottone */
+    }
+    #ai-chat-input {
+      flex-grow: 1;
+      padding: 10px 15px;
+      border: 1px solid var(--gray-medium);
+      border-radius: 22px; /* Stondatura per input */
+      margin-right: 10px;
+      resize: none;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      max-height: 90px; /* Limita altezza textarea */
+      overflow-y: auto; /* Scroll se il testo è lungo */
+      background-color: white;
+    }
+    #ai-chat-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+      outline: none;
+    }
+    #ai-chat-send-btn {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 42px; height: 42px; /* Leggermente più grande */
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background-color 0.2s, transform 0.15s;
+    }
+    #ai-chat-send-btn:hover { background-color: var(--primary); transform: scale(1.05); }
+    #ai-chat-send-btn:disabled { background-color: var(--gray-medium); cursor: not-allowed; transform: none; }
+    #ai-chat-send-btn i { transition: transform 0.2s ease-out; }
+    #ai-chat-send-btn:hover i { transform: translateX(1px) rotate(10deg); }
+
 
   </style>
 </head>
@@ -331,6 +450,24 @@
   </div>
 </div>
 
+<div id="ai-assistant-fab" title="Assistente Virtuale Eremo">
+  <i class="fas fa-headset"></i> </div>
+
+<div id="ai-chat-popup">
+  <div id="ai-chat-header">
+    <h3>Assistente Eremo <i class="fas fa-robot"></i></h3>
+    <button id="ai-chat-close-btn" aria-label="Chiudi Chat">&times;</button>
+  </div>
+  <div id="ai-chat-messages">
+    <div class="ai-message">Ciao! Sono l'assistente virtuale dell'Eremo. Come posso aiutarti oggi riguardo il sito?</div>
+  </div>
+  <div id="ai-chat-input-container">
+    <textarea id="ai-chat-input" placeholder="Scrivi la tua domanda..." rows="2"></textarea>
+    <button id="ai-chat-send-btn" aria-label="Invia Messaggio"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+
 <footer>
   <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p>
 </footer>
@@ -343,12 +480,12 @@
   let currentUserData = null;
   let isEditModeActive = false;
   let originalPageContentsForCancel = {};
-  let currentPageDbContents = {}; // Contenuti attuali (dal DB o modificati localmente)
+  let currentPageDbContents = {};
 
   const defaultPageContents = {
     heroTitle: "Eremo Frate Francesco",
     heroSubtitle: "Uno spazio sacro per il dialogo tra l'umano e il divino, immerso nella quiete delle Prealpi Bergamasche.",
-    heroBackgroundImage: "images/eremo.jpg", // Immagine di sfondo di default per hero section
+    heroBackgroundImage: "images/eremo.jpg",
     fraternitaHeading: "La Fraternità",
     fraternitaText: "La Fraternità Eremo Frate Francesco, nata nel 1992 attorno alla Parola di Dio sotto la guida di padre Maurizio Novelli secondo il metodo della “Lectio Divina”, è una organizzazione di volontari cristiani che condividono uno stile di vita comunitario e fraterno; non ha scopo di lucro e persegue finalità civiche, solidaristiche e di utilità sociale.",
     fraternitaImage: "images/fraternita.jpg",
@@ -358,8 +495,184 @@
     accoglienzaHeading: "L'Accoglienza",
     accoglienzaText: "All’Eremo accogliamo adulti e giovani, singoli e gruppi, sacerdoti e religiosi che desiderano trascorrere uno o più giorni in un clima di silenzio, di ascolto, di preghiera e di fraternità; promuoviamo momenti di spiritualità e di meditazione, incontri di formazione e convegni su tematiche religiose e sociali, attività culturali e artistiche.",
     accoglienzaImage: "images/accoglienza.jpg",
-    navbarLogo: "images/Logo_eremo.png" // <--- AGGIUNGI QUESTA RIGA
+    navbarLogo: "images/Logo_eremo.png"
   };
+
+  // === INIZIO CODICE ASSISTENTE AI ===
+  const aiAssistantFab = document.getElementById('ai-assistant-fab');
+  const aiChatPopup = document.getElementById('ai-chat-popup');
+  const aiChatCloseBtn = document.getElementById('ai-chat-close-btn');
+  const aiChatMessagesContainer = document.getElementById('ai-chat-messages');
+  const aiChatInput = document.getElementById('ai-chat-input');
+  const aiChatSendBtn = document.getElementById('ai-chat-send-btn');
+
+  const GROQ_API_KEY = "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"; // CHIAVE API NUMERO 1
+  const GROQ_MODEL_NAME = "llama3-8b-8192";
+
+  const SYSTEM_PROMPT_FOR_ASSISTANT = `
+Sei un assistente virtuale amichevole e disponibile per il sito web "Eremo Frate Francesco".
+Il tuo scopo è aiutare gli utenti a capire come utilizzare il sito e trovare informazioni.
+Basati ESCLUSIVAMENTE sulle seguenti informazioni estratte dal manuale utente del sito. Non inventare funzionalità o pagine che non sono descritte qui.
+Rispondi in modo conciso e chiaro. Se una domanda esula da queste informazioni, indica gentilmente che puoi fornire aiuto solo per le funzionalità descritte.
+
+Manuale Utente Eremo Frate Francesco (Sintesi per AI):
+
+1. Accesso e Registrazione:
+   - Per accedere: cliccare sul pulsante "Accedi" situato in alto a destra nella pagina.
+   - Nuovi visitatori: Cliccare su "Registrati" (accessibile dal popup di login) per creare un nuovo account.
+   - Utenti già registrati (inclusi Admin): Usare nome utente (email) e password scelti.
+   - Recupero password: Se dimenticata, cliccare su "Password dimenticata?" nel popup di login e seguire le istruzioni inviate via email.
+   - Schermata iniziale (Homepage): Mostra informazioni generali sull'associazione e un carosello di immagini.
+
+2. Consultare gli Eventi:
+   - Per vedere gli eventi: Navigare alla sezione "Calendario attività" dal menu principale.
+   - Ricerca e Filtri: È possibile usare una barra di ricerca per parole chiave o applicare filtri avanzati (data, categoria, ecc.).
+   - Dettagli Evento: Cliccando su un evento si visualizzano descrizione, orari, posti disponibili. Gli utenti registrati possono vedere anche commenti e foto.
+
+3. Prenotare un Evento:
+   - Selezione: Dalla pagina "Calendario attività", cliccare sull'evento desiderato.
+   - Pulsante Prenota: Se disponibile, cliccare su "Prenota ora".
+   - Dati Prenotazione: Inserire il numero di posti (massimo 4 per utente per evento) e, se richiesto, i nomi degli altri partecipanti. È possibile indicare richieste speciali.
+   - Conferma: Dopo aver verificato i dati, cliccare "Conferma". Si riceverà un'email di conferma.
+   - Area Personale: Le prenotazioni effettuate sono visibili nella propria Area Personale.
+
+4. Annullare una Prenotazione:
+   - Dall'Area Personale: Selezionare la prenotazione da annullare.
+   - Cliccare su "Annulla" e confermare.
+   - Termini: L'annullamento deve avvenire entro i termini specificati (es. 24 ore prima dell'evento).
+
+5. Gestione Profilo Utente (Area Personale):
+   - Accesso: Cliccare sull'icona del proprio profilo in alto a destra, poi su "Il mio profilo".
+   - Modifiche Info: È possibile modificare nome, cognome. L'email solitamente non è modificabile.
+   - Icona Profilo: Si può cambiare l'icona del profilo scegliendone una dalla lista o generando una nuova con l'AI.
+   - Password: È possibile modificare la password inserendo quella vecchia e poi quella nuova.
+   - Le Mie Prenotazioni: In questa sezione si possono visualizzare gli eventi futuri a cui si è iscritti e quelli passati.
+
+6. Feedback e Commenti (per Utenti Registrati):
+   - Lasciare un Commento/Recensione: Dopo aver partecipato a un evento, si può accedere alla pagina di dettaglio dell'evento e lasciare un commento.
+   - Moderazione: Tutti i commenti sono soggetti a moderazione.
+
+7. Segnalare Problemi Tecnici:
+   - Se si riscontrano errori o malfunzionamenti sul sito:
+     - Cliccare sul link "Assistenza" o "Contatti" (solitamente nel footer o nel menu).
+     - Descrivere il problema, allegando screenshot se possibile.
+     - Inviare la segnalazione. Verrà recapitata agli amministratori del sito.
+
+Se la domanda dell'utente è generica sull'Eremo (es. "Cos'è l'Eremo?"), puoi rispondere basandoti sulla descrizione generale che hai.
+Se la domanda è su come fare qualcosa che non è nel manuale, rispondi che non hai informazioni specifiche su quella funzionalità e suggerisci di consultare la pagina "Contatti" per assistenza diretta.
+Non rispondere a domande non pertinenti al sito o al suo utilizzo.
+Mantieni un tono cortese e d'aiuto.
+`.trim();
+
+  let chatHistory = [{ role: "assistant", content: "Ciao! Sono l'assistente virtuale dell'Eremo. Come posso aiutarti oggi riguardo il sito?" }];
+
+  function toggleAiChat() {
+    if (aiChatPopup.classList.contains('active')) {
+      aiChatPopup.classList.remove('active');
+      aiAssistantFab.innerHTML = '<i class="fas fa-headset"></i>'; // Icona iniziale
+    } else {
+      aiChatPopup.classList.add('active');
+      aiAssistantFab.innerHTML = '<i class="fas fa-times"></i>'; // Icona per chiudere
+      aiChatInput.focus();
+    }
+  }
+
+  function addMessageToChat(sender, text) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+    // Semplice sanitizzazione per evitare HTML injection dal testo dell'AI.
+    // Per output Markdown più complesso, servirebbe una libreria dedicata.
+    const textNode = document.createTextNode(text);
+    messageDiv.appendChild(textNode);
+    aiChatMessagesContainer.appendChild(messageDiv);
+    aiChatMessagesContainer.scrollTop = aiChatMessagesContainer.scrollHeight; // Scroll all'ultimo messaggio
+    return messageDiv;
+  }
+
+  async function handleSendMessage() {
+    const userInput = aiChatInput.value.trim();
+    if (!userInput) return;
+
+    addMessageToChat('user', userInput);
+    chatHistory.push({ role: "user", content: userInput });
+    aiChatInput.value = '';
+    aiChatInput.disabled = true;
+    aiChatSendBtn.disabled = true;
+
+    const thinkingMessageDiv = addMessageToChat('ai', "Sto pensando");
+    thinkingMessageDiv.classList.add('thinking');
+    const thinkingDotsSpan = document.createElement('span');
+    thinkingDotsSpan.classList.add('dots');
+    thinkingMessageDiv.appendChild(thinkingDotsSpan);
+
+
+    try {
+      const messagesPayload = [
+        { role: "system", content: SYSTEM_PROMPT_FOR_ASSISTANT },
+        ...chatHistory.slice(-6) // Invia gli ultimi 6 messaggi della cronologia (incluso l'ultimo dell'utente) + system prompt
+      ];
+
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${GROQ_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          messages: messagesPayload,
+          model: GROQ_MODEL_NAME,
+          temperature: 0.3, // Più basso per risposte più focalizzate
+          max_tokens: 300,
+          top_p: 0.8
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || `Errore API Groq: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const aiResponse = data.choices[0]?.message?.content.trim();
+
+      thinkingMessageDiv.remove(); // Rimuovi "Sto pensando..."
+
+      if (aiResponse) {
+        addMessageToChat('ai', aiResponse);
+        chatHistory.push({ role: "assistant", content: aiResponse });
+      } else {
+        addMessageToChat('ai', "Non ho ricevuto una risposta valida. Riprova.");
+      }
+
+    } catch (error) {
+      console.error("Errore chiamata API Groq:", error);
+      thinkingMessageDiv.remove();
+      addMessageToChat('ai', `Spiacente, si è verificato un errore: ${error.message}. Prova a riformulare la tua domanda.`);
+    } finally {
+      aiChatInput.disabled = false;
+      aiChatSendBtn.disabled = false;
+      aiChatInput.focus();
+    }
+  }
+
+  if (aiAssistantFab) aiAssistantFab.addEventListener('click', toggleAiChat);
+  if (aiChatCloseBtn) aiChatCloseBtn.addEventListener('click', toggleAiChat);
+  if (aiChatSendBtn) aiChatSendBtn.addEventListener('click', handleSendMessage);
+  if (aiChatInput) {
+    aiChatInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSendMessage();
+      }
+    });
+    // Auto-resize textarea
+    aiChatInput.addEventListener('input', function () {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+  }
+  // === FINE CODICE ASSISTENTE AI ===
+
 
   function sanitizeTextForHTML(str) { if (typeof str !== 'string') str = String(str || ''); const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');}
   function loadUserData() { const uds = localStorage.getItem('userDataEFF'); if (uds) { try { currentUserData = JSON.parse(uds); if (!currentUserData || typeof currentUserData.email === 'undefined') {currentUserData = null; localStorage.removeItem('userDataEFF');}} catch (e) { console.error("Err parsing userDataEFF:", e); currentUserData = null; localStorage.removeItem('userDataEFF');}} else { currentUserData = null; }}
@@ -369,10 +682,11 @@
   const userBtnTrigger = document.getElementById('userBtnTrigger'); const userDropdownMenu = document.getElementById('userDropdownMenu'); if(userBtnTrigger&&userDropdownMenu){userBtnTrigger.addEventListener('click',function(e){e.stopPropagation();const iO=userDropdownMenu.style.display==='block';userDropdownMenu.style.display=iO?'none':'block';this.setAttribute('aria-expanded',String(!iO));}); document.addEventListener('click',function(e){if(userDropdownMenu.style.display==='block'&&!userBtnTrigger.contains(e.target)&&!userDropdownMenu.contains(e.target)){userDropdownMenu.style.display='none';userBtnTrigger.setAttribute('aria-expanded','false');}}); }
   const loginOverlay = document.getElementById('loginOverlay'); const loginPopup = document.getElementById('loginPopup'); const closeLoginPopupBtn = document.getElementById('closeLoginPopupBtn'); const loginTabs = document.querySelectorAll('.login-tab'); const loginForms = document.querySelectorAll('.login-popup .login-form'); const loginFormEl = document.getElementById('loginForm'); const registerFormEl = document.getElementById('registerForm'); const loginErrorMessageEl = document.getElementById('login-error-message'); const registerErrorMessageEl = document.getElementById('register-error-message');
   function openLoginPopup(){if(loginOverlay)loginOverlay.classList.add('active');if(loginPopup)loginPopup.classList.add('active');document.body.style.overflow='hidden';resetFormErrorsAndMessages();document.querySelector('.login-tab[data-tab="login"]')?.click();document.getElementById('login-email')?.focus();}
-  function closeLoginPopup(){if(loginOverlay)loginOverlay.classList.remove('active');if(loginPopup)loginPopup.classList.remove('active');document.body.style.overflow='';resetFormErrorsAndMessages();}
+  function closeLoginPopup(){if(loginOverlay)loginOverlay.classList.remove('active');if(loginPopup)loginPopup.classList.remove('active');if (!aiChatPopup.classList.contains('active')) document.body.style.overflow='';resetFormErrorsAndMessages();}
   function resetFormErrorsAndMessages(){loginForms.forEach(f=>f.querySelectorAll('.form-control.error-border').forEach(i=>i.classList.remove('error-border')));if(loginErrorMessageEl)loginErrorMessageEl.style.display='none';if(registerErrorMessageEl)registerErrorMessageEl.style.display='none';}
   document.getElementById('login-btn-desktop')?.addEventListener('click',openLoginPopup); document.getElementById('login-btn-mobile')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();closeMobileMenuOnLinkClick();});
-  if(closeLoginPopupBtn)closeLoginPopupBtn.addEventListener('click',closeLoginPopup); if(loginOverlay)loginOverlay.addEventListener('click',(e)=>{if(e.target===loginOverlay)closeLoginPopup();}); document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&loginPopup?.classList.contains('active'))closeLoginPopup();});
+  if(closeLoginPopupBtn)closeLoginPopupBtn.addEventListener('click',closeLoginPopup); if(loginOverlay)loginOverlay.addEventListener('click',(e)=>{if(e.target===loginOverlay)closeLoginPopup();});
+  document.addEventListener('keydown',(e)=>{if(e.key==='Escape'){if(loginPopup?.classList.contains('active'))closeLoginPopup();if(aiChatPopup?.classList.contains('active'))toggleAiChat();if(forgotPasswordPopup?.classList.contains('active'))closeForgotPasswordPopup();if(editContentModal?.style.display==='flex')closeEditContentModal();}});
   loginTabs.forEach(t=>t.addEventListener('click',()=>{const id=t.dataset.tab;loginTabs.forEach(tb=>tb.classList.remove('active'));t.classList.add('active');loginForms.forEach(f=>{f.classList.remove('active');if(f.id===`${id}Form`){f.classList.add('active');f.querySelector('input:not([type="hidden"])')?.focus();}});resetFormErrorsAndMessages();}));
   loginFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=loginFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';try{const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath||defaultUserIconPath,isAdmin:j.is_admin===true||j.is_admin===1};localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));updateNavbarUI();closeLoginPopup();await loadPageContentsFromServer();showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");}else{loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}}}catch(err){console.error("Errore login:",err);if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
   registerFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=registerFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Registrazione...<div class="spinner-mini-light"></div>';try{const r=await fetch('registrati.php',{method:'POST',body:new FormData(registerFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){alert(j.message||"Registrazione completata! Ora puoi accedere.");document.querySelector('.login-tab[data-tab="login"]')?.click();document.getElementById('login-email').value=document.getElementById('register-email').value;registerFormEl.reset();}else{if(registerErrorMessageEl){registerErrorMessageEl.textContent=j.message||"Errore registrazione.";registerErrorMessageEl.style.display='block';}if(j.errors){for(const f in j.errors)document.getElementById(`register-${f}`)?.classList.add('error-border');}}}catch(err){console.error("Errore registrazione:",err);if(registerErrorMessageEl){registerErrorMessageEl.textContent="Errore connessione o server.";registerErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
@@ -384,11 +698,10 @@
   const forgotPasswordForm = document.getElementById('forgotPasswordForm');
   const forgotPasswordMessage = document.getElementById('forgot-password-message');
   function openForgotPasswordPopup() { closeLoginPopup(); if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active'); document.body.style.overflow = 'hidden'; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; document.getElementById('forgot-email')?.focus(); }
-  function closeForgotPasswordPopup() { if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active'); document.body.style.overflow = ''; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; forgotPasswordForm?.reset(); }
+  function closeForgotPasswordPopup() { if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active'); if (!aiChatPopup.classList.contains('active')) document.body.style.overflow = ''; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; forgotPasswordForm?.reset(); }
   if (forgotPasswordLink) { forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); openForgotPasswordPopup(); }); }
   if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
   if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && forgotPasswordPopup?.classList.contains('active')) closeForgotPasswordPopup(); });
   forgotPasswordForm?.addEventListener('submit', async (e) => { e.preventDefault(); if (forgotPasswordMessage) { forgotPasswordMessage.style.display = 'none'; forgotPasswordMessage.className = 'form-message'; } const emailInput = document.getElementById('forgot-email'); const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML; submitBtn.disabled = true; submitBtn.innerHTML = 'Invio...<div class="spinner-mini-light"></div>'; try { const formData = new FormData(forgotPasswordForm); const response = await fetch('richiesta_recupero_password.php', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { forgotPasswordMessage.textContent = result.message; forgotPasswordMessage.classList.add('success'); emailInput.value = ''; } else { forgotPasswordMessage.textContent = result.message || "Si è verificato un errore."; forgotPasswordMessage.classList.add('error'); } } catch (error) { console.error('Errore richiesta recupero password:', error); forgotPasswordMessage.textContent = "Errore di connessione o del server."; forgotPasswordMessage.classList.add('error'); } finally { if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } });
 
   function handleLogout(){localStorage.removeItem('userDataEFF'); localStorage.removeItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`); currentUserData=null;isEditModeActive=false;updateNavbarUI();loadPageContentsFromServer();const editContainer=document.getElementById('editPageBtnContainer');if(editContainer)editContainer.style.display='none';showPageStatus('Logout effettuato.','info');}
@@ -410,362 +723,97 @@
       const cachedData = localStorage.getItem(cacheKey);
       if (cachedData) {
         cachedContents = JSON.parse(cachedData);
-        applyContentsToPage(cachedContents); // Applica subito dalla cache
+        applyContentsToPage(cachedContents);
         console.log("Contenuti caricati dalla cache.");
-        originalPageContentsForCancel = { ...cachedContents }; // Salva per annullamento
-        currentPageDbContents = { ...cachedContents }; // Imposta come contenuti correnti
+        originalPageContentsForCancel = { ...cachedContents };
+        currentPageDbContents = { ...cachedContents };
         appliedFromCache = true;
       }
-    } catch (e) {
-      console.error("Errore caricamento cache:", e);
-      localStorage.removeItem(cacheKey);
-    }
+    } catch (e) { console.error("Errore caricamento cache:", e); localStorage.removeItem(cacheKey); }
 
     try {
       const r = await fetch(`api_get_page_content.php?page=${PAGE_NAME_FOR_CONTENT}`);
       if (r.status === 401 || r.status === 403) {
-        console.warn("Sessione scaduta o non valida secondo il server.");
-        if (currentUserData) { handleLogout(); showPageStatus("La tua sessione è scaduta. Effettua nuovamente il login.", "error", 5000); }
-        // Se la sessione non è valida e non c'era cache, usa i default
-        if (!appliedFromCache) {
-          currentPageDbContents = { ...defaultPageContents };
-          applyContentsToPage(currentPageDbContents);
-          originalPageContentsForCancel = { ...currentPageDbContents };
-        }
-        updateNavbarUI(); // Aggiorna UI per stato logout
-        return;
+        console.warn("Sessione scaduta o non valida.");
+        if (currentUserData) { handleLogout(); showPageStatus("Sessione scaduta. Effettua login.", "error", 5000); }
+        if (!appliedFromCache) { currentPageDbContents = { ...defaultPageContents }; applyContentsToPage(currentPageDbContents); originalPageContentsForCancel = { ...currentPageDbContents }; }
+        updateNavbarUI(); return;
       }
       if (!r.ok) throw new Error(`Errore server: ${r.status}`);
       const d = await r.json();
-      let serverContents;
-      if (d.success && d.contents && Object.keys(d.contents).length > 0) {
-        serverContents = d.contents;
-      } else {
-        console.warn("Nessun contenuto custom dal DB o errore API, uso i default.", d.message || '');
-        serverContents = { ...defaultPageContents };
-      }
+      let serverContents = (d.success && d.contents && Object.keys(d.contents).length > 0) ? d.contents : { ...defaultPageContents };
 
-      // Aggiorna la pagina e la cache solo se i contenuti del server sono diversi da quelli in cache (o se non c'era cache)
       if (!cachedContents || JSON.stringify(cachedContents) !== JSON.stringify(serverContents)) {
-        currentPageDbContents = serverContents; // Aggiorna i contenuti correnti
-        applyContentsToPage(currentPageDbContents);
+        currentPageDbContents = serverContents; applyContentsToPage(currentPageDbContents);
         localStorage.setItem(cacheKey, JSON.stringify(currentPageDbContents));
         console.log("Contenuti aggiornati dal server e cache salvata.");
-        if (cachedContents) { // Mostra messaggio solo se c'era una cache da aggiornare
-          showPageStatus("Contenuti aggiornati.", "info", 2000);
-        }
-      } else {
-        console.log("Contenuti dal server identici alla cache. Nessun re-render necessario dalla risposta server.");
-      }
-      originalPageContentsForCancel = { ...currentPageDbContents }; // Aggiorna per annullamento
+        if (cachedContents) showPageStatus("Contenuti aggiornati.", "info", 2000);
+      } else { console.log("Contenuti dal server identici alla cache."); }
+      originalPageContentsForCancel = { ...currentPageDbContents };
     } catch (err) {
       console.error("Errore caricamento contenuti dal server:", err);
-      if (!appliedFromCache) { // Se non c'era cache e il server fallisce, usa i default
-        currentPageDbContents = { ...defaultPageContents };
-        applyContentsToPage(currentPageDbContents);
-        originalPageContentsForCancel = { ...currentPageDbContents };
-      }
+      if (!appliedFromCache) { currentPageDbContents = { ...defaultPageContents }; applyContentsToPage(currentPageDbContents); originalPageContentsForCancel = { ...currentPageDbContents };}
       showPageStatus("Errore caricamento server. Mostrati dati locali/predefiniti.", "error");
     }
   }
 
   function applyContentsToPage(contents) {
-    // Applica heroBackgroundImage
     const heroSection = document.getElementById('heroSection');
     if (heroSection) {
       const heroBgUrl = contents.heroBackgroundImage || defaultPageContents.heroBackgroundImage || 'images/eremo.jpg';
-      heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.1)),url('${heroBgUrl}')`;
+      heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.1)),url('${heroBgUrl.replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29")}')`;
     }
-
-    // Applica altri contenuti testuali e immagini
     document.querySelectorAll('[data-content-key]').forEach(el => {
-      const key = el.dataset.contentKey;
-      // Salta heroBackgroundImage qui perché già gestito
-      if (key === 'heroBackgroundImage') return;
-
+      const key = el.dataset.contentKey; if (key === 'heroBackgroundImage') return;
       const contentValue = contents[key] !== undefined ? contents[key] : defaultPageContents[key];
-
       if (el.tagName === 'IMG') {
-        const imageElement = el;
-        const parentContainer = imageElement.closest('.editable-image-wrapper') || imageElement.parentElement; // Trova il wrapper corretto
-        const spinnerContainer = parentContainer.querySelector('.image-loading-spinner');
-        let errorDisplay = parentContainer.querySelector('.image-load-error-display');
-
+        const imageElement = el; const parentContainer = imageElement.closest('.editable-image-wrapper') || imageElement.parentElement;
+        const spinnerContainer = parentContainer.querySelector('.image-loading-spinner'); let errorDisplay = parentContainer.querySelector('.image-load-error-display');
         if (errorDisplay) errorDisplay.style.display = 'none';
-
         const finalSrc = contentValue || defaultPageContents[key];
-
         if (finalSrc) {
           if (spinnerContainer) spinnerContainer.style.display = 'none';
-          imageElement.src = finalSrc;
-          imageElement.style.display = 'block';
-          imageElement.alt = (defaultPageContents[key] || `Immagine per ${key}`).replace(" - Caricamento...", "");
-
+          imageElement.src = finalSrc; imageElement.style.display = 'block';
+          imageElement.alt = (defaultPageContents[key]?.alt || `Immagine per ${key}`).replace(" - Caricamento...", "");
           imageElement.onerror = function() {
-            console.warn(`Errore caricamento immagine: ${this.src}. Mostro messaggio di errore.`);
-            this.style.display = 'none';
-            if (spinnerContainer) spinnerContainer.style.display = 'none';
-
-            if (!errorDisplay) {
-              errorDisplay = document.createElement('div');
-              errorDisplay.className = 'image-load-error-display';
-              parentContainer.insertBefore(errorDisplay, this);
-            }
-            errorDisplay.innerHTML = `<p>Immagine non disponibile</p><p style="font-size:0.8em;">(${this.dataset.contentKey || key})</p>`;
-            errorDisplay.style.display = 'flex';
-            this.onerror = null;
+            this.style.display = 'none'; if (spinnerContainer) spinnerContainer.style.display = 'none';
+            if (!errorDisplay) { errorDisplay = document.createElement('div'); errorDisplay.className = 'image-load-error-display'; parentContainer.insertBefore(errorDisplay, this); }
+            errorDisplay.innerHTML = `<p>Immagine non disponibile</p><p style="font-size:0.8em;">(${this.dataset.contentKey || key})</p>`; errorDisplay.style.display = 'flex'; this.onerror = null;
           };
-        } else {
-          if (spinnerContainer) spinnerContainer.style.display = 'flex';
-          imageElement.style.display = 'none';
-          console.warn(`Nessun URL immagine per ${key}, mostro spinner.`);
-        }
-      } else { // Per elementi non-immagine (testo)
-        if (contentValue !== undefined) {
-          el.innerHTML = sanitizeTextForHTML(contentValue);
-        } else {
-          el.innerHTML = sanitizeTextForHTML(`[Contenuto per ${key} mancante]`);
-        }
-      }
+        } else { if (spinnerContainer) spinnerContainer.style.display = 'flex'; imageElement.style.display = 'none';}
+      } else { el.innerHTML = contentValue !== undefined ? sanitizeTextForHTML(contentValue) : sanitizeTextForHTML(`[Contenuto per ${key} mancante]`);}
     });
   }
 
   function toggleEditMode(enable){
     isEditModeActive=enable;
-    document.querySelectorAll('.edit-icon-text, .edit-icon-image, .edit-icon-banner-bg').forEach(icon =>
-            icon.style.display = (currentUserData?.isAdmin && enable) ? 'inline-flex' : 'none'
-    );
-    document.querySelectorAll('img.chi-siamo-image').forEach(img => {
-      (currentUserData?.isAdmin && enable) ? img.classList.add('editable-image-target') : img.classList.remove('editable-image-target');
-    });
-
-    // Gestione visibilità bottoni principali di modifica
-    const editContainer=document.getElementById('editPageBtnContainer');
-    const editBtn=document.getElementById('editPageBtn');
-    const saveBtn=document.getElementById('savePageChangesBtn');
-    const cancelBtn=document.getElementById('cancelPageChangesBtn');
-
-    if(editContainer) {
-      editContainer.style.display = currentUserData?.isAdmin ? 'flex' : 'none';
-      if (currentUserData?.isAdmin) {
-        if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block';
-        if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none';
-        if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none';
-      } else { // Se non è admin, nascondi tutti i bottoni di modifica pagina
-        if(editBtn) editBtn.style.display = 'none';
-        if(saveBtn) saveBtn.style.display = 'none';
-        if(cancelBtn) cancelBtn.style.display = 'none';
-      }
-    }
-
-    if(enable){
-      originalPageContentsForCancel={...currentPageDbContents}; // Salva stato corrente per annullamento
-    }
+    document.querySelectorAll('.edit-icon-text, .edit-icon-image, .edit-icon-banner-bg').forEach(icon => icon.style.display = (currentUserData?.isAdmin && enable) ? 'inline-flex' : 'none');
+    document.querySelectorAll('img.chi-siamo-image').forEach(img => { (currentUserData?.isAdmin && enable) ? img.classList.add('editable-image-target') : img.classList.remove('editable-image-target'); });
+    const editContainer=document.getElementById('editPageBtnContainer'); const editBtn=document.getElementById('editPageBtn'); const saveBtn=document.getElementById('savePageChangesBtn'); const cancelBtn=document.getElementById('cancelPageChangesBtn');
+    if(editContainer) { editContainer.style.display = currentUserData?.isAdmin ? 'flex' : 'none'; if (currentUserData?.isAdmin) { if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block'; if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none'; if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none'; } else { if(editBtn) editBtn.style.display = 'none'; if(saveBtn) saveBtn.style.display = 'none'; if(cancelBtn) cancelBtn.style.display = 'none'; }}
+    if(enable){originalPageContentsForCancel={...currentPageDbContents};}
   }
 
   function openEditModal(key,type,currentValue){
-    currentEditingKey=key;
-    currentEditingType=type;
-    if(!editContentModal||!editModalMessage)return;
+    currentEditingKey=key; currentEditingType=type; if(!editContentModal||!editModalMessage)return;
     editModalMessage.style.display='none';editModalMessage.textContent='';
-
     editModalTextarea.style.display='none';editModalInputText.style.display='none';editModalInputImage.style.display='none';editModalInputFile.style.display='none';editModalFileLabel.style.display='none';editModalFileNote.style.display='none';editModalInputFile.value='';
-
-    let valForInput=currentValue;
-    // Per testo e textarea, decodifica HTML entities e normalizza newline per l'editing
-    if(type==='textarea'||type==='text'){
-      const tmp=document.createElement('div');tmp.innerHTML=currentValue;valForInput=tmp.innerText.replace(/<br\s*\/?>/gi, "\n");
-    }
-
-    if(type==='textarea'){
-      // Qui viene impostato il titolo del modale, senza la chiave
-      editModalTitle.textContent=`Modifica Testo Paragrafo`;
-      editModalFieldLabelText.textContent="Testo (paragrafo):";editModalTextarea.value=valForInput;editModalTextarea.style.display='block';editModalTextarea.focus();
-    } else if(type==='image' || type === 'backgroundImage'){
-      // Qui viene impostato il titolo del modale, senza la chiave
-      editModalTitle.textContent = `Modifica Immagine`;
-      editModalFieldLabelText.textContent="URL Immagine Corrente:";editModalInputImage.value=valForInput;editModalInputImage.style.display='block';editModalInputFile.style.display='block';editModalFileLabel.style.display='block';editModalFileNote.style.display='block';editModalInputImage.focus();
-    } else { // text
-      // Qui viene impostato il titolo del modale, senza la chiave
-      editModalTitle.textContent=`Modifica Testo Breve`;
-      editModalFieldLabelText.textContent="Testo (titolo/corto):";editModalInputText.value=valForInput;editModalInputText.style.display='block';editModalInputText.focus();
-    }
+    let valForInput=currentValue; if(type==='textarea'||type==='text'){const tmp=document.createElement('div');tmp.innerHTML=currentValue;valForInput=tmp.innerText.replace(/<br\s*\/?>/gi, "\n");}
+    if(type==='textarea'){ editModalTitle.textContent=`Modifica Testo Paragrafo`; editModalFieldLabelText.textContent="Testo (paragrafo):";editModalTextarea.value=valForInput;editModalTextarea.style.display='block';editModalTextarea.focus();
+    } else if(type==='image' || type === 'backgroundImage'){ editModalTitle.textContent = `Modifica Immagine`; editModalFieldLabelText.textContent="URL Immagine Corrente:";editModalInputImage.value=valForInput;editModalInputImage.style.display='block';editModalInputFile.style.display='block';editModalFileLabel.style.display='block';editModalFileNote.style.display='block';editModalInputImage.focus();
+    } else { editModalTitle.textContent=`Modifica Testo Breve`; editModalFieldLabelText.textContent="Testo (titolo/corto):";editModalInputText.value=valForInput;editModalInputText.style.display='block';editModalInputText.focus(); }
     editContentModal.style.display='flex';
   }
 
   function closeEditContentModal(){if(editContentModal)editContentModal.style.display='none';currentEditingKey=null;}
-
   if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
-
-  if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{
-    const contentsToSave={};
-
-    // Gestione specifica per heroBackgroundImage
-    const heroSectionForSave = document.getElementById('heroSection');
-    if (heroSectionForSave && heroSectionForSave.style.backgroundImage) {
-      const bgStyle = heroSectionForSave.style.backgroundImage;
-      const urlMatch = bgStyle.match(/url\("?([^"]*)"?\)/);
-      if (urlMatch && urlMatch[1]) {
-        contentsToSave.heroBackgroundImage = urlMatch[1];
-      } else {
-        // Se non c'è URL, salva stringa vuota o valore di default se preferito
-        contentsToSave.heroBackgroundImage = defaultPageContents.heroBackgroundImage || '';
-      }
-    } else if (heroSectionForSave) { // Se non c'è style.backgroundImage, usa default
-      contentsToSave.heroBackgroundImage = defaultPageContents.heroBackgroundImage || '';
-    }
-
-
-    // Gestione degli altri elementi con data-content-key
-    document.querySelectorAll('[data-content-key]').forEach(el=>{
-      const key=el.dataset.contentKey;
-      // heroBackgroundImage è già gestito, quindi lo saltiamo qui
-      if (key === 'heroBackgroundImage') return;
-
-      if (el.tagName === 'IMG') {
-        contentsToSave[key] = el.src;
-      } else {
-        contentsToSave[key] = el.innerHTML || ''; // Usa innerHTML per testo formattato
-      }
-    });
-
-    const btn=savePageChangesBtn; const oldHtml=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
-    try{
-      const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});
-      const j=await r.json(); if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");
-
-      currentPageDbContents={...contentsToSave}; // Aggiorna stato corrente con i dati salvati
-      originalPageContentsForCancel={...currentPageDbContents}; // Aggiorna anche per annullamento futuro
-      localStorage.setItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`, JSON.stringify(currentPageDbContents)); // Aggiorna cache
-
-      showPageStatus(j.message||'Modifiche salvate!','success'); toggleEditMode(false);
-    }catch(err){ console.error("Errore salvataggio:",err); showPageStatus(`Errore: ${err.message}`,'error');
-    }finally{ btn.disabled=false; btn.innerHTML=oldHtml; }
-  });
-
-  if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{
-    applyContentsToPage(originalPageContentsForCancel); // Ripristina dai contenuti originali (prima dell'attivazione edit mode)
-    currentPageDbContents = {...originalPageContentsForCancel}; // Resetta anche i contenuti correnti
-    toggleEditMode(false);
-    showPageStatus('Modifiche annullate.','info');
-  });
-
-  document.addEventListener('click',function(e){
-    if(!isEditModeActive||!currentUserData?.isAdmin)return;
-    // Cerca l'icona di modifica più vicina (testo, immagine, o banner)
-    const editIcon = e.target.closest('.edit-icon-text, .edit-icon-image, .edit-icon-banner-bg');
-    const imageTarget = e.target.closest('img.editable-image-target'); // Per click diretto su immagini <IMG>
-
-    let elToEdit, key, type, currentVal;
-
-    if(editIcon){
-      e.preventDefault(); // << AGGIUNGI QUESTA RIGA
-      e.stopPropagation(); // << AGGIUNGI QUESTA RIGA
-
-      key = editIcon.dataset.key;
-      type = editIcon.dataset.type;
-
-      if (type === 'backgroundImage' && key === 'heroBackgroundImage') {
-        elToEdit = document.getElementById('heroSection');
-        const bgStyle = elToEdit.style.backgroundImage;
-        const urlMatch = bgStyle.match(/url\("?([^"]*)"?\)/);
-        currentVal = (urlMatch && urlMatch[1]) ? urlMatch[1] : (defaultPageContents.heroBackgroundImage || '');
-      } else { // Per 'text', 'textarea', 'image'
-        elToEdit = document.getElementById(`content-${key}`);
-        if(!elToEdit){console.error(`Elemento con id content-${key} non trovato`);return;}
-        currentVal = elToEdit.tagName === 'IMG' ? elToEdit.src : elToEdit.innerHTML;
-      }
-      openEditModal(key,type,currentVal);
-    } else if(imageTarget){ // Click diretto su un <img> editabile
-      // L'immagine stessa ha data-content-key
-      key = imageTarget.dataset.contentKey;
-      type = 'image'; // Il click diretto su un img è sempre per 'image'
-      currentVal = imageTarget.src;
-      openEditModal(key,type,currentVal);
-    }
-  });
-
+  if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{ const contentsToSave={}; const heroSectionForSave = document.getElementById('heroSection'); if (heroSectionForSave && heroSectionForSave.style.backgroundImage) { const bgStyle = heroSectionForSave.style.backgroundImage; const urlMatch = bgStyle.match(/url\("?([^"]*)"?\)/); if (urlMatch && urlMatch[1]) { contentsToSave.heroBackgroundImage = urlMatch[1]; } else { contentsToSave.heroBackgroundImage = defaultPageContents.heroBackgroundImage || ''; }} else if (heroSectionForSave) { contentsToSave.heroBackgroundImage = defaultPageContents.heroBackgroundImage || ''; } document.querySelectorAll('[data-content-key]').forEach(el=>{const key=el.dataset.contentKey; if (key === 'heroBackgroundImage') return; if (el.tagName === 'IMG') { contentsToSave[key] = el.src; } else { contentsToSave[key] = el.innerHTML || ''; }}); const btn=savePageChangesBtn; const oldHtml=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...'; try{ const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})}); const j=await r.json(); if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio."); currentPageDbContents={...contentsToSave}; originalPageContentsForCancel={...currentPageDbContents}; localStorage.setItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`, JSON.stringify(currentPageDbContents)); showPageStatus(j.message||'Modifiche salvate!','success'); toggleEditMode(false); }catch(err){ console.error("Errore salvataggio:",err); showPageStatus(`Errore: ${err.message}`,'error'); }finally{ btn.disabled=false; btn.innerHTML=oldHtml; }});
+  if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{ applyContentsToPage(originalPageContentsForCancel); currentPageDbContents = {...originalPageContentsForCancel}; toggleEditMode(false); showPageStatus('Modifiche annullate.','info');});
+  document.addEventListener('click',function(e){ if(!isEditModeActive||!currentUserData?.isAdmin)return; const editIcon = e.target.closest('.edit-icon-text, .edit-icon-image, .edit-icon-banner-bg'); const imageTarget = e.target.closest('img.editable-image-target'); let elToEdit, key, type, currentVal; if(editIcon){ key = editIcon.dataset.key; type = editIcon.dataset.type; if (type === 'backgroundImage' && key === 'heroBackgroundImage') { elToEdit = document.getElementById('heroSection'); const bgStyle = elToEdit.style.backgroundImage; const urlMatch = bgStyle.match(/url\("?([^"]*)"?\)/); currentVal = (urlMatch && urlMatch[1]) ? urlMatch[1] : (defaultPageContents.heroBackgroundImage || ''); } else { elToEdit = document.getElementById(`content-${key}`); if(!elToEdit){console.error(`Elemento content-${key} non trovato`);return;} currentVal = elToEdit.tagName === 'IMG' ? elToEdit.src : elToEdit.innerHTML;} openEditModal(key,type,currentVal); } else if(imageTarget){ key = imageTarget.dataset.contentKey; type = 'image'; currentVal = imageTarget.src; openEditModal(key,type,currentVal);}});
   if(closeEditContentModalBtn)closeEditContentModalBtn.addEventListener('click',closeEditContentModal);
   if(cancelEditModalBtn)cancelEditModalBtn.addEventListener('click',closeEditContentModal);
-
-  if(saveEditModalBtn)saveEditModalBtn.addEventListener('click',async()=>{
-    if(!currentEditingKey)return;
-
-    let targetElement;
-    if (currentEditingType === 'backgroundImage' && currentEditingKey === 'heroBackgroundImage') {
-      targetElement = document.getElementById('heroSection');
-    } else {
-      targetElement = document.getElementById(`content-${currentEditingKey}`);
-    }
-
-    if(!targetElement){
-      if(editModalMessage){editModalMessage.textContent="Err: Elem. non trovato.";editModalMessage.className='form-message error';editModalMessage.style.display='block';}
-      return;
-    }
-
-    let newValue='';
-    const fileInput=document.getElementById('editModalInputFile');
-    const saveModalButton=saveEditModalBtn;const originalSaveModalButtonHtml=saveModalButton.innerHTML;
-    let closeTheModal = true;
-
-    if((currentEditingType==='image' || currentEditingType === 'backgroundImage') && fileInput.files[0]){
-      saveModalButton.disabled=true;saveModalButton.innerHTML='<i class="fas fa-spinner fa-spin"></i> Caricamento...';
-      const formData=new FormData();formData.append('imageFile',fileInput.files[0]);formData.append('page_name',PAGE_NAME_FOR_CONTENT);formData.append('content_key',currentEditingKey); // Usa currentEditingKey (es. 'heroBackgroundImage', 'fraternitaImage')
-      try{
-        const r=await fetch('api_upload_image.php',{method:'POST',body:formData});
-        const j=await r.json();
-        if(!r.ok||!j.success)throw new Error(j.message||"Errore upload file.");
-        newValue=j.filePath; // Questo è l'URL dell'immagine caricata
-
-        if (currentEditingType === 'backgroundImage') {
-          targetElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${newValue}')`;
-        } else { // 'image'
-          targetElement.src=newValue;
-        }
-        currentPageDbContents[currentEditingKey] = newValue; // Aggiorna stato corrente
-        if(editModalMessage)editModalMessage.style.display='none';
-      }
-      catch(err){
-        console.error("Errore upload immagine:",err);
-        if(editModalMessage){editModalMessage.textContent=`Errore upload: ${err.message}`;editModalMessage.className='form-message error';editModalMessage.style.display='block';}
-        closeTheModal = false;
-      }
-      finally{saveModalButton.disabled=false;saveModalButton.innerHTML=originalSaveModalButtonHtml;}
-    } else if (currentEditingType==='image' || currentEditingType === 'backgroundImage'){
-      newValue = editModalInputImage.value.trim();
-      if (currentEditingType === 'backgroundImage') {
-        targetElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${newValue}')`;
-      } else { // 'image'
-        targetElement.src=newValue;
-      }
-      currentPageDbContents[currentEditingKey] = newValue; // Aggiorna stato corrente
-    } else if(currentEditingType==='textarea'){
-      newValue=sanitizeTextForHTML(editModalTextarea.value);targetElement.innerHTML=newValue;
-      currentPageDbContents[currentEditingKey] = editModalTextarea.value; // Salva testo grezzo per coerenza
-    } else { // text
-      newValue=sanitizeTextForHTML(editModalInputText.value);targetElement.innerHTML=newValue;
-      currentPageDbContents[currentEditingKey] = editModalInputText.value; // Salva testo grezzo
-    }
-    if (closeTheModal) closeEditContentModal();
-  });
-
-  document.addEventListener('DOMContentLoaded',async()=>{
-    const c=document.getElementById('currentYear');if(c)c.textContent=new Date().getFullYear();
-    loadUserData();
-    updateNavbarUI(); // Chiamata iniziale per UI navbar
-    await loadPageContentsFromServer(); // Carica contenuti e applicali
-    // La visibilità dei bottoni di modifica pagina è gestita da updateNavbarUI e toggleEditMode
-    // Assicurati che toggleEditMode(false) venga chiamato se l'utente è admin ma non in edit mode all'inizio
-    if (currentUserData && currentUserData.isAdmin && !isEditModeActive) {
-      toggleEditMode(false);
-    } else if (!currentUserData || !currentUserData.isAdmin) {
-      // Nascondi tutte le icone se non admin o non loggato
-      document.querySelectorAll('.edit-icon-text,.edit-icon-image,.edit-icon-banner-bg').forEach(i=>i.style.display='none');
-      document.querySelectorAll('img.chi-siamo-image.editable-image-target').forEach(img=>img.classList.remove('editable-image-target'));
-      const editContainer=document.getElementById('editPageBtnContainer');
-      if(editContainer) editContainer.style.display='none';
-    }
-  });
+  if(saveEditModalBtn)saveEditModalBtn.addEventListener('click',async()=>{ if(!currentEditingKey)return; let targetElement; if (currentEditingType === 'backgroundImage' && currentEditingKey === 'heroBackgroundImage') { targetElement = document.getElementById('heroSection'); } else { targetElement = document.getElementById(`content-${currentEditingKey}`);} if(!targetElement){if(editModalMessage){editModalMessage.textContent="Err: Elem. non trovato.";editModalMessage.className='form-message error';editModalMessage.style.display='block';}return;} let newValue=''; const fileInput=document.getElementById('editModalInputFile'); const saveModalButton=saveEditModalBtn;const originalSaveModalButtonHtml=saveModalButton.innerHTML; let closeTheModal = true; if((currentEditingType==='image' || currentEditingType === 'backgroundImage') && fileInput.files[0]){ saveModalButton.disabled=true;saveModalButton.innerHTML='<i class="fas fa-spinner fa-spin"></i> Caricamento...'; const formData=new FormData();formData.append('imageFile',fileInput.files[0]);formData.append('page_name',PAGE_NAME_FOR_CONTENT);formData.append('content_key',currentEditingKey); try{ const r=await fetch('api_upload_image.php',{method:'POST',body:formData}); const j=await r.json(); if(!r.ok||!j.success)throw new Error(j.message||"Errore upload file."); newValue=j.filePath; if (currentEditingType === 'backgroundImage') { targetElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${newValue.replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29")}')`; } else { targetElement.src=newValue; } currentPageDbContents[currentEditingKey] = newValue; if(editModalMessage)editModalMessage.style.display='none';} catch(err){ console.error("Errore upload immagine:",err); if(editModalMessage){editModalMessage.textContent=`Errore upload: ${err.message}`;editModalMessage.className='form-message error';editModalMessage.style.display='block';} closeTheModal = false; } finally{saveModalButton.disabled=false;saveModalButton.innerHTML=originalSaveModalButtonHtml;}} else if (currentEditingType==='image' || currentEditingType === 'backgroundImage'){ newValue = editModalInputImage.value.trim(); if (currentEditingType === 'backgroundImage') { targetElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${newValue.replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29")}')`; } else { targetElement.src=newValue; } currentPageDbContents[currentEditingKey] = newValue;} else if(currentEditingType==='textarea'){ newValue=sanitizeTextForHTML(editModalTextarea.value);targetElement.innerHTML=newValue; currentPageDbContents[currentEditingKey] = editModalTextarea.value;} else { newValue=sanitizeTextForHTML(editModalInputText.value);targetElement.innerHTML=newValue; currentPageDbContents[currentEditingKey] = editModalInputText.value;} if (closeTheModal) closeEditContentModal();});
+  document.addEventListener('DOMContentLoaded',async()=>{ const c=document.getElementById('currentYear');if(c)c.textContent=new Date().getFullYear(); loadUserData(); updateNavbarUI(); await loadPageContentsFromServer(); if (currentUserData && currentUserData.isAdmin && !isEditModeActive) { toggleEditMode(false); } else if (!currentUserData || !currentUserData.isAdmin) { document.querySelectorAll('.edit-icon-text,.edit-icon-image,.edit-icon-banner-bg').forEach(i=>i.style.display='none'); document.querySelectorAll('img.chi-siamo-image.editable-image-target').forEach(img=>img.classList.remove('editable-image-target')); const editContainer=document.getElementById('editPageBtnContainer'); if(editContainer) editContainer.style.display='none';}});
   // === FINE SCRIPT UNIFICATO ===
 </script>
 </body>
