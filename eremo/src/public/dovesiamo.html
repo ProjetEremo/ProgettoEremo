@@ -58,7 +58,10 @@
 <header class="navbar-container" id="navbarContainer">
   <nav class="navbar">
     <div class="logo">
-      <a href="index.html" id="logoLink"><span class="emoji">🏔️</span><h2 id="navbarTitle">Eremo Frate Francesco</h2></a>
+      <a href="index.html" id="logoLink">
+        <img src="images/Logo_eremo.png" alt="Logo Eremo Frate Francesco" class="navbar-logo-img" id="navbarLogoImgTag">
+        <h2 id="navbarTitle">Eremo Frate Francesco</h2>
+      </a>
     </div>
     <div class="menu" id="mainMenu">
       <a href="eventiincorso.html" id="navCalendarioAttivita">Calendario attività</a>
@@ -286,9 +289,9 @@
     mapIframeSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2791.778205780889!2d9.747583015500093!3d45.74087297910504!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47814f7b104783bf%3A0xde070acb563411c3!2sChiesa%20di%20San%20Vito!5e0!3m2!1sit!2sit!4v1620000000000!5m2!1sit!2sit", // Esempio URL Google Maps
     locationHeading: "Raggiungici a San Vito di Nembro",
     locationText1: "L'Eremo Frate Francesco si trova in una posizione tranquilla e suggestiva, ideale per il raccoglimento, nella frazione di San Vito a Nembro (BG).",
-    locationAddress: "<strong>Indirizzo:</strong> Via San Vito, 24027 Nembro BG (Presso la Chiesa di San Vito)",
-    locationDirections: "<strong>Indicazioni:</strong> Dalla SP35, seguire per Nembro centro e poi per San Vito. L'eremo si trova nella parte alta della frazione.",
-    locationParking: "<strong>Parcheggio:</strong> Disponibile nelle vicinanze.",
+    locationAddress: "<strong>Indirizzo: </strong> Via San Vito, 24027 Nembro BG (Presso la Chiesa di San Vito)",
+    locationDirections: "<strong>Indicazioni: </strong> Dalla SP35, seguire per Nembro centro e poi per San Vito. L'eremo si trova nella parte alta della frazione.",
+    locationParking: "<strong>Parcheggio: </strong> Disponibile nelle vicinanze.",
     locationDirectionsButtonHref: "https://maps.app.goo.gl/exampleLink",
     infoUtiliHeading: "Informazioni Utili",
     orariCardText1: "L'accesso all'Eremo è legato alle attività programmate. Per visite o ritiri personali, è necessario contattarci preventivamente.",
@@ -610,7 +613,7 @@
       if (currentEditingKey === 'locationAddress' || currentEditingKey === 'locationDirections') {
         const prefixText = currentEditingKey === 'locationAddress' ? 'Indirizzo:' : 'Indicazioni:';
         if (processedValue.startsWith(prefixText) && !processedValue.startsWith('<strong>')) {
-          processedValue = `<strong>${prefixText}</strong>` + processedValue.substring(prefixText.length).trimStart();
+          processedValue = `<strong>${prefixText}</strong>` + processedValue.substring(prefixText.length);
         }
       }
       targetElement.innerHTML = formatHTMLContent(processedValue);
@@ -630,22 +633,50 @@
     closeEditContentModal();
   });
 
-  document.addEventListener('DOMContentLoaded',async()=>{
+  async function loadNavbarLogo() {
+    const logoImgTag = document.getElementById('navbarLogoImgTag');
+    if (!logoImgTag) {
+      console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in dovesiamo.html.");
+      return;
+    }
+
+    const defaultLogoPath = 'images/Logo_eremo.png'; // Ensure this path is correct
+
+    try {
+      const response = await fetch('api_get_page_content.php?page=index');
+      if (!response.ok) {
+        throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
+      }
+      const data = await response.json();
+
+      if (data.success && data.contents && data.contents.navbarLogo) {
+        logoImgTag.src = data.contents.navbarLogo;
+      } else {
+        console.warn("URL del logo navbar non trovato o errore API. Uso il logo di default.");
+        logoImgTag.src = defaultLogoPath;
+      }
+    } catch (error) {
+      console.error("Errore nel caricare dinamicamente il logo navbar:", error);
+      logoImgTag.src = defaultLogoPath;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded',async()=> {
     const c=gebi('currentYear');if(c)c.textContent=new Date().getFullYear();
     loadUserData();
+    await loadNavbarLogo(); // <<< ADD THIS CALL HERE
     await loadPageContentsFromServer();
     await fetchAndUpdateUserDisplayDataFromApi();
     if(!isEditModeActive||!currentUserData?.isAdmin){document.querySelectorAll('.edit-icon-text,.edit-icon-iframe,.edit-icon-href').forEach(i=>i.style.display='none');} else { toggleEditMode(false); }
 
-    // INIZIO MODIFICA: Event listener per ESC aggiornato
+    // Event listener for ESC updated
     document.addEventListener('keydown',(e)=>{
       if(e.key==='Escape'){
         if(loginPopup?.classList.contains('active')) closeLoginPopup();
-        if(gebi('forgotPasswordPopup')?.classList.contains('active')) closeForgotPasswordPopup(); // NUOVA RIGA
+        if(gebi('forgotPasswordPopup')?.classList.contains('active')) closeForgotPasswordPopup();
         if(editContentModal?.style.display==='flex') closeEditContentModal();
       }
     });
-    // FINE MODIFICA: Event listener per ESC aggiornato
   });
 </script>
 
