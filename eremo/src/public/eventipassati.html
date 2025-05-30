@@ -128,7 +128,10 @@
 <header class="navbar-container" id="navbarContainer">
   <nav class="navbar">
     <div class="logo">
-      <a href="index.html" id="logoLink"><span class="emoji">🏔️</span><h2 id="navbarTitle">Eremo Frate Francesco</h2></a>
+      <a href="index.html" id="logoLink">
+        <img src="images/Logo_eremo.png" alt="Logo Eremo Frate Francesco" class="navbar-logo-img" id="navbarLogoImgTag">
+        <h2 id="navbarTitle">Eremo Frate Francesco</h2>
+      </a>
     </div>
     <div class="menu" id="mainMenu">
       <a href="eventiincorso.html" id="navCalendarioAttivita">Calendario attività</a>
@@ -858,6 +861,35 @@
       if (p.textContent) eventiPassatiGridEl.appendChild(p);
     }
   }
+  // Funzione per caricare dinamicamente il logo della navbar
+  async function loadNavbarLogo() {
+    const logoImgTag = document.getElementById('navbarLogoImgTag');
+    if (!logoImgTag) {
+      console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in eventipassati.html.");
+      return;
+    }
+
+    const defaultLogoPath = 'images/Logo_eremo.png'; // Assicurati che questo percorso sia corretto
+
+    try {
+      const response = await fetch('api_get_page_content.php?page=index'); // Recupera i contenuti di 'index'
+      if (!response.ok) {
+        throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
+      }
+      const data = await response.json();
+
+      if (data.success && data.contents && data.contents.navbarLogo) {
+        logoImgTag.src = data.contents.navbarLogo;
+      } else {
+        console.warn("URL del logo navbar non trovato o errore API. Uso il logo di default.");
+        logoImgTag.src = defaultLogoPath;
+      }
+    } catch (error) {
+      console.error("Errore nel caricare dinamicamente il logo navbar:", error);
+      logoImgTag.src = defaultLogoPath; // Fallback in caso di errore
+    }
+  }
+
 
   // Event listener al caricamento del DOM
   document.addEventListener("DOMContentLoaded", async () => {
@@ -865,8 +897,8 @@
     if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
     loadUserData(); // Carica dati utente da localStorage
-    await fetchAndUpdateUserDisplayData(); // Aggiorna UI navbar
-
+    await fetchAndUpdateUserDisplayData(); // Aggiorna UI navbar (generale)
+    await loadNavbarLogo(); // <<< AGGIUNGI QUESTA CHIAMATA QUI
     // Aggiungi event listener ai filtri per il filtraggio "live"
     searchTitleEl?.addEventListener("input", filterEvents);
     searchMonthEl?.addEventListener("change", filterEvents);

@@ -917,10 +917,7 @@
   <nav class="navbar">
     <div class="logo">
       <a href="index.html">
-        <div class="editable-image-wrapper navbar-logo-wrapper">
-          <img src="images/Logo_eremo.png" alt="Logo Eremo Frate Francesco" class="navbar-logo-img" id="content-navbarLogo" data-content-key="navbarLogo">
-          <span class="edit-icon-image" data-key="navbarLogo" data-type="image" title="Modifica logo" style="top: 2px; right: 2px; width:18px; height:18px; font-size:0.6em;">&#9998;</span>
-        </div>
+        <img src="images/Logo_eremo.png" alt="Logo Eremo Frate Francesco" class="navbar-logo-img" id="navbarLogoImgTag">
         <h2 id="navbar-title">Eremo Frate Francesco</h2>
       </a>
     </div>
@@ -1821,6 +1818,39 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     } catch (e) { return dateString; }
   }
 
+  async function loadNavbarLogo() {
+    const logoImgTag = document.getElementById('navbarLogoImgTag');
+    if (!logoImgTag) {
+      console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in eventiincorso.html.");
+      return;
+    }
+
+    // Percorso del logo di default/fallback se il caricamento dinamico fallisce
+    const defaultLogoPath = 'images/Logo_eremo.png'; // Assicurati che questo percorso sia corretto
+
+    try {
+      // Chiamiamo l'API per ottenere i contenuti della pagina 'index',
+      // perché è lì che viene gestito il 'navbarLogo'.
+      const response = await fetch('api_get_page_content.php?page=index');
+      if (!response.ok) {
+        throw new Error(`Errore HTTP ${response.status} nel caricare i contenuti della pagina 'index' per il logo.`);
+      }
+      const data = await response.json();
+
+      if (data.success && data.contents && data.contents.navbarLogo) {
+        logoImgTag.src = data.contents.navbarLogo;
+      } else {
+        console.warn("URL del logo navbar non trovato nei dati della pagina 'index' o errore API. Uso il logo di default.");
+        logoImgTag.src = defaultLogoPath;
+      }
+    } catch (error) {
+      console.error("Errore nel caricare dinamicamente il logo navbar:", error);
+      logoImgTag.src = defaultLogoPath; // Fallback in caso di errore
+    }
+  }
+
+
+
   function initializeBookingPopupHandlers() {
     const bO = gebi('bookingPopupOverlay'); const bP = gebi('bookingPopup'); const cB = gebi('closeBookingPopupBtn'); const bF = gebi('bookingForm'); const nPI = gebi('numeroPosti'); const pFC = gebi('participantFieldsContainer'); const bEII = gebi('bookingEventId'); const bPT = gebi('bookingPopupTitle'); const bRM = gebi('bookingResponseMessage'); const iPP = gebi('infoPostiPrenotabili'); const mSB = gebi('maxSeatsAllowedBooking');
     const formContentWrapper = bF ? bF.querySelector('.form-content-wrapper') : null;
@@ -2626,7 +2656,10 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
   document.addEventListener('DOMContentLoaded', async () => {
     const cY = gebi("currentYear"); if (cY) cY.textContent = new Date().getFullYear();
     initGlobalFlyerOverlay();
-    loadUserData(); updateNavbarUI(); await loadEvents();
+    loadUserData();
+    updateNavbarUI(); // Aggiorna la UI generale della navbar
+    await loadNavbarLogo(); // Carica specificamente il logo dinamicamente
+    await loadEvents();     // Poi carica gli eventi
     initializeBookingPopupHandlers();
     initializeWaitlistPopupHandlers();
     initializeDashAdminEventPopupHandlers();
