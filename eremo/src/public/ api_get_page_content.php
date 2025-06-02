@@ -1,6 +1,8 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
+require_login(); // Verifica se l'utente è loggato
 require_once 'config/db_config.php'; // Adatta il percorso se necessario
+
 
 $response = ['success' => false, 'contents' => null, 'message' => ''];
 $pageName = isset($_GET['page']) ? trim($_GET['page']) : 'index'; // Default a 'index'
