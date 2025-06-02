@@ -1,7 +1,8 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 require_once 'config_session.php'; // PRIMA COSA
-require_login(); // Verifica se l'utente è loggato
+// require_login(); // RIMOSSA DA QUI la chiamata incondizionata
+
 require_once 'config/db_config.php'; // Adatta il percorso se necessario
 
 
@@ -39,10 +40,8 @@ try {
         $response['success'] = true;
         $response['contents'] = $contents;
     } else {
-        // Se non trova contenuti specifici, potrebbe inviare un array vuoto
-        // o un messaggio, o i default (ma i default sono gestiti dal JS come fallback)
-        $response['success'] = true; // Successo nel recuperare, ma magari è vuoto
-        $response['contents'] = []; // Invia un array vuoto
+        $response['success'] = true;
+        $response['contents'] = [];
         $response['message'] = 'Nessun contenuto personalizzato trovato per la pagina: ' . htmlspecialchars($pageName) . '. Verranno usati i default.';
     }
     $stmt->close();
