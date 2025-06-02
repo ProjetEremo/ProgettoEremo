@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
+require_once 'config_session.php'; // PRIMA COSA
 require_login(); // Verifica se l'utente è loggato
 require_once 'config/db_config.php'; // Adatta il percorso se necessario
 
