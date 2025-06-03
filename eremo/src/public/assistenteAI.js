@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-// File: assistenteAI.js (Versione Rivoluzionata e Corretta v10 - Debug Prenotazione V2)
-=======
-// File: assistenteAI.js (Versione Rivoluzionata e Corretta v6 - Debug Nomi)
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
+// File: assistenteAI.js (Versione Rivoluzionata e Corretta v10 - Formattazione Eventi Migliorata)
 document.addEventListener('DOMContentLoaded', () => {
     const aiAssistantFabEl = document.getElementById('ai-assistant-fab');
     const aiChatPopupEl = document.getElementById('ai-chat-popup');
@@ -12,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const aiChatSendBtnEl = document.getElementById('ai-chat-send-btn');
 
     if (!aiAssistantFabEl || !aiChatPopupEl || !aiChatCloseBtnEl || !aiChatMessagesContainerEl || !aiChatInputEl || !aiChatSendBtnEl) {
-        console.warn("AssistenteAI v10: Elementi UI fondamentali non trovati.");
+        console.warn("AssistenteAI: Elementi UI fondamentali non trovati.");
         if (aiAssistantFabEl) aiAssistantFabEl.style.display = 'none';
         return;
     }
@@ -34,25 +30,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userData = JSON.parse(userDataString);
                 if (userData && userData.email) {
                     IS_USER_LOGGED_IN = true;
-                    CURRENT_USER_EMAIL = userData.email.trim(); // Trim email at source
+                    CURRENT_USER_EMAIL = userData.email;
                     CURRENT_USER_DATA = userData;
-                    console.log("AssistenteAI v10: Utente loggato:", CURRENT_USER_EMAIL);
                     return;
                 }
             } catch (e) {
-                console.error("AssistenteAI v10: Errore parsing userDataEFF", e);
+                console.error("AssistenteAI: Errore parsing userDataEFF", e);
                 localStorage.removeItem('userDataEFF');
             }
         }
         IS_USER_LOGGED_IN = false;
         CURRENT_USER_EMAIL = null;
         CURRENT_USER_DATA = null;
-        console.log("AssistenteAI v10: Utente non loggato.");
     }
 
     let chatHistoryForAssistant = [];
     let currentBookingState = {};
-    let currentCancellationState = {};
 
     function resetBookingState() {
         currentBookingState = {
@@ -64,38 +57,23 @@ document.addEventListener('DOMContentLoaded', () => {
             partecipanti: [],
             richiesteSpeciali: null,
             postiGiaPrenotatiUtente: undefined,
-<<<<<<< HEAD
-            postiDisponibiliEvento: undefined,
-            summaryPresented: false
-=======
             postiDisponibiliEvento: undefined
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
         };
-        console.log("AssistenteAI v10: Stato prenotazione resettato.", JSON.stringify(currentBookingState));
-    }
-
-    function resetCancellationState() {
-        currentCancellationState = {
-            isActive: false,
-            bookingIdToCancel: null,
-            bookingDetailsToCancel: null,
-            summaryPresented: false
-        };
-        console.log("AssistenteAI v10: Stato cancellazione resettato.", JSON.stringify(currentCancellationState));
+        console.log("AssistenteAI: Stato prenotazione resettato.");
     }
 
     const INTENT_ANALYSIS_SYSTEM_PROMPT = () => `
-<<<<<<< HEAD
-Analizza la richiesta dell'utente per il sito "Eremo Frate Francesco". Data e ora correnti: ${new Date().toISOString()}. Utente loggato: ${IS_USER_LOGGED_IN} (Email: ${CURRENT_USER_EMAIL || 'N/D'}).
-Stato prenotazione attuale (JS): ${JSON.stringify(currentBookingState)}.
-Stato cancellazione attuale (JS): ${JSON.stringify(currentCancellationState)}.
-=======
 Analizza la richiesta dell'utente per il sito "Eremo Frate Francesco". Data e ora correnti: ${new Date().toISOString()}. Utente loggato: ${IS_USER_LOGGED_IN} (Email: ${CURRENT_USER_EMAIL || 'N/D'}). Stato prenotazione attuale (se esiste): ${JSON.stringify(currentBookingState)}.
-Determina:
-1.  "intent": L'azione principale. Valori: GET_EVENTS, GET_EVENT_DETAILS, START_BOOKING_FLOW, COLLECT_BOOKING_DETAILS, CONFIRM_BOOKING_DETAILS, GET_USER_PROFILE, GET_USER_BOOKINGS, GENERAL_QUERY, UNKNOWN.
-    - Usa START_BOOKING_FLOW se l'utente esprime intenzione di prenotare E (mancano eventId/eventTitle in currentBookingState OPPURE l'utente sta chiaramente iniziando una nuova richiesta per un evento diverso, o non c'è un evento attivo in currentBookingState).
-    - Usa COLLECT_BOOKING_DETAILS se currentBookingState è attivo con eventId e eventTitle, e l'utente fornisce dettagli (numero persone, nomi partecipanti) OPPURE se stai attivamente chiedendo questi dettagli.
-        - Se stai chiedendo il numero di posti e l'utente fornisce un numero, estrai "numeroPosti".
+
+Devi rispondere ESCLUSIVAMENTE con un oggetto JSON valido. Non includere testo al di fuori dell'oggetto JSON.
+
+Determina i seguenti campi:
+1.  "intent": L'azione principale. Valori possibili: GET_EVENTS, GET_EVENT_DETAILS, START_BOOKING_FLOW, COLLECT_BOOKING_DETAILS, CONFIRM_BOOKING_DETAILS, GET_USER_PROFILE, GET_USER_BOOKINGS, GENERAL_QUERY, UNKNOWN.
+    - Se l'utente invia un saluto (es. "ciao", "salve"), una frase di cortesia, o una domanda molto generica non correlata direttamente alle azioni specifiche del sito, classifica come "GENERAL_QUERY".
+    - Per GET_EVENTS, se non specificato diversamente dall'utente (es. una data specifica o un termine di ricerca), assumi che l'utente voglia eventi futuri (es. \`params: {"period": "all_future"}\`).
+    - Usa START_BOOKING_FLOW se l'utente esprime intenzione di prenotare E (mancano eventId/eventTitle in currentBookingState OPPURE l'utente sta chiaramente iniziando una nuova richiesta per un evento diverso, o non c'è un evento attivo in currentBookingState). Per questo intent, "requires_login" DEVE essere true.
+    - Usa COLLECT_BOOKING_DETAILS se currentBookingState è attivo con eventId e eventTitle, e l'utente fornisce dettagli (numero persone, nomi partecipanti) OPPURE se stai attivamente chiedendo questi dettagli. Per questo intent, "requires_login" DEVE essere true.
+        - Se stai chiedendo il numero di posti e l'utente fornisce un numero, estrai "numeroPosti" in \`params\`.
         - Se stai chiedendo i nomi dei partecipanti (e currentBookingState.numeroPosti è noto e currentBookingState.partecipanti.length < currentBookingState.numeroPosti), e l'utente fornisce testo che assomiglia a nomi completi:
           ESTRAI **solo le coppie Nome Cognome** in \`params.partecipanti_nomi_cognomi\` come un ARRAY DI STRINGHE.
           Ogni stringa nell'array DEVE rappresentare un SINGOLO partecipante completo (es. "Mario Rossi").
@@ -113,107 +91,48 @@ Determina:
           Fai del tuo meglio per isolare e separare correttamente i nomi completi in stringhe individuali nell'array.
           **Se l'input dell'utente contiene chiaramente nomi di persone e l'assistente sta aspettando nomi (cioè currentBookingState.numeroPosti è definito e currentBookingState.partecipanti.length < currentBookingState.numeroPosti), allora il campo \`params.partecipanti_nomi_cognomi\` DEVE essere popolato con i nomi estratti. Non lasciarlo vuoto o nullo in questo scenario cruciale.**
           L'intent DEVE rimanere COLLECT_BOOKING_DETAILS finché il codice JS non ha tutti i nomi necessari e li ha validati internamente (tramite validateBookingStateForConfirmation).
-    - Usa CONFIRM_BOOKING_DETAILS ESCLUSIVAMENTE se il sistema JavaScript (tramite validateBookingStateForConfirmation) ha determinato che TUTTI i dati necessari (eventId, eventTitle, numeroPosti, e un array completo di nomi partecipanti VALIDI) sono stati raccolti e sono corretti in currentBookingState, E l'assistente ha presentato il riepilogo e l'utente ha risposto affermativamente (es. "sì", "conferma", "procedi"). Non anticipare questo intent.
-2.  "params": Oggetto JSON con parametri ESTRATTI DALL'ULTIMO INPUT UTENTE.
-3.  "php_script": Script PHP da chiamare (se applicabile). Valori: "get_events.php", "get_event_details.php", "prenota_evento.php", "api/api_get_user_profile.php", "api/api_get_user_bookings.php", "none".
-4.  "requires_login": true/false.
-5.  "missing_info_prompt": Se mancano info ESSENZIALI per l'intent (specialmente per COLLECT_BOOKING_DETAILS o se START_BOOKING_FLOW non ha hint evento E currentBookingState.eventId non è noto), una frase SPECIFICA per richiederle. Altrimenti null.
-    - Per prenotazioni, i dati essenziali: eventId, eventTitle, numeroPosti (1-${MAX_SEATS_PER_SINGLE_BOOKING_REQUEST}, rispettando i limiti utente/evento), partecipanti (array "Nome Cognome").
-6.  "is_clarification_needed": true/false.
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
+    - Usa CONFIRM_BOOKING_DETAILS ESCLUSIVAMENTE se il sistema JavaScript (tramite validateBookingStateForConfirmation) ha determinato che TUTTI i dati necessari (eventId, eventTitle, numeroPosti, e un array completo di nomi partecipanti VALIDI) sono stati raccolti e sono corretti in currentBookingState, E l'assistente ha presentato il riepilogo e l'utente ha risposto affermativamente (es. "sì", "conferma", "procedi"). Non anticipare questo intent. Per questo intent, "requires_login" DEVE essere true.
+2.  "params": Oggetto JSON con parametri ESTRATTI DALL'ULTIMO INPUT UTENTE. Se nessun parametro è rilevante, usa un oggetto vuoto \`{}\`.
+3.  "php_script": Script PHP da chiamare (se applicabile). Valori: "get_events.php", "get_event_details.php", "prenota_evento.php", "api/api_get_user_profile.php", "api/api_get_user_bookings.php", "none". Per "GENERAL_QUERY" o "UNKNOWN", usa "none".
+4.  "requires_login": true/false. Per "GENERAL_QUERY", solitamente \`false\` a meno che la domanda non implichi dati utente. Per GET_USER_PROFILE e GET_USER_BOOKINGS, DEVE essere true.
+5.  "missing_info_prompt": Se mancano info ESSENZIALI per un intent specifico (specialmente per COLLECT_BOOKING_DETAILS o se START_BOOKING_FLOW non ha hint evento E currentBookingState.eventId non è noto), una frase SPECIFICA per richiederle. Altrimenti \`null\`. Per "GENERAL_QUERY" senza azioni specifiche, questo dovrebbe essere \`null\`.
+6.  "is_clarification_needed": true/false. Per "GENERAL_QUERY" chiaro (es. "ciao"), questo dovrebbe essere \`false\`. Se l'input è ambiguo, \`true\`.
 
-Determina ESATTAMENTE:
-1.  "intent": L'azione principale. Valori possibili: GET_EVENTS, GET_EVENT_DETAILS, START_BOOKING_FLOW, COLLECT_BOOKING_DETAILS, CONFIRM_BOOKING_DETAILS, GET_USER_PROFILE, GET_USER_BOOKINGS, START_CANCEL_BOOKING, COLLECT_CANCEL_BOOKING_ID, CONFIRM_CANCEL_BOOKING, USER_WANTS_TO_LOGIN, GET_USER_MANUAL, GENERAL_QUERY, UNKNOWN.
-    - START_BOOKING_FLOW: Utente esprime intenzione di prenotare E (currentBookingState.isActive è false OPPURE eventId/eventTitle in currentBookingState non corrispondono a un nuovo evento menzionato).
-    - COLLECT_BOOKING_DETAILS: currentBookingState.isActive=true E currentBookingState.summaryPresented=false. L'utente fornisce dettagli (numero posti, nomi partecipanti) O l'assistente sta attivamente chiedendo questi dettagli.
-        - Se l'utente fornisce un numero dopo che gli è stato chiesto il numero di posti, estrai \`params.numeroPosti\` (int).
-        - Se l'utente fornisce testo che assomiglia a nomi completi (dopo che gli è stato chiesto e currentBookingState.numeroPosti è noto): ESTRAI **solo le coppie Nome Cognome** in \`params.partecipanti_nomi_cognomi\` (array di stringhe, es. ["Mario Rossi", "Luigi Verdi"]).
-    - CONFIRM_BOOKING_DETAILS: ESCLUSIVAMENTE se currentBookingState.isActive=true, currentBookingState.summaryPresented=true (l'assistente ha presentato il riepilogo completo), E l'utente risponde con una *semplice affermazione* (es. "sì", "conferma", "ok", "procedi", "va bene", "corretto"). L'oggetto \`params\` DEVE essere un oggetto JSON vuoto: \`{}\`. Se l'utente, invece di una semplice conferma, fornisce nuovi dettagli o chiede modifiche (es. "sì, ma per Michele Rossi e non Luca"), l'intent DEVE essere COLLECT_BOOKING_DETAILS con i nuovi parametri.
-    - START_CANCEL_BOOKING: Utente esprime intenzione di annullare una prenotazione (es. "voglio annullare", "cancella la mia prenotazione"). Se fornisce un ID prenotazione (es. "annulla la 123"), estrai \`params.booking_id\` (numero intero).
-    - COLLECT_CANCEL_BOOKING_ID: currentCancellationState.isActive=true e currentCancellationState.summaryPresented=false. L'assistente sta chiedendo l'ID della prenotazione da annullare e l'utente fornisce un numero. Estrai \`params.booking_id\` (numero intero).
-    - CONFIRM_CANCEL_BOOKING: ESCLUSIVAMENTE se currentCancellationState.isActive=true, currentCancellationState.bookingIdToCancel è valorizzato, currentCancellationState.summaryPresented=true (l'assistente ha chiesto conferma per l'annullamento dell'ID specifico), e l'utente risponde con una *semplice affermazione*. L'oggetto \`params\` DEVE essere un oggetto JSON vuoto: \`{}\`.
-    - USER_WANTS_TO_LOGIN: Utente chiede come fare login/accedere/registrarsi o esprime necessità di farlo.
-    - GET_USER_MANUAL: Utente chiede come usare il sito, un manuale, istruzioni, o aiuto generico sulle funzionalità.
-    - GET_USER_BOOKINGS: Utente chiede di vedere le sue prenotazioni. Se currentCancellationState.isActive è true e l'utente dice "non ricordo l'ID", questo è l'intent corretto.
-2.  "params": Oggetto JSON con parametri ESTRATTI DALL'ULTIMO INPUT UTENTE. Per intent di conferma (CONFIRM_BOOKING_DETAILS, CONFIRM_CANCEL_BOOKING) basati su un semplice "ok" o "sì", \`params\` deve essere \`{}\`. Esempi: \`{"event_id": 84}\`, \`{"numeroPosti": 2}\`, \`{"partecipanti_nomi_cognomi": ["Mario Rossi", "Anna Neri"]}\`, \`{"booking_id": 159}\`.
-3.  "php_script": Script PHP da chiamare. Scegli ESATTAMENTE dalla seguente lista (includi il path completo): "/get_events.php", "/get_event_details.php", "/prenota_evento.php", "api/api_get_user_profile.php", "api/api_get_user_bookings.php", "api/api_cancel_booking.php", "none".
-4.  "requires_login": true/false. Imposta a \`true\` per: CONFIRM_BOOKING_DETAILS, GET_USER_PROFILE, GET_USER_BOOKINGS, CONFIRM_CANCEL_BOOKING, e qualsiasi intent che chiami /prenota_evento.php, api/api_get_user_profile.php, api/api_get_user_bookings.php, api/api_cancel_booking.php. Anche START_BOOKING_FLOW e START_CANCEL_BOOKING dovrebbero avere \`requires_login: true\`.
-5.  "missing_info_prompt": Se l'intent è di raccogliere dettagli (es. COLLECT_BOOKING_DETAILS) ma \`params\` è vuoto o non contiene le informazioni attese per quella fase del flusso, fornisci una frase specifica per richiederle (es. "Per quante persone?", "Potresti darmi i nomi dei partecipanti?"). Altrimenti null.
-6.  "is_clarification_needed": true/false. Se l'input è molto ambiguo o l'intent non è assolutamente chiaro, anche considerando il contesto.
-
-Considera attentamente la cronologia e gli stati JS. Se l'utente dice "il 161" e \`currentCancellationState.isActive\` è true e l'assistente aveva chiesto un ID, l'intent è \`COLLECT_CANCEL_BOOKING_ID\` con \`params: {"booking_id": 161}\`.
-Rispondi ESCLUSIVAMENTE in formato JSON. Non aggiungere commenti o testo al di fuori dell'oggetto JSON.
+Esempio per "ciao":
+\`\`\`json
+{
+  "intent": "GENERAL_QUERY",
+  "params": {},
+  "php_script": "none",
+  "requires_login": false,
+  "missing_info_prompt": null,
+  "is_clarification_needed": false
+}
+\`\`\`
+Considera la cronologia. Se un evento (es. ID 84) è stato appena discusso e l'utente vuole prenotare (es. "per 1"), popola "params.event_id": 84, "params.event_name_hint": "titolo evento se noto", e "params.numeroPosti": 1.
+Ricorda: Rispondi ESCLUSIVAMENTE in formato JSON.
     `.trim();
 
     const MAIN_ASSISTANT_SYSTEM_PROMPT = () => `
-Sei un assistente virtuale avanzato, empatico, proattivo, estremamente competente e con un'eccellente memoria contestuale per il sito "Eremo Frate Francesco".
-Data/Ora: ${new Date().toISOString()}. Utente: ${IS_USER_LOGGED_IN ? CURRENT_USER_EMAIL : 'Non loggato'}.
-Stato Prenotazione JS (aggiornato dal sistema): ${JSON.stringify(currentBookingState)}.
-Stato Cancellazione JS (aggiornato dal sistema): ${JSON.stringify(currentCancellationState)}.
+Sei un assistente virtuale avanzato per "Eremo Frate Francesco". Data e ora correnti: ${new Date().toISOString()}. Utente loggato: ${IS_USER_LOGGED_IN} (Email: ${CURRENT_USER_EMAIL || 'N/D'}). Stato prenotazione (se rilevante): ${JSON.stringify(currentBookingState)}.
+Il tuo scopo è ESEGUIRE AZIONI e fornire informazioni. Il sistema JavaScript (JS) aggiorna currentBookingState. Tu guidi l'utente e fai domande basate su currentBookingState e sulle informazioni mancanti identificate dal JS.
 
-**Principio Guida Fondamentale:** Il tuo obiettivo primario è fornire un'esperienza utente impeccabile, fluida, naturale e profondamente intelligente. Basati sugli stati JS forniti per comprendere il contesto attuale e la storia recente della conversazione. Formula le tue risposte e domande in modo autonomo e conversazionale, evitando rigidità. Anticipa le necessità dell'utente e guidalo con iniziativa. Se un'informazione è già nello stato JS (es. \`currentBookingState.eventTitle\`), USALA nelle tue risposte senza richiederla. **Devi generare UNA SOLA risposta completa per ogni turno.**
+INTERAZIONE CON DATI PHP (RUOLO "system"):
+- Se ricevi una lista di eventi (risultato di GET_EVENTS), presentala in modo chiaro e leggibile usando Markdown. Utilizza una lista numerata o puntata. Ogni evento deve essere su una nuova riga.
+  Formato suggerito per ogni evento:
+  \`- **Nome Evento** (ID: xxx) - Data: YYYY-MM-DD\`
+  Oppure:
+  \`1. **Nome Evento**
+     - ID: xxx
+     - Data: YYYY-MM-DD\`
+  Se ci sono molti eventi, puoi presentarne un numero limitato (es. i primi 5) e chiedere all'utente se desidera vederne altri o filtrare la ricerca.
+- Se l'utente chiede di un evento per nome e il JS ti passa una lista di corrispondenze, presenta la lista (usando la formattazione chiara sopra) e chiedi di specificare l'ID.
 
-<<<<<<< HEAD
-**Manuale Utente Ultra-Dettagliato (da usare per intent GET_USER_MANUAL o per rispondere a domande specifiche):**
-L'Eremo Frate Francesco è un luogo di spiritualità. Il sito web ti permette di:
-1.  **Esplorare Eventi:**
-    * **Come fare:** Chiedi "mostra eventi", "eventi di giugno", "dettagli evento 'Nome Evento Specifico'" o "dettagli evento ID 84". Puoi anche cercare per parole chiave come "ritiro spirituale sulla preghiera".
-    * **Cosa ottieni:** Ti fornirò una lista degli eventi futuri con titolo, data e ID. Se chiedi dettagli per un evento specifico (o se ne trovo solo uno per la tua ricerca), ti darò informazioni complete: titolo, data, orari (se disponibili come "Durata"), descrizione estesa, nome del relatore (con eventuale prefisso), associazione organizzatrice, numero di posti ancora disponibili e costo (o se è ad offerta libera).
-2.  **Prenotare Eventi (Richiede Login):**
-    * **Come iniziare:** Esprimi chiaramente la tua intenzione: "Voglio prenotare [nome evento o ID]", "iscrivimi a [nome evento]", o se abbiamo appena discusso un evento, puoi dire "sì, prenotiamo quello". Se non specifichi l'evento, te lo chiederò io. Se non sei loggato, ti informerò che è necessario l'accesso.
-    * **Processo Guidato (il tuo ruolo è guidare l'utente, il JS gestisce lo stato):**
-        a.  **Selezione Evento:** Confermerò l'evento. Se fornisci un nome e ci sono più risultati, ti presenterò una lista numerata con ID e ti chiederò di specificare l'ID. (JS aggiorna \`currentBookingState.eventId\`, \`eventTitle\`, \`postiGiaPrenotatiUtente\`, \`postiDisponibiliEvento\`).
-        b.  **Verifica Disponibilità e Limiti:** Basandoti su \`currentBookingState.postiGiaPrenotatiUtente\` e \`currentBookingState.postiDisponibiliEvento\`, informa l'utente. Limite: ${MAX_SEATS_PER_SINGLE_BOOKING_REQUEST} per richiesta, ${MAX_TOTAL_SEATS_PER_USER_PER_EVENT} totali per utente per evento. Se limite raggiunto (es. \`postiGiaPrenotatiUtente >= ${MAX_TOTAL_SEATS_PER_USER_PER_EVENT}\`), comunica: "Risulta che hai già prenotato ${currentBookingState.postiGiaPrenotatiUtente} posti per l'evento '${currentBookingState.eventTitle}', raggiungendo il limite massimo. Non è possibile aggiungere altri posti." e interrompi il flusso di prenotazione per questo evento.
-        c.  **Numero Partecipanti:** Se puoi ancora prenotare, chiedi: "Per quante persone desideri prenotare? ${currentBookingState.postiGiaPrenotatiUtente > 0 ? `Ne hai già ${currentBookingState.postiGiaPrenotatiUtente}. ` : ''}Puoi richiederne da 1 a [numero massimo calcolato dal JS, es. 3] in questa prenotazione." (JS aggiorna \`currentBookingState.numeroPosti\`).
-        d.  **Nomi Partecipanti:** Una volta ottenuto un numero valido di partecipanti (\`currentBookingState.numeroPosti\` è settato), chiedi: "Perfetto. Adesso avrei bisogno del NOME e COGNOME completo per ${currentBookingState.numeroPosti > 1 ? ('ciascuno dei ' + currentBookingState.numeroPosti + ' partecipanti') : 'il partecipante'}. Puoi dirmeli uno alla volta o tutti insieme, ad esempio: 'Mario Rossi, Anna Bianchi'." (JS aggiorna \`currentBookingState.partecipanti\`). Se l'utente fornisce solo un nome, o un nome incompleto, chiedi gentilmente di fornire sia nome che cognome.
-        e.  **Riepilogo e Conferma:** Quando tutti i dati necessari (evento, numero posti, e un nome e cognome valido per ogni partecipante) sono stati raccolti e validati dal JS (il JS internamente chiama \`validateBookingStateForConfirmation\`), TU presenterai un riepilogo chiaro e completo:
-            \`Perfetto! Riepilogo la tua richiesta di prenotazione:
-            - Evento: \${currentBookingState.eventTitle} (ID: \${currentBookingState.eventId})
-            - Numero Partecipanti: \${currentBookingState.numeroPosti}
-            - Partecipanti:
-                1. \${currentBookingState.partecipanti[0]}
-                2. \${currentBookingState.partecipanti[1]} (e così via, se presenti)
-            È tutto corretto? Posso procedere con la prenotazione?\`
-            (A questo punto, il sistema JS imposterà \`currentBookingState.summaryPresented = true\`).
-        f.  **Esito Prenotazione:** Dopo che l'utente conferma il riepilogo (es. "sì", "conferma"), il sistema JS eseguirà validazioni interne.
-            * **ATTENDI UN MESSAGGIO DI SISTEMA.** NON rispondere immediatamente "sto inviando".
-            * Se ricevi un messaggio di sistema che inizia con \`VALIDATION_FAILED_PRE_PHP: [dettagli dell'errore JS]\`, DEVI comunicare all'utente che la validazione interna è fallita e quali correzioni sono necessarie, basandoti sui [dettagli dell'errore JS]. Esempio: "Sembra esserci un problema con i dati forniti: [dettagli dell'errore JS]. Potresti per favore correggere e riprovare?"
-            * Se ricevi un messaggio di sistema che inizia con \`PHP_CALL_ATTEMPTING: /prenota_evento.php\`, ALLORA E SOLO ALLORA rispondi: "Ok, sto inviando la tua richiesta di prenotazione al sistema. Attendi un momento per la conferma..." o una frase simile che indichi attesa. Dopodiché, **NON DEVI ASSOLUTAMENTE INVENTARE UN RISULTATO, UN ID PRENOTAZIONE, O UN MESSAGGIO DI SUCCESSO.**
-            * **ATTENDI OBBLIGATORIAMENTE** un successivo messaggio di sistema (che inizierà con \`PHP_RESULT\` o \`PHP_CALL_ERROR\`) che conterrà l'esito effettivo. Questo messaggio di sistema è l'UNICA fonte di verità.
-                * Se il messaggio di sistema è \`PHP_RESULT from /prenota_evento.php: {"success":true, "message":"...", "idPrenotazione":123}\` (o simile con success:true e un idPrenotazione), ALLORA E SOLO ALLORA potrai comunicare: "Ottime notizie! Prenotazione per '${currentBookingState.eventTitle}' effettuata con successo per ${currentBookingState.numeroPosti} partecipante/i! L'ID della tua prenotazione è [ID_Prenotazione_dal_messaggio_system]." (Usa l'ID esatto fornito).
-                * Se il messaggio di sistema è \`PHP_RESULT from /prenota_evento.php: {"success":false, "message":"Posti esauriti"}\` (o altro errore di business con success:false), DEVI comunicare ESATTAMENTE quel messaggio di errore: "Purtroppo si è verificato un problema con la tua richiesta: [messaggio_dal_messaggio_system]."
-                * Se il messaggio di sistema è \`PHP_CALL_ERROR for /prenota_evento.php: [messaggio di errore tecnico]\`, DEVI comunicare che c'è stato un problema tecnico: "Spiacente, si è verificato un errore tecnico durante il tentativo di prenotazione. Dettagli: [messaggio di errore tecnico]. Per favore, riprova più tardi o contatta l'assistenza se il problema persiste."
-            * Se l'utente chiede aggiornamenti MENTRE sei in attesa del messaggio \`PHP_RESULT\` o \`PHP_CALL_ERROR\` (dopo aver detto "sto inviando..."), rispondi: "Sto ancora attendendo la risposta definitiva dal sistema di prenotazione. Appena avrò novità, te lo comunicherò immediatamente." NON fornire alcuna altra informazione o previsione.
-3.  **Visualizzare le Tue Prenotazioni (Richiede Login):**
-    * **Come fare:** Chiedi "le mie prenotazioni", "mostra i miei eventi prenotati", "a cosa sono iscritto?".
-    * **Cosa ottieni:** Se JS fornisce una lista di prenotazioni (tramite messaggio \`role: "system"\`), presentala in modo chiaro: \`Ecco le tue prenotazioni:\n1. Evento: [Nome Evento] (ID Prenotazione: [ID_Prenotazione]) - Data: [Data] - Posti: [NumPosti]\n2. ...\` Se non ci sono prenotazioni, dillo.
-4.  **Annullare una Prenotazione (Richiede Login):**
-    * **Come iniziare:** Di' "voglio annullare una prenotazione" o "cancella la prenotazione ID [numero ID]".
-    * **Processo Guidato:**
-        a.  **Identificazione ID:** Se non fornisci l'ID, chiedi: "Certo. Qual è l'ID della prenotazione che desideri annullare? Se non lo ricordi, posso mostrarti prima le tue prenotazioni attive." (JS imposta \`currentCancellationState.isActive = true\`).
-        b.  **Se Utente Non Ricorda ID:** Se l'utente dice "non ricordo" o "mostramele", l'intent JS sarà \`GET_USER_BOOKINGS\`. Dopo che JS ti ha fornito l'elenco delle sue prenotazioni (tramite messaggio "system"), e se \`currentCancellationState.isActive\` è ancora \`true\`, la tua prossima domanda *deve* essere: "Ecco le tue prenotazioni. Quale di queste (specifica l'ID) vuoi annullare?".
-        c.  **Conferma Annullamento:** Una volta che JS ha un ID prenotazione valido in \`currentCancellationState.bookingIdToCancel\`, chiedi conferma esplicita: "Sei sicuro di voler annullare la prenotazione con ID ${currentCancellationState.bookingIdToCancel}? ${currentCancellationState.bookingDetailsToCancel ? `Si tratta dell'evento '${currentCancellationState.bookingDetailsToCancel.eventName}'.` : ''}". (JS imposterà \`currentCancellationState.summaryPresented = true\`).
-        d.  **Esito Annullamento:** Dopo che l'utente conferma, il sistema JS tenterà di chiamare lo script PHP \`api/api_cancel_booking.php\`.
-            * **ATTENDI UN MESSAGGIO DI SISTEMA.** NON rispondere immediatamente "sto inviando".
-            * Se ricevi un messaggio di sistema che inizia con \`PHP_CALL_ATTEMPTING: api/api_cancel_booking.php\`, ALLORA E SOLO ALLORA rispondi: "Ok, sto inviando la tua richiesta di annullamento al sistema. Attendi un momento per la conferma..." o una frase simile.
-            * **NON DEVI ASSOLUTAMENTE INVENTARE UN RISULTATO.**
-            * **ATTENDI OBBLIGATORIAMENTE** un successivo messaggio di sistema (\`PHP_RESULT\` o \`PHP_CALL_ERROR\`) con l'esito.
-                * Se il messaggio di sistema contiene \`"success": true\`, ALLORA E SOLO ALLORA comunica: "L'annullamento della prenotazione ID ${currentCancellationState.bookingIdToCancel} è stato effettuato con successo."
-                * Se il messaggio di sistema contiene \`"success": false\` e un \`"message"\`, DEVI comunicare ESATTAMENTE quell'errore.
-                * Se il messaggio di sistema indica un errore tecnico, DEVI comunicarlo.
-            * Se l'utente chiede aggiornamenti MENTRE sei in attesa, rispondi: "Sto ancora attendendo la risposta definitiva dal sistema per l'annullamento."
-5.  **Gestire il Profilo Utente (Richiede Login):**
-    * **Come fare:** Chiedi "mio profilo", "i miei dati" o "area personale".
-    * **Cosa puoi fare (sul sito):** L'Area Personale del sito ti permette di aggiornare il tuo nome, cognome, scegliere un'icona profilo e cambiare la password. Io posso mostrarti le informazioni attuali del tuo profilo (nome, email) se JS me le fornisce, ma per le modifiche dovrai visitare la pagina apposita sul sito.
-6.  **Login e Registrazione:**
-    * **Come fare:** Se non sei loggato e provi a fare un'azione che richiede l'accesso, te lo farò notare. Per accedere o registrarti, cerca il pulsante "Accedi" o l'icona utente nel menu principale del sito. Da lì, potrai inserire email e password se hai già un account, oppure seguire il link per crearne uno nuovo.
-    * **Assistenza:** Se chiedi "come faccio a fare login?", "voglio registrarmi", o "ho dimenticato la password", ti spiegherò come usare queste funzionalità direttamente sul sito.
-=======
 PROCESSO DI PRENOTAZIONE (Requires_login: true):
 1.  LOGIN: L'utente deve essere loggato. Se non lo è, informalo e fermati. Email (${CURRENT_USER_EMAIL || 'Nessun utente loggato'}) usata automaticamente.
 2.  FASE 1: Identificazione Evento e Controllo Limiti (JS popola currentBookingState.eventId, currentBookingState.eventTitle, currentBookingState.postiGiaPrenotatiUtente)
     - Se currentBookingState.eventId NON è noto: "Certamente! A quale evento sei interessato/a? Se hai un nome o un ID, forniscimelo."
-    - Se utente fornisce nome evento e JS ti passa lista eventi: presenta lista e chiedi ID.
+    - Se utente fornisce nome evento e JS ti passa lista eventi: presenta lista (formattata chiaramente) e chiedi ID.
     - Quando JS ha eventId e eventTitle, E HA VERIFICATO i posti già prenotati:
         - Se currentBookingState.postiGiaPrenotatiUtente >= ${MAX_TOTAL_SEATS_PER_USER_PER_EVENT}: Informa l'utente: "Ho verificato e risulta che hai già prenotato ${currentBookingState.postiGiaPrenotatiUtente} posti per l'evento '${currentBookingState.eventTitle}', raggiungendo il limite massimo di ${MAX_TOTAL_SEATS_PER_USER_PER_EVENT}. Non è possibile aggiungere altri posti." Interrompi il flusso di prenotazione per questo evento.
         - Altrimenti (se può ancora prenotare): "Ok, procediamo con la prenotazione per l'evento '${currentBookingState.eventTitle}' (ID: ${currentBookingState.eventId})." Poi chiedi numero partecipanti.
@@ -235,20 +154,13 @@ PROCESSO DI PRENOTAZIONE (Requires_login: true):
       È tutto corretto? Posso procedere con la prenotazione?\`
     - Solo DOPO che l'utente conferma, l'intent analysis dovrebbe dare CONFIRM_BOOKING_DETAILS. Il JS chiamerà 'prenota_evento.php'.
     - Comunica l'esito (successo/fallimento) da PHP. Se fallisce con messaggio specifico (es. "Limite massimo..."), riportalo. Se JS segnala dati mancanti PRIMA di chiamare PHP, riformula la richiesta.
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
 
-**Interazione con Dati PHP (Ruolo "system" - per tua informazione, non da mostrare all'utente):**
-- Quando JS ti fornisce dati da PHP (es. lista eventi, dettagli prenotazione, esito operazione), questi verranno aggiunti alla cronologia chat con \`role: "system"\` e un prefisso chiaro (es. \`PHP_RESULT from...\`, \`PHP_CALL_ERROR for...\`, \`VALIDATION_FAILED_PRE_PHP: ...\`, \`PHP_CALL_ATTEMPTING: ...\`). Tu devi usare queste informazioni per formulare la tua risposta successiva all'utente. **NON dare MAI per scontato l'esito di un'operazione finché non ricevi il messaggio di sistema (\`role: "system"\`) con il risultato esplicito.**
-
-**Stile Conversazionale e Gestione Errori:**
--   **Empatia e Proattività:** Se l'utente sembra confuso, bloccato, o se un flusso si interrompe, offri aiuto o alternative chiare.
--   **Chiarezza Assoluta:** Riformula le informazioni importanti per assicurarti che l'utente abbia capito, specialmente prima di una conferma.
--   **Flessibilità Contestuale:** Se l'utente cambia idea o fornisce informazioni in un ordine inaspettato, cerca di adattarti.
--   **Evita "Non ho capito" Generico:** Se l'intent non è chiaro, fai una domanda specifica per chiarire.
-
-Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grassetto con \`**testo**\`) per migliorare la leggibilità.
+ISTRUZIONI GENERALI:
+- PRIORITÀ: Esegui azione o fornisci info. Se mancano dati (controlla currentBookingState), chiedili specificamente.
+- CHIAREZZA: Sii esplicito su ID e Titolo evento quando noti.
+- SALUTI E CONVERSAZIONE GENERICA: Se l'intent è GENERAL_QUERY (es. l'utente dice "ciao"), rispondi in modo amichevole e breve, ad esempio "Ciao! Come posso aiutarti oggi con le informazioni sull'Eremo Frate Francesco o con le prenotazioni?". Non limitarti a dire che non puoi assistere per semplici saluti.
+- Se una domanda specifica esula dalle tue capacità (informazioni non pertinenti al sito Eremo Frate Francesco o alle sue funzionalità), allora indica gentilmente che non puoi assistere su quell'argomento specifico. Rispondi in italiano.
 `.trim();
-
 
     function _updateInitialAssistantMessageUI(assistantMessageContent) {
         while (aiChatMessagesContainerEl.firstChild) {
@@ -264,7 +176,7 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
         } else if (CURRENT_USER_EMAIL && typeof CURRENT_USER_EMAIL === 'string') {
             userNamePart = `, ${CURRENT_USER_EMAIL.split('@')[0]}`;
         }
-        const assistantMessageContent = `Ciao! Sono l'assistente virtuale dell'Eremo${userNamePart}. Come posso aiutarti oggi riguardo il sito? Posso aiutarti a trovare eventi, prenotare, visualizzare o annullare le tue prenotazioni. Chiedimi pure "come si usa il sito" per un riepilogo.`;
+        const assistantMessageContent = `Ciao! Sono l'assistente virtuale dell'Eremo${userNamePart}. Come posso aiutarti oggi riguardo il sito?`;
         const systemMessageContent = `Data e ora correnti: ${new Date().toISOString()}${(CURRENT_USER_EMAIL ? `. Utente loggato: ${CURRENT_USER_EMAIL}` : ". Nessun utente loggato.")}`;
         chatHistoryForAssistant = [
             { role: "system", content: systemMessageContent },
@@ -272,7 +184,6 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
         ];
         _updateInitialAssistantMessageUI(assistantMessageContent);
         resetBookingState();
-        resetCancellationState();
     }
 
     function simpleXorDecryptClientSide(base64String, key) {
@@ -284,7 +195,7 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
             }
             return outText;
         } catch (e) {
-            console.error("AssistenteAI v10: Fallimento decifratura API key:", e);
+            console.error("AssistenteAI: Fallimento decifratura API key:", e);
             return null;
         }
     }
@@ -302,7 +213,7 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                 const decryptedKey = simpleXorDecryptClientSide(obfuscatedKeyField, decryptionKeyField);
                 if (decryptedKey) {
                     GROQ_API_KEY_FOR_ASSISTANT = decryptedKey;
-                    console.log("AssistenteAI v10: Chiave API Groq per assistente pronta.");
+                    console.log("AssistenteAI: Chiave API Groq per assistente pronta.");
                     if (aiAssistantFabEl) aiAssistantFabEl.style.display = 'flex';
                     return true;
                 } else {
@@ -312,7 +223,7 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                 throw new Error(config.message || "Dati API key per assistente mancanti o corrotti dal server.");
             }
         } catch (error) {
-            console.error('AssistenteAI v10: Errore recupero/preparazione API key Groq:', error);
+            console.error('AssistenteAI: Errore recupero/preparazione API key Groq:', error);
             addMessageToChatUI('ai', "Errore: l'assistente AI non è al momento disponibile (configurazione API fallita).");
             if (aiAssistantFabEl) aiAssistantFabEl.style.display = 'none';
             GROQ_API_KEY_FOR_ASSISTANT = "CHIAVE_NON_CARICATA_O_ERRATA";
@@ -328,11 +239,7 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
             if (chatHistoryForAssistant.length <= 2) initializeChatHistory();
             if (aiChatInputEl) aiChatInputEl.focus();
         } else {
-<<<<<<< HEAD
-            // Non resettare gli stati qui, potrebbero essere attivi flussi che l'utente vuole riprendere
-=======
-            resetBookingState(); // Resetta lo stato quando la chat viene chiusa
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
+            resetBookingState();
         }
         document.body.style.overflow = isActive ? 'hidden' : '';
     }
@@ -340,33 +247,9 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
     function addMessageToChatUI(sender, text, type = 'text') {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
-<<<<<<< HEAD
-        if (sender === 'system') messageDiv.style.display = 'none'; // I messaggi di sistema non sono visibili all'utente
-=======
-        if (sender === 'system') messageDiv.style.display = 'none'; // I messaggi di sistema non sono visibili
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
+        if (sender === 'system') messageDiv.style.display = 'none';
 
-        if (type === 'html') {
-            let processedText = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/^- (.*)/gm, '<li>$1</li>')
-                .replace(/^(\d+)\. (.*)/gm, '<li>$2</li>');
-
-            if (processedText.includes('<li>')) {
-                const isUnordered = /<ul>|<\/ul>|<li>/.test(processedText) && !/<ol>|<\/ol>/.test(processedText);
-                const listTag = isUnordered ? 'ul' : 'ol';
-                if (!processedText.trim().startsWith(`<${listTag}>`)) {
-                    processedText = `<${listTag}>` + processedText + `</${listTag}>`;
-                }
-                processedText = processedText.replace(/<br>\s*(<li>)/gi, '$1');
-                processedText = processedText.replace(/(<\/li>)\s*<br>/gi, '$1');
-            }
-            processedText = processedText.replace(/\n(?!(<\/?(ul|ol|li)>))/g, '<br>');
-            processedText = processedText.replace(/(<\/(ul|ol|li)>)\n/g, '$1');
-
-            messageDiv.innerHTML = processedText;
-        }
+        if (type === 'html') messageDiv.innerHTML = text; // Use innerHTML for Markdown formatted text
         else messageDiv.appendChild(document.createTextNode(text));
 
         aiChatMessagesContainerEl.appendChild(messageDiv);
@@ -374,70 +257,41 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
         return messageDiv;
     }
 
-    async function callPhpScript(scriptPath, params = {}, method = 'GET', contentType = 'application/x-www-form-urlencoded') {
+    async function callPhpScript(scriptPath, params = {}, method = 'GET') {
         let url = scriptPath;
-        // Normalizzazione URL
-        if (scriptPath.startsWith('api/')) { /* Path già corretto */ }
-        else if (scriptPath.startsWith('/api/')) { url = scriptPath.substring(1); }
-        else if (scriptPath.startsWith('/')) { /* Path corretto */ }
-        else { url = '/' + scriptPath; }
-
         const options = { method };
 
-        // Aggiunta automatica email utente per certi script se loggato
-        if (CURRENT_USER_EMAIL && (url.includes('/get_events.php') || url.includes('/get_event_details.php') || url.includes('api/api_get_user_bookings.php'))) {
-            if (!params.user_email_for_script && !params.email) {
-                if (url.includes('api/api_get_user_bookings.php')) {
-                    params.email = CURRENT_USER_EMAIL;
-                } else {
-                    params.user_email_for_script = CURRENT_USER_EMAIL;
-                }
-            }
+        if (CURRENT_USER_EMAIL && (scriptPath.includes('get_events.php') || scriptPath.includes('get_event_details.php'))) {
+            if (!params.user_email_for_script) params.user_email_for_script = CURRENT_USER_EMAIL;
         }
 
         if (method === 'GET') {
             if (Object.keys(params).length > 0) url += '?' + new URLSearchParams(params).toString();
         } else if (method === 'POST') {
-            if (contentType === 'application/json') {
-                options.headers = { 'Content-Type': 'application/json' };
-                options.body = JSON.stringify(params);
-            } else {
-                const formData = new FormData();
-                console.log("AssistenteAI v10 (callPhpScript): Populating FormData from params:", JSON.parse(JSON.stringify(params))); // Log dei parametri sorgente
-                for (const key in params) {
-                    if (params.hasOwnProperty(key)) {
-                        if (Array.isArray(params[key])) {
-                            params[key].forEach((value, index) => {
-                                formData.append(key + '[]', value);
-                                console.log(`  FormData append (array): ${key}[] = "${value}"`);
-                            });
-                        } else {
-                            formData.append(key, params[key]);
-                            console.log(`  FormData append (scalar): ${key} = "${params[key]}"`);
-                        }
-                    }
-                }
-                options.body = formData;
-                console.log("AssistenteAI v10 (callPhpScript): FormData entries being sent:");
-                for (let [fdKey, fdValue] of formData.entries()) {
-                    console.log(`    ${fdKey}: ${fdValue}`);
+            const formData = new FormData();
+            for (const key in params) {
+                if (Array.isArray(params[key])) {
+                    params[key].forEach(value => formData.append(key + '[]', value));
+                } else {
+                    formData.append(key, params[key]);
                 }
             }
+            options.body = formData;
         }
-
+        console.log(`Calling PHP: ${method} ${url}`, method === 'POST' ? Object.fromEntries(options.body instanceof FormData ? options.body.entries() : []) : '');
+        const thinkingPhpMessage = addMessageToChatUI('ai', `Sto contattando i nostri sistemi per ${scriptPath.split('/').pop()}...`);
         try {
             const response = await fetch(url, options);
+            if (thinkingPhpMessage) thinkingPhpMessage.remove();
             if (!response.ok) {
-                let errorText = `Errore HTTP ${response.status} (${response.statusText}) dallo script ${url}`;
-                try {
-                    const errorData = await response.json();
-                    errorText = errorData.message || errorData.error || `Errore ${response.status} - ${errorData.detail || response.statusText}`;
-                } catch (e) { /* Il corpo dell'errore non era JSON */ }
+                let errorText = `Errore HTTP ${response.status} dallo script ${scriptPath}`;
+                try { const errorData = await response.json(); errorText = errorData.message || errorData.error || errorText; } catch (e) { /*ignore*/ }
                 throw new Error(errorText);
             }
             return await response.json();
         } catch (error) {
-            console.error(`AssistenteAI v10: Errore chiamata a ${url}:`, error);
+            if (thinkingPhpMessage) thinkingPhpMessage.remove();
+            console.error(`Errore chiamata a ${scriptPath}:`, error);
             throw error;
         }
     }
@@ -476,18 +330,16 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
     function validateBookingStateForConfirmation(state) {
         if (!state.isActive) return { isValid: false, missingInfo: "Il flusso di prenotazione non è attivo." };
         if (!state.eventId || !state.eventTitle) return { isValid: false, missingInfo: "L'evento non è stato specificato correttamente (manca ID o Titolo)." };
-        if (isNaN(parseInt(state.eventId, 10))) return { isValid: false, missingInfo: "ID Evento non è un numero valido."};
 
         const postiGiaPrenotati = state.postiGiaPrenotatiUtente || 0;
         const postiAncoraPrenotabiliPerUtente = MAX_TOTAL_SEATS_PER_USER_PER_EVENT - postiGiaPrenotati;
         const maxConsentitoPerQuestaRichiesta = Math.min(MAX_SEATS_PER_SINGLE_BOOKING_REQUEST, postiAncoraPrenotabiliPerUtente);
 
-        const numeroPostiInt = parseInt(state.numeroPosti, 10);
-        if (isNaN(numeroPostiInt) || numeroPostiInt < 1 || numeroPostiInt > maxConsentitoPerQuestaRichiesta) {
-            return { isValid: false, missingInfo: `Il numero di posti richiesti (${state.numeroPosti || 'N/D'}) non è valido. Puoi richiedere da 1 a ${maxConsentitoPerQuestaRichiesta} posti per questa prenotazione.` };
+        if (!state.numeroPosti || state.numeroPosti < 1 || state.numeroPosti > maxConsentitoPerQuestaRichiesta) {
+            return { isValid: false, missingInfo: `Il numero di posti richiesti (${state.numeroPosti || 'N/D'}) non è valido. Puoi richiedere da 1 a ${maxConsentitoPerQuestaRichiesta} posti per questa prenotazione (limite ${MAX_SEATS_PER_SINGLE_BOOKING_REQUEST} per richiesta, ${postiAncoraPrenotabiliPerUtente} ancora disponibili per te per questo evento).` };
         }
         if (!state.partecipanti || !Array.isArray(state.partecipanti)) return { isValid: false, missingInfo: "L'elenco dei partecipanti non è valido."};
-        if (state.partecipanti.length !== numeroPostiInt) return { isValid: false, missingInfo: `Sono richiesti NOME e COGNOME per ${numeroPostiInt} partecipante/i, ma ne sono stati forniti ${state.partecipanti.length}.` };
+        if (state.partecipanti.length !== state.numeroPosti) return { isValid: false, missingInfo: `Sono richiesti NOME e COGNOME per ${state.numeroPosti} partecipante/i, ma ne sono stati forniti ${state.partecipanti.length}.` };
 
         for (let i = 0; i < state.partecipanti.length; i++) {
             const partecipante = state.partecipanti[i];
@@ -499,16 +351,22 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
     }
 
     async function fetchEventDetailsAndUserBookingStatus(eventId, userEmail) {
-        if (!eventId || !userEmail) {
-            console.warn("AssistenteAI v10: fetchEventDetailsAndUserBookingStatus: eventId o userEmail mancanti.");
-            return null;
+        if (!eventId) {
+            console.warn("fetchEventDetailsAndUserBookingStatus: eventId mancante.");
+            currentBookingState.eventTitle = `ID Evento non specificato (o errore interno).`;
+            currentBookingState.postiGiaPrenotatiUtente = 0;
+            currentBookingState.postiDisponibiliEvento = 0;
+            return false;
+        }
+        if (!userEmail) {
+            console.warn("fetchEventDetailsAndUserBookingStatus: userEmail mancante (utente non loggato?).");
+            currentBookingState.eventTitle = `Accesso richiesto per dettagli evento ID ${eventId}`;
+            currentBookingState.postiGiaPrenotatiUtente = 0;
+            currentBookingState.postiDisponibiliEvento = 0;
+            return false;
         }
         try {
-<<<<<<< HEAD
-            const eventDetailsResult = await callPhpScript("/get_event_details.php", {
-=======
             const eventDetailsResult = await callPhpScript("get_event_details.php", {
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
                 id: eventId,
                 user_email_for_script: userEmail
             });
@@ -517,31 +375,21 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                 currentBookingState.eventTitle = eventDetailsResult.data.details.Titolo;
                 currentBookingState.postiGiaPrenotatiUtente = parseInt(eventDetailsResult.data.details.posti_gia_prenotati_utente, 10) || 0;
                 currentBookingState.postiDisponibiliEvento = parseInt(eventDetailsResult.data.details.PostiDisponibili, 10);
-<<<<<<< HEAD
-                console.log("AssistenteAI v10: Dettagli evento e stato prenotazione utente recuperati:", currentBookingState);
-                chatHistoryForAssistant.push({ role: "system", content: `Stato prenotazione utente per evento ${currentBookingState.eventTitle} (ID: ${currentBookingState.eventId}): posti già prenotati = ${currentBookingState.postiGiaPrenotatiUtente}. Posti disponibili evento: ${currentBookingState.postiDisponibiliEvento}.`});
-                return true;
-            } else {
-                console.warn("AssistenteAI v10: Dettagli evento non trovati o formato inatteso (get_event_details.php) per eventId:", eventId, eventDetailsResult);
-                const eventsResult = await callPhpScript("/get_events.php", {
-=======
                 console.log("Dettagli evento e stato prenotazione utente recuperati:", currentBookingState);
                 return true;
             } else {
                 console.warn("Dettagli evento non trovati o formato risposta inatteso da get_event_details.php per eventId:", eventId, eventDetailsResult);
                 const eventsResult = await callPhpScript("get_events.php", {
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
                     event_id_specific: eventId,
                     user_email_for_script: userEmail
                 });
-                if (eventsResult.success && eventsResult.data && Array.isArray(eventsResult.data) && eventsResult.data.length > 0) {
+                if (eventsResult.success && eventsResult.data && eventsResult.data.length > 0) {
                     const eventInfo = eventsResult.data.find(e => e.idevento == eventId);
                     if (eventInfo) {
                         currentBookingState.eventTitle = eventInfo.titolo;
                         currentBookingState.postiGiaPrenotatiUtente = parseInt(eventInfo.posti_gia_prenotati_utente, 10) || 0;
                         currentBookingState.postiDisponibiliEvento = parseInt(eventInfo.posti_disponibili, 10);
-                        console.log("AssistenteAI v10: Dettagli evento e stato prenotazione utente recuperati (fallback get_events):", currentBookingState);
-                        chatHistoryForAssistant.push({ role: "system", content: `Stato prenotazione utente per evento ${currentBookingState.eventTitle} (ID: ${currentBookingState.eventId}): posti già prenotati = ${currentBookingState.postiGiaPrenotatiUtente}. Posti disponibili evento: ${currentBookingState.postiDisponibiliEvento}.`});
+                        console.log("Dettagli evento e stato prenotazione utente recuperati (fallback get_events):", currentBookingState);
                         return true;
                     }
                 }
@@ -551,11 +399,7 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                 return false;
             }
         } catch (e) {
-<<<<<<< HEAD
-            console.error("AssistenteAI v10: Errore in fetchEventDetailsAndUserBookingStatus:", e);
-=======
             console.error("Errore in fetchEventDetailsAndUserBookingStatus:", e);
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
             currentBookingState.eventTitle = currentBookingState.eventTitle || `Evento ID ${eventId} (Errore recupero dettagli)`;
             currentBookingState.postiGiaPrenotatiUtente = 0;
             currentBookingState.postiDisponibiliEvento = 0;
@@ -566,7 +410,6 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
 
     async function handleSendMessageToAI() {
         checkUserLoginStatus();
-        console.log("AssistenteAI v10: handleSendMessageToAI - CURRENT_USER_EMAIL:", CURRENT_USER_EMAIL, "IS_USER_LOGGED_IN:", IS_USER_LOGGED_IN);
         if (!GROQ_API_KEY_FOR_ASSISTANT || GROQ_API_KEY_FOR_ASSISTANT === "CHIAVE_NON_CARICATA_O_ERRATA") {
             const keyReady = await fetchAndPrepareAssistantApiKey();
             if (!keyReady) { addMessageToChatUI('ai', "L'assistente AI non è correttamente configurato. Impossibile procedere."); return; }
@@ -579,21 +422,9 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
         chatHistoryForAssistant.push({ role: "user", content: userInput });
         aiChatInputEl.value = ''; aiChatInputEl.disabled = true; aiChatSendBtnEl.disabled = true; aiChatInputEl.style.height = 'auto';
 
-        let thinkingMessageDiv = null;
+        const thinkingMessageDiv = addMessageToChatUI('ai', "Sto elaborando la tua richiesta...");
 
         try {
-<<<<<<< HEAD
-            const intentHistory = chatHistoryForAssistant.slice(-10);
-            let intentResponseJson = await getGroqCompletion(intentHistory, INTENT_ANALYSIS_SYSTEM_PROMPT(), 0.1, 900);
-            let parsedIntent;
-            try {
-                parsedIntent = JSON.parse(intentResponseJson);
-                console.log("AssistenteAI v10: Intent Analysis:", parsedIntent);
-                chatHistoryForAssistant.push({ role: "system", content: `Intent analysis result: ${JSON.stringify(parsedIntent)}` });
-            } catch (e) {
-                console.error("AssistenteAI v10: Errore parsing JSON dell'intento:", e, "\nRisposta LLM:\n", intentResponseJson);
-                parsedIntent = { intent: "GENERAL_QUERY", php_script: "none", params: {}, requires_login: false, missing_info_prompt: null, is_clarification_needed: true };
-=======
             const intentHistory = chatHistoryForAssistant.slice(-6);
             let intentResponseJson = await getGroqCompletion(intentHistory, INTENT_ANALYSIS_SYSTEM_PROMPT(), 0.2, 800);
             let parsedIntent;
@@ -606,181 +437,52 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                 chatHistoryForAssistant.push({ role: "system", content: `Intent analysis result: ${JSON.stringify(parsedIntent)}` });
             } catch (e) {
                 console.error("Errore parsing JSON dell'intento:", e, "\nRisposta LLM:\n", intentResponseJson);
-                parsedIntent = { intent: "GENERAL_QUERY", php_script: "none", params: {}, requires_login: false, missing_info_prompt: "Non ho compreso bene la tua richiesta. Puoi riformularla in modo più chiaro?", is_clarification_needed: true };
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
+                parsedIntent = {
+                    intent: "GENERAL_QUERY", params: {}, php_script: "none", requires_login: false,
+                    missing_info_prompt: "Non ho compreso bene la tua richiesta. Puoi riformularla in modo più chiaro?",
+                    is_clarification_needed: true
+                };
                 chatHistoryForAssistant.push({ role: "system", content: `Intent analysis fallback (parsing error): ${JSON.stringify(parsedIntent)}` });
             }
 
-            if (parsedIntent.requires_login && !IS_USER_LOGGED_IN) {
-<<<<<<< HEAD
-                const loginMessage = "Per questa azione è necessario l'accesso. Puoi accedere o registrarti dal menu principale del sito. Vuoi che ti spieghi come fare o preferisci provare un'altra azione che non richiede l'accesso?";
-=======
+            const bookingIntents = ["START_BOOKING_FLOW", "COLLECT_BOOKING_DETAILS", "CONFIRM_BOOKING_DETAILS"];
+            if (bookingIntents.includes(parsedIntent.intent) && !IS_USER_LOGGED_IN) {
                 if (thinkingMessageDiv) thinkingMessageDiv.remove();
-                const loginMessage = "Per questa azione è necessario effettuare l'accesso. Puoi accedere o registrarti tramite il menu del sito.";
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
+                const loginMessage = "Per procedere con una prenotazione, è necessario effettuare l'accesso. Puoi accedere o registrarti tramite il menu del sito.";
                 addMessageToChatUI('ai', loginMessage);
                 chatHistoryForAssistant.push({ role: "assistant", content: loginMessage });
-                finalizeUIAfterResponse();
-                return;
+                resetBookingState();
+                finalizeUIAfterResponse(); return;
             }
 
-            // --- GESTIONE STATI E LOGICA JS ---
+            if (parsedIntent.requires_login && !IS_USER_LOGGED_IN) {
+                if (thinkingMessageDiv) thinkingMessageDiv.remove();
+                const loginMessage = "Per questa azione è necessario effettuare l'accesso. Puoi accedere o registrarti tramite il menu del sito.";
+                addMessageToChatUI('ai', loginMessage);
+                chatHistoryForAssistant.push({ role: "assistant", content: loginMessage });
+                resetBookingState();
+                finalizeUIAfterResponse(); return;
+            }
+
+
             if (parsedIntent.intent === "START_BOOKING_FLOW") {
-                if (!currentBookingState.isActive || (parsedIntent.params?.event_id && parseInt(parsedIntent.params.event_id, 10) !== currentBookingState.eventId) || (parsedIntent.params?.event_name_hint && parsedIntent.params.event_name_hint !== currentBookingState.eventNameHint)) {
+                if (!currentBookingState.isActive || (parsedIntent.params?.event_id && parseInt(parsedIntent.params.event_id, 10) !== currentBookingState.eventId) || parsedIntent.params?.event_name_hint) {
                     resetBookingState();
                 }
                 currentBookingState.isActive = true;
-                currentBookingState.summaryPresented = false;
                 if (parsedIntent.params?.event_id) currentBookingState.eventId = parseInt(parsedIntent.params.event_id, 10);
                 if (parsedIntent.params?.event_name_hint) currentBookingState.eventNameHint = parsedIntent.params.event_name_hint;
-<<<<<<< HEAD
-                if (parsedIntent.params?.numeroPosti) {
-                    currentBookingState.numeroPosti = parseInt(parsedIntent.params.numeroPosti, 10);
-                    currentBookingState.partecipanti = [];
-                }
-            } else if (parsedIntent.intent === "COLLECT_BOOKING_DETAILS" && currentBookingState.isActive) {
-                currentBookingState.summaryPresented = false;
-                if (parsedIntent.params?.event_id && (!currentBookingState.eventId || parseInt(parsedIntent.params.event_id, 10) !== currentBookingState.eventId)) {
-                    currentBookingState.eventId = parseInt(parsedIntent.params.event_id, 10); currentBookingState.eventTitle = null; currentBookingState.postiGiaPrenotatiUtente = undefined;
-                }
-                if (parsedIntent.params?.event_name_hint && !currentBookingState.eventId) currentBookingState.eventNameHint = parsedIntent.params.event_name_hint;
-
-                if (parsedIntent.params?.numeroPosti) {
-                    const nuovoNumeroPosti = parseInt(parsedIntent.params.numeroPosti, 10);
-                    if (currentBookingState.numeroPosti !== nuovoNumeroPosti) {
-                        currentBookingState.numeroPosti = nuovoNumeroPosti;
-                        currentBookingState.partecipanti = [];
-                    }
-                }
-                if (parsedIntent.params?.partecipanti_nomi_cognomi && Array.isArray(parsedIntent.params.partecipanti_nomi_cognomi) && parsedIntent.params.partecipanti_nomi_cognomi.length > 0) {
-                    const newNames = parsedIntent.params.partecipanti_nomi_cognomi.map(name => name.trim()).filter(name => name && name.split(' ').filter(Boolean).length >= 1);
-                    if (newNames.length > 0 && currentBookingState.numeroPosti) {
-                        const combinedNames = [...new Set([...currentBookingState.partecipanti, ...newNames])];
-                        currentBookingState.partecipanti = combinedNames.slice(0, currentBookingState.numeroPosti);
-                        console.log("AssistenteAI v10: Nomi partecipanti aggiornati:", currentBookingState.partecipanti);
-                    }
-                }
-            } else if (parsedIntent.intent === "CONFIRM_BOOKING_DETAILS") {
-                if (!currentBookingState.summaryPresented) {
-                    parsedIntent.intent = "COLLECT_BOOKING_DETAILS";
-                    parsedIntent.php_script = "none";
-                    chatHistoryForAssistant.push({ role: "system", content: "AI_ERROR: CONFIRM_BOOKING_DETAILS ricevuto ma currentBookingState.summaryPresented era false. L'AI deve prima presentare il riepilogo completo e poi chiedere conferma." });
-                }
-            } else if (parsedIntent.intent === "START_CANCEL_BOOKING") {
-                resetCancellationState();
-                currentCancellationState.isActive = true;
-                currentCancellationState.summaryPresented = false;
-                if (parsedIntent.params?.booking_id) {
-                    currentCancellationState.bookingIdToCancel = parseInt(parsedIntent.params.booking_id, 10);
-                }
-            } else if (parsedIntent.intent === "COLLECT_CANCEL_BOOKING_ID" && currentCancellationState.isActive) {
-                currentCancellationState.summaryPresented = false;
-                if (parsedIntent.params?.booking_id) {
-                    currentCancellationState.bookingIdToCancel = parseInt(parsedIntent.params.booking_id, 10);
-                }
-            } else if (parsedIntent.intent === "CONFIRM_CANCEL_BOOKING") {
-                if (!currentCancellationState.summaryPresented) {
-                    parsedIntent.intent = "COLLECT_CANCEL_BOOKING_ID";
-                    parsedIntent.php_script = "none";
-                    chatHistoryForAssistant.push({ role: "system", content: "AI_ERROR: CONFIRM_CANCEL_BOOKING ricevuto ma currentCancellationState.summaryPresented era false. L'AI deve prima chiedere conferma per l'ID specifico." });
-                }
-            }
-
-            // --- PREPARAZIONE PER CHIAMATA PHP ---
-            let phpScriptToCall = parsedIntent.php_script;
-            let scriptParams = { ...parsedIntent.params };
-
-            if (parsedIntent.intent === "CONFIRM_BOOKING_DETAILS" && currentBookingState.summaryPresented) {
-                const validation = validateBookingStateForConfirmation(currentBookingState);
-                let canProceedToPhp = validation.isValid;
-                let problemDetails = validation.missingInfo || "";
-
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!IS_USER_LOGGED_IN || !CURRENT_USER_EMAIL || !emailRegex.test(CURRENT_USER_EMAIL)) {
-                    canProceedToPhp = false;
-                    problemDetails += (problemDetails ? " " : "") + `L'email dell'utente (${CURRENT_USER_EMAIL || "N/D"}) non sembra valida o l'utente non è loggato.`;
-                    console.error("AssistenteAI v10 (CONFIRM_BOOKING): Validazione email/login fallita. Email:", CURRENT_USER_EMAIL, "Logged in:", IS_USER_LOGGED_IN);
-                }
-
-                if (canProceedToPhp) {
-                    phpScriptToCall = "/prenota_evento.php";
-                    scriptParams = {
-                        eventId: parseInt(currentBookingState.eventId, 10),
-                        numeroPosti: parseInt(currentBookingState.numeroPosti, 10),
-                        contatto: CURRENT_USER_EMAIL, // Già trimmata in checkUserLoginStatus
-                        partecipanti_nomi: [],
-                        partecipanti_cognomi: []
-                    };
-
-                    for (const fullName of currentBookingState.partecipanti) {
-                        const parts = fullName.trim().split(/\s+/);
-                        const cognome = parts.length > 1 ? parts.pop().trim() : ""; // Ultima parola come cognome
-                        const nome = parts.join(" ").trim(); // Il resto come nome
-
-                        if (nome && cognome) {
-                            scriptParams.partecipanti_nomi.push(nome);
-                            scriptParams.partecipanti_cognomi.push(cognome);
-                        } else {
-                            problemDetails += (problemDetails ? " " : "") + ` Partecipante "${fullName}" non ha prodotto un nome e cognome validi.`;
-                            canProceedToPhp = false;
-                            break;
-                        }
-                    }
-
-                    if (canProceedToPhp && (scriptParams.partecipanti_nomi.length !== scriptParams.numeroPosti || scriptParams.partecipanti_cognomi.length !== scriptParams.numeroPosti)) {
-                        canProceedToPhp = false;
-                        problemDetails += (problemDetails ? " " : "") + " Il numero finale di nomi/cognomi processati non corrisponde al numero di posti.";
-                        console.error("AssistenteAI v10 (CONFIRM_BOOKING): Mismatch conteggio nomi/cognomi finali.", scriptParams);
-                    }
-                }
-
-                if (canProceedToPhp) {
-                    console.log("AssistenteAI v10 (CONFIRM_BOOKING): scriptParams pronti per FormData:", JSON.parse(JSON.stringify(scriptParams)));
-                    chatHistoryForAssistant.push({ role: "system", content: `PHP_CALL_ATTEMPTING: ${phpScriptToCall}. AI should now inform user it is sending request and to wait. PARAMS_LOG: ${JSON.stringify(scriptParams)}` });
-                } else {
-                    chatHistoryForAssistant.push({ role: "system", content: `VALIDATION_FAILED_PRE_PHP: Validazione fallita (JS) prima di chiamare prenota_evento.php: ${problemDetails.trim()}. L'AI deve informare l'utente e chiedere correzioni.` });
-                    phpScriptToCall = "none";
-                    currentBookingState.summaryPresented = false;
-                }
-            }
-            else if (parsedIntent.intent === "CONFIRM_CANCEL_BOOKING" && currentCancellationState.summaryPresented && currentCancellationState.bookingIdToCancel) {
-                scriptParams = { idPrenotazione: currentCancellationState.bookingIdToCancel };
-                phpScriptToCall = "api/api_cancel_booking.php";
-                chatHistoryForAssistant.push({ role: "system", content: `PHP_CALL_ATTEMPTING: ${phpScriptToCall}. AI should now inform user it is sending request and to wait. PARAMS_LOG: ${JSON.stringify(scriptParams)}` });
-            }
-
-
-            // Esegui la chiamata PHP se definita
-            if (phpScriptToCall && phpScriptToCall !== "none") {
-                let method = (phpScriptToCall.includes('/prenota_evento.php') || phpScriptToCall.includes('api/api_cancel_booking.php')) ? 'POST' : 'GET';
-                let reqContentType = (phpScriptToCall.includes('api/api_cancel_booking.php')) ? 'application/json' : 'application/x-www-form-urlencoded';
-
-                if (phpScriptToCall.includes('/get_event_details.php') && scriptParams.event_id && !scriptParams.id) {
-                    scriptParams.id = scriptParams.event_id; delete scriptParams.event_id;
-                }
-                if (phpScriptToCall.includes('api/api_get_user_bookings.php') && !scriptParams.email && CURRENT_USER_EMAIL) {
-                    scriptParams.email = CURRENT_USER_EMAIL;
-                }
-                if (phpScriptToCall.includes('/get_events.php') && !scriptParams.user_email_for_script && CURRENT_USER_EMAIL) {
-                    scriptParams.user_email_for_script = CURRENT_USER_EMAIL;
-                }
-
-                if ((parsedIntent.intent === "START_BOOKING_FLOW" || parsedIntent.intent === "COLLECT_BOOKING_DETAILS" || (parsedIntent.intent === "CONFIRM_BOOKING_DETAILS" && phpScriptToCall === "/prenota_evento.php" )) &&
-                    currentBookingState.eventId &&
-                    (!currentBookingState.eventTitle || currentBookingState.postiGiaPrenotatiUtente === undefined) &&
-                    IS_USER_LOGGED_IN) {
-                    await fetchEventDetailsAndUserBookingStatus(currentBookingState.eventId, CURRENT_USER_EMAIL);
-                }
-
-=======
 
                 if (thinkingMessageDiv) thinkingMessageDiv.remove();
                 let initialBookingPrompt = parsedIntent.missing_info_prompt || "Certo, iniziamo la prenotazione!";
 
                 if (currentBookingState.eventId && IS_USER_LOGGED_IN && typeof currentBookingState.postiGiaPrenotatiUtente === 'undefined') {
                     const detailsFetched = await fetchEventDetailsAndUserBookingStatus(currentBookingState.eventId, CURRENT_USER_EMAIL);
-                    if (!detailsFetched && !currentBookingState.eventTitle) {
+                    if (!detailsFetched && (!currentBookingState.eventTitle || currentBookingState.eventTitle.includes("Errore") || currentBookingState.eventTitle.includes("Dettagli non trovati") || currentBookingState.eventTitle.includes("Accesso richiesto"))) {
                         initialBookingPrompt = `Non sono riuscito a trovare i dettagli per l'evento ID ${currentBookingState.eventId}. Potresti verificare l'ID o fornire il nome dell'evento?`;
+                        if (currentBookingState.eventTitle.includes("Accesso richiesto")) {
+                            initialBookingPrompt = "Per visualizzare i dettagli dell'evento e prenotare, devi prima accedere.";
+                        }
                         resetBookingState();
                         addMessageToChatUI('ai', initialBookingPrompt);
                         chatHistoryForAssistant.push({ role: "assistant", content: initialBookingPrompt });
@@ -795,7 +497,7 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                     resetBookingState(); finalizeUIAfterResponse(); return;
                 }
 
-                if (currentBookingState.eventId && currentBookingState.eventTitle) {
+                if (currentBookingState.eventId && currentBookingState.eventTitle && !currentBookingState.eventTitle.includes("Errore") && !currentBookingState.eventTitle.includes("Dettagli non trovati")  && !currentBookingState.eventTitle.includes("Accesso richiesto")) {
                     if (parsedIntent.params?.numeroPosti) {
                         const numPostiRichiesti = parseInt(parsedIntent.params.numeroPosti, 10);
                         const postiAncoraPrenotabili = MAX_TOTAL_SEATS_PER_USER_PER_EVENT - (currentBookingState.postiGiaPrenotatiUtente || 0);
@@ -824,11 +526,10 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                                 currentBookingState.postiGiaPrenotatiUtente = parseInt(eventInfo.posti_gia_prenotati_utente, 10) || 0;
                                 currentBookingState.postiDisponibiliEvento = parseInt(eventInfo.posti_disponibili, 10);
 
-                                if (typeof currentBookingState.postiGiaPrenotatiUtente === 'undefined') {
-                                    await fetchEventDetailsAndUserBookingStatus(currentBookingState.eventId, CURRENT_USER_EMAIL);
-                                }
-
-                                if (currentBookingState.postiGiaPrenotatiUtente >= MAX_TOTAL_SEATS_PER_USER_PER_EVENT) {
+                                if (!IS_USER_LOGGED_IN){
+                                    initialBookingPrompt = `Ho trovato l'evento: "${currentBookingState.eventTitle}" (ID: ${currentBookingState.eventId}). Per prenotare, è necessario effettuare l'accesso.`;
+                                    resetBookingState();
+                                } else if (currentBookingState.postiGiaPrenotatiUtente >= MAX_TOTAL_SEATS_PER_USER_PER_EVENT) {
                                     initialBookingPrompt = `Ho trovato l'evento: "${currentBookingState.eventTitle}" (ID: ${currentBookingState.eventId}). Tuttavia, hai già ${currentBookingState.postiGiaPrenotatiUtente} posti prenotati, raggiungendo il limite di ${MAX_TOTAL_SEATS_PER_USER_PER_EVENT}.`;
                                     resetBookingState();
                                 } else {
@@ -842,9 +543,9 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                                     }
                                 }
                             } else {
-                                let eventListString = "Ho trovato più eventi che corrispondono. Quale desideri?\n";
+                                let eventListString = "Ho trovato più eventi che corrispondono. Quale desideri? Fornisci l'ID:\n";
                                 eventsResult.data.slice(0, 5).forEach(evt => {
-                                    eventListString += `- ${evt.titolo} (ID: ${evt.idevento})\n`;
+                                    eventListString += `- **${evt.titolo}** (ID: ${evt.idevento}) - Data: ${evt.data_inizio_evento || evt.DataInizio || 'N/D'}\n`;
                                 });
                                 initialBookingPrompt = eventListString;
                             }
@@ -852,14 +553,26 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                     } catch (phpError) { initialBookingPrompt = `Si è verificato un errore durante la ricerca dell'evento. Per favore, fornisci l'ID esatto se lo conosci.`; console.error(phpError); resetBookingState(); }
                 } else if (!currentBookingState.eventId && !currentBookingState.eventNameHint) {
                     initialBookingPrompt = "A quale evento sei interessato/a? Per favore, fornisci il nome o l'ID dell'evento.";
+                } else if (currentBookingState.eventTitle && (currentBookingState.eventTitle.includes("Errore") || currentBookingState.eventTitle.includes("Dettagli non trovati") || currentBookingState.eventTitle.includes("Accesso richiesto"))) {
+                    initialBookingPrompt = `C'è stato un problema con l'evento selezionato (${currentBookingState.eventTitle}). A quale evento sei interessato/a? Per favore, fornisci nome o ID.`;
+                    if (currentBookingState.eventTitle.includes("Accesso richiesto")) {
+                        initialBookingPrompt = "Per procedere, è necessario effettuare l'accesso.";
+                    }
+                    resetBookingState();
                 }
-
-                addMessageToChatUI('ai', initialBookingPrompt);
+                addMessageToChatUI('ai', initialBookingPrompt, 'html'); // Use html for Markdown
                 chatHistoryForAssistant.push({ role: "assistant", content: initialBookingPrompt });
                 finalizeUIAfterResponse(); return;
             }
 
-            if (parsedIntent.intent === "COLLECT_BOOKING_DETAILS" && currentBookingState.isActive) {
+            if (parsedIntent.intent === "COLLECT_BOOKING_DETAILS") {
+                if (!currentBookingState.isActive) {
+                    if (thinkingMessageDiv) thinkingMessageDiv.remove();
+                    const msg = "Per raccogliere i dettagli della prenotazione, dobbiamo prima iniziare un flusso di prenotazione. Vuoi che ti aiuti a trovare un evento e iniziare?";
+                    addMessageToChatUI('ai', msg);
+                    chatHistoryForAssistant.push({ role: "assistant", content: msg });
+                    finalizeUIAfterResponse(); return;
+                }
                 if (thinkingMessageDiv) thinkingMessageDiv.remove();
 
                 if (parsedIntent.params?.event_id && (!currentBookingState.eventId || parseInt(parsedIntent.params.event_id, 10) !== currentBookingState.eventId)) {
@@ -873,6 +586,9 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
 
                 if (parsedIntent.params?.numeroPosti) {
                     const numPostiRichiesti = parseInt(parsedIntent.params.numeroPosti, 10);
+                    if (IS_USER_LOGGED_IN && currentBookingState.eventId && typeof currentBookingState.postiGiaPrenotatiUtente === 'undefined') {
+                        await fetchEventDetailsAndUserBookingStatus(currentBookingState.eventId, CURRENT_USER_EMAIL);
+                    }
                     const postiGiaPrenotati = typeof currentBookingState.postiGiaPrenotatiUtente !== 'undefined' ? currentBookingState.postiGiaPrenotatiUtente : 0;
                     const postiAncoraPrenotabili = MAX_TOTAL_SEATS_PER_USER_PER_EVENT - postiGiaPrenotati;
                     const maxPerQuestaPrenotazione = Math.min(MAX_SEATS_PER_SINGLE_BOOKING_REQUEST, postiAncoraPrenotabili);
@@ -886,9 +602,8 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                     }
                 }
 
-                // Blocco di elaborazione nomi partecipanti con logging aggiuntivo
                 if (parsedIntent.params?.partecipanti_nomi_cognomi) {
-                    console.log("AssistenteAI (v6 debug): Ricevuto partecipanti_nomi_cognomi:", JSON.stringify(parsedIntent.params.partecipanti_nomi_cognomi));
+                    console.log("AssistenteAI (v10 debug): Ricevuto partecipanti_nomi_cognomi:", JSON.stringify(parsedIntent.params.partecipanti_nomi_cognomi));
                     let newNamesInput = parsedIntent.params.partecipanti_nomi_cognomi;
                     let rawExtractedNames = [];
 
@@ -899,13 +614,11 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                     } else if (typeof newNamesInput === 'string' && newNamesInput.trim() !== "") {
                         rawExtractedNames.push(newNamesInput.trim());
                     }
-                    console.log("AssistenteAI (v6 debug): rawExtractedNames:", JSON.stringify(rawExtractedNames));
 
                     let fullyProcessedNewNames = [];
                     rawExtractedNames.forEach(nameEntry => {
                         let cleanedEntry = nameEntry.replace(/^(ecco i due|ecco i nomi|sono|per il partecipante|i nomi sono|i partecipanti sono)\s*[:]?\s*/i, '').trim();
                         const individualNames = cleanedEntry.split(/\s*,\s*|\s+e\s+|\s+ed\s+/i);
-                        console.log(`AssistenteAI (v6 debug): nameEntry='${nameEntry}', cleanedEntry='${cleanedEntry}', individualNames='${JSON.stringify(individualNames)}'`);
                         individualNames.forEach(name => {
                             const trimmedName = name.trim();
                             if (trimmedName && trimmedName.split(' ').filter(Boolean).length >= 1) {
@@ -914,34 +627,29 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                         });
                     });
                     fullyProcessedNewNames = [...new Set(fullyProcessedNewNames)];
-                    console.log("AssistenteAI (v6 debug): fullyProcessedNewNames dopo elaborazione:", JSON.stringify(fullyProcessedNewNames), "Lunghezza:", fullyProcessedNewNames.length);
 
                     if (fullyProcessedNewNames.length > 0) {
-                        console.log("AssistenteAI (v6 debug): Entrato in 'if (fullyProcessedNewNames.length > 0)'. Nomi processati:", JSON.stringify(fullyProcessedNewNames));
-                        if (currentBookingState.numeroPosti) {
-                            currentBookingState.partecipanti = fullyProcessedNewNames.slice(0, currentBookingState.numeroPosti);
-                        } else {
-                            currentBookingState.partecipanti = [...new Set(currentBookingState.partecipanti.concat(fullyProcessedNewNames))];
-                        }
-                        console.log("AssistenteAI (v6 debug): currentBookingState.partecipanti PRIMA della deduplica finale e slice:", JSON.stringify(currentBookingState.partecipanti));
-                        currentBookingState.partecipanti = [...new Set(currentBookingState.partecipanti)];
+                        let combinedNames = [...currentBookingState.partecipanti];
+                        fullyProcessedNewNames.forEach(newName => {
+                            if (!combinedNames.includes(newName)) {
+                                combinedNames.push(newName);
+                            }
+                        });
+                        currentBookingState.partecipanti = [...new Set(combinedNames)];
+
                         if (currentBookingState.numeroPosti && currentBookingState.partecipanti.length > currentBookingState.numeroPosti) {
                             currentBookingState.partecipanti = currentBookingState.partecipanti.slice(0, currentBookingState.numeroPosti);
                         }
-                        console.log("AssistenteAI (v6 debug): currentBookingState.partecipanti AGGIORNATO a:", JSON.stringify(currentBookingState.partecipanti), "Lunghezza:", currentBookingState.partecipanti.length);
-                    } else {
-                        console.log("AssistenteAI (v6 debug): fullyProcessedNewNames era vuoto. Nessun nome aggiunto a currentBookingState.partecipanti.");
+                        console.log("AssistenteAI (v10 debug): currentBookingState.partecipanti AGGIORNATO a:", JSON.stringify(currentBookingState.partecipanti));
                     }
-                } else {
-                    console.log("AssistenteAI (v6 debug): parsedIntent.params.partecipanti_nomi_cognomi non presente o vuoto.");
                 }
 
 
-                if (currentBookingState.eventId && IS_USER_LOGGED_IN && (typeof currentBookingState.postiGiaPrenotatiUtente === 'undefined' || !currentBookingState.eventTitle)) {
+                if (currentBookingState.eventId && IS_USER_LOGGED_IN && (typeof currentBookingState.postiGiaPrenotatiUtente === 'undefined' || !currentBookingState.eventTitle || currentBookingState.eventTitle.includes("Errore") || currentBookingState.eventTitle.includes("Dettagli non trovati") || currentBookingState.eventTitle.includes("Accesso richiesto"))) {
                     const detailsSuccess = await fetchEventDetailsAndUserBookingStatus(currentBookingState.eventId, CURRENT_USER_EMAIL);
-                    if (!detailsSuccess && !currentBookingState.eventTitle) {
-                        addMessageToChatUI('ai', `Non sono riuscito a recuperare i dettagli per l'evento ID ${currentBookingState.eventId}. Potresti ricontrollare l'ID o il nome?`);
-                        chatHistoryForAssistant.push({ role: "assistant", content: `Fallimento recupero dettagli evento ID ${currentBookingState.eventId}` });
+                    if (!detailsSuccess) {
+                        addMessageToChatUI('ai', `Non sono riuscito a recuperare i dettagli aggiornati per l'evento ID ${currentBookingState.eventId}. Potresti ricontrollare l'ID o il nome?`);
+                        chatHistoryForAssistant.push({ role: "assistant", content: `Fallimento recupero dettagli evento ID ${currentBookingState.eventId} in COLLECT_BOOKING_DETAILS` });
                         resetBookingState();
                         finalizeUIAfterResponse(); return;
                     }
@@ -952,7 +660,7 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                     addMessageToChatUI('ai', limitReachedMsg); chatHistoryForAssistant.push({ role: "assistant", content: limitReachedMsg });
                     resetBookingState(); finalizeUIAfterResponse(); return;
                 }
-                if (currentBookingState.numeroPosti) {
+                if (currentBookingState.numeroPosti && IS_USER_LOGGED_IN) {
                     const postiGiaPrenotati = typeof currentBookingState.postiGiaPrenotatiUtente !== 'undefined' ? currentBookingState.postiGiaPrenotatiUtente : 0;
                     const postiAncoraPrenotabiliPerUtente = MAX_TOTAL_SEATS_PER_USER_PER_EVENT - postiGiaPrenotati;
                     const maxConsentitoPerQuestaRichiesta = Math.min(MAX_SEATS_PER_SINGLE_BOOKING_REQUEST, postiAncoraPrenotabiliPerUtente);
@@ -965,27 +673,31 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                     }
                 }
 
-                console.log("AssistenteAI (v6 debug): Stato PRIMA di validateBookingStateForConfirmation:", JSON.stringify(currentBookingState));
                 let nextPrompt = "";
                 const validation = validateBookingStateForConfirmation(currentBookingState);
 
-                if (!currentBookingState.eventId || !currentBookingState.eventTitle) {
+                if (!currentBookingState.eventId || !currentBookingState.eventTitle || currentBookingState.eventTitle.includes("Errore") || currentBookingState.eventTitle.includes("Dettagli non trovati") || currentBookingState.eventTitle.includes("Accesso richiesto")) {
                     nextPrompt = "Sembra ci sia stato un problema con la selezione dell'evento. A quale evento eri interessato/a? Per favore, fornisci nome o ID.";
+                    if (currentBookingState.eventTitle && currentBookingState.eventTitle.includes("Accesso richiesto")) {
+                        nextPrompt = "Per procedere con la prenotazione, è necessario effettuare l'accesso.";
+                    }
+                    resetBookingState();
                 } else if (!validation.isValid) {
                     nextPrompt = validation.missingInfo;
                 } else {
                     let summary = `Perfetto! Riepilogo la prenotazione:\n`;
-                    summary += `- Evento: ${currentBookingState.eventTitle} (ID: ${currentBookingState.eventId})\n`;
+                    summary += `- Evento: **${currentBookingState.eventTitle}** (ID: ${currentBookingState.eventId})\n`;
                     summary += `- Numero Partecipanti: ${currentBookingState.numeroPosti}\n`;
                     summary += `- Partecipanti:\n`;
                     currentBookingState.partecipanti.forEach((p, idx) => { summary += `  ${idx + 1}. ${p}\n`; });
                     summary += `\nÈ tutto corretto? Posso procedere con la prenotazione?`;
                     nextPrompt = summary;
                 }
-                addMessageToChatUI('ai', nextPrompt);
+                addMessageToChatUI('ai', nextPrompt, 'html'); // Use html for Markdown
                 chatHistoryForAssistant.push({ role: "assistant", content: nextPrompt });
                 finalizeUIAfterResponse(); return;
             }
+
 
             if (parsedIntent.intent === "CONFIRM_BOOKING_DETAILS") {
                 const validation = validateBookingStateForConfirmation(currentBookingState);
@@ -1015,6 +727,10 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                 let scriptPath = parsedIntent.php_script;
                 let method = (scriptPath === 'prenota_evento.php') ? 'POST' : 'GET';
 
+                if (scriptPath === 'get_events.php' && (!scriptParams.period && !scriptParams.search_term && !scriptParams.event_id_specific)) {
+                    scriptParams.period = "all_future";
+                    console.log("AssistenteAI: Defaulting to 'all_future' for get_events.php");
+                }
                 if (scriptPath === 'prenota_evento.php' && !scriptParams.contatto && CURRENT_USER_EMAIL) {
                     scriptParams.contatto = CURRENT_USER_EMAIL;
                 }
@@ -1024,39 +740,49 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                 if (scriptPath === 'get_events.php' && CURRENT_USER_EMAIL && !scriptParams.user_email_for_script) {
                     scriptParams.user_email_for_script = CURRENT_USER_EMAIL;
                 }
+                if ((scriptPath.includes("prenota_evento.php") || scriptPath.includes("api/api_get_user_profile.php") || scriptPath.includes("api/api_get_user_bookings.php")) && !IS_USER_LOGGED_IN) {
+                    if (thinkingMessageDiv) thinkingMessageDiv.remove();
+                    const loginRequiredMsg = "Per questa operazione è necessario essere autenticati. Per favore, effettua l'accesso.";
+                    addMessageToChatUI('ai', loginRequiredMsg);
+                    chatHistoryForAssistant.push({ role: "assistant", content: loginRequiredMsg });
+                    finalizeUIAfterResponse(); return;
+                }
 
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
+
                 try {
-                    const phpResult = await callPhpScript(phpScriptToCall, scriptParams, method, reqContentType);
-                    chatHistoryForAssistant.push({ role: "system", content: `PHP_RESULT from ${phpScriptToCall}: ${JSON.stringify(phpResult)}` });
-                    console.log("AssistenteAI v10: PHP Result:", phpResult);
+                    const phpResult = await callPhpScript(scriptPath, scriptParams, method);
+                    chatHistoryForAssistant.push({ role: "system", content: `Risultato PHP (${scriptPath}): ${JSON.stringify(phpResult)}` });
+                    console.log("PHP Result for " + scriptPath + ":", phpResult);
 
-<<<<<<< HEAD
-                    if (phpResult.success) {
-                        if (parsedIntent.intent === "CONFIRM_BOOKING_DETAILS") {
-                            console.log("AssistenteAI v10: Prenotazione PHP success. AI informerà.");
-                        }
-                        if (parsedIntent.intent === "CONFIRM_CANCEL_BOOKING") {
-                            resetCancellationState();
-                            console.log("AssistenteAI v10: Cancellazione PHP success. AI informerà.");
-                        }
-                    } else {
-                        console.warn(`AssistenteAI v10: Chiamata a ${phpScriptToCall} fallita (PHP success=false):`, phpResult.message);
-                        if (parsedIntent.intent === "CONFIRM_BOOKING_DETAILS") {
-                            currentBookingState.summaryPresented = false;
-                        }
-                    }
-                } catch (phpError) {
-                    console.error("AssistenteAI v10: Errore grave durante chiamata PHP:", phpError);
-                    const systemErrorMessage = `PHP_CALL_ERROR for ${phpScriptToCall}: ${phpError.message}`;
-                    chatHistoryForAssistant.push({ role: "system", content: systemErrorMessage });
+                    if (parsedIntent.intent === "GET_EVENTS") {
+                        if (thinkingMessageDiv) thinkingMessageDiv.remove();
+                        if (phpResult.success && phpResult.data) {
+                            chatHistoryForAssistant.push({ role: "system", content: `Dati degli eventi ricevuti. Per favore, presentali all'utente in modo chiaro, usando Markdown per la lista.`});
+                            const aiFormattedEvents = await getGroqCompletion(chatHistoryForAssistant.slice(-10), MAIN_ASSISTANT_SYSTEM_PROMPT(), 0.5, 1500);
 
-                    if (parsedIntent.intent.includes("BOOKING")) {
-                        currentBookingState.summaryPresented = false;
+                            if (aiFormattedEvents) {
+                                addMessageToChatUI('ai', aiFormattedEvents, 'html'); // Use html for Markdown
+                                chatHistoryForAssistant.push({ role: "assistant", content: aiFormattedEvents });
+                            } else {
+                                let fallbackDisplay = "Non sono riuscito a formattare la risposta come avrei voluto, ma ecco gli eventi trovati:\n\n";
+                                if (phpResult.data.length > 0) {
+                                    phpResult.data.forEach((event, index) => {
+                                        fallbackDisplay += `- **${event.titolo}** (ID: ${event.idevento}) - Data: ${event.data_inizio_evento || event.DataInizio || 'N/D'}\n`;
+                                    });
+                                } else {
+                                    fallbackDisplay = "Non ci sono eventi disponibili al momento o che corrispondano alla tua ricerca.";
+                                }
+                                addMessageToChatUI('ai', fallbackDisplay, 'html'); // Use html for Markdown
+                                chatHistoryForAssistant.push({ role: "system", content: "Main LLM failed to format GET_EVENTS, JS fallback used."});
+                                chatHistoryForAssistant.push({ role: "assistant", content: fallbackDisplay }); // Store the raw fallback string
+                            }
+                        } else {
+                            addMessageToChatUI('ai', phpResult.message || "Non sono riuscito a recuperare gli eventi in questo momento.");
+                            chatHistoryForAssistant.push({ role: "assistant", content: phpResult.message || "Failed to retrieve events from PHP for GET_EVENTS." });
+                        }
+                        finalizeUIAfterResponse(); return;
                     }
-                    if (parsedIntent.intent.includes("CANCEL")) {
-                        currentCancellationState.summaryPresented = false;
-=======
+
                     if (parsedIntent.intent === "CONFIRM_BOOKING_DETAILS") {
                         if (thinkingMessageDiv) thinkingMessageDiv.remove();
                         const finalMessage = phpResult.message || (phpResult.success ? "Prenotazione confermata con successo!" : "Si è verificato un errore durante la conferma della prenotazione. Riprova o contatta l'assistenza.");
@@ -1065,6 +791,8 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                         if (phpResult.success) resetBookingState();
                         finalizeUIAfterResponse(); return;
                     }
+
+
                 } catch (phpError) {
                     console.error("Errore durante la chiamata allo script PHP:", phpError);
                     if (thinkingMessageDiv) thinkingMessageDiv.remove();
@@ -1083,88 +811,37 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
             if (thinkingMessageDiv) thinkingMessageDiv.remove();
 
             const requiresAiResponseGeneration =
-                !["START_BOOKING_FLOW", "COLLECT_BOOKING_DETAILS", "CONFIRM_BOOKING_DETAILS"].includes(parsedIntent.intent) ||
                 (parsedIntent.intent === "GENERAL_QUERY" || parsedIntent.intent === "UNKNOWN") ||
-                (parsedIntent.php_script && parsedIntent.php_script !== "none" && chatHistoryForAssistant[chatHistoryForAssistant.length-1]?.role === "system");
+                (parsedIntent.php_script && parsedIntent.php_script !== "none" &&
+                    chatHistoryForAssistant[chatHistoryForAssistant.length - 1]?.role === "system") ||
+                (!["START_BOOKING_FLOW", "COLLECT_BOOKING_DETAILS", "CONFIRM_BOOKING_DETAILS", "GET_EVENTS"].includes(parsedIntent.intent) &&
+                    !(parsedIntent.is_clarification_needed && parsedIntent.missing_info_prompt));
 
-            if (requiresAiResponseGeneration && chatHistoryForAssistant[chatHistoryForAssistant.length -1]?.role !== 'assistant') {
+
+            if (requiresAiResponseGeneration && chatHistoryForAssistant[chatHistoryForAssistant.length - 1]?.role !== 'assistant') {
                 const finalResponseHistory = chatHistoryForAssistant.slice(-10);
                 const aiFinalResponse = await getGroqCompletion(finalResponseHistory, MAIN_ASSISTANT_SYSTEM_PROMPT(), 0.5, 1500);
 
                 if (aiFinalResponse) {
-                    addMessageToChatUI('ai', aiFinalResponse);
+                    addMessageToChatUI('ai', aiFinalResponse, 'html'); // Use html for Markdown
                     chatHistoryForAssistant.push({ role: "assistant", content: aiFinalResponse });
                 } else {
-                    if (parsedIntent.intent === "GENERAL_QUERY" || parsedIntent.intent === "UNKNOWN") {
-                        const fallbackMsg = "Non sono sicuro di come rispondere. Puoi provare a chiedere in un altro modo?";
-                        addMessageToChatUI('ai', fallbackMsg);
-                        chatHistoryForAssistant.push({ role: "assistant", content: "LLM response for general query was empty. Used fallback." });
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
+                    let fallbackMsg = "Non sono sicuro di come rispondere. Puoi provare a chiedere in un altro modo?";
+                    if (parsedIntent.intent !== "GENERAL_QUERY" && parsedIntent.intent !== "UNKNOWN") {
+                        fallbackMsg = "Si è verificato un problema nella generazione della risposta. Riprova.";
                     }
+                    addMessageToChatUI('ai', fallbackMsg);
+                    chatHistoryForAssistant.push({ role: "system", content: `Main LLM response was empty for intent '${parsedIntent.intent}'. Used fallback message.` });
+                    chatHistoryForAssistant.push({ role: "assistant", content: fallbackMsg });
                 }
             }
 
-<<<<<<< HEAD
-            // --- GENERAZIONE RISPOSTA FINALE AI ---
-            if (thinkingMessageDiv && thinkingMessageDiv.parentNode) {
-                const lastSystemMessage = chatHistoryForAssistant.findLast(msg => msg.role === 'system');
-                if (!lastSystemMessage || !lastSystemMessage.content.startsWith('PHP_CALL_ATTEMPTING')) {
-                    // thinkingMessageDiv.remove();
-                }
-            }
-
-
-            const finalResponseHistory = chatHistoryForAssistant.slice(-12);
-            const aiFinalResponse = await getGroqCompletion(finalResponseHistory, MAIN_ASSISTANT_SYSTEM_PROMPT(), 0.35, 2000);
-
-            if (aiFinalResponse) {
-                if ( (parsedIntent.intent === "COLLECT_BOOKING_DETAILS" && validateBookingStateForConfirmation(currentBookingState).isValid) ||
-                    ( (parsedIntent.intent === "START_CANCEL_BOOKING" || parsedIntent.intent === "COLLECT_CANCEL_BOOKING_ID") && currentCancellationState.bookingIdToCancel)
-                ) {
-                    if (aiFinalResponse.toLowerCase().includes("confermi?") || aiFinalResponse.toLowerCase().includes("posso procedere?") || aiFinalResponse.toLowerCase().includes("sei sicuro")) {
-                        if (currentBookingState.isActive && (parsedIntent.intent.includes("BOOKING") || parsedIntent.intent.includes("COLLECT_BOOKING"))) {
-                            currentBookingState.summaryPresented = true;
-                            console.log("AssistenteAI v10: JS ha impostato currentBookingState.summaryPresented = true dopo risposta AI che chiede conferma.")
-                        }
-                        if (currentCancellationState.isActive && (parsedIntent.intent.includes("CANCEL") || parsedIntent.intent.includes("COLLECT_CANCEL"))) {
-                            currentCancellationState.summaryPresented = true;
-                            console.log("AssistenteAI v10: JS ha impostato currentCancellationState.summaryPresented = true dopo risposta AI che chiede conferma.")
-                        }
-                    }
-                }
-                if (parsedIntent.intent === "CONFIRM_BOOKING_DETAILS" &&
-                    chatHistoryForAssistant.some(msg =>
-                        msg.role === "system" &&
-                        msg.content.includes('PHP_RESULT from /prenota_evento.php') &&
-                        (() => { try { const result = JSON.parse(msg.content.substring(msg.content.indexOf('{'))); return result.success === true && result.idPrenotazione; } catch { return false; } })()
-                    ) &&
-                    (aiFinalResponse.toLowerCase().includes("prenotazione effettuata con successo") || aiFinalResponse.toLowerCase().includes("id della tua prenotazione è"))
-                ) {
-                    resetBookingState();
-                    console.log("AssistenteAI v10: Stato prenotazione resettato dopo conferma di successo comunicata dall'AI, basata su PHP_RESULT.");
-                }
-
-
-                addMessageToChatUI('ai', aiFinalResponse, aiFinalResponse.includes('\n- ') || aiFinalResponse.includes('\n* ') || aiFinalResponse.includes('</') ? 'html' : 'text');
-                chatHistoryForAssistant.push({ role: "assistant", content: aiFinalResponse });
-            } else {
-                addMessageToChatUI('ai', "Non sono sicuro di come rispondere in questo momento. Potresti provare a riformulare la tua richiesta?");
-                chatHistoryForAssistant.push({ role: "assistant", content: "LLM_NO_RESPONSE" });
-            }
-
-        } catch (error) {
-            console.error("AssistenteAI v10: Errore grave in handleSendMessageToAI:", error);
-            if (thinkingMessageDiv && thinkingMessageDiv.parentNode) thinkingMessageDiv.remove();
-            addMessageToChatUI('ai', `Spiacente, si è verificato un errore generale imprevisto: ${error.message}. Per favore, riprova tra poco.`);
-=======
         } catch (error) {
             console.error("Errore in handleSendMessageToAI:", error);
             if (thinkingMessageDiv) thinkingMessageDiv.remove();
             addMessageToChatUI('ai', `Spiacente, si è verificato un errore imprevisto: ${error.message}. Per favore, riprova.`);
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
             chatHistoryForAssistant.push({ role: "assistant", content: `General Error in handleSendMessageToAI: ${error.message}` });
             resetBookingState();
-            resetCancellationState();
         } finally {
             finalizeUIAfterResponse();
         }
@@ -1176,19 +853,15 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
         if (aiChatPopupEl.classList.contains('active')) {
             aiChatInputEl.focus();
         }
-        if (chatHistoryForAssistant.length > 20) {
-            chatHistoryForAssistant = [
-                chatHistoryForAssistant[0],
-                ...chatHistoryForAssistant.slice(chatHistoryForAssistant.length - 19)
-            ];
+        if (chatHistoryForAssistant.length > 30) {
+            const systemMessagesToKeep = chatHistoryForAssistant.filter(msg => msg.role === 'system' && msg.content.startsWith('Data e ora correnti:'));
+            const lastSystemDateTime = systemMessagesToKeep.length > 0 ? systemMessagesToKeep[systemMessagesToKeep.length-1] : chatHistoryForAssistant[0];
+            const recentMessages = chatHistoryForAssistant.slice(Math.max(1, chatHistoryForAssistant.length - 29));
+            chatHistoryForAssistant = [lastSystemDateTime, ...recentMessages.filter(msg => msg !== lastSystemDateTime)];
         }
     }
 
-<<<<<<< HEAD
-    console.log("AssistenteAI: Script in esecuzione (v10 - Debug Prenotazione V2).");
-=======
-    console.log("AssistenteAI: Script in esecuzione (v6 - Debug Nomi).");
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
+    console.log("AssistenteAI: Script in esecuzione (v10 - Formattazione Eventi Migliorata).");
     checkUserLoginStatus();
     initializeChatHistory();
 
@@ -1211,14 +884,6 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
                     this.style.height = newHeight + 'px';
                 });
             }
-<<<<<<< HEAD
-            console.log("AssistenteAI v10: Event listeners attaccati.");
-        } else {
-            console.error("AssistenteAI v10: Inizializzazione fallita, API key non caricata.");
-        }
-    }).catch(error => {
-        console.error("AssistenteAI v10: Errore critico durante fetchAndPrepareAssistantApiKey:", error);
-=======
             console.log("AssistenteAI: Event listeners attaccati correttamente.");
         } else {
             console.error("AssistenteAI: Inizializzazione fallita, API key non caricata o non valida.");
@@ -1233,6 +898,5 @@ Rispondi sempre in italiano. Utilizza Markdown (liste con \`* \` o \`- \`, grass
             aiAssistantFabEl.title = "Assistente AI non disponibile (errore)";
             aiAssistantFabEl.style.cursor = "not-allowed";
         }
->>>>>>> 859ae99fd6c55362ac78ef0431ca2eb8eecea1ad
     });
 });
