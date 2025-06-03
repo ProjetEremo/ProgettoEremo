@@ -99,46 +99,40 @@
     .close-modal-content-btn { position: absolute; top: 10px; right: 15px; font-size: 1.8rem; color: var(--gray-medium); background: none; border: none; cursor: pointer; line-height: 1;}
     .close-modal-content-btn:hover { color: var(--dark); }
 
-    /* Stili per #pageOverallStatus */
+    /* Stili per #pageOverallStatus - Standardizzati */
     #pageOverallStatus {
       position: fixed;
-      bottom: 80px; /* Posizionato sopra #editPageBtnContainer (default 20px + altezza bottone ~50px + margine) */
+      bottom: 80px;
       left: 50%;
       z-index: 1000;
-
       padding: 10px 20px;
-      border-radius: 8px; /* Coerente con .form-message */
+      border-radius: 8px;
       font-size: 0.9em;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
-
-      background-color: var(--primary); /* Stile di default per 'info' */
+      background-color: var(--primary);
       color: white;
-
-      display: block; /* Sempre block, visibilità gestita da opacity e transform */
-      opacity: 0; /* Stato iniziale: invisibile */
-      transform: translateX(-50%) translateY(30px); /* Stato iniziale animazione: centrato X, leggermente in basso */
+      display: block;
+      opacity: 0;
+      transform: translateX(-50%) translateY(30px);
       transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275), transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275);
-      pointer-events: none; /* Non interagibile quando invisibile */
-
-      max-width: 90%; /* Evita che sia troppo largo su schermi grandi */
+      pointer-events: none;
+      max-width: 90%;
       box-sizing: border-box;
     }
 
     #pageOverallStatus.active {
-      opacity: 1; /* Stato finale: visibile */
-      transform: translateX(-50%) translateY(0); /* Stato finale animazione: posizione corretta */
-      pointer-events: auto; /* Interagibile quando visibile */
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
     }
 
     #pageOverallStatus.success {
       background-color: var(--success, green);
-      /* color: white; è già definito nello stile base */
     }
 
     #pageOverallStatus.error {
       background-color: var(--danger, red);
-      /* color: white; è già definito nello stile base */
     }
 
     .image-loading-spinner { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-color: var(--gray-light); border-radius: var(--border-radius-large); z-index: 1; }
@@ -149,8 +143,6 @@
     .image-load-error-display { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-color: var(--gray-light); border-radius: var(--border-radius-large); color: var(--gray-dark); text-align: center; padding: 1rem; z-index: 1; }
     .image-load-error-display p { margin: 0.2rem 0; font-size: 0.9em;}
 
-    /* Stili per il Logo Dinamico Navbar e Assistente AI */
-    /* ... (stili commentati omessi per brevità, sono invariati) ... */
   </style>
 </head>
 
@@ -379,9 +371,7 @@
 
 <script>
   const PAGE_NAME_FOR_CONTENT = 'index';
-  const defaultUserIconPath = 'uploads/icons/default_user.png';
 
-  let currentUserData = null;
   let isEditModeActive = false;
   let originalPageContentsForCancel = {};
   let currentPageDbContents = {};
@@ -421,7 +411,9 @@
       navbarTitle:document.getElementById('navbar-title'),
       editPageBtnContainer:document.getElementById('editPageBtnContainer'),
       navGestioneEventiAdmin: document.getElementById('nav-gestione-eventi-admin'),
-      mobileNavGestioneEventiAdminLink: document.getElementById('mobile-nav-gestione-eventi-admin-link')
+      mobileNavGestioneEventiAdminLink: document.getElementById('mobile-nav-gestione-eventi-admin-link'),
+      navProfilo: document.getElementById('nav-profilo'), // Aggiunto per coerenza
+      navMiePrenotazioni: document.getElementById('nav-mie-prenotazioni') // Aggiunto per coerenza
     };
 
     if(el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'none';
@@ -435,6 +427,9 @@
     if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
     if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
     if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
+    if(el.navProfilo) el.navProfilo.style.display = 'none'; // Aggiunto reset
+    if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none'; // Aggiunto reset
+
 
     if (currentUserData) {
       if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block';
@@ -448,15 +443,18 @@
         el.navbarAvatarImg.alt = `Avatar di ${currentUserData.nome||'utente'}`;
         el.navbarAvatarImg.onerror=function(){this.src=defaultUserIconPath;};
       }
+      // Mostra sempre profilo e prenotazioni se loggato
+      if(el.navProfilo) el.navProfilo.style.display = 'block';
+      if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block';
+
+
       if(currentUserData.isAdmin){
         if(el.navDashboard) el.navDashboard.style.display = 'block';
         if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
         if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'block';
         if(el.mobileNavGestioneEventiAdminLink) el.mobileNavGestioneEventiAdminLink.style.display = 'block';
         if(el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
-        if(el.editPageBtnContainer){
-          // La visibilità è gestita dalla classe .active
-        }
+        // La visibilità di editPageBtnContainer è gestita da toggleEditMode
       } else {
         if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
         if(el.editPageBtnContainer) el.editPageBtnContainer.classList.remove('active');
@@ -493,7 +491,45 @@
   document.getElementById('login-btn-desktop')?.addEventListener('click',openLoginPopup); document.getElementById('login-btn-mobile')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();closeMobileMenuOnLinkClick();});
   if(closeLoginPopupBtn)closeLoginPopupBtn.addEventListener('click',closeLoginPopup); if(loginOverlay)loginOverlay.addEventListener('click',(e)=>{if(e.target===loginOverlay)closeLoginPopup();});
   loginTabs.forEach(t=>t.addEventListener('click',()=>{const id=t.dataset.tab;loginTabs.forEach(tb=>tb.classList.remove('active'));t.classList.add('active');loginForms.forEach(f=>{f.classList.remove('active');if(f.id===`${id}Form`){f.classList.add('active');f.querySelector('input:not([type="hidden"])')?.focus();}});resetFormErrorsAndMessages();}));
-  loginFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=loginFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';try{const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath||defaultUserIconPath,isAdmin:j.is_admin===true||j.is_admin===1};localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));updateNavbarUI();closeLoginPopup();await loadPageContentsFromServer();showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");}else{loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}}}catch(err){console.error("Errore login:",err);if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
+
+  loginFormEl?.addEventListener('submit',async(e)=>{
+    e.preventDefault();
+    resetFormErrorsAndMessages();
+    const b=loginFormEl.querySelector('button[type="submit"]');
+    const o=b.innerHTML;
+    b.disabled=true;
+    b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';
+    try{
+      const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});
+      const j=await r.json();
+      if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);
+      if(j.success){
+        currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath||defaultUserIconPath,isAdmin:j.is_admin===true||j.is_admin===1};
+        localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));
+
+        updateNavbarUI(); // Aggiorna la navbar con i dati utente
+        closeLoginPopup(); // Chiudi il popup di login
+        await loadPageContentsFromServer(); // Ricarica i contenuti della pagina (potrebbe essere necessario per admin)
+
+        // MODIFICA: Chiama toggleEditMode se l'utente è admin
+        if (currentUserData.isAdmin) {
+          toggleEditMode(false); // Attiva i controlli admin, mostrando "Attiva Modifiche"
+        }
+        showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success"); // Mostra messaggio di benvenuto
+
+      }else{
+        loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));
+        if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}
+      }
+    }catch(err){
+      console.error("Errore login:",err);
+      if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}
+    }finally{
+      b.disabled=false;
+      b.innerHTML=o;
+    }
+  });
+
   registerFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=registerFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Registrazione...<div class="spinner-mini-light"></div>';try{const r=await fetch('registrati.php',{method:'POST',body:new FormData(registerFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){document.querySelector('.login-tab[data-tab="login"]')?.click();document.getElementById('login-email').value=document.getElementById('register-email').value;registerFormEl.reset();}else{if(registerErrorMessageEl){registerErrorMessageEl.textContent=j.message||"Errore registrazione.";registerErrorMessageEl.style.display='block';}if(j.errors){for(const f in j.errors)document.getElementById(`register-${f}`)?.classList.add('error-border');}}}catch(err){console.error("Errore registrazione:",err);if(registerErrorMessageEl){registerErrorMessageEl.textContent="Errore connessione o server.";if(registerErrorMessageEl)registerErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
 
   const forgotPasswordLink = document.getElementById('forgotPasswordLink');
@@ -516,35 +552,28 @@
   const editPageBtn=document.getElementById('editPageBtn');const savePageChangesBtn=document.getElementById('savePageChangesBtn'); const cancelPageChangesBtn=document.getElementById('cancelPageChangesBtn');const editContentModal=document.getElementById('editContentModal'); const closeEditContentModalBtn=document.getElementById('closeEditContentModalBtn');const editModalTitle=document.getElementById('editModalTitle'); const editModalTextarea=document.getElementById('editModalTextarea');const editModalInputText=document.getElementById('editModalInputText'); const editModalInputImage=document.getElementById('editModalInputImage');const editModalFieldLabelText=document.getElementById('editModalFieldLabelText'); const saveEditModalBtn=document.getElementById('saveEditModalBtn');const cancelEditModalBtn=document.getElementById('cancelEditModalBtn'); const editModalMessage=document.getElementById('editModalMessage');const pageOverallStatus=document.getElementById('pageOverallStatus'); const editModalInputFile=document.getElementById('editModalInputFile'); const editModalFileLabel=document.getElementById('editModalFileLabel'); const editModalFileNote = document.getElementById('editModalFileNote');
   let currentEditingKey=null;let currentEditingType='text';
 
+  // Funzione showPageStatus standardizzata
   function showPageStatus(message, type = 'info', duration = 3000) {
     if (!pageOverallStatus) return;
-
     pageOverallStatus.textContent = message;
-    pageOverallStatus.classList.remove('success', 'error', 'active'); // Rimuove prima le classi per resettare lo stato
+    pageOverallStatus.className = 'form-message'; // Reset base class
+    pageOverallStatus.classList.remove('success', 'error', 'active');
 
     if (type === 'success') {
       pageOverallStatus.classList.add('success');
     } else if (type === 'error') {
       pageOverallStatus.classList.add('error');
     }
-    // Per 'info', si affida agli stili base di #pageOverallStatus
+    // Per 'info', si affida agli stili CSS di #pageOverallStatus e .active
 
     if (pageOverallStatus.hideTimeout) {
       clearTimeout(pageOverallStatus.hideTimeout);
     }
-
-    // Forza un reflow del browser. Questo è cruciale per riavviare l'animazione
-    // se la funzione viene chiamata rapidamente più volte.
-    void pageOverallStatus.offsetHeight;
-
-    // Aggiunge .active per mostrare e animare
+    void pageOverallStatus.offsetHeight; // Forza reflow per riavviare animazione CSS
     pageOverallStatus.classList.add('active');
 
     pageOverallStatus.hideTimeout = setTimeout(() => {
       pageOverallStatus.classList.remove('active');
-      // La transizione CSS gestirà l'effetto di scomparsa.
-      // pointer-events: none sarà riapplicato automaticamente dal CSS
-      // quando .active viene rimosso.
     }, duration);
   }
 
@@ -635,7 +664,7 @@
 
     if(editContainer) {
       if (currentUserData?.isAdmin) {
-        editContainer.classList.add('active');
+        editContainer.classList.add('active'); // Sempre .active se admin, i bottoni dentro cambiano
         if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block';
         if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none';
         if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none';
@@ -650,11 +679,9 @@
   }
 
   function openEditModal(key, type, currentValue) {
-    console.log(`DEBUG: openEditModal - key: ${key}, type: ${type}, value: ${currentValue}`);
     currentEditingKey = key;
     currentEditingType = type;
     if (!editContentModal || !editModalMessage) {
-      console.error("DEBUG: Elementi del modal (editContentModal o editModalMessage) non trovati!");
       return;
     }
 
@@ -717,7 +744,6 @@
   }
 
   function closeEditContentModal() {
-    console.log(`DEBUG: closeEditContentModal - currentKey: ${currentEditingKey}`);
     if (editContentModal) {
       editContentModal.style.display = 'none';
     }
@@ -743,7 +769,6 @@
       e.stopPropagation();
       if (editIcon.dataset.key === 'navbarLogo') {
         e.preventDefault();
-        console.log("DEBUG: navbarLogo edit icon clicked, preventDefault() called.");
       }
 
       key = editIcon.dataset.key;
@@ -768,7 +793,6 @@
       e.stopPropagation();
       if (imageTarget.id === 'content-navbarLogo') {
         e.preventDefault();
-        console.log("DEBUG: navbarLogo imageTarget (content-navbarLogo) clicked, preventDefault() called.");
       }
 
       key = imageTarget.dataset.contentKey;
@@ -806,11 +830,11 @@
     loadUserData();
     updateNavbarUI();
     await loadPageContentsFromServer();
+    // MODIFICA: Assicura che toggleEditMode sia chiamato dopo che i dati utente sono completamente caricati e la UI navbar è aggiornata
     if (currentUserData && currentUserData.isAdmin) {
-      toggleEditMode(false);
+      toggleEditMode(false); // Mostra "Attiva Modifiche" se admin
     } else {
-      document.querySelectorAll('.edit-icon-text,.edit-icon-image,.edit-icon-banner-bg').forEach(i=>i.style.display='none');
-      document.querySelectorAll('img.chi-siamo-image.editable-image-target').forEach(img=>img.classList.remove('editable-image-target'));
+      toggleEditMode(false); // Assicura che i controlli admin siano nascosti se non admin
       const editContainer=document.getElementById('editPageBtnContainer');
       if(editContainer) editContainer.classList.remove('active');
     }
