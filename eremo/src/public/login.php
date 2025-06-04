@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json; charset=utf-8'); // Assicura charset UTF-8
-session_start();
+require_once 'config_session.php'; // Includi la configurazione della sessione
 
 // Configurazione database (invariata)
 $host = "localhost";

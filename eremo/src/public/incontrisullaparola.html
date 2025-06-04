@@ -29,25 +29,139 @@
         .terms-checkbox label { font-weight: normal; color: var(--gray-dark); } .terms-checkbox a { color: var(--primary); text-decoration: underline; }
 
         /* Stili Modifica Pagina Admin */
-        #editPageBtnContainer { position: fixed; bottom: 20px; right: 20px; z-index: 1001; display: none; }
-        #editPageBtn, #savePageChangesBtn, #cancelPageChangesBtn { background-color: var(--accent); color: white; padding: 10px 18px; border: none; border-radius: 50px; box-shadow: var(--shadow-medium); cursor: pointer; font-size: 0.95rem; margin-left: 10px; transition: background-color 0.2s; }
+        #editPageBtnContainer {
+            position: fixed;
+            bottom: 20px; /* Riportato in basso */
+            left: 50%; /* Centra orizzontalmente */
+            transform: translateX(-50%) translateY(100px); /* Inizialmente spostato in basso per l'animazione */
+            z-index: 1001;
+            display: flex; /* Usa flex per allineare i bottoni */
+            gap: 10px; /* Spazio tra i bottoni */
+            opacity: 0; /* Inizialmente invisibile */
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Animazione più fluida */
+        }
+
+        #editPageBtnContainer.active {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0); /* Ritorna alla posizione normale */
+        }
+
+        #editPageBtn, #savePageChangesBtn, #cancelPageChangesBtn {
+            background-color: var(--accent);
+            color: white;
+            padding: 12px 20px; /* Dimensione leggermente ridotta ma ancora evidente */
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Ombra più pronunciata */
+            cursor: pointer;
+            font-size: 1rem; /* Dimensione font */
+            transition: background-color 0.2s, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            white-space: nowrap; /* Evita che il testo vada a capo */
+        }
         #editPageBtn i, #savePageChangesBtn i, #cancelPageChangesBtn i { margin-right: 8px; }
-        #savePageChangesBtn { background-color: var(--success); } #cancelPageChangesBtn { background-color: var(--gray-dark); }
-        #editPageBtn:hover { background-color: #c07b50; } #savePageChangesBtn:hover { background-color: #27ae60; } #cancelPageChangesBtn:hover { background-color: var(--dark); }
+        #savePageChangesBtn { background-color: var(--success); }
+        #cancelPageChangesBtn { background-color: var(--gray-dark); }
+        #editPageBtn:hover { background-color: #c07b50; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+        #savePageChangesBtn:hover { background-color: #27ae60; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+        #cancelPageChangesBtn:hover { background-color: var(--dark); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+
         .editable-text-wrapper { position: relative; display: block; width:100%; }
         .editable-image-wrapper { position: relative; display: block; }
-        .editable-text-wrapper:hover .edit-icon-text, .editable-image-wrapper:hover .edit-icon-image { display: inline-flex; align-items: center; justify-content: center; }
-        .edit-icon-text, .edit-icon-image { display: none; position: absolute; top: -5px; right: -5px; background: var(--accent); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 0.75em; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); text-align: center; line-height: 22px; z-index:5; }
-        /* Posizionamento icona edit per H1 centrato */
+
+        /* Stili per le icone di modifica */
+        .edit-icon-text, .edit-icon-image {
+            display: none; /* Gestito via JS per apparire solo in modalità edit */
+            position: absolute;
+            background: var(--accent);
+            color: white;
+            width: 28px; /* Aumentato per maggiore visibilità */
+            height: 28px; /* Aumentato per maggiore visibilità */
+            border-radius: 50%;
+            font-size: 0.9em; /* Dimensione font icona */
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex; /* Usa flexbox per centrare l'icona */
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            opacity: 0; /* Inizialmente invisibile per l'animazione */
+            transform: scale(0.8); /* Inizialmente più piccolo per l'animazione */
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+
+        /* Apparizione delle icone al passaggio del mouse sul wrapper */
+        .editable-text-wrapper:hover .edit-icon-text,
+        .editable-image-wrapper:hover .edit-icon-image {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Posizionamento specifico delle icone */
+        /* Regola generale per posizionare l'icona fuori dall'angolo in alto a destra */
+        .edit-icon-text, .edit-icon-image {
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%) scale(0.8); /* Sposta di metà larghezza/altezza fuori dall'angolo */
+        }
+
+        /* Regola per l'H1 principale, centrandola verticalmente rispetto all'altezza del testo */
         .main-title-editable-wrapper > h1 + .edit-icon-text {
             top: 50%;
-            right: -5px;
-            transform: translateY(-50%);
+            right: 0;
+            transform: translate(50%, -50%) scale(0.8);
         }
-        .editable-text-wrapper h2 + .edit-icon-text,
-        .editable-text-wrapper h3 + .edit-icon-text { top: 5px; right: -25px; }
-        .card-content .editable-text-wrapper h3 + .edit-icon-text { top: 0px; right: 0px; }
-        .card-content .editable-text-wrapper p + .edit-icon-text { top: -2px; right: -2px; }
+
+        /* Regole più specifiche per evitare sovrapposizioni in base al layout */
+        /* Per gli h2 all'interno di chi-siamo-section */
+        .chi-siamo-section .editable-text-wrapper h2 + .edit-icon-text {
+            top: 0; /* Allinea in alto */
+            right: 0;
+            transform: translate(calc(100% + 5px), -50%) scale(0.8); /* Sposta completamente a destra del testo, più un margine */
+        }
+
+        /* Per i p all'interno di chi-siamo-section */
+        .chi-siamo-section .editable-text-wrapper p + .edit-icon-text {
+            top: 50%; /* Centra verticalmente con la riga di testo */
+            right: 0;
+            transform: translate(calc(100% + 5px), -50%) scale(0.8); /* Sposta a destra del testo, più un margine */
+        }
+
+        /* Per le immagini */
+        .editable-image-wrapper .edit-icon-image {
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%) scale(0.8);
+        }
+
+        /* Per gli h2 all'interno delle info-cards */
+        .card-grid .editable-text-wrapper h2 + .edit-icon-text {
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%) scale(0.8); /* Torna alla regola generale per angoli */
+        }
+
+        /* Per i p all'interno delle info-cards */
+        .card-content .editable-text-wrapper p + .edit-icon-text {
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%) scale(0.8);
+        }
+
+        /* Hover per le icone, mantiene la posizione mentre scala */
+        .editable-text-wrapper:hover .edit-icon-text,
+        .editable-image-wrapper:hover .edit-icon-image {
+            opacity: 1;
+            transform: translate(50%, -50%) scale(1);
+        }
+
+        /* Eccezioni per hover dove la posizione è diversa */
+        .main-title-editable-wrapper:hover > h1 + .edit-icon-text,
+        .chi-siamo-section .editable-text-wrapper:hover h2 + .edit-icon-text,
+        .chi-siamo-section .editable-text-wrapper:hover p + .edit-icon-text {
+            opacity: 1;
+            /* Mantiene la traslazione specifica ma scala */
+            transform: translate(var(--custom-translate-x, 50%), var(--custom-translate-y, -50%)) scale(1);
+        }
 
 
         img.editable-image-target { border: 3px dashed var(--accent) !important; cursor: pointer; opacity: 0.85; }
@@ -67,7 +181,7 @@
         .chi-siamo-image-container { aspect-ratio: 4/3; }
     </style>
 </head>
-<body class="page-incontri">
+<body>
 
 <header class="navbar-container" id="navbarContainer">
     <nav class="navbar">
@@ -126,7 +240,7 @@
         <div class="editable-text-wrapper main-title-editable-wrapper" style="text-align: center;">
             <h1 id="content-pageHeaderTitle" data-content-key="pageHeaderTitle"
                 style="color: var(--primary); margin-top: 3rem; margin-bottom: 3.5rem; font-size: clamp(2.8rem, 5.8vw, 3.5rem);"></h1>
-            <span class="edit-icon-text" data-key="pageHeaderTitle" data-type="text" title="Modifica Titolo Pagina">&#9998;</span>
+            <span class="edit-icon-text" data-key="pageHeaderTitle" data-type="text" title="Modifica Titolo Pagina">✎</span>
         </div>
     </div>
 
@@ -134,20 +248,20 @@
         <section class="chi-siamo-section section-padding">
             <div class="chi-siamo-image-container editable-image-wrapper">
                 <img src="" alt="Gruppo di studio biblico" class="chi-siamo-image" id="content-cosaSonoImage" data-content-key="cosaSonoImage">
-                <span class="edit-icon-image" data-key="cosaSonoImage" data-type="image" title="Modifica Immagine">&#9998;</span>
+                <span class="edit-icon-image" data-key="cosaSonoImage" data-type="image" title="Modifica Immagine">✎</span>
             </div>
             <div class="chi-siamo-content">
                 <div class="editable-text-wrapper">
                     <h2 id="content-cosaSonoHeading" data-content-key="cosaSonoHeading"></h2>
-                    <span class="edit-icon-text" data-key="cosaSonoHeading" data-type="text" title="Modifica Titolo">&#9998;</span>
+                    <span class="edit-icon-text" data-key="cosaSonoHeading" data-type="text" title="Modifica Titolo">✎</span>
                 </div>
                 <div class="editable-text-wrapper">
                     <p id="content-cosaSonoText1" data-content-key="cosaSonoText1"></p>
-                    <span class="edit-icon-text" data-key="cosaSonoText1" data-type="textarea" title="Modifica Testo">&#9998;</span>
+                    <span class="edit-icon-text" data-key="cosaSonoText1" data-type="textarea" title="Modifica Testo">✎</span>
                 </div>
                 <div class="editable-text-wrapper">
                     <p id="content-cosaSonoText2" data-content-key="cosaSonoText2"></p>
-                    <span class="edit-icon-text" data-key="cosaSonoText2" data-type="textarea" title="Modifica Testo">&#9998;</span>
+                    <span class="edit-icon-text" data-key="cosaSonoText2" data-type="textarea" title="Modifica Testo">✎</span>
                 </div>
             </div>
         </section>
@@ -155,7 +269,7 @@
         <section class="section-padding" style="background-color: var(--light); border-radius: var(--border-radius-large);">
             <div class="editable-text-wrapper">
                 <h2 class="text-center mb-4" style="color: var(--primary);" id="content-infoPraticheHeading" data-content-key="infoPraticheHeading"></h2>
-                <span class="edit-icon-text" data-key="infoPraticheHeading" data-type="text" title="Modifica Titolo">&#9998;</span>
+                <span class="edit-icon-text" data-key="infoPraticheHeading" data-type="text" title="Modifica Titolo">✎</span>
             </div>
             <div class="card-grid">
                 <div class="card info-card">
@@ -163,7 +277,7 @@
                         <h3><i class="fas fa-calendar-alt" style="margin-right: 8px; color: var(--secondary);"></i> Quando</h3>
                         <div class="editable-text-wrapper">
                             <p id="content-infoQuandoText" data-content-key="infoQuandoText"></p>
-                            <span class="edit-icon-text" data-key="infoQuandoText" data-type="quando" title="Modifica Info Quando">&#9998;</span>
+                            <span class="edit-icon-text" data-key="infoQuandoText" data-type="quando" title="Modifica Info Quando">✎</span>
                             <p style="margin-top: 1rem; font-size: 1rem;">Prossimo incontro: <strong id="next-meeting-date"></strong></p>
                         </div>
                     </div>
@@ -173,7 +287,7 @@
                         <h3><i class="fas fa-map-marker-alt" style="margin-right: 8px; color: var(--secondary);"></i> Dove</h3>
                         <div class="editable-text-wrapper">
                             <p id="content-infoDoveText" data-content-key="infoDoveText"></p>
-                            <span class="edit-icon-text" data-key="infoDoveText" data-type="textarea" title="Modifica Info Dove">&#9998;</span>
+                            <span class="edit-icon-text" data-key="infoDoveText" data-type="textarea" title="Modifica Info Dove">✎</span>
                         </div>
                         <a href="dovesiamo.html" class="card-btn card-btn-secondary" style="margin-top: 1rem;">Come raggiungerci</a>
                     </div>
@@ -183,7 +297,7 @@
                         <h3><i class="fas fa-users" style="margin-right: 8px; color: var(--secondary);"></i> A chi è rivolto</h3>
                         <div class="editable-text-wrapper">
                             <p id="content-infoRivoltoText" data-content-key="infoRivoltoText"></p>
-                            <span class="edit-icon-text" data-key="infoRivoltoText" data-type="textarea" title="Modifica Info Rivolto">&#9998;</span>
+                            <span class="edit-icon-text" data-key="infoRivoltoText" data-type="textarea" title="Modifica Info Rivolto">✎</span>
                         </div>
                     </div>
                 </div>
@@ -193,20 +307,20 @@
         <section class="chi-siamo-section reverse section-padding">
             <div class="chi-siamo-image-container editable-image-wrapper">
                 <img src="" alt="Condivisione comunitaria" class="chi-siamo-image" id="content-approccioImage" data-content-key="approccioImage">
-                <span class="edit-icon-image" data-key="approccioImage" data-type="image" title="Modifica Immagine">&#9998;</span>
+                <span class="edit-icon-image" data-key="approccioImage" data-type="image" title="Modifica Immagine">✎</span>
             </div>
             <div class="chi-siamo-content">
                 <div class="editable-text-wrapper">
                     <h2 id="content-approccioHeading" data-content-key="approccioHeading"></h2>
-                    <span class="edit-icon-text" data-key="approccioHeading" data-type="text" title="Modifica Titolo">&#9998;</span>
+                    <span class="edit-icon-text" data-key="approccioHeading" data-type="text" title="Modifica Titolo">✎</span>
                 </div>
                 <div class="editable-text-wrapper">
                     <p id="content-approccioText1" data-content-key="approccioText1"></p>
-                    <span class="edit-icon-text" data-key="approccioText1" data-type="textarea" title="Modifica Testo">&#9998;</span>
+                    <span class="edit-icon-text" data-key="approccioText1" data-type="textarea" title="Modifica Testo">✎</span>
                 </div>
                 <div class="editable-text-wrapper">
                     <p id="content-approccioText2" data-content-key="approccioText2"></p>
-                    <span class="edit-icon-text" data-key="approccioText2" data-type="textarea" title="Modifica Testo">&#9998;</span>
+                    <span class="edit-icon-text" data-key="approccioText2" data-type="textarea" title="Modifica Testo">✎</span>
                 </div>
             </div>
         </section>
@@ -214,7 +328,7 @@
         <section class="section-padding">
             <div class="editable-text-wrapper">
                 <h2 class="text-center mb-4" id="content-passiLectioHeading" data-content-key="passiLectioHeading"></h2>
-                <span class="edit-icon-text" data-key="passiLectioHeading" data-type="text" title="Modifica Titolo">&#9998;</span>
+                <span class="edit-icon-text" data-key="passiLectioHeading" data-type="text" title="Modifica Titolo">✎</span>
             </div>
             <div class="card-grid lectio-steps-grid">
                 <div class="card">
@@ -222,11 +336,11 @@
                         <div style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;">1</div>
                         <div class="editable-text-wrapper">
                             <h3 id="content-passoLectioHeadingCard" data-content-key="passoLectioHeadingCard"></h3>
-                            <span class="edit-icon-text" data-key="passoLectioHeadingCard" data-type="text" title="Modifica Titolo Passo">&#9998;</span>
+                            <span class="edit-icon-text" data-key="passoLectioHeadingCard" data-type="text" title="Modifica Titolo Passo">✎</span>
                         </div>
                         <div class="editable-text-wrapper">
                             <p id="content-passoLectioTextCard" data-content-key="passoLectioTextCard"></p>
-                            <span class="edit-icon-text" data-key="passoLectioTextCard" data-type="textarea" title="Modifica Testo Passo">&#9998;</span>
+                            <span class="edit-icon-text" data-key="passoLectioTextCard" data-type="textarea" title="Modifica Testo Passo">✎</span>
                         </div>
                     </div>
                 </div>
@@ -235,11 +349,11 @@
                         <div style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;">2</div>
                         <div class="editable-text-wrapper">
                             <h3 id="content-passoMeditatioHeadingCard" data-content-key="passoMeditatioHeadingCard"></h3>
-                            <span class="edit-icon-text" data-key="passoMeditatioHeadingCard" data-type="text" title="Modifica Titolo Passo">&#9998;</span>
+                            <span class="edit-icon-text" data-key="passoMeditatioHeadingCard" data-type="text" title="Modifica Titolo Passo">✎</span>
                         </div>
                         <div class="editable-text-wrapper">
                             <p id="content-passoMeditatioTextCard" data-content-key="passoMeditatioTextCard"></p>
-                            <span class="edit-icon-text" data-key="passoMeditatioTextCard" data-type="textarea" title="Modifica Testo Passo">&#9998;</span>
+                            <span class="edit-icon-text" data-key="passoMeditatioTextCard" data-type="textarea" title="Modifica Testo Passo">✎</span>
                         </div>
                     </div>
                 </div>
@@ -248,11 +362,11 @@
                         <div style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;">3</div>
                         <div class="editable-text-wrapper">
                             <h3 id="content-passoOratioHeadingCard" data-content-key="passoOratioHeadingCard"></h3>
-                            <span class="edit-icon-text" data-key="passoOratioHeadingCard" data-type="text" title="Modifica Titolo Passo">&#9998;</span>
+                            <span class="edit-icon-text" data-key="passoOratioHeadingCard" data-type="text" title="Modifica Titolo Passo">✎</span>
                         </div>
                         <div class="editable-text-wrapper">
                             <p id="content-passoOratioTextCard" data-content-key="passoOratioTextCard"></p>
-                            <span class="edit-icon-text" data-key="passoOratioTextCard" data-type="textarea" title="Modifica Testo Passo">&#9998;</span>
+                            <span class="edit-icon-text" data-key="passoOratioTextCard" data-type="textarea" title="Modifica Testo Passo">✎</span>
                         </div>
                     </div>
                 </div>
@@ -263,7 +377,7 @@
 
 <div class="login-popup-overlay" id="loginOverlay"></div>
 <div class="login-popup" id="loginPopup">
-    <button class="close-popup" id="closeLoginPopupBtn" aria-label="Chiudi popup">&times;</button>
+    <button class="close-popup" id="closeLoginPopupBtn" aria-label="Chiudi popup">×</button>
     <div class="login-tabs"> <div class="login-tab active" data-tab="login">Accedi</div> <div class="login-tab" data-tab="register">Registrati</div></div>
     <form class="login-form active" id="loginForm" method="POST">
         <div class="form-group mb-3"><label for="login-email">Email</label><input type="email" id="login-email" name="login-email" class="form-control" required autocomplete="email"></div>
@@ -287,7 +401,7 @@
 
 <div class="login-popup-overlay" id="forgotPasswordOverlay"></div>
 <div class="login-popup" id="forgotPasswordPopup">
-    <button class="close-popup" id="closeForgotPasswordPopupBtn" aria-label="Chiudi popup">&times;</button>
+    <button class="close-popup" id="closeForgotPasswordPopupBtn" aria-label="Chiudi popup">×</button>
     <h3 style="text-align:center; margin-bottom: 1rem; color: var(--primary);">Recupera Password</h3>
     <p style="font-size:0.95em; color:var(--gray-dark); margin-bottom:1.5rem; text-align:left;">Inserisci l'indirizzo email associato al tuo account. Se presente nel nostro sistema, ti invieremo un link per reimpostare la password.</p>
     <form id="forgotPasswordForm" method="POST">
@@ -310,7 +424,7 @@
 
 <div id="editContentModal" class="edit-content-modal">
     <div class="edit-content-modal-content">
-        <button class="close-modal-btn" id="closeEditContentModalBtn" aria-label="Chiudi">&times;</button>
+        <button class="close-modal-btn" id="closeEditContentModalBtn" aria-label="Chiudi">×</button>
         <h3 id="editModalTitle">Modifica Contenuto</h3>
         <div class="form-group">
             <label id="editModalFieldLabelText">Testo:</label>
@@ -331,7 +445,7 @@
 
 <div id="editQuandoModal" class="edit-quando-modal">
     <div class="edit-quando-modal-content">
-        <button class="close-modal-btn" id="closeEditQuandoModalBtn" aria-label="Chiudi">&times;</button>
+        <button class="close-modal-btn" id="closeEditQuandoModalBtn" aria-label="Chiudi">×</button>
         <h3>Modifica Dettagli Incontro "Quando"</h3>
         <div class="form-group">
             <label for="editQuandoDayOfWeek">Giorno della Settimana:</label>
@@ -368,7 +482,7 @@
 <div id="ai-chat-popup">
     <div id="ai-chat-header">
         <h3>Assistente Eremo <i class="fas fa-robot"></i></h3>
-        <button id="ai-chat-close-btn" aria-label="Chiudi Chat">&times;</button>
+        <button id="ai-chat-close-btn" aria-label="Chiudi Chat">×</button>
     </div>
     <div id="ai-chat-messages">
         <div class="ai-message">Ciao! Sono l'assistente virtuale dell'Eremo. Come posso aiutarti oggi riguardo il sito?</div>
@@ -481,7 +595,7 @@
         const mobileNavGestioneEventiAdminEl = gebi('mobileNavGestioneEventiAdmin');
         const mobileLogoutLinkEl = gebi('mobileLogoutLink');
 
-        [loginBtnDesktop, userDropdownContainer, navProfilo, navMiePrenotazioni, navDashboard, navGestioneEventiAdmin, logoutLinkDesktop, loginBtnMobile, mobileNavProfiloEl, mobileNavPrenotazioniEl, mobileNavDashboardEl, mobileNavGestioneEventiAdminEl, mobileLogoutLinkEl, mobileMenuSeparator, editPageBtnContainer].forEach(el => { if (el) el.style.display = 'none'; });
+        [loginBtnDesktop, userDropdownContainer, navProfilo, navMiePrenotazioni, navDashboard, navGestioneEventiAdmin, logoutLinkDesktop, loginBtnMobile, mobileNavProfiloEl, mobileNavPrenotazioniEl, mobileNavDashboardEl, mobileNavGestioneEventiAdminEl, mobileLogoutLinkEl, mobileMenuSeparator].forEach(el => { if (el) el.style.display = 'none'; });
 
         if (currentUserData) {
             if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
@@ -495,15 +609,17 @@
             if (currentUserData.isAdmin) {
                 if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
                 [navProfilo, navMiePrenotazioni, navDashboard, navGestioneEventiAdmin, mobileNavProfiloEl, mobileNavPrenotazioniEl, mobileNavDashboardEl, mobileNavGestioneEventiAdminEl].forEach(el => { if(el) el.style.display = 'block'; });
-                if (editPageBtnContainer) { editPageBtnContainer.style.display = 'flex'; gebi('editPageBtn').style.display = isEditModeActive ? 'none' : 'inline-block'; gebi('savePageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; gebi('cancelPageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; }
+                // The visibility of the button container is handled by toggleEditMode
             } else {
                 if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
                 [navProfilo, navMiePrenotazioni, mobileNavProfiloEl, mobileNavPrenotazioniEl].forEach(el => { if(el) el.style.display = 'block'; });
+                if(editPageBtnContainer) editPageBtnContainer.classList.remove('active'); // Hide if not admin
             }
         } else {
             if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
             if (loginBtnMobile) loginBtnMobile.style.display = 'block';
             if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+            if(editPageBtnContainer) editPageBtnContainer.classList.remove('active'); // Hide if not logged in
         }
     }
 
@@ -673,7 +789,71 @@
         updateNextMeetingDateDisplay();
     }
 
-    function toggleEditMode(enable){isEditModeActive=enable;document.querySelectorAll('.edit-icon-text,.edit-icon-image').forEach(icon=>icon.style.display=(currentUserData?.isAdmin&&enable)?'inline-flex':'none');document.querySelectorAll('img.chi-siamo-image, img.page-header-image').forEach(img=>{ (currentUserData?.isAdmin&&enable)?img.classList.add('editable-image-target'):img.classList.remove('editable-image-target');});const editContainer=gebi('editPageBtnContainer');const editBtn=gebi('editPageBtn');const saveBtn=gebi('savePageChangesBtn');const cancelBtn=gebi('cancelPageChangesBtn');if(editContainer&&currentUserData?.isAdmin)editContainer.style.display='flex';else if(editContainer)editContainer.style.display='none';if(editBtn)editBtn.style.display=enable?'none':(currentUserData?.isAdmin?'inline-block':'none');if(saveBtn)saveBtn.style.display=enable?'inline-block':'none';if(cancelBtn)cancelBtn.style.display=enable?'inline-block':'none';if(enable){originalPageContentsForCancel= JSON.parse(JSON.stringify(currentPageDbContents));}}
+    function toggleEditMode(enable){
+        isEditModeActive=enable;
+        document.querySelectorAll('.edit-icon-text, .edit-icon-image').forEach(icon => {
+            if (currentUserData?.isAdmin && enable) {
+                icon.style.display = 'flex';
+                const parentWrapper = icon.closest('.editable-text-wrapper, .editable-image-wrapper');
+                if (parentWrapper) {
+                    let translateX = '50%';
+                    let translateY = '-50%';
+
+                    if (parentWrapper.classList.contains('main-title-editable-wrapper')) {
+                        translateX = '50%';
+                        translateY = '-50%';
+                    } else if (parentWrapper.closest('.chi-siamo-section')) {
+                        const tagName = parentWrapper.querySelector('[data-content-key]')?.tagName;
+                        if (tagName === 'H2') {
+                            translateX = 'calc(100% + 5px)';
+                            translateY = '-50%';
+                        } else if (tagName === 'P') {
+                            translateX = 'calc(100% + 5px)';
+                            translateY = '-50%';
+                        }
+                    } else if (parentWrapper.closest('.card-grid')) {
+                        translateX = '50%';
+                        translateY = '-50%';
+                    } else if (parentWrapper.classList.contains('editable-image-wrapper')) {
+                        translateX = '50%';
+                        translateY = '-50%';
+                    }
+
+                    icon.style.setProperty('--custom-translate-x', translateX);
+                    icon.style.setProperty('--custom-translate-y', translateY);
+                }
+                setTimeout(() => {
+                    icon.style.opacity = '1';
+                    icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(1)`;
+                }, 10);
+            } else {
+                icon.style.opacity = '0';
+                icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(0.8)`;
+                setTimeout(() => {
+                    icon.style.display = 'none';
+                }, 300);
+            }
+        });
+
+        const editContainer=gebi('editPageBtnContainer');
+        const editBtn=gebi('editPageBtn');
+        const saveBtn=gebi('savePageChangesBtn');
+        const cancelBtn=gebi('cancelPageChangesBtn');
+        if(editContainer) {
+            if (currentUserData?.isAdmin) {
+                editContainer.classList.add('active'); // Attiva l'animazione di entrata
+                if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block';
+                if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none';
+                if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none';
+            } else {
+                editContainer.classList.remove('active'); // Nascondi se non admin
+                if(editBtn) editBtn.style.display = 'none';
+                if(saveBtn) saveBtn.style.display = 'none';
+                if(cancelBtn) cancelBtn.style.display = 'none';
+            }
+        }
+        if(enable){originalPageContentsForCancel= JSON.parse(JSON.stringify(currentPageDbContents));}
+    }
 
     function openEditModal(key,type,currentValue){
         currentEditingKey=key;currentEditingType=type;
@@ -778,6 +958,7 @@
         let elToEdit,key,type,currentVal;
 
         if(editIcon){
+            e.stopPropagation(); // Impedisce la propagazione dell'evento
             key=editIcon.dataset.key; type=editIcon.dataset.type;
             if (type === 'quando') {
                 openEditQuandoModal();
@@ -788,6 +969,7 @@
             currentVal = elToEdit.tagName === 'IMG' ? elToEdit.src : elToEdit.innerHTML;
             openEditModal(key, type, currentVal);
         } else if(imageTarget){
+            e.stopPropagation(); // Impedisce la propagazione dell'evento
             key=imageTarget.dataset.contentKey; type='image';currentVal=imageTarget.src;
             openEditModal(key,type,currentVal);
         }
@@ -872,7 +1054,7 @@
                 const timeParts = quandoData.endTime.split(':');
                 if (timeParts.length === 2) {
                     triggerHour = parseInt(timeParts[0]);
-                    triggerMinute = parseInt(timeParts[1]);
+                    triggerMinute = parseInt(parseInt(timeParts[1]));
                 }
             }
             nextMeetingDateElement.textContent = formatDateItalian(getNextMeetingDay(targetDay, triggerHour, triggerMinute));
@@ -910,20 +1092,19 @@
     document.addEventListener('DOMContentLoaded',async()=>{
         const c=gebi('currentYear');if(c)c.textContent=new Date().getFullYear();
         loadUserData();
-        // await fetchAndUpdateUserDisplayDataFromApi(); // Chiamata spostata dopo loadNavbarLogo per assicurare UI base
-        await loadNavbarLogo(); // <<< AGGIUNGI QUESTA CHIAMATA QUI
+        updateNavbarUI(); // Call updateNavbarUI initially
+        await loadNavbarLogo();
         await loadPageContentsFromServer(); // Carica contenuti della pagina specifica
         await fetchAndUpdateUserDisplayDataFromApi(); // Aggiorna UI navbar dopo che i dati utente sono certi
 
-        if(!isEditModeActive||!currentUserData?.isAdmin){
+        // Ensure edit UI is correctly initialized based on admin status
+        const editContainer = gebi('editPageBtnContainer');
+        if (currentUserData && currentUserData.isAdmin) {
+            toggleEditMode(false); // Initialize edit mode buttons and icons
+        } else {
+            if(editContainer) editContainer.classList.remove('active'); // Ensure button container is hidden
             document.querySelectorAll('.edit-icon-text,.edit-icon-image').forEach(i=>i.style.display='none');
             document.querySelectorAll('img.chi-siamo-image, img.page-header-image').forEach(img=>img.classList.remove('editable-image-target'));
-        } else {
-            // Se è admin e isEditModeActive era true per qualche motivo (es. da uno stato precedente),
-            // assicurati che i bottoni siano visualizzati correttamente.
-            // Questa chiamata potrebbe essere ridondante se updateNavbarUI già gestisce i bottoni edit.
-            toggleEditMode(false); // O toggleEditMode(isEditModeActive); se vuoi preservare lo stato.
-            // Per coerenza, al caricamento, di solito è false.
         }
 
         // Event listener per ESC aggiornato

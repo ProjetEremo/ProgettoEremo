@@ -487,7 +487,8 @@
   </div>
 </div>
 
-<p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati. OdV Via San Vito 2, Nembro. C.F.:90004060167</p>
+<footer> <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati. OdV Via San Vito 2, Nembro. C.F.:90004060167</p>
+</footer>
 
 <div id="ai-bubble-animation-overlay">
   <div id="ai-revealed-icon-container">
@@ -604,35 +605,49 @@
     }
   }
 
-  // Funzione helper per chiamate API
+  // Funzione helper per chiamate API (MODIFICATA per gestire meglio 401/403)
   async function callApi(url, method = 'GET', data = null) {
     const headers = { 'Content-Type': 'application/json' };
-    const options = { method, headers, credentials: 'same-origin' };
+    const options = { method, headers, credentials: 'same-origin' }; // Assicura l'invio dei cookie di sessione
     if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
       options.body = JSON.stringify(data);
     }
     try {
       const response = await fetch(url, options);
       if (!response.ok) {
-        let errorData = { message: `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
+        let errorData;
         let rawErrorText = '';
         try {
           rawErrorText = await response.text();
           errorData = JSON.parse(rawErrorText);
-        } catch (e) { errorData.message = rawErrorText || errorData.message; }
-        throw new Error(errorData.message || `Errore del server: ${response.status} per ${url}`);
+        } catch (e) {
+          errorData = { message: rawErrorText || `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
+        }
+        // Aggiungi lo status all'oggetto errore se non presente, per una gestione più facile
+        if (!errorData.status) errorData.status = response.status;
+        throw errorData; // Lancia l'oggetto errore (o un Error object con le info)
       }
-      if (response.status === 204) return {};
+      if (response.status === 204) return {}; // No Content
       const contentType = response.headers.get("content-type");
-      if (contentType && contentType.indexOf("application/json") !== -1) { return await response.json(); }
-      else { const textResponse = await response.text(); return { success: true, data: textResponse, message: textResponse }; }
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        return await response.json();
+      } else {
+        const textResponse = await response.text();
+        return { success: true, data: textResponse, message: textResponse };
+      }
     } catch (error) {
-      console.error(`Fallimento chiamata API ${url}:`, error.message);
-      throw error;
+      console.error(`Fallimento chiamata API ${url}:`, error.message || error);
+      // Assicurati che l'errore rilanciato abbia uno status se disponibile
+      if (error && !error.status && error.message && error.message.includes("HTTP")) {
+        const match = error.message.match(/HTTP (\d+)/);
+        if (match && match[1]) error.status = parseInt(match[1]);
+      }
+      throw error; // Rilancia l'errore per essere gestito dal chiamante
     }
   }
 
-  // Inizializzazione UI per utente ospite o errore caricamento
+
+  // Inizializzazione UI per utente ospite o errore caricamento/sessione scaduta
   function initializeUIForGuest(errorMessage = "Funzionalità non disponibile. Effettua il login.") {
     const mainAvatarImg = document.querySelector('#main-avatar img');
     const navbarAvatarImg = document.querySelector('#navbar-avatar img');
@@ -646,21 +661,32 @@
 
     const emailInput = document.getElementById('email');
     if(emailInput) emailInput.value = '';
+    const nomeInput = document.getElementById('nome');
+    if(nomeInput) nomeInput.value = '';
+    const cognomeInput = document.getElementById('cognome');
+    if(cognomeInput) cognomeInput.value = '';
+
 
     document.querySelectorAll('#profile-info-form input:not(#email), #profile-info-form button, #save-icon-btn, #password-change-form input, #password-change-form button, #delete-account-form input, #delete-account-form button, #btn-generate-ai-icon, #ai-icon-prompt, #btn-save-ai-generated-icon, #btn-discard-ai-generated-icon').forEach(el => el.disabled = true);
 
     const avatarContainer = document.getElementById('avatar-options-container');
-    if(avatarContainer) avatarContainer.innerHTML = `<p>${errorMessage}</p>`;
+    if(avatarContainer) avatarContainer.innerHTML = `<p style="text-align:center; padding:1rem;">${errorMessage}</p>`;
     const bookingsGrid = document.getElementById('user-bookings-grid');
-    if(bookingsGrid) bookingsGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
+    if(bookingsGrid) bookingsGrid.innerHTML = `<p style="text-align:center; padding:1rem;">${errorMessage}</p>`;
     const waitlistGrid = document.getElementById('user-waitlist-grid');
-    if(waitlistGrid) waitlistGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
+    if(waitlistGrid) waitlistGrid.innerHTML = `<p style="text-align:center; padding:1rem;">${errorMessage}</p>`;
+    const noBookingsMsg = document.getElementById('no-bookings-message');
+    if(noBookingsMsg) noBookingsMsg.style.display = 'none'; // Nascondi "nessuna prenotazione" se mostriamo errore
+    const noWaitlistMsg = document.getElementById('no-waitlist-message');
+    if(noWaitlistMsg) noWaitlistMsg.style.display = 'none';
+
 
     const aiIconMessageEl = document.getElementById('ai-icon-message');
     if(aiIconMessageEl) displayMessage('ai-icon-message', errorMessage, false, false);
 
-    if(errorMessage !== "Funzionalità non disponibile. Effettua il login.") {
-      displayMessage('profile-info-message', errorMessage, false);
+    // Mostra il messaggio principale nella sezione info profilo se è un errore di sessione/caricamento
+    if (errorMessage.toLowerCase().includes("sessione") || errorMessage.toLowerCase().includes("login") || errorMessage.toLowerCase().includes("errore caricamento")) {
+      displayMessage('profile-info-message', errorMessage, false, false); // Non cancellare subito
     }
   }
 
@@ -693,14 +719,15 @@
     const defaultLogoPath = '/images/Logo_eremo.png'; // Usare path assoluto per coerenza
 
     try {
-      const response = await fetch('/api_get_page_content.php?page=index'); // Assumi che l'API sia alla root
+      // Assicurati che api_get_page_content.php non richieda login per il logo
+      const response = await fetch('/api_get_page_content.php?page=index');
       if (!response.ok) {
         throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
       }
       const data = await response.json();
 
       if (data.success && data.contents && data.contents.navbarLogo) {
-        logoImgTag.src = getDisplayIconPath(data.contents.navbarLogo); // Usa getDisplayIconPath per consistenza
+        logoImgTag.src = getDisplayIconPath(data.contents.navbarLogo);
       } else {
         console.warn("URL del logo navbar non trovato o errore API. Uso il logo di default.");
         logoImgTag.src = defaultLogoPath;
@@ -710,6 +737,29 @@
       logoImgTag.src = defaultLogoPath; // Fallback in caso di errore
     }
   }
+
+  // NUOVA FUNZIONE: Verifica attiva della sessione server
+  async function checkUserSessionActive() {
+    try {
+      // Assicurati che 'api/api_check_session.php' esista e usi require_login()
+      // Dovrebbe restituire {success: true} o un errore 401/403 se la sessione non è valida
+      await callApi('api/api_check_session.php');
+      return true; // La chiamata ha avuto successo (nessun errore), la sessione è attiva
+    } catch (error) {
+      // Controlla se l'errore è dovuto a sessione scaduta (401/403)
+      if (error && (error.status === 401 || error.status === 403)) {
+        console.warn("Session check: Sessione server non attiva (401/403).");
+        return false; // Sessione non attiva
+      }
+      // Per altri errori (es. rete, server down), consideriamo la sessione potenzialmente attiva
+      // ma con problemi di comunicazione. Potresti voler gestire questo diversamente.
+      // Se l'API non è raggiungibile, non possiamo confermare la sessione, ma non è detto sia scaduta.
+      console.warn("Errore durante il check della sessione (non 401/403):", error.message || error);
+      return true; // In questo caso, assumiamo che la sessione possa essere ancora valida per evitare logout aggressivi per problemi di rete.
+                   // Se l'API non è raggiungibile, le altre chiamate API falliranno comunque e gestiranno il logout se necessario.
+    }
+  }
+
 
   document.addEventListener('DOMContentLoaded', async () => {
     // Inizializzazione elementi DOM
@@ -727,7 +777,7 @@
 
     const currentYearEl = document.getElementById('currentYear');
     if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
-    await loadNavbarLogo(); // <<< AGGIUNGI QUESTA CHIAMATA QUI, all'inizio o dopo loadUserData
+    await loadNavbarLogo();
 
     if (saveIconBtnEl) {
       const textSpan = saveIconBtnEl.querySelector('.btn-text');
@@ -737,7 +787,7 @@
         spinnerOverlay = document.createElement('span');
         spinnerOverlay.className = 'spinner-btn-overlay';
         const spinnerDiv = document.createElement('div');
-        spinnerDiv.className = 'modern-spinner'; // Assumi che .modern-spinner sia definito in CSS
+        spinnerDiv.className = 'modern-spinner';
         spinnerDiv.style.cssText = 'width:20px; height:20px; border-width:2px; margin:0; border-color:white white transparent transparent;';
         spinnerOverlay.appendChild(spinnerDiv);
         saveIconBtnEl.appendChild(spinnerOverlay);
@@ -757,63 +807,65 @@
       if(checkIcon) checkIcon.style.display = 'none';
     }
 
-    // --- INIZIO CODICE PER ANIMAZIONE HEADER PROFILO ---
     const profileHeaderEl = document.querySelector('.profile-header');
     if (profileHeaderEl) {
-      // 1. Aggiungi una classe per impostare gli stati iniziali (elementi nascosti)
       profileHeaderEl.classList.add('profile-header-loading');
-
-      // 2. Dopo un brevissimo ritardo (per permettere al browser di applicare lo stato iniziale),
-      //    rimuovi la classe di pre-caricamento e aggiungi la classe che triggera l'animazione.
       setTimeout(() => {
         profileHeaderEl.classList.remove('profile-header-loading');
         profileHeaderEl.classList.add('loaded');
-      }, 50); // Un piccolo ritardo (50ms) è spesso sufficiente
+      }, 50);
     }
-    // --- FINE CODICE PER ANIMAZIONE HEADER PROFILO ---
 
+    // --- INIZIO LOGICA DI CARICAMENTO E VERIFICA SESSIONE ---
     const userDataString = localStorage.getItem('userDataEFF');
     if (userDataString) {
       try {
         currentUserDataFromStorage = JSON.parse(userDataString);
+        // PRIMA DI TUTTO, VERIFICA LA SESSIONE REALE SUL SERVER
+        const sessionIsValidOnServer = await checkUserSessionActive();
+
+        if (!sessionIsValidOnServer) {
+          console.warn("Sessione server non valida rilevata all'avvio di areapersonale.html.");
+          logout(false); // Esegui il logout client-side (false per non mostrare alert duplicati)
+          initializeUIForGuest("La tua sessione è scaduta. Effettua nuovamente il login.");
+          return; // Interrompi ulteriori caricamenti se la sessione non è valida
+        }
+
+        // Se la sessione server è valida, popola l'UI con i dati da localStorage
+        // e poi aggiorna con i dati freschi dal server.
         const navbarUsername = document.getElementById('navbar-username');
         const navbarAvatarImg = document.querySelector('#navbar-avatar img');
         const mainAvatarImg = document.querySelector('#main-avatar img');
         const profileGreeting = document.getElementById('profile-greeting');
-        const emailInput = document.getElementById('email');
-        const nomeInput = document.getElementById('nome');
-        const cognomeInput = document.getElementById('cognome');
 
         if (navbarUsername) navbarUsername.textContent = currentUserDataFromStorage.nome || 'Utente';
         selectedIconPath = normalizeIconPath(currentUserDataFromStorage.iconPath || defaultIconPath);
         if (navbarAvatarImg) navbarAvatarImg.src = getDisplayIconPath(selectedIconPath);
         if (mainAvatarImg) mainAvatarImg.src = getDisplayIconPath(selectedIconPath);
         if (profileGreeting) profileGreeting.textContent = `Ciao, ${currentUserDataFromStorage.nome || 'Utente'}!`;
-        if (emailInput) emailInput.value = currentUserDataFromStorage.email || '';
-        if(nomeInput) nomeInput.value = currentUserDataFromStorage.nome || '';
-        if(cognomeInput) cognomeInput.value = currentUserDataFromStorage.cognome || '';
-      } catch(e) {
-        currentUserDataFromStorage = null;
-        initializeUIForGuest("Errore caricamento dati locali.");
-      }
-    } else {
-      initializeUIForGuest("Effettua il login per accedere alle funzionalità.");
-    }
+        // Non impostare nome/cognome/email qui, lo farà loadUserProfileFromServer
 
-    if (currentUserDataFromStorage) {
-      try {
-        await loadUserProfileFromServer();
+        // Ora carica/aggiorna i dati dal server
+        await loadUserProfileFromServer(); // Questa funzione ora gestirà anche 401/403
         await loadAvailableIcons();
         await loadUserBookings();
         await loadUserWaitlist();
         if(btnGenerateAiIconEl) btnGenerateAiIconEl.disabled = false;
         if(aiIconPromptEl) aiIconPromptEl.disabled = false;
-      } catch (error) {
-        console.error("Errore durante il setup post-login:", error);
-        displayMessage('profile-info-message', 'Errore caricamento dati. Riprova.', false, false);
-        initializeUIForGuest('Errore caricamento dati. Riprova.');
+
+      } catch(e) { // Questo catch è per errori nel parsing di localStorage o errori imprevisti
+        console.error("Errore durante l'inizializzazione o il caricamento dei dati:", e);
+        currentUserDataFromStorage = null;
+        logout(false);
+        initializeUIForGuest("Errore durante il caricamento della pagina. Riprova.");
       }
+    } else {
+      // Nessun dato utente in localStorage, quindi l'utente non è "loggato" nel browser.
+      initializeUIForGuest("Effettua il login per accedere alle funzionalità.");
+      // Non c'è bisogno di chiamare logout() qui.
     }
+    // --- FINE LOGICA DI CARICAMENTO E VERIFICA SESSIONE ---
+
 
     btnGenerateAiIconEl?.addEventListener('click', handleGenerateAiIcon);
     aiGeneratedIconPreviewEl?.addEventListener('click', handleSelectAiGeneratedIcon);
@@ -830,13 +882,28 @@
     }
   });
 
+  // Funzione per gestire errori API, specialmente 401/403 per la sessione
+  function handleApiError(error, messageElementId, defaultErrorMessage) {
+    let displayMsg = defaultErrorMessage;
+    if (error && (error.status === 401 || error.status === 403)) {
+      displayMsg = "Sessione scaduta o non autorizzata. Effettua nuovamente il login.";
+      console.warn("API Error: Sessione scaduta (401/403). Eseguo logout client.");
+      logout(false);
+      initializeUIForGuest(displayMsg);
+    } else if (error && error.message) {
+      displayMsg = error.message;
+    }
+    displayMessage(messageElementId, displayMsg, false, false); // Non cancellare subito il messaggio di errore importante
+  }
+
+
   async function loadUserProfileFromServer() {
     const mainAvatarImg = document.querySelector('#main-avatar img');
     const navbarAvatarImg = document.querySelector('#navbar-avatar img');
     const navbarUsername = document.getElementById('navbar-username');
     const profileGreeting = document.getElementById('profile-greeting');
     try {
-      const apiUserData = await callApi('api/api_get_user_profile.php');
+      const apiUserData = await callApi('api/api_get_user_profile.php'); // Assicurati che questa API esista e sia protetta
       if (apiUserData && apiUserData.success) {
         const data = apiUserData.data;
         document.getElementById('nome').value = data.nome || '';
@@ -850,16 +917,23 @@
         if(navbarUsername) navbarUsername.textContent = data.nome || 'Utente';
         if(profileGreeting) profileGreeting.textContent = `Ciao, ${data.nome || 'Utente'}!`;
 
+        // Aggiorna i dati in localStorage con quelli freschi dal server
         currentUserDataFromStorage = {
-          nome: data.nome, cognome: data.cognome, email: data.email,
-          iconPath: selectedIconPath
+          nome: data.nome,
+          cognome: data.cognome,
+          email: data.email,
+          iconPath: selectedIconPath,
+          // Mantieni isAdmin se era presente, altrimenti l'API dovrebbe fornirlo
+          isAdmin: currentUserDataFromStorage ? currentUserDataFromStorage.isAdmin : false
         };
         localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
       } else {
-        displayMessage('profile-info-message', (apiUserData && apiUserData.message) ? apiUserData.message : "Errore recupero profilo.", false);
+        // Se l'API non ha successo ma non è un 401 (gestito da handleApiError nel catch)
+        // mostra il messaggio specifico dell'API.
+        displayMessage('profile-info-message', (apiUserData && apiUserData.message) ? apiUserData.message : "Errore nel recupero del profilo utente.", false, false);
       }
     } catch (error) {
-      displayMessage('profile-info-message', `Errore caricamento profilo: ${error.message}.`, false);
+      handleApiError(error, 'profile-info-message', 'Errore durante il caricamento del profilo utente.');
     }
   }
 
@@ -885,7 +959,7 @@
     container.innerHTML = '<p>Caricamento icone disponibili...</p>';
 
     try {
-      const iconsData = await callApi('api/api_get_icons.php');
+      const iconsData = await callApi('api/api_get_icons.php'); // Assicurati che questa API esista
       if (iconsData && iconsData.success && iconsData.icons) {
         container.innerHTML = '';
         if (iconsData.icons.length > 0) {
@@ -905,7 +979,7 @@
             img.classList.add('avatar-option-image');
             img.setAttribute('data-path', normalizedPath);
             img.addEventListener('click', () => {
-              if (!currentUserDataFromStorage) return;
+              if (!currentUserDataFromStorage) return; // Non permettere selezione se non loggato (UI dovrebbe già impedirlo)
               selectedIconPath = normalizedPath;
               updateIconSelectionVisual();
               const mainAvatarPreview = document.querySelector('#main-avatar img');
@@ -941,10 +1015,14 @@
           container.innerHTML = `<p>${iconsData.message || 'Nessuna icona personalizzata disponibile.'}</p>`;
         }
       } else {
+        // Se iconsData.success è false ma non è un errore 401/403 (già gestito da handleApiError)
         container.innerHTML = `<p>${(iconsData && iconsData.message) ? iconsData.message : 'Errore nel caricamento delle icone.'}</p>`;
       }
     } catch (error) {
-      container.innerHTML = `<p class="form-message error" style="display:block;">Errore caricamento icone: ${error.message}</p>`;
+      handleApiError(error, 'avatar-options-container', 'Errore durante il caricamento delle icone disponibili.');
+      // Sovrascrive il contenuto del container con il messaggio di errore da handleApiError
+      // ma displayMessage scrive in un elemento con ID, quindi dobbiamo farlo manualmente per il container.
+      if (container) container.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${error.message || 'Errore caricamento icone.'}</p>`;
     }
   }
 
@@ -958,7 +1036,7 @@
     }
     try {
       displayMessage('icon-save-message', 'Eliminazione icona in corso...', true, false, true);
-      const response = await callApi('api/api_delete_icon.php', 'POST', { iconPath: iconPathToDelete });
+      const response = await callApi('api/api_delete_icon.php', 'POST', { iconPath: iconPathToDelete }); // Assicurati che esista
       if (response.success) {
         displayMessage('icon-save-message', response.message || 'Icona eliminata con successo!', true, true, true);
         if (selectedIconPath === iconPathToDelete) {
@@ -966,14 +1044,13 @@
           const mainAvatarPreview = document.querySelector('#main-avatar img');
           if (mainAvatarPreview) mainAvatarPreview.src = getDisplayIconPath(defaultIconPath);
         }
-        await loadAvailableIcons();
-        await loadUserProfileFromServer();
+        await loadAvailableIcons(); // Ricarica la griglia
+        await loadUserProfileFromServer(); // Ricarica il profilo per aggiornare l'icona se era quella corrente
       } else {
         throw new Error(response.message || 'Errore durante l\'eliminazione dell\'icona sul server.');
       }
     } catch (error) {
-      console.error("Errore eliminazione icona:", error);
-      displayMessage('icon-save-message', `Errore eliminazione: ${error.message}`, false, true, true);
+      handleApiError(error, 'icon-save-message', 'Errore durante l\'eliminazione dell\'icona.');
     }
   }
 
@@ -1039,21 +1116,18 @@
       bubbleIntervalId = null;
     }
 
-    // Fai svanire rapidamente le bolle esistenti
     const existingBubbles = aiBubbleAnimationOverlayEl.querySelectorAll('.bubble');
     existingBubbles.forEach(bubble => {
-      bubble.classList.add('fade-out'); // Applica la classe per farle svanire
-      // Rimuovi dopo l'animazione di fade-out
-      setTimeout(() => { if (bubble.parentElement) bubble.remove(); }, 400); // Durata di bubbleFadeOut
+      bubble.classList.add('fade-out');
+      setTimeout(() => { if (bubble.parentElement) bubble.remove(); }, 400);
     });
 
 
     if (generatedIconBase64 && aiRevealedIconContainerEl && revealedAiIconImgEl) {
       revealedAiIconImgEl.src = generatedIconBase64;
-      // Ritarda leggermente la visualizzazione dell'icona centrale per dare tempo alle bolle di iniziare a svanire
       setTimeout(() => {
         aiRevealedIconContainerEl.classList.add('show');
-      }, 150); // Leggero ritardo
+      }, 150);
 
 
       setTimeout(() => {
@@ -1072,12 +1146,11 @@
         if(btnDiscardAiGeneratedIconEl) btnDiscardAiGeneratedIconEl.style.display = 'inline-flex';
         if(btnGenerateAiIconEl) btnGenerateAiIconEl.style.display = 'none';
 
-      }, 1800 + 150); // Aggiungi il ritardo del reveal al tempo di visualizzazione
+      }, 1800 + 150);
     } else {
-      // Nessuna icona generata (errore), nascondi solo l'overlay dopo che le bolle sono svanite
       setTimeout(() => {
         if(aiBubbleAnimationOverlayEl) aiBubbleAnimationOverlayEl.style.display = 'none';
-      }, 400); // Durata di bubbleFadeOut
+      }, 400);
     }
   }
 
@@ -1091,12 +1164,12 @@
     if(btnSaveAiGeneratedIconEl) btnSaveAiGeneratedIconEl.style.display = 'none';
     if(btnDiscardAiGeneratedIconEl) btnDiscardAiGeneratedIconEl.style.display = 'none';
     if(aiPreviewContainerEl) aiPreviewContainerEl.style.display = 'none';
-    displayMessage('ai-icon-message', '', true, false);
+    displayMessage('ai-icon-message', '', true, false); // Pulisci messaggi precedenti
 
     startBubbleAnimation();
 
     const CLOUDFLARE_WORKER_URL = 'https://text-to-image-template.tnt-teambom.workers.dev';
-    const stylisticKeywords = "profile avatar, vibrant sticker style, vector art, 2d illustration, clean lines, simple shading, bright colors, detailed, circular icon";
+    const stylisticKeywords = "profile avatar, realistic icon style, full color, vector art, 2d illustration with depth, clean lines, balanced shading, realistic color palette, detailed, circular icon";
     const augmentedPrompt = `${promptText}, ${stylisticKeywords}`;
 
     try {
@@ -1117,18 +1190,19 @@
       if (imageBlob.type && imageBlob.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onloadend = function() {
-          stopBubbleAnimation(reader.result);
+          stopBubbleAnimation(reader.result); // Passa il base64 all'animazione
         }
         reader.readAsDataURL(imageBlob);
       } else {
-        const errorText = await imageBlob.text();
+        const errorText = await imageBlob.text(); // Se non è un'immagine, prova a leggere come testo
         displayMessage('ai-icon-message', `Risposta non valida dal servizio AI: ${errorText.substring(0,100)}...`, false);
-        stopBubbleAnimation();
+        stopBubbleAnimation(); // Ferma l'animazione senza un'icona
       }
     } catch (error) {
       displayMessage('ai-icon-message', `Errore generazione AI: ${error.message}. Riprova.`, false);
-      stopBubbleAnimation();
+      stopBubbleAnimation(); // Ferma l'animazione in caso di errore
     } finally {
+      // Riabilita i controlli solo se non sono apparsi i bottoni Salva/Scarta (cioè se non c'è un'icona generata)
       if (btnSaveAiGeneratedIconEl && btnSaveAiGeneratedIconEl.style.display === 'none') {
         if(btnGenerateAiIconEl) {
           btnGenerateAiIconEl.disabled = false;
@@ -1155,15 +1229,22 @@
       displayMessage('ai-icon-message', 'Nessuna icona generata valida da salvare.', false);
       return;
     }
-    selectedIconPath = aiGeneratedIconPreviewEl.src.startsWith('data:image/') ? aiGeneratedIconPreviewEl.src : normalizeIconPath(aiGeneratedIconPreviewEl.src.substring(aiGeneratedIconPreviewEl.src.indexOf("uploads/icons/")));
-    updateIconSelectionVisual();
-    handleSaveIcon();
+    // Assicura che selectedIconPath sia il base64 se l'immagine è nuova
+    if (aiGeneratedIconPreviewEl.src.startsWith('data:image/')) {
+      selectedIconPath = aiGeneratedIconPreviewEl.src;
+    } else { // Se per qualche motivo fosse già un path salvato, normalizzalo
+      selectedIconPath = normalizeIconPath(aiGeneratedIconPreviewEl.src.substring(aiGeneratedIconPreviewEl.src.indexOf("uploads/icons/")));
+    }
+    updateIconSelectionVisual(); // Seleziona l'icona AI nella preview
+    handleSaveIcon(); // Chiama la funzione di salvataggio principale
 
+    // Resetta i controlli AI
     if(btnSaveAiGeneratedIconEl) btnSaveAiGeneratedIconEl.style.display = 'none';
     if(btnDiscardAiGeneratedIconEl) btnDiscardAiGeneratedIconEl.style.display = 'none';
     if(btnGenerateAiIconEl) btnGenerateAiIconEl.style.display = 'inline-flex';
     if(btnGenerateAiIconEl) btnGenerateAiIconEl.disabled = false;
     if(aiIconPromptEl) aiIconPromptEl.disabled = false;
+    // Non pulire il prompt, l'utente potrebbe volerlo modificare leggermente
   }
 
   function handleDiscardAiGeneratedIcon() {
@@ -1171,15 +1252,16 @@
       aiPreviewContainerEl.style.display = 'none';
       aiPreviewContainerEl.classList.remove('revealed');
     }
-    if(aiGeneratedIconPreviewEl) aiGeneratedIconPreviewEl.src = '#';
+    if(aiGeneratedIconPreviewEl) aiGeneratedIconPreviewEl.src = '#'; // Rimuovi l'immagine dalla preview
     displayMessage('ai-icon-message', 'Generazione annullata. Puoi provare con un nuovo prompt.', true, true);
 
+    // Resetta i controlli AI
     if(btnSaveAiGeneratedIconEl) btnSaveAiGeneratedIconEl.style.display = 'none';
     if(btnDiscardAiGeneratedIconEl) btnDiscardAiGeneratedIconEl.style.display = 'none';
     if(btnGenerateAiIconEl) btnGenerateAiIconEl.style.display = 'inline-flex';
     if(btnGenerateAiIconEl) btnGenerateAiIconEl.disabled = false;
     if(aiIconPromptEl) aiIconPromptEl.disabled = false;
-    if(aiIconPromptEl) aiIconPromptEl.value = '';
+    if(aiIconPromptEl) aiIconPromptEl.value = ''; // Pulisci il prompt
   }
 
   async function handleSaveIcon() {
@@ -1199,17 +1281,20 @@
     if(checkIconFA) checkIconFA.style.display = 'none';
     if(spinnerOverlay) spinnerOverlay.style.display = 'flex';
 
+    // Se l'icona selezionata è un base64 (nuova icona AI non ancora salvata su disco)
     if (selectedIconPath && selectedIconPath.startsWith('data:image/')) {
-      displayMessage('icon-save-message', 'Salvataggio icona AI personalizzata...', true, false, true);
+      displayMessage('icon-save-message', 'Salvataggio icona AI personalizzata sul server...', true, false, true);
       try {
-        const saveResponse = await callApi('api/api_save_ai_icon.php', 'POST', { imageBase64: selectedIconPath });
+        // API per salvare il base64 come file e restituire il path
+        const saveResponse = await callApi('api/api_save_ai_icon.php', 'POST', { imageBase64: selectedIconPath }); // Assicurati che esista
         if (saveResponse.success && saveResponse.iconPath) {
           finalIconPathToServer = normalizeIconPath(saveResponse.iconPath);
+          // L'icona AI è ora salvata come file, procedi ad aggiornare il DB con questo path
         } else {
-          throw new Error(saveResponse.message || 'Errore salvataggio file icona AI.');
+          throw new Error(saveResponse.message || 'Errore durante il salvataggio del file dell\'icona AI.');
         }
       } catch (error) {
-        displayMessage('icon-save-message', `Errore salvataggio file: ${error.message}`, false, true, true);
+        handleApiError(error, 'icon-save-message', 'Errore durante il salvataggio del file icona.');
         saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
         if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
         if(saveIconFA) saveIconFA.style.display = 'inline-block';
@@ -1217,6 +1302,7 @@
         return;
       }
     } else if (!selectedIconPath || (selectedIconPath === defaultIconPath && !document.querySelector(`.avatar-option-image[data-path="${defaultIconPath}"].selected`))) {
+      // Controlla se un'icona è effettivamente selezionata (non base64)
       const aiPreviewImg = document.getElementById('ai-generated-icon-preview');
       if (!document.querySelector('.avatar-option-image.selected') && !(aiPreviewImg && aiPreviewImg.classList.contains('selected') && aiPreviewImg.src !== '#')) {
         displayMessage('icon-save-message', 'Nessuna nuova icona selezionata.', false, true, true);
@@ -1229,7 +1315,8 @@
     }
 
     if (!finalIconPathToServer || finalIconPathToServer.startsWith('data:image/')) {
-      displayMessage('icon-save-message', 'Errore: path icona non valido per DB.', false, true, true);
+      // Questo non dovrebbe accadere se il salvataggio base64 ha funzionato
+      displayMessage('icon-save-message', 'Errore: path icona non valido per il database.', false, true, true);
       saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
       if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
       if(saveIconFA) saveIconFA.style.display = 'inline-block';
@@ -1237,13 +1324,15 @@
       return;
     }
 
+    // Ora aggiorna il DB con il path dell'icona (sia essa preesistente o appena salvata da base64)
     let pathToSaveForDB = finalIconPathToServer;
-    if (!pathToSaveForDB.startsWith('/')) {
+    if (!pathToSaveForDB.startsWith('/')) { // Assicura che il path nel DB inizi con / se è relativo alla root del sito
       pathToSaveForDB = '/' + pathToSaveForDB;
     }
 
+
     try {
-      const response = await callApi('api/api_update_user_icon.php', 'PUT', { icon: pathToSaveForDB });
+      const response = await callApi('api/api_update_user_icon.php', 'PUT', { icon: pathToSaveForDB }); // Assicurati che esista
       if (response.success) {
         saveIconBtnEl.classList.remove('saving');
         saveIconBtnEl.classList.add('saved-success');
@@ -1255,23 +1344,25 @@
         const navbarAvatarImg = document.querySelector('#navbar-avatar img');
         const mainAvatarImg = document.querySelector('#main-avatar img');
         const cacheBuster = '?t=' + new Date().getTime();
-        let displayPathForUIAfterSave = getDisplayIconPath(finalIconPathToServer);
+        let displayPathForUIAfterSave = getDisplayIconPath(finalIconPathToServer); // Usa il path normalizzato e corretto
 
         if (navbarAvatarImg) navbarAvatarImg.src = displayPathForUIAfterSave + cacheBuster;
         if (mainAvatarImg) mainAvatarImg.src = displayPathForUIAfterSave + cacheBuster;
 
-        selectedIconPath = finalIconPathToServer;
+        selectedIconPath = finalIconPathToServer; // Aggiorna selectedIconPath con il path del file salvato
         if(currentUserDataFromStorage) {
-          currentUserDataFromStorage.iconPath = finalIconPathToServer;
+          currentUserDataFromStorage.iconPath = finalIconPathToServer; // Salva il path del file
           localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
         }
-        await loadAvailableIcons();
+        await loadAvailableIcons(); // Ricarica la griglia, che ora includerà la nuova icona se è stata generata da AI
         displayMessage('icon-save-message', response.message || 'Icona profilo aggiornata!', true, true, true);
 
+        // Se l'icona AI era stata generata e ora è salvata, aggiorna il src della preview AI
+        // per puntare al file salvato, non più al base64.
         if (aiGeneratedIconPreviewEl && aiGeneratedIconPreviewEl.src.startsWith('data:image/')) {
           aiGeneratedIconPreviewEl.src = displayPathForUIAfterSave + cacheBuster;
         }
-        updateIconSelectionVisual();
+        updateIconSelectionVisual(); // Assicura che la nuova icona sia visualmente selezionata
 
         setTimeout(() => {
           saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saved-success');
@@ -1280,10 +1371,10 @@
           if(checkIconFA) checkIconFA.style.display = 'none';
         }, 2500);
       } else {
-        throw new Error(response.message || 'Errore aggiornamento icona profilo.');
+        throw new Error(response.message || 'Errore durante l\'aggiornamento dell\'icona profilo nel database.');
       }
     } catch (error) {
-      displayMessage('icon-save-message', `Errore aggiornamento: ${error.message}`, false, true, true);
+      handleApiError(error, 'icon-save-message', 'Errore durante l\'aggiornamento dell\'icona.');
       saveIconBtnEl.disabled = false; saveIconBtnEl.classList.remove('saving');
       if(textSpan) {textSpan.textContent = saveIconBtnOriginalText; textSpan.style.opacity = '1';}
       if(saveIconFA) saveIconFA.style.display = 'inline-block';
@@ -1297,7 +1388,7 @@
     if (!currentUserDataFromStorage) { displayMessage('profile-info-message', 'Autenticazione richiesta.', false); return; }
     const updatedInfo = { nome: document.getElementById('nome').value, cognome: document.getElementById('cognome').value };
     try {
-      const response = await callApi('api/api_update_user_profile.php', 'PUT', updatedInfo);
+      const response = await callApi('api/api_update_user_profile.php', 'PUT', updatedInfo); // Assicurati che esista
       if (response.success) {
         const navbarUsername = document.getElementById('navbar-username');
         const profileGreeting = document.getElementById('profile-greeting');
@@ -1308,9 +1399,14 @@
           currentUserDataFromStorage.cognome = updatedInfo.cognome;
           localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
         }
-        displayMessage('profile-info-message', response.message || 'Info aggiornate!', true);
-      } else { displayMessage('profile-info-message', response.message || 'Errore aggiornamento.', false); }
-    } catch (error) { displayMessage('profile-info-message', `Errore: ${error.message}`, false); }
+        displayMessage('profile-info-message', response.message || 'Informazioni personali aggiornate!', true);
+      } else {
+        // Non è un errore 401/403 (già gestito), ma un altro errore API
+        displayMessage('profile-info-message', response.message || 'Errore durante l\'aggiornamento delle informazioni.', false);
+      }
+    } catch (error) {
+      handleApiError(error, 'profile-info-message', 'Errore durante l\'aggiornamento delle informazioni.');
+    }
   }
 
   async function handlePasswordChangeSubmit(e) {
@@ -1320,14 +1416,18 @@
     const newPassword = document.getElementById('nuova-password').value;
     const confirmPassword = document.getElementById('conferma-password').value;
     if (newPassword !== confirmPassword) { displayMessage('password-change-message', 'Le nuove password non coincidono.', false); return; }
-    if (newPassword.length < 8) { displayMessage('password-change-message', 'Password min. 8 caratteri.', false); return; }
+    if (newPassword.length < 8) { displayMessage('password-change-message', 'La nuova password deve contenere almeno 8 caratteri.', false); return; }
     try {
-      const response = await callApi('api/api_change_password.php', 'POST', { oldPassword, newPassword });
+      const response = await callApi('api/api_change_password.php', 'POST', { oldPassword, newPassword }); // Assicurati che esista
       if (response.success) {
-        displayMessage('password-change-message', response.message || 'Password aggiornata!', true);
-        e.target.reset();
-      } else { displayMessage('password-change-message', response.message || 'Errore cambio password.', false); }
-    } catch (error) { displayMessage('password-change-message', `Errore: ${error.message}`, false); }
+        displayMessage('password-change-message', response.message || 'Password aggiornata con successo!', true);
+        e.target.reset(); // Pulisci i campi del form password
+      } else {
+        displayMessage('password-change-message', response.message || 'Errore durante il cambio password.', false);
+      }
+    } catch (error) {
+      handleApiError(error, 'password-change-message', 'Errore durante il cambio password.');
+    }
   }
 
   async function loadUserBookings() {
@@ -1337,10 +1437,10 @@
     bookingsGrid.innerHTML = '<p style="text-align:center; padding:1rem;">Caricamento prenotazioni...</p>';
     noBookingsMsg.style.display = 'none';
     try {
-      const response = await callApi('api/api_get_user_bookings.php');
+      const response = await callApi('api/api_get_user_bookings.php'); // Assicurati che esista
       if (response.success && response.bookings) {
         const bookings = response.bookings;
-        bookingsGrid.innerHTML = '';
+        bookingsGrid.innerHTML = ''; // Pulisci prima di aggiungere
         if (bookings.length > 0) {
           bookings.forEach(booking => {
             const formattedDate = booking.eventDataInizio ? new Date(booking.eventDataInizio.replace(/-/g, '/')).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Data non definita';
@@ -1372,10 +1472,12 @@
           noBookingsMsg.style.display = 'block';
         }
       } else {
-        bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento prenotazioni.'}</p>`;
+        // Non è un 401 (gestito da handleApiError), ma un altro errore API
+        bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore durante il caricamento delle prenotazioni.'}</p>`;
       }
     } catch (error) {
-      bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore: ${error.message}</p>`;
+      handleApiError(error, 'user-bookings-grid', 'Errore durante il caricamento delle prenotazioni.');
+      if (bookingsGrid) bookingsGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${error.message || 'Errore caricamento prenotazioni.'}</p>`;
     }
   }
 
@@ -1386,10 +1488,10 @@
     waitlistGrid.innerHTML = '<p style="text-align:center; padding:1rem;">Caricamento eventi in coda...</p>';
     noWaitlistMsg.style.display = 'none';
     try {
-      const response = await callApi('api/api_get_user_waitlist.php');
+      const response = await callApi('api/api_get_user_waitlist.php'); // Assicurati che esista
       if (response.success && response.waitlistEntries) {
         const entries = response.waitlistEntries;
-        waitlistGrid.innerHTML = '';
+        waitlistGrid.innerHTML = ''; // Pulisci prima di aggiungere
         if (entries.length > 0) {
           entries.forEach(entry => {
             const formattedDate = entry.eventDataInizio ? new Date(entry.eventDataInizio.replace(/-/g, '/')).toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Data non definita';
@@ -1402,7 +1504,7 @@
               statusMessage = `Evento non più prenotabile. (Richiesti: ${entry.numeroPostiInCoda})`;
               statusColor = 'var(--gray-dark-color, grey)'; cardClass = 'waitlist-card-unavailable';
             }
-            if (entry.eventFlagPrenotabile == 1) {
+            if (entry.eventFlagPrenotabile == 1) { // Permetti di uscire dalla coda solo se l'evento è ancora "attivo" per la coda
               cancelButtonHtml = `<button class="card-btn card-btn-danger btn-cancel-waitlist" data-event-id="${entry.idEvento}">Esci dalla Coda</button>`;
             }
             let iconSrc = normalizeIconPath(entry.eventFotoCopertina || defaultIconPath);
@@ -1430,10 +1532,11 @@
           attachCancelWaitlistListeners();
         } else { noWaitlistMsg.style.display = 'block'; }
       } else {
-        waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore caricamento lista d\'attesa.'}</p>`;
+        waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${response.message || 'Errore durante il caricamento della lista d\'attesa.'}</p>`;
       }
     } catch (error) {
-      waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">Errore: ${error.message}</p>`;
+      handleApiError(error, 'user-waitlist-grid', 'Errore durante il caricamento della lista d\'attesa.');
+      if(waitlistGrid) waitlistGrid.innerHTML = `<p class="form-message error" style="display:block; text-align:center;">${error.message || 'Errore caricamento lista d\'attesa.'}</p>`;
     }
   }
 
@@ -1445,16 +1548,25 @@
   }
   async function handleCancelBooking(event) {
     const button = event.target; const bookingId = button.dataset.bookingId;
-    if (!currentUserDataFromStorage) { alert('Autenticazione richiesta.'); return; }
+    if (!currentUserDataFromStorage) { alert('Autenticazione richiesta.'); return; } // Questo non dovrebbe accadere se la UI è corretta
     if (confirm('Sei sicuro di voler annullare questa prenotazione?')) {
       button.disabled = true; button.textContent = 'Annullamento...';
       try {
-        const response = await callApi('api/api_cancel_booking.php', 'POST', { idPrenotazione: bookingId });
+        const response = await callApi('api/api_cancel_booking.php', 'POST', { idPrenotazione: bookingId }); // Assicurati che esista
         if (response.success) {
-          alert(response.message || 'Prenotazione annullata.');
-          loadUserBookings(); loadUserWaitlist(); // Ricarica entrambe le sezioni
-        } else { throw new Error(response.message || 'Errore annullamento.'); }
-      } catch (error) { alert(`Errore: ${error.message}`); }
+          alert(response.message || 'Prenotazione annullata con successo.');
+          loadUserBookings(); // Ricarica solo le prenotazioni
+          // Potrebbe essere utile ricaricare anche la waitlist se l'annullamento libera posti
+          loadUserWaitlist();
+        } else { throw new Error(response.message || 'Errore durante l\'annullamento della prenotazione.'); }
+      } catch (error) {
+        // handleApiError gestirà il logout se è un 401/403
+        handleApiError(error, 'user-bookings-grid', 'Errore durante l\'annullamento della prenotazione.');
+        // Se non è un errore di sessione, mostra l'alert specifico
+        if (!(error && (error.status === 401 || error.status === 403))) {
+          alert(`Errore: ${error.message || 'Impossibile annullare la prenotazione.'}`);
+        }
+      }
       finally { button.disabled = false; button.textContent = 'Annulla Prenotazione';}
     }
   }
@@ -1468,15 +1580,20 @@
   async function handleCancelWaitlist(event) {
     const button = event.target; const eventId = button.dataset.eventId;
     if (!currentUserDataFromStorage) { alert('Autenticazione richiesta.'); return; }
-    if (confirm('Sei sicuro di voler uscire dalla lista d\'attesa?')) {
+    if (confirm('Sei sicuro di voler uscire dalla lista d\'attesa per questo evento?')) {
       button.disabled = true; button.textContent = 'Rimozione...';
       try {
-        const response = await callApi('api/api_cancel_waitlist.php', 'POST', { idEvento: eventId });
+        const response = await callApi('api/api_cancel_waitlist.php', 'POST', { idEvento: eventId }); // Assicurati che esista
         if (response.success) {
-          alert(response.message || 'Rimosso dalla lista d\'attesa.');
-          loadUserWaitlist();
-        } else { throw new Error(response.message || 'Errore rimozione.'); }
-      } catch (error) { alert(`Errore: ${error.message}`); }
+          alert(response.message || 'Rimosso dalla lista d\'attesa con successo.');
+          loadUserWaitlist(); // Ricarica la lista d'attesa
+        } else { throw new Error(response.message || 'Errore durante la rimozione dalla lista d\'attesa.'); }
+      } catch (error) {
+        handleApiError(error, 'user-waitlist-grid', 'Errore durante la rimozione dalla lista d\'attesa.');
+        if (!(error && (error.status === 401 || error.status === 403))) {
+          alert(`Errore: ${error.message || 'Impossibile uscire dalla lista d\'attesa.'}`);
+        }
+      }
       finally { button.disabled = false; button.textContent = 'Esci dalla Coda';}
     }
   }
@@ -1488,24 +1605,26 @@
     const deleteButton = document.getElementById('btn-confirm-delete-account');
 
     if (!currentUserDataFromStorage || !currentUserDataFromStorage.email) {
-      displayMessage('delete-account-message', 'Utente non verificato.', false); return;
+      displayMessage('delete-account-message', 'Utente non verificato o email mancante. Impossibile procedere.', false); return;
     }
     if (confirmEmail !== currentUserDataFromStorage.email) {
-      displayMessage('delete-account-message', 'L\'email non corrisponde.', false); return;
+      displayMessage('delete-account-message', 'L\'email inserita non corrisponde a quella del tuo account.', false); return;
     }
-    if (confirm('ATTENZIONE! Sei sicuro di voler eliminare il tuo account? Questa azione è IRREVERSIBILE.')) {
-      if (confirm('CONFERMA FINALE: Tutti i tuoi dati verranno cancellati. Procedere?')) {
-        deleteButton.disabled = true; deleteButton.textContent = 'Eliminazione...';
+    if (confirm('ATTENZIONE! Sei assolutamente sicuro di voler eliminare il tuo account? Questa azione è IRREVERSIBILE e tutti i tuoi dati (profilo, prenotazioni, icone generate, ecc.) verranno cancellati definitivamente.')) {
+      if (confirm('CONFERMA FINALE: Questa è l\'ultima possibilità per annullare. Procedere con l\'eliminazione definitiva dell\'account?')) {
+        deleteButton.disabled = true; deleteButton.textContent = 'Eliminazione in corso...';
         try {
+          // L'API api_delete_account.php dovrebbe gestire la cancellazione sicura
           const response = await callApi('api/api_delete_account.php', 'POST', { email: confirmEmail });
           if (response.success) {
-            displayMessage('delete-account-message', response.message || "Account eliminato.", true);
-            alert(response.message || "Account eliminato. Verrai reindirizzato.");
-            logout(false); // Logout senza alert duplicato
+            displayMessage('delete-account-message', response.message || "Account eliminato con successo.", true, false); // Non cancellare subito
+            alert(response.message || "Il tuo account è stato eliminato. Verrai reindirizzato alla homepage.");
+            logout(false); // Esegui il logout client-side senza mostrare un altro alert
             setTimeout(() => { window.location.href = 'index.html'; }, 2500);
-          } else { throw new Error(response.message || 'Errore eliminazione account.'); }
+          } else { throw new Error(response.message || 'Errore durante l\'eliminazione dell\'account.'); }
         } catch (error) {
-          displayMessage('delete-account-message', `Errore: ${error.message}`, false);
+          // handleApiError gestirà il logout se è un 401/403 (improbabile qui se l'utente è loggato per iniziare)
+          handleApiError(error, 'delete-account-message', 'Errore durante l\'eliminazione dell\'account.');
           deleteButton.disabled = false; deleteButton.textContent = 'Elimina il Mio Account Definitivamente';
         }
       }
@@ -1513,25 +1632,42 @@
   }
 
   function logout(showAlert = true) {
+    const wasLoggedIn = !!localStorage.getItem('userDataEFF');
     localStorage.removeItem('userDataEFF');
+    currentUserDataFromStorage = null; // Resetta la variabile globale
+
     // Chiamata API per invalidare la sessione sul server
-    fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' })
+    fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' }) // Assicurati che esista
             .then(response => response.json())
             .then(data => {
-              if(data.success && showAlert) {
-                alert('Logout effettuato. Verrai reindirizzato alla homepage.');
-              } else if (!data.success && showAlert) {
-                alert('Logout dal server fallito, ma i dati locali sono stati rimossi. Verrai reindirizzato.');
+              if (data.success) {
+                if (showAlert && wasLoggedIn) alert('Logout effettuato con successo. Verrai reindirizzato alla homepage.');
+              } else {
+                if (showAlert && wasLoggedIn) alert('Logout dal server fallito, ma i dati locali sono stati rimossi. Verrai reindirizzato.');
               }
             })
             .catch(error => {
               console.error("Errore API logout:", error);
-              if(showAlert) alert('Errore durante il logout. Verrai reindirizzato.');
+              if (showAlert && wasLoggedIn) alert('Errore durante il logout dal server. Verrai reindirizzato.');
             })
             .finally(() => {
-              // Reindirizza sempre, a meno che showAlert sia false (usato da handleDeleteAccount)
-              if (showAlert || (!showAlert && window.location.pathname.includes("areapersonale.html")) ) {
-                window.location.href = 'index.html';
+              // Se ci troviamo in areapersonale.html, reindirizza sempre a index.html dopo il logout.
+              // Altrimenti, se showAlert è true (logout standard da altre pagine), reindirizza.
+              if (window.location.pathname.includes("areapersonale.html") || showAlert) {
+                // Se siamo già in areapersonale, non c'è bisogno di reindirizzare subito,
+                // initializeUIForGuest dovrebbe aver già resettato la pagina.
+                // Ma se è un logout esplicito (showAlert=true), allora reindirizza.
+                if (showAlert) {
+                  window.location.href = 'index.html';
+                } else {
+                  // Se showAlert è false (es. da sessione scaduta rilevata in areapersonale),
+                  // initializeUIForGuest è già stata chiamata.
+                  // Potresti voler aggiornare la navbar qui se non già fatto da initializeUIForGuest
+                  const navbarUsername = document.getElementById('navbar-username');
+                  const navbarAvatarImg = document.querySelector('#navbar-avatar img');
+                  if (navbarUsername) navbarUsername.textContent = 'Ospite';
+                  if (navbarAvatarImg) navbarAvatarImg.src = getDisplayIconPath(defaultIconPath);
+                }
               }
             });
   }
