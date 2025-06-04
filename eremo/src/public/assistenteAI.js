@@ -1,4 +1,4 @@
-// File: assistenteAI.js (Versione Rivoluzionata e Corretta v11 - TTS Corretto + Ottimizzazione Parlato)
+// File: assistenteAI.js (Versione Rivoluzionata e Corretta v12 - Correzione Invio Dati Prenotazione)
 document.addEventListener('DOMContentLoaded', () => {
     const aiAssistantFabEl = document.getElementById('ai-assistant-fab');
     const aiChatPopupEl = document.getElementById('ai-chat-popup');
@@ -40,13 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function speakText(text) {
         if (!isTTSEnabled || !('speechSynthesis' in window)) {
-            // console.warn("TTS non abilitato o non supportato."); // Potrebbe essere loggato troppo spesso
             return;
         }
-        // Verifica aggiuntiva: non parlare se la chat non è visibile
         if (!aiChatPopupEl.classList.contains('active')) {
-            // console.log("SpeakText: Chat non attiva, non parlo.");
-            window.speechSynthesis.cancel(); // Ferma comunque se c'era qualcosa in corso
+            window.speechSynthesis.cancel();
             return;
         }
 
@@ -68,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         plainText = plainText.replace(/`([^`]+)`/g, '$1');
         plainText = plainText.replace(/&nbsp;/g, ' ');
         plainText = plainText.replace(/#/g, '');
-        plainText = plainText.replace(/\s+/g, ' ').trim(); // Normalizza spazi multipli
+        plainText = plainText.replace(/\s+/g, ' ').trim();
 
         if (plainText.trim() === "") return;
 
@@ -120,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
             eventTitle: null,
             eventNameHint: null,
             numeroPosti: null,
-            partecipanti: [],
+            partecipanti: [], // Array di stringhe "Nome Cognome"
             richiesteSpeciali: null,
             postiGiaPrenotatiUtente: undefined,
             postiDisponibiliEvento: undefined
@@ -276,8 +273,6 @@ Fornisci solo il testo finale, pronto per essere letto.
 
         chatHistoryForAssistant = [
             { role: "system", content: systemMessageContent },
-            // Non aggiungiamo il messaggio dell'assistente qui, verrà aggiunto da _updateInitialAssistantMessageUI
-            // e processAndDisplayAiResponse si occuperà di leggerlo se la chat è aperta.
         ];
         _updateInitialAssistantMessageUI(assistantMessageContent);
         resetBookingState();
@@ -321,7 +316,6 @@ Fornisci solo il testo finale, pronto per essere letto.
             }
         } catch (error) {
             console.error('AssistenteAI: Errore recupero/preparazione API key Groq:', error);
-            // Non mostrare il messaggio di errore nella chat qui, verrà gestito se l'utente prova ad usarla
             if (aiAssistantFabEl) aiAssistantFabEl.style.display = 'none';
             GROQ_API_KEY_FOR_ASSISTANT = "CHIAVE_NON_CARICATA_O_ERRATA";
             return false;
@@ -329,89 +323,59 @@ Fornisci solo il testo finale, pronto per essere letto.
     }
 
     function toggleAiChat() {
-        checkUserLoginStatus(); // Aggiorna lo stato utente ogni volta che si apre/chiude
+        checkUserLoginStatus();
         const isActive = aiChatPopupEl.classList.toggle('active');
         aiAssistantFabEl.innerHTML = isActive ? '<i class="fas fa-times"></i>' : '<i class="fas fa-headset"></i>';
 
         if (isActive) {
-            // Se la cronologia è vuota o contiene solo il system prompt, inizializza.
-            // L'inizializzazione ora aggiunge il messaggio di benvenuto tramite _updateInitialAssistantMessageUI,
-            // che a sua volta chiama addMessageToChatUI.
-            // addMessageToChatUI ora controlla se la chat è attiva prima di parlare.
-            if (chatHistoryForAssistant.length <= 1) { // 0 o solo il system prompt
+            if (chatHistoryForAssistant.length <= 1) {
                 initializeChatHistory();
-            } else {
-                // Se la chat viene riaperta e c'è già una cronologia,
-                // e l'ultimo messaggio è dell'assistente, potremmo volerlo rileggere.
-                // Per ora, non lo rileggiamo automaticamente per evitare fastidi.
-                // L'utente può scorrere e rileggere se necessario.
             }
             if (aiChatInputEl) aiChatInputEl.focus();
         } else {
             if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-            // Non resettare lo stato della prenotazione alla chiusura,
-            // l'utente potrebbe voler continuare dopo aver riaperto.
-            // resetBookingState(); // Commentato
         }
         document.body.style.overflow = isActive ? 'hidden' : '';
     }
 
-    // Modificata per gestire la logica TTS e il messaggio iniziale
     function addMessageToChatUI(sender, text, type = 'html', isInitialAssistantMessage = false) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
         if (sender === 'system') messageDiv.style.display = 'none';
 
-        if (type === 'html') messageDiv.innerHTML = text; // Usa innerHTML per permettere Markdown/HTML
+        if (type === 'html') messageDiv.innerHTML = text;
         else messageDiv.textContent = text;
 
         aiChatMessagesContainerEl.appendChild(messageDiv);
         aiChatMessagesContainerEl.scrollTop = aiChatMessagesContainerEl.scrollHeight;
 
-        // Logica TTS:
-        // Parla solo se è un messaggio dell'AI (o 'assistant' per il messaggio iniziale),
-        // se il TTS è abilitato, E se la finestra della chat è attualmente attiva/visibile.
         if (isTTSEnabled && (sender === 'ai' || sender === 'assistant') && aiChatPopupEl.classList.contains('active')) {
             if (isInitialAssistantMessage) {
-                // Per il messaggio iniziale, lo passiamo direttamente a speakText
-                // perché processAndDisplayAiResponse non viene chiamato per questo.
-                // L'ottimizzazione TTS non si applica al messaggio di benvenuto statico.
                 speakText(text);
-            } else if (sender === 'ai') {
-                // Per i messaggi dinamici dell'AI, la chiamata a speakText
-                // sarà gestita da processAndDisplayAiResponse DOPO l'ottimizzazione.
-                // Quindi, non chiamiamo speakText qui per sender === 'ai'.
             }
         }
         return messageDiv;
     }
 
-    // Nuova funzione per processare la risposta dell'AI e ottimizzarla per TTS
     async function processAndDisplayAiResponse(chatResponseText, isThinkingMessage = false) {
-        // 1. Aggiungi il messaggio AI (formattato HTML/Markdown) alla UI.
-        //    La funzione addMessageToChatUI NON chiamerà speakText per sender === 'ai'.
         const messageDiv = addMessageToChatUI('ai', chatResponseText, 'html');
 
-        // Non aggiungere messaggi di "sto pensando" alla cronologia effettiva dell'assistente
         if (!isThinkingMessage) {
             chatHistoryForAssistant.push({ role: "assistant", content: chatResponseText });
         }
 
-        // 2. Se il TTS è abilitato E la chat è visibile E non è un messaggio di "sto pensando",
-        //    genera e parla la versione ottimizzata.
         if (isTTSEnabled && aiChatPopupEl.classList.contains('active') && !isThinkingMessage) {
-            let textToSpeak = chatResponseText; // Fallback al testo originale
+            let textToSpeak = chatResponseText;
 
             try {
                 const ttsOptimizerMessages = [{ role: "user", content: chatResponseText }];
-
                 console.log("AssistenteAI: Richiesta ottimizzazione TTS per:", chatResponseText.substring(0,100)+"...");
                 const spokenResponseCandidate = await getGroqCompletion(
                     ttsOptimizerMessages,
                     TTS_OPTIMIZER_SYSTEM_PROMPT(),
-                    GROQ_MODEL_NAME_TTS_OPTIMIZER, // Usa il modello specificato per TTS
+                    GROQ_MODEL_NAME_TTS_OPTIMIZER,
                     0.2,
-                    1000 // Max tokens per la risposta ottimizzata TTS
+                    1000
                 );
 
                 if (spokenResponseCandidate && spokenResponseCandidate.trim() !== "") {
@@ -419,16 +383,13 @@ Fornisci solo il testo finale, pronto per essere letto.
                     console.log("AssistenteAI: Testo ottimizzato per TTS:", textToSpeak.substring(0,100)+"...");
                 } else {
                     console.warn("AssistenteAI: Ottimizzazione TTS non ha prodotto output valido, uso testo originale ripulito.");
-                    // speakText farà la pulizia di base
                 }
             } catch (error) {
                 console.error("AssistenteAI: Errore durante l'ottimizzazione TTS:", error);
-                // In caso di errore, textToSpeak è già il chatResponseText, speakText farà la pulizia
             }
-
             speakText(textToSpeak);
         }
-        return messageDiv; // Restituisce il div del messaggio per eventuale rimozione (es. "sto pensando")
+        return messageDiv;
     }
 
 
@@ -436,9 +397,29 @@ Fornisci solo il testo finale, pronto per essere letto.
         let url = scriptPath;
         const options = { method };
 
+        // Aggiungi user_email_for_script se disponibile e lo script lo richiede (per GET e POST)
         if (CURRENT_USER_EMAIL && (scriptPath.includes('get_events.php') || scriptPath.includes('get_event_details.php'))) {
-            if (!params.user_email_for_script) params.user_email_for_script = CURRENT_USER_EMAIL;
+            if (!params.user_email_for_script) { // Evita di sovrascrivere se già presente
+                if (method === 'GET') {
+                    // Per GET, aggiungilo ai parametri URL se non esiste già
+                    const tempParams = new URLSearchParams(params);
+                    if (!tempParams.has('user_email_for_script')) {
+                        tempParams.set('user_email_for_script', CURRENT_USER_EMAIL);
+                    }
+                    // Ricostruisci i params per GET o l'URL
+                    // Questa parte è complessa se params è già un oggetto.
+                    // È più semplice se lo script PHP si aspetta user_email come parte dei parametri normali.
+                    // Per ora, assumiamo che se params è un oggetto, user_email_for_script venga aggiunto lì.
+                    params.user_email_for_script = CURRENT_USER_EMAIL;
+
+                } else if (method === 'POST') {
+                    // Per POST, assicurati che sia nei parametri che verranno messi nel FormData
+                    // Se params è l'oggetto che va in FormData, basta aggiungerlo.
+                    params.user_email_for_script = CURRENT_USER_EMAIL;
+                }
+            }
         }
+
 
         if (method === 'GET') {
             if (Object.keys(params).length > 0) url += '?' + new URLSearchParams(params).toString();
@@ -453,7 +434,8 @@ Fornisci solo il testo finale, pronto per essere letto.
             }
             options.body = formData;
         }
-        console.log(`Calling PHP: ${method} ${url}`, method === 'POST' ? Object.fromEntries(options.body instanceof FormData ? options.body.entries() : []) : '');
+        console.log(`Calling PHP: ${method} ${url}`, method === 'POST' ? Object.fromEntries(options.body instanceof FormData ? options.body.entries() : []) : params);
+
 
         const thinkingPhpMessage = await processAndDisplayAiResponse(`Sto contattando i nostri sistemi per ${scriptPath.split('/').pop()}...`, true);
 
@@ -462,14 +444,19 @@ Fornisci solo il testo finale, pronto per essere letto.
             if (thinkingPhpMessage) thinkingPhpMessage.remove();
             if (!response.ok) {
                 let errorText = `Errore HTTP ${response.status} dallo script ${scriptPath}`;
-                try { const errorData = await response.json(); errorText = errorData.message || errorData.error || errorText; } catch (e) { /*ignore*/ }
+                try {
+                    const errorData = await response.json();
+                    errorText = errorData.message || errorData.error || errorText;
+                } catch (e) { /*ignore*/ }
                 throw new Error(errorText);
             }
             return await response.json();
         } catch (error) {
             if (thinkingPhpMessage) thinkingPhpMessage.remove();
             console.error(`Errore chiamata a ${scriptPath}:`, error);
-            throw error; // Rilancia per essere gestito dal chiamante
+            // Aggiungiamo il messaggio di errore specifico alla cronologia AI per debug
+            chatHistoryForAssistant.push({ role: "system", content: `Errore da ${scriptPath}: ${error.message}` });
+            throw error;
         }
     }
 
@@ -534,7 +521,6 @@ Fornisci solo il testo finale, pronto per essere letto.
     }
 
     async function fetchEventDetailsAndUserBookingStatus(eventId, userEmail) {
-        // ... (codice invariato, assicurati che sia corretto e gestisca gli errori)
         if (!eventId) {
             console.warn("fetchEventDetailsAndUserBookingStatus: eventId mancante.");
             currentBookingState.eventTitle = `ID Evento non specificato (o errore interno).`;
@@ -542,14 +528,13 @@ Fornisci solo il testo finale, pronto per essere letto.
             currentBookingState.postiDisponibiliEvento = 0;
             return false;
         }
-        if (!userEmail && currentBookingState.isActive) { // Solo se la prenotazione è attiva ha senso questo warning
+        if (!userEmail && currentBookingState.isActive) {
             console.warn("fetchEventDetailsAndUserBookingStatus: userEmail mancante per un flusso di prenotazione attivo.");
-            // Non modificare eventTitle qui se non è un errore fatale per l'intent corrente
-            return false; // Indica che i dati specifici dell'utente non possono essere recuperati
+            return false;
         }
         try {
             const scriptParams = { id: eventId };
-            if (userEmail) { // Invia l'email solo se disponibile
+            if (userEmail) {
                 scriptParams.user_email_for_script = userEmail;
             }
             const eventDetailsResult = await callPhpScript("get_event_details.php", scriptParams);
@@ -562,14 +547,13 @@ Fornisci solo il testo finale, pronto per essere letto.
                 return true;
             } else {
                 console.warn("Dettagli evento non trovati o formato risposta inatteso da get_event_details.php per eventId:", eventId, eventDetailsResult);
-                // Fallback: prova a ottenere info base da get_events.php
                 const fallbackParams = { event_id_specific: eventId };
                 if (userEmail) {
                     fallbackParams.user_email_for_script = userEmail;
                 }
                 const eventsResult = await callPhpScript("get_events.php", fallbackParams);
                 if (eventsResult.success && eventsResult.data && eventsResult.data.length > 0) {
-                    const eventInfo = eventsResult.data.find(e => e.idevento == eventId); // Usa == per confronto flessibile se gli ID possono essere stringhe/numeri
+                    const eventInfo = eventsResult.data.find(e => e.idevento == eventId);
                     if (eventInfo) {
                         currentBookingState.eventTitle = eventInfo.titolo;
                         currentBookingState.postiGiaPrenotatiUtente = parseInt(eventInfo.posti_gia_prenotati_utente, 10) || 0;
@@ -581,7 +565,7 @@ Fornisci solo il testo finale, pronto per essere letto.
                 currentBookingState.eventTitle = currentBookingState.eventTitle || `Evento ID ${eventId} (Dettagli non trovati)`;
                 currentBookingState.postiGiaPrenotatiUtente = currentBookingState.postiGiaPrenotatiUtente === undefined ? 0 : currentBookingState.postiGiaPrenotatiUtente;
                 currentBookingState.postiDisponibiliEvento = currentBookingState.postiDisponibiliEvento === undefined ? 0 : currentBookingState.postiDisponibiliEvento;
-                return false; // Indica che i dettagli completi non sono stati trovati
+                return false;
             }
         } catch (e) {
             console.error("Errore in fetchEventDetailsAndUserBookingStatus:", e);
@@ -594,7 +578,7 @@ Fornisci solo il testo finale, pronto per essere letto.
 
 
     async function handleSendMessageToAI() {
-        checkUserLoginStatus(); // Assicura che lo stato utente sia aggiornato
+        checkUserLoginStatus();
 
         if (!GROQ_API_KEY_FOR_ASSISTANT || GROQ_API_KEY_FOR_ASSISTANT === "CHIAVE_NON_CARICATA_O_ERRATA") {
             const keyReady = await fetchAndPrepareAssistantApiKey();
@@ -607,24 +591,23 @@ Fornisci solo il testo finale, pronto per essere letto.
         const userInput = aiChatInputEl.value.trim();
         if (!userInput) return;
 
-        addMessageToChatUI('user', userInput, 'text'); // Messaggio utente è solo testo
+        addMessageToChatUI('user', userInput, 'text');
         chatHistoryForAssistant.push({ role: "user", content: userInput });
         aiChatInputEl.value = '';
         aiChatInputEl.disabled = true;
         aiChatSendBtnEl.disabled = true;
-        aiChatInputEl.style.height = 'auto'; // Resetta altezza
+        aiChatInputEl.style.height = 'auto';
 
 
-        const thinkingMessageDiv = await processAndDisplayAiResponse("Sto pensando...", true); // isThinkingMessage = true
+        const thinkingMessageDiv = await processAndDisplayAiResponse("Sto pensando...", true);
 
         try {
-            // 1. Analisi dell'intento
             const intentAnalysisRaw = await getGroqCompletion(
-                chatHistoryForAssistant.slice(-5), // Invia solo gli ultimi messaggi rilevanti
+                chatHistoryForAssistant.slice(-5),
                 INTENT_ANALYSIS_SYSTEM_PROMPT(),
-                GROQ_MODEL_NAME_ASSISTANT, // Usa il modello principale per l'analisi intenti
-                0.1, // Temperatura bassa per l'analisi JSON
-                500  // Max tokens per JSON
+                GROQ_MODEL_NAME_ASSISTANT,
+                0.1,
+                500
             );
 
             let intentAnalysisParsed;
@@ -634,31 +617,25 @@ Fornisci solo il testo finale, pronto per essere letto.
                 console.error("AssistenteAI: Errore parsing intent analysis JSON:", e, intentAnalysisRaw);
                 if (thinkingMessageDiv) thinkingMessageDiv.remove();
                 await processAndDisplayAiResponse("C'è stato un problema nell'interpretare la tua richiesta. Potresti riformulare?");
-                return; // Esce dalla funzione ma riabilita input nel finally
+                return;
             }
             console.log("AssistenteAI: Intent Analysis:", intentAnalysisParsed);
 
-            // 2. Gestione Login se richiesto dall'intent
             if (intentAnalysisParsed.requires_login && !IS_USER_LOGGED_IN) {
                 if (thinkingMessageDiv) thinkingMessageDiv.remove();
                 await processAndDisplayAiResponse("Per questa operazione è necessario effettuare il login. Accedi al sito e riprova.");
-                // Potresti voler resettare currentBookingState se l'azione fallisce per login mancante
                 if (currentBookingState.isActive) resetBookingState();
                 return;
             }
 
             let mainAiResponseContent;
-            let systemMessageForMainAI = null; // Messaggio di sistema aggiuntivo per l'AI principale
-
-            // --- LOGICA DI GESTIONE INTENT E AZIONI ---
-            // Questa è una parte cruciale e complessa che devi adattare dal tuo codice precedente.
-            // Di seguito un esempio di come potrebbe essere strutturata.
+            let systemMessageForMainAI = null;
 
             switch (intentAnalysisParsed.intent) {
                 case "GET_EVENTS":
                     try {
                         const phpParams = intentAnalysisParsed.params || {};
-                        if (CURRENT_USER_EMAIL) phpParams.user_email_for_script = CURRENT_USER_EMAIL; // Aggiungi email utente
+                        // Non è necessario aggiungere user_email_for_script qui, callPhpScript lo gestirà
                         const eventsData = await callPhpScript(intentAnalysisParsed.php_script, phpParams);
                         systemMessageForMainAI = `Risultato da ${intentAnalysisParsed.php_script}: ${JSON.stringify(eventsData)}`;
                     } catch (error) {
@@ -669,7 +646,7 @@ Fornisci solo il testo finale, pronto per essere letto.
                 case "GET_EVENT_DETAILS":
                     try {
                         const phpParams = intentAnalysisParsed.params || {};
-                        if (CURRENT_USER_EMAIL) phpParams.user_email_for_script = CURRENT_USER_EMAIL;
+                        // Non è necessario aggiungere user_email_for_script qui, callPhpScript lo gestirà
                         const eventDetailsData = await callPhpScript(intentAnalysisParsed.php_script, phpParams);
                         systemMessageForMainAI = `Risultato da ${intentAnalysisParsed.php_script}: ${JSON.stringify(eventDetailsData)}`;
                     } catch (error) {
@@ -678,28 +655,21 @@ Fornisci solo il testo finale, pronto per essere letto.
                     break;
 
                 case "START_BOOKING_FLOW":
-                    resetBookingState(); // Resetta per un nuovo flusso
+                    resetBookingState();
                     currentBookingState.isActive = true;
                     if (intentAnalysisParsed.params.event_id) {
                         currentBookingState.eventId = intentAnalysisParsed.params.event_id;
-                        // Recupera dettagli evento e stato prenotazione utente
                         await fetchEventDetailsAndUserBookingStatus(currentBookingState.eventId, CURRENT_USER_EMAIL);
-                        // Il prompt principale dell'AI gestirà la logica basata su currentBookingState aggiornato
                     } else if (intentAnalysisParsed.params.event_name_hint) {
                         currentBookingState.eventNameHint = intentAnalysisParsed.params.event_name_hint;
-                        // Potresti voler fare una ricerca eventi qui se il nome è un hint
-                        // e poi chiedere all'utente di specificare l'ID.
-                        // Per ora, lasciamo che l'AI principale chieda l'ID o il nome.
                     }
-                    // Il prompt principale dell'AI guiderà l'utente.
                     break;
 
                 case "COLLECT_BOOKING_DETAILS":
                     if (!currentBookingState.isActive || !currentBookingState.eventId) {
                         systemMessageForMainAI = "L'utente sta cercando di fornire dettagli di prenotazione, ma il flusso non è attivo o manca l'ID evento. Chiedi di iniziare specificando un evento.";
-                        resetBookingState(); // Assicura che sia pulito
+                        resetBookingState();
                     } else {
-                        // Aggiorna currentBookingState con i params dall'intent
                         if (intentAnalysisParsed.params.numeroPosti) {
                             const numPostiRichiesti = parseInt(intentAnalysisParsed.params.numeroPosti, 10);
                             const postiGiaPrenotati = currentBookingState.postiGiaPrenotatiUtente || 0;
@@ -709,26 +679,23 @@ Fornisci solo il testo finale, pronto per essere letto.
                                 currentBookingState.numeroPosti = numPostiRichiesti;
                             } else {
                                 systemMessageForMainAI = `L'utente ha richiesto ${numPostiRichiesti} posti, ma il massimo consentito è ${maxPrenotabiliOra}. Informalo.`;
-                                currentBookingState.numeroPosti = null; // Resetta se non valido
+                                currentBookingState.numeroPosti = null;
                             }
                         }
                         if (intentAnalysisParsed.params.partecipanti_nomi_cognomi && Array.isArray(intentAnalysisParsed.params.partecipanti_nomi_cognomi) && currentBookingState.numeroPosti) {
-                            // Aggiungi solo i nomi mancanti, fino a currentBookingState.numeroPosti
                             const nomiDaAggiungere = intentAnalysisParsed.params.partecipanti_nomi_cognomi;
                             for (const nome of nomiDaAggiungere) {
                                 if (currentBookingState.partecipanti.length < currentBookingState.numeroPosti) {
-                                    // Semplice validazione: deve essere una stringa con almeno due parole
                                     if (typeof nome === 'string' && nome.trim().split(' ').filter(Boolean).length >= 2) {
                                         currentBookingState.partecipanti.push(nome.trim());
                                     } else {
                                         systemMessageForMainAI = (systemMessageForMainAI || "") + ` Il nome '${nome}' non sembra completo (Nome Cognome). Richiedilo corretto.`;
                                     }
                                 } else {
-                                    break; // Raggiunto il numero di partecipanti richiesto
+                                    break;
                                 }
                             }
                         }
-                        // L'AI principale chiederà ulteriori info se necessario, basandosi su currentBookingState
                     }
                     break;
 
@@ -740,22 +707,39 @@ Fornisci solo il testo finale, pronto per essere letto.
                     const validation = validateBookingStateForConfirmation(currentBookingState);
                     if (validation.isValid) {
                         try {
+                            // Prepara i dati per prenota_evento.php
+                            const nomiPartecipanti = [];
+                            const cognomiPartecipanti = [];
+                            currentBookingState.partecipanti.forEach(partecipante => {
+                                const parts = partecipante.trim().split(' ');
+                                nomiPartecipanti.push(parts.shift()); // Primo elemento come nome
+                                cognomiPartecipanti.push(parts.join(' ')); // Il resto come cognome
+                            });
+
                             const bookingParams = {
-                                event_id: currentBookingState.eventId,
-                                user_email: CURRENT_USER_EMAIL,
-                                numero_posti: currentBookingState.numeroPosti,
-                                partecipanti: currentBookingState.partecipanti, // Array di stringhe
-                                richieste_speciali: currentBookingState.richiesteSpeciali || ''
+                                eventId: currentBookingState.eventId, // Nome corretto per PHP
+                                numeroPosti: currentBookingState.numeroPosti, // Nome corretto per PHP
+                                contatto: CURRENT_USER_EMAIL, // Nome corretto per PHP (email dell'utente)
+                                partecipanti_nomi: nomiPartecipanti, // Array di nomi
+                                partecipanti_cognomi: cognomiPartecipanti, // Array di cognomi
+                                // richieste_speciali: currentBookingState.richiesteSpeciali || '' // Non sembra essere usato da prenota_evento.php
                             };
+                            // Aggiungi richieste speciali se presente e gestita da PHP (attualmente non lo è)
+                            // if (currentBookingState.richiesteSpeciali) {
+                            //     bookingParams.richieste_speciali = currentBookingState.richiesteSpeciali;
+                            // }
+
+                            console.log("AssistenteAI: Invio parametri a prenota_evento.php:", bookingParams);
                             const bookingResult = await callPhpScript("prenota_evento.php", bookingParams, 'POST');
                             systemMessageForMainAI = `Risultato prenotazione: ${JSON.stringify(bookingResult)}`;
                             if (bookingResult.success) {
-                                resetBookingState(); // Resetta dopo prenotazione riuscita
-                            } else {
-                                // Non resettare se fallisce, l'utente potrebbe voler correggere
+                                resetBookingState();
                             }
                         } catch (error) {
-                            systemMessageForMainAI = `Errore durante la prenotazione: ${error.message}`;
+                            // L'errore da callPhpScript è già stato loggato e aggiunto alla cronologia system
+                            // systemMessageForMainAI non è necessario qui perché l'errore è già nel system message
+                            // systemMessageForMainAI = `Errore durante la prenotazione: ${error.message}`;
+                            // Il messaggio di errore specifico da PHP verrà mostrato all'utente dall'AI principale
                         }
                     } else {
                         systemMessageForMainAI = `Tentativo di conferma fallito. Dati mancanti o non validi: ${validation.missingInfo}. Chiedi all'utente di correggere o fornire i dati. Stato attuale: ${JSON.stringify(currentBookingState)}`;
@@ -777,22 +761,19 @@ Fornisci solo il testo finale, pronto per essere letto.
                 case "GENERAL_QUERY":
                 case "UNKNOWN":
                 default:
-                    // Nessuna azione specifica, l'AI principale risponderà genericamente
-                    // o in base al prompt di chiarimento se presente
                     if (intentAnalysisParsed.missing_info_prompt) {
                         systemMessageForMainAI = `L'analisi dell'intento suggerisce di chiedere: ${intentAnalysisParsed.missing_info_prompt}`;
                     }
                     break;
             }
 
-            // 3. Genera la risposta dell'AI principale
             const messagesForMainAI = [...chatHistoryForAssistant];
             if (systemMessageForMainAI) {
                 messagesForMainAI.push({ role: "system", content: systemMessageForMainAI });
             }
 
             mainAiResponseContent = await getGroqCompletion(
-                messagesForMainAI.slice(-10), // Invia una cronologia più consistente all'AI principale
+                messagesForMainAI.slice(-10),
                 MAIN_ASSISTANT_SYSTEM_PROMPT(),
                 GROQ_MODEL_NAME_ASSISTANT
             );
@@ -808,7 +789,16 @@ Fornisci solo il testo finale, pronto per essere letto.
         } catch (error) {
             console.error("AssistenteAI: Errore in handleSendMessageToAI:", error);
             if (thinkingMessageDiv) thinkingMessageDiv.remove();
-            await processAndDisplayAiResponse(`Si è verificato un errore: ${error.message}. Riprova più tardi.`);
+            // Il messaggio di errore specifico (se da PHP) è già stato aggiunto come system message
+            // L'AI principale dovrebbe riceverlo e comunicarlo.
+            // Qui possiamo mettere un messaggio generico se l'errore non è già stato gestito per la visualizzazione.
+            // Se l'errore è già stato comunicato dall'AI, questo potrebbe essere ridondante.
+            // await processAndDisplayAiResponse(`Si è verificato un errore: ${error.message}. Riprova più tardi.`);
+            // Lasciamo che l'AI principale gestisca la visualizzazione dell'errore basandosi sul system message.
+            // Se non c'è un system message specifico (es. errore API Groq), allora mostriamo questo.
+            if (!chatHistoryForAssistant.find(msg => msg.role === "system" && msg.content.startsWith("Errore da"))) {
+                await processAndDisplayAiResponse(`Si è verificato un errore: ${error.message}. Riprova più tardi.`);
+            }
         } finally {
             aiChatInputEl.disabled = false;
             aiChatSendBtnEl.disabled = false;
@@ -835,14 +825,9 @@ Fornisci solo il testo finale, pronto per essere letto.
     // Inizializzazione
     fetchAndPrepareAssistantApiKey().then(keyReady => {
         if (keyReady) {
-            // Non inizializzare la chat history qui, ma quando la chat viene aperta per la prima volta.
-            // Questo evita che il messaggio di benvenuto venga preparato (e potenzialmente letto)
-            // se la chat non viene mai aperta.
-            // initializeChatHistory(); // Spostato in toggleAiChat
             console.log("AssistenteAI: Pronto. La chat verrà inizializzata all'apertura.");
         } else {
             console.warn("AssistenteAI: Chiave API non caricata. L'assistente potrebbe non funzionare.");
-            // Non mostrare messaggi nella chat qui, l'utente vedrà un errore se prova ad usarla.
         }
     });
 
