@@ -1,4 +1,4 @@
-// File: assistenteAI.js (Versione Rivoluzionata e Corretta v10 - Formattazione Eventi Migliorata)
+// File: assistenteAI.js (Versione Rivoluzionata e Corretta v10 - Formattazione Eventi Migliorata + TTS)
 document.addEventListener('DOMContentLoaded', () => {
     const aiAssistantFabEl = document.getElementById('ai-assistant-fab');
     const aiChatPopupEl = document.getElementById('ai-chat-popup');
@@ -22,6 +22,70 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const MAX_SEATS_PER_SINGLE_BOOKING_REQUEST = 5;
     const MAX_TOTAL_SEATS_PER_USER_PER_EVENT = 5;
+
+    // --- INIZIO MODIFICHE PER TTS ---
+    let isTTSEnabled = true; // Imposta su true per avere la sintesi vocale sempre attiva
+    let speechSynthesisVoices = [];
+
+    function loadVoices() {
+        if ('speechSynthesis' in window) {
+            speechSynthesisVoices = window.speechSynthesis.getVoices();
+        }
+    }
+
+    // Carica le voci disponibili
+    loadVoices();
+    if ('speechSynthesis' in window && window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function speakText(text) {
+        if (!isTTSEnabled || !('speechSynthesis' in window)) {
+            console.warn("TTS non abilitato o non supportato.");
+            return;
+        }
+
+        window.speechSynthesis.cancel(); // Ferma la sintesi precedente, se attiva
+
+        let plainText = text;
+
+        // Estrai testo pulito se è HTML
+        if (/<[a-z][\s\S]*>/i.test(text)) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = text;
+            plainText = tempDiv.textContent || tempDiv.innerText || "";
+        }
+
+        // Pulisci da alcuni elementi comuni per una pronuncia migliore
+        plainText = plainText.replace(/\*\*(.*?)\*\*/g, '$1'); // Rimuovi **markdown** (grassetto)
+        plainText = plainText.replace(/\*(.*?)\*/g, '$1');   // Rimuovi *markdown* (corsivo)
+        plainText = plainText.replace(/ID:\s*\w+/gi, ''); // Rimuove "ID: xxx"
+        plainText = plainText.replace(/\[(.*?)\]\(.*?\)/g, '$1'); // Converte [testo](link) in "testo"
+        plainText = plainText.replace(/```[\s\S]*?```/g, ' '); // Rimuove blocchi di codice
+        plainText = plainText.replace(/`([^`]+)`/g, '$1'); // Rimuove codice inline
+        plainText = plainText.replace(/&nbsp;/g, ' '); // Sostituisce &nbsp; con spazio
+        plainText = plainText.replace(/#/g, ''); // Rimuove cancelletti (usati per titoli in markdown)
+
+        if (plainText.trim() === "") return;
+
+        const utterance = new SpeechSynthesisUtterance(plainText);
+        utterance.lang = 'it-IT'; // Imposta la lingua italiana
+
+        const italianVoice = speechSynthesisVoices.find(voice => voice.lang === 'it-IT');
+        if (italianVoice) {
+            utterance.voice = italianVoice;
+        } else {
+            console.warn("Nessuna voce italiana trovata, verrà usata la voce di default.");
+        }
+
+        utterance.onerror = function(event) {
+            console.error('Errore SpeechSynthesisUtterance:', event.error, "Testo:", plainText);
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+    // --- FINE MODIFICHE PER TTS ---
+
 
     function checkUserLoginStatus() {
         const userDataString = localStorage.getItem('userDataEFF');
@@ -182,7 +246,7 @@ ISTRUZIONI GENERALI:
             { role: "system", content: systemMessageContent },
             { role: "assistant", content: assistantMessageContent }
         ];
-        _updateInitialAssistantMessageUI(assistantMessageContent);
+        _updateInitialAssistantMessageUI(assistantMessageContent); // Questo chiamerà speakText per il messaggio iniziale
         resetBookingState();
     }
 
@@ -236,9 +300,10 @@ ISTRUZIONI GENERALI:
         const isActive = aiChatPopupEl.classList.toggle('active');
         aiAssistantFabEl.innerHTML = isActive ? '<i class="fas fa-times"></i>' : '<i class="fas fa-headset"></i>';
         if (isActive) {
-            if (chatHistoryForAssistant.length <= 2) initializeChatHistory();
+            if (chatHistoryForAssistant.length <= 2) initializeChatHistory(); // Assicura che l'inizializzazione avvenga se necessario
             if (aiChatInputEl) aiChatInputEl.focus();
         } else {
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel(); // Ferma la voce quando si chiude la chat
             resetBookingState();
         }
         document.body.style.overflow = isActive ? 'hidden' : '';
@@ -249,11 +314,18 @@ ISTRUZIONI GENERALI:
         messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
         if (sender === 'system') messageDiv.style.display = 'none';
 
-        if (type === 'html') messageDiv.innerHTML = text; // Use innerHTML for Markdown formatted text
+        if (type === 'html') messageDiv.innerHTML = text;
         else messageDiv.appendChild(document.createTextNode(text));
 
         aiChatMessagesContainerEl.appendChild(messageDiv);
         aiChatMessagesContainerEl.scrollTop = aiChatMessagesContainerEl.scrollHeight;
+
+        // --- MODIFICA PER TTS ---
+        // Chiama speakText se il mittente è l'AI (o 'assistant' per il messaggio iniziale)
+        if (sender === 'ai' || sender === 'assistant') {
+            speakText(text);
+        }
+        // --- FINE MODIFICA PER TTS ---
         return messageDiv;
     }
 
@@ -861,12 +933,14 @@ ISTRUZIONI GENERALI:
         }
     }
 
-    console.log("AssistenteAI: Script in esecuzione (v10 - Formattazione Eventi Migliorata).");
+    console.log("AssistenteAI: Script in esecuzione (v10 - Formattazione Eventi Migliorata + TTS).");
     checkUserLoginStatus();
-    initializeChatHistory();
+    // initializeChatHistory() viene chiamato in toggleAiChat se la cronologia è vuota o all'apertura della chat
+    // o subito dopo fetchAndPrepareAssistantApiKey per il messaggio iniziale.
 
     fetchAndPrepareAssistantApiKey().then(keyReady => {
         if (keyReady) {
+            initializeChatHistory(); // Inizializza la cronologia (e quindi il primo messaggio vocale) qui
             if (aiAssistantFabEl) aiAssistantFabEl.addEventListener('click', toggleAiChat);
             if (aiChatCloseBtnEl) aiChatCloseBtnEl.addEventListener('click', toggleAiChat);
             if (aiChatSendBtnEl) aiChatSendBtnEl.addEventListener('click', handleSendMessageToAI);
