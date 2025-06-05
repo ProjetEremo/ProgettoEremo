@@ -77,7 +77,7 @@
       font-size: 0.9em;
       cursor: pointer;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      display: flex;
+      /* display: flex; */ /* Rimosso per evitare conflitti, gestito da JS */
       align-items: center;
       justify-content: center;
       z-index: 5;
@@ -89,6 +89,7 @@
     .editable-text-wrapper:hover .edit-icon-text,
     .editable-iframe-wrapper:hover .edit-icon-iframe,
     .editable-href-wrapper:hover .edit-icon-href {
+      display: flex; /* Mostra con flex quando serve */
       opacity: 1;
       transform: scale(1);
     }
@@ -144,6 +145,71 @@
     .location-actions .editable-href-wrapper:hover .edit-icon-href {
       opacity: 1;
       transform: translate(var(--custom-translate-x, 50%), var(--custom-translate-y, -50%)) scale(1);
+    }
+
+    /* Specific styles for phone number section */
+    .contatto-card .contatto-valore {
+      text-align: center; /* Center the content within .contatto-valore */
+      display: flex; /* Use flexbox to center content horizontally */
+      justify-content: center; /* Center horizontally in flex container */
+      align-items: center; /* Vertically align items if they have different heights */
+      flex-wrap: wrap; /* Allow content to wrap if too long */
+    }
+
+    .contatto-card .contatto-valore .editable-text-wrapper {
+      display: inline-flex; /* Treat as inline block but with flex properties */
+      align-items: center; /* Vertically align items within this wrapper */
+      position: relative; /* Crucial for positioning the absolute icon */
+      vertical-align: middle; /* Align with surrounding text */
+      /* Remove width: 100% which was causing extra space */
+    }
+
+    /* Adjust specific elements inside .contatto-valore for better spacing */
+    .contatto-card .contatto-valore strong {
+      display: inline; /* Ensure strong tag doesn't break line unnecessarily */
+    }
+
+    .contatto-card .contatto-valore .editable-text-wrapper .edit-icon-text {
+      position: absolute; /* Position absolutely relative to its flex parent */
+      top: 50%; /* Center vertically */
+      left: 100%; /* Position it right at the end of the text/wrapper */
+      transform: translate(5px, -50%) scale(0.8); /* Shift 5px to the right and vertically center */
+
+      /* Ensure it's always visible and on top when active */
+      z-index: 10;
+      opacity: 0; /* Start hidden */
+      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    }
+
+    .contatto-card .contatto-valore .editable-text-wrapper:hover .edit-icon-text {
+      opacity: 1;
+      transform: translate(5px, -50%) scale(1); /* Maintain 5px shift and scale up */
+    }
+    /* Specific style for card1PhoneName1 and card1PhoneName2 icons */
+    /* Ensure the edit icon for the *name* is relative to its own span, not the phone number's span */
+    .contatto-card .contatto-valore .editable-text-wrapper > .edit-icon-text { /* Target icon for phone number itself */
+      top: 50%;
+      left: 100%;
+      transform: translate(5px, -50%) scale(0.8);
+    }
+
+    .contatto-card .contatto-valore .editable-text-wrapper > .edit-icon-text:hover {
+      opacity: 1;
+      transform: translate(5px, -50%) scale(1);
+    }
+
+    /* Icon for the name inside parentheses:
+       It's a child of its own .editable-text-wrapper which is inside the main phone .editable-text-wrapper.
+       So, its position should be relative to its immediate parent. */
+    .contatto-card .contatto-valore .editable-text-wrapper .editable-text-wrapper .edit-icon-text {
+      top: 50%; /* Vertically center relative to its parent (the inner span) */
+      left: 100%; /* Position right after the text it modifies */
+      transform: translate(5px, -50%) scale(0.8); /* Small horizontal offset */
+    }
+
+    .contatto-card .contatto-valore .editable-text-wrapper .editable-text-wrapper:hover .edit-icon-text {
+      opacity: 1;
+      transform: translate(5px, -50%) scale(1);
     }
 
 
@@ -271,25 +337,33 @@
           <span class="edit-icon-text" data-key="card1Description" data-type="textarea" title="Modifica Descrizione Card">✎</span>
         </div>
 
-        <div class="editable-text-wrapper">
-          <p class="contatto-valore">
-            <span id="content-card1PhoneNumber1" data-content-key="card1PhoneNumber1"></span>
-            (<span id="content-card1PhoneName1" data-content-key="card1PhoneName1"></span>)
-          </p>
-          <span class="edit-icon-text" data-key="card1PhoneNumber1" data-type="tel" title="Modifica Numero Telefono">✎</span>
-          <span class="edit-icon-text" data-key="card1PhoneName1" data-type="text" title="Modifica Nome Possessore">✎</span>
+        <div class="contatto-valore">
+          <div class="editable-text-wrapper">
+            <strong><span id="content-card1PhoneNumber1" data-content-key="card1PhoneNumber1"></span></strong>
+            (
+            <div class="editable-text-wrapper" style="display: inline-block;">
+              <strong><span id="content-card1PhoneName1" data-content-key="card1PhoneName1"></span></strong>
+              <span class="edit-icon-text" data-key="card1PhoneName1" data-type="text" title="Modifica Nome Referente">✎</span>
+            </div>
+            )
+            <span class="edit-icon-text" data-key="card1PhoneNumber1" data-type="tel" title="Modifica Numero Telefono">✎</span>
+          </div>
         </div>
 
-        <div class="editable-text-wrapper">
-          <p class="contatto-valore">
-            <span id="content-card1PhoneNumber2" data-content-key="card1PhoneNumber2"></span>
-            (<span id="content-card1PhoneName2" data-content-key="card1PhoneName2"></span>)
-          </p>
-          <span class="edit-icon-text" data-key="card1PhoneNumber2" data-type="tel" title="Modifica Numero Telefono">✎</span>
-          <span class="edit-icon-text" data-key="card1PhoneName2" data-type="text" title="Modifica Nome Possessore">✎</span>
+        <div class="contatto-valore">
+          <div class="editable-text-wrapper">
+            <strong><span id="content-card1PhoneNumber2" data-content-key="card1PhoneNumber2"></span></strong>
+            (
+            <div class="editable-text-wrapper" style="display: inline-block;">
+              <strong><span id="content-card1PhoneName2" data-content-key="card1PhoneName2"></span></strong>
+              <span class="edit-icon-text" data-key="card1PhoneName2" data-type="text" title="Modifica Nome Referente">✎</span>
+            </div>
+            )
+            <span class="edit-icon-text" data-key="card1PhoneNumber2" data-type="tel" title="Modifica Numero Telefono">✎</span>
+          </div>
         </div>
 
-
+        <br>
         <div class="phone-buttons-group">
           <button class="btn-contatto half-btn" id="copyPhoneBtnCard1_1">
             <i class="fas fa-copy"></i> Copia Numero 1
@@ -450,6 +524,25 @@
     doveTrovarciAddress: "Via San Vito, 24027 Nembro BG"
   };
 
+  // Mappa per i nomi visualizzati nel modale di modifica
+  const keyDisplayNameMap = {
+    pageTitle: "Titolo Pagina",
+    pageIntroText: "Testo Introduttivo",
+    card1Title: "Titolo Card Telefono",
+    card1Description: "Descrizione Card Telefono",
+    card1PhoneNumber1: "Numero Telefono 1",
+    card1PhoneName1: "Nome Referente 1",
+    card1PhoneNumber2: "Numero Telefono 2",
+    card1PhoneName2: "Nome Referente 2",
+    card2Title: "Titolo Card Email",
+    card2Description: "Descrizione Card Email",
+    card2Email: "Indirizzo Email",
+    doveTrovarciHeading: "Titolo Sezione 'Dove Trovarci'",
+    doveTrovarciAddress: "Indirizzo Eremo"
+    // Aggiungi qui altre chiavi se necessario per altre pagine
+  };
+
+
   function gebi(id) { return document.getElementById(id); }
   function formatHTMLContent(str) { if (typeof str !== 'string') str = String(str || ''); return str.replace(/\r\n|\r|\n/g, '<br>'); }
   function loadUserData() { const uds = localStorage.getItem('userDataEFF'); if (uds) { try { currentUserData = JSON.parse(uds); if (!currentUserData || typeof currentUserData.email === 'undefined') {currentUserData = null; localStorage.removeItem('userDataEFF');}} catch (e) { console.error("Err parsing userDataEFF:", e); currentUserData = null; localStorage.removeItem('userDataEFF');}} else { currentUserData = null; }}
@@ -478,34 +571,64 @@
 
   function updateNavbarUI() {
     const logoLink = gebi('logoLink'); if (logoLink) logoLink.href = "index.html";
-    const navbarTitle = gebi('navbarTitle'); const loginBtnDesktop = gebi('login-btn-desktop'); const userDropdownContainer = gebi('userDropdownContainer'); const navbarAvatarSpan = gebi('navbar-avatar'); const navbarUsername = gebi('navbar-username'); const dropdownProfilo = gebi('dropdownProfilo'); const dropdownPrenotazioni = gebi('dropdownPrenotazioni'); const dropdownLogout = gebi('dropdownLogout'); const loginBtnMobile = gebi('login-btn-mobile'); const mobileNavProfilo = gebi('mobileNavProfilo'); const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni'); const mobileLogoutLink = gebi('mobileLogoutLink'); const mobileMenuSeparator = gebi('mobileMenuSeparator'); const userDropdownMenu = gebi('userDropdownMenu'); const mobileMenu = gebi('mobileMenu'); const editPageBtnContainer = gebi('editPageBtnContainer');
-    let dropdownDashboard = gebi('dropdownDashboard'); if (userDropdownMenu && !dropdownDashboard) { dropdownDashboard = document.createElement('a'); dropdownDashboard.id = 'dropdownDashboard'; dropdownDashboard.href = 'dashboard.html'; dropdownDashboard.textContent = 'Dashboard Admin'; userDropdownMenu.insertBefore(dropdownDashboard, dropdownLogout); }
-    let dropdownGestioneEventi = gebi('dropdownGestioneEventi'); if (userDropdownMenu && !dropdownGestioneEventi) { dropdownGestioneEventi = document.createElement('a'); dropdownGestioneEventi.id = 'dropdownGestioneEventi'; dropdownGestioneEventi.href = 'eventiincorsoAdmin.html'; dropdownGestioneEventi.textContent = 'Gestione Eventi'; userDropdownMenu.insertBefore(dropdownGestioneEventi, dropdownLogout); }
-    let mobileNavDashboard = gebi('mobileNavDashboard'); if (mobileMenu && !mobileNavDashboard) { mobileNavDashboard = document.createElement('a'); mobileNavDashboard.id = 'mobileNavDashboard'; mobileNavDashboard.href = 'dashboard.html'; mobileNavDashboard.textContent = 'Dashboard Admin'; mobileMenu.insertBefore(mobileNavDashboard, mobileLogoutLink); }
-    let mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); if (mobileMenu && !mobileNavGestioneEventiAdmin) { mobileNavGestioneEventiAdmin = document.createElement('a'); mobileNavGestioneEventiAdmin.id = 'mobileNavGestioneEventiAdmin'; mobileNavGestioneEventiAdmin.href = 'eventiincorsoAdmin.html'; mobileNavGestioneEventiAdmin.textContent = 'Gestione Eventi'; mobileMenu.insertBefore(mobileNavGestioneEventiAdmin, mobileLogoutLink); }
-    if (loginBtnDesktop) loginBtnDesktop.style.display = 'none'; if (userDropdownContainer) userDropdownContainer.style.display = 'none'; if (dropdownProfilo) dropdownProfilo.style.display = 'none'; if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none'; if (dropdownDashboard) dropdownDashboard.style.display = 'none'; if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none'; if (loginBtnMobile) loginBtnMobile.style.display = 'none'; if (mobileNavProfilo) mobileNavProfilo.style.display = 'none'; if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none'; if (mobileNavDashboard) mobileNavDashboard.style.display = 'none'; if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none'; if (mobileLogoutLink) mobileLogoutLink.style.display = 'none'; if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'none';
+    const navbarTitle = gebi('navbarTitle'); const loginBtnDesktop = gebi('login-btn-desktop'); const userDropdownContainer = gebi('userDropdownContainer'); const navbarAvatarSpan = gebi('navbar-avatar'); const navbarUsername = gebi('navbar-username');
+    const dropdownProfilo = gebi('dropdownProfilo');
+    const dropdownPrenotazioni = gebi('dropdownPrenotazioni');
+    const dropdownDashboard = gebi('dropdownDashboard');
+    const dropdownGestioneEventi = gebi('dropdownGestioneEventi'); // Modificato per usare un ID univoco
+    const dropdownLogout = gebi('dropdownLogout'); // Assicurati che questo esista
+    const loginBtnMobile = gebi('login-btn-mobile');
+    const mobileNavProfilo = gebi('mobileNavProfilo');
+    const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni');
+    const mobileNavDashboard = gebi('mobileNavDashboard');
+    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); // Modificato per usare un ID univoco
+    const mobileLogoutLink = gebi('mobileLogoutLink');
+    const mobileMenuSeparator = gebi('mobileMenuSeparator');
+    const editPageBtnContainer = gebi('editPageBtnContainer');
 
-    if (currentUserData) {
-      if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block'; if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
-      const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null; if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
-      if (mobileLogoutLink) mobileLogoutLink.style.display = 'block'; if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
+    // Reset iniziale di tutti gli item specifici dell'utente/admin
+    [loginBtnDesktop, userDropdownContainer, dropdownProfilo, dropdownPrenotazioni, dropdownDashboard, dropdownGestioneEventi, loginBtnMobile, mobileNavProfilo, mobileNavPrenotazioni, mobileNavDashboard, mobileNavGestioneEventiAdmin, mobileLogoutLink, mobileMenuSeparator].forEach(el => { if (el) el.style.display = 'none'; });
+    if(dropdownLogout) dropdownLogout.style.display = 'none'; // Nascondi anche logout inizialmente
 
-      if (dropdownProfilo) dropdownProfilo.style.display = 'block';
-      if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block';
-      if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
-      if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
+    if (currentUserData) { // Utente Loggato
+      if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
+      if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
+      const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
+      if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
+      if (dropdownLogout) dropdownLogout.style.display = 'block'; // Mostra Logout Desktop
+      if (mobileLogoutLink) mobileLogoutLink.style.display = 'block';
+      if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
 
-      if (currentUserData.isAdmin) {
-        if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)"; if (dropdownDashboard) dropdownDashboard.style.display = 'block'; if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'block'; if (mobileNavDashboard) mobileNavDashboard.style.display = 'block'; if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'block';
-      } else {
+      if (currentUserData.isAdmin) { // ADMIN LOGGATO
+        if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
+        if (dropdownProfilo) dropdownProfilo.style.display = 'block';
+        if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
+        if (dropdownDashboard) dropdownDashboard.style.display = 'block';
+        if (mobileNavDashboard) mobileNavDashboard.style.display = 'block';
+
+        // Nascondi "Le mie prenotazioni" e "Gestione Eventi" per admin
+        if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none';
+        if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
+        if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none';
+        if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none';
+
+      } else { // UTENTE NORMALE LOGGATO
         if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+        if (dropdownProfilo) dropdownProfilo.style.display = 'block';
+        if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
+        if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block';
+        if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
+        // Dashboard e Gestione Eventi rimangono 'none' dal reset iniziale
         if(editPageBtnContainer) editPageBtnContainer.classList.remove('active');
       }
-    } else {
-      if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block'; if (loginBtnMobile) loginBtnMobile.style.display = 'block'; if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+    } else { // UTENTE NON LOGGATO
+      if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
+      if (loginBtnMobile) loginBtnMobile.style.display = 'block';
+      if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
       if(editPageBtnContainer) editPageBtnContainer.classList.remove('active');
     }
   }
+
 
   function handleLogout(){localStorage.removeItem('userDataEFF');currentUserData=null;isEditModeActive=false;updateNavbarUI();loadPageContentsFromServer();showPageStatus('Logout effettuato.','info');}
   let lastScroll = 0; const navbarContainer = gebi("navbarContainer"); if (navbarContainer) { window.addEventListener("scroll", function () { const cS = window.pageYOffset||document.documentElement.scrollTop; if(cS<=50){navbarContainer.classList.remove("hidden");lastScroll=0;return;} if(cS>lastScroll&&!navbarContainer.classList.contains("hidden"))navbarContainer.classList.add("hidden"); else if(cS<lastScroll&&navbarContainer.classList.contains("hidden"))navbarContainer.classList.remove("hidden"); lastScroll=cS<=0?0:cS;}, false);}
@@ -541,7 +664,7 @@
         if (currentUserData.isAdmin) {
           toggleEditMode(false);
         }
-        showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");
+        showPageStatus(`Benvenuto/a ${currentUserData.nome}!`, "success");
 
       }else{
         loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));
@@ -576,11 +699,10 @@
   const editContentModal=gebi('editContentModal'); const closeEditContentModalBtn=gebi('closeEditContentModalBtn');const editModalTitle=gebi('editModalTitle'); const editModalTextarea=gebi('editModalTextarea');const editModalInputText=gebi('editModalInputText'); const editModalInputUrl = gebi('editModalInputUrl'); const editModalInputEmail = gebi('editModalInputEmail'); const editModalInputTel = gebi('editModalInputTel'); const editModalFieldLabelText=gebi('editModalFieldLabelText'); const saveEditModalBtn=gebi('saveEditModalBtn');const cancelEditModalBtn=gebi('cancelEditModalBtn'); const editModalMessage=gebi('editModalMessage');const pageOverallStatus=gebi('pageOverallStatus');
   let currentEditingKey=null;let currentEditingType='text';
 
-  // Funzione showPageStatus standardizzata
   function showPageStatus(message, type = 'info', duration = 3000) {
     if (!pageOverallStatus) return;
     pageOverallStatus.textContent = message;
-    pageOverallStatus.className = 'form-message'; // Reset base class
+    pageOverallStatus.className = 'form-message';
     pageOverallStatus.classList.remove('success', 'error', 'active');
 
     if (type === 'success') {
@@ -588,12 +710,10 @@
     } else if (type === 'error') {
       pageOverallStatus.classList.add('error');
     }
-    // Per 'info', si affida agli stili CSS di #pageOverallStatus e .active
-
     if (pageOverallStatus.hideTimeout) {
       clearTimeout(pageOverallStatus.hideTimeout);
     }
-    void pageOverallStatus.offsetHeight; // Forza reflow per riavviare animazione CSS
+    void pageOverallStatus.offsetHeight;
     pageOverallStatus.classList.add('active');
 
     pageOverallStatus.hideTimeout = setTimeout(() => {
@@ -624,19 +744,21 @@
       let contentValue = contents[key] !== undefined ? contents[key] : defaultPageContents[key];
       if (typeof contentValue !== 'string') contentValue = String(contentValue || '');
 
-      if (contentValue !== undefined) {
-        if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') { el.src = contentValue; }
-        else if (el.tagName === 'A' && key === 'locationDirectionsButtonHref') { el.href = contentValue; }
-        else { el.innerHTML = formatHTMLContent(contentValue); }
+      // Handle the strong tags for phone numbers and names
+      if (key === 'card1PhoneNumber1' || key === 'card1PhoneName1' ||
+              key === 'card1PhoneNumber2' || key === 'card1PhoneName2') {
+        // We assume the stored content does NOT include the strong tag,
+        // as the HTML structure explicitly adds it.
+        // So, we just set the innerHTML of the span.
+        el.innerHTML = formatHTMLContent(contentValue);
+      }
+      else if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') { el.src = contentValue; }
+      else if (el.tagName === 'A' && key === 'locationDirectionsButtonHref') { el.href = contentValue; }
+      else { el.innerHTML = formatHTMLContent(contentValue); }
 
-        if (key === 'card2Email') {
-          const mailLink = gebi('mailtoLinkCard2');
-          if (mailLink) mailLink.href = `mailto:${contentValue.trim().replace(/<br\s*\/?>/gi, "")}`;
-        }
-      } else {
-        if (el.tagName === 'IFRAME') el.src = "about:blank";
-        else if (el.tagName === 'A') el.href="#";
-        else el.innerHTML = `[${key} mancante]`;
+      if (key === 'card2Email') {
+        const mailLink = gebi('mailtoLinkCard2');
+        if (mailLink) mailLink.href = `mailto:${contentValue.trim().replace(/<br\s*\/?>/gi, "")}`;
       }
     });
   }
@@ -646,19 +768,26 @@
     document.querySelectorAll('.edit-icon-text, .edit-icon-iframe, .edit-icon-href').forEach(icon => {
       if (currentUserData?.isAdmin && enable) {
         icon.style.display = 'flex';
-        const parentWrapper = icon.closest('.editable-text-wrapper, .editable-iframe-wrapper, .editable-href-wrapper');
+        const parentWrapper = icon.closest('.editable-text-wrapper');
         if (parentWrapper) {
           let translateX = '50%';
           let translateY = '-50%';
+
           if (parentWrapper.classList.contains('main-title-editable-wrapper')) {
             translateX = '50%';
             translateY = '-50%';
           } else if (parentWrapper.closest('.contatto-card')) {
-            const tagName = parentWrapper.querySelector('[data-content-key]')?.tagName;
-            if (tagName === 'H3') {
+            const dataKey = icon.dataset.key;
+            // Specific positioning for phone numbers and names within the phone card
+            if (dataKey.includes('card1PhoneNumber') || dataKey.includes('card1PhoneName')) {
+              // These are already positioned relative to their parent 'editable-text-wrapper'
+              // in the CSS, so the translate values here are just for the offset.
+              translateX = '5px';
+              translateY = '-50%';
+            } else if (parentWrapper.querySelector('h3')) {
               translateX = 'calc(100% + 5px)';
               translateY = '-50%';
-            } else if (tagName === 'P') {
+            } else if (parentWrapper.querySelector('p')) {
               translateX = 'calc(100% + 5px)';
               translateY = '-50%';
             }
@@ -712,7 +841,10 @@
     currentEditingKey=key;currentEditingType=type;
     if(!editContentModal||!editModalMessage)return;
     editModalMessage.style.display='none';editModalMessage.textContent='';
-    editModalTitle.textContent=`Modifica: ${key}`;
+
+    // Usa la mappa per ottenere il nome visualizzato, altrimenti usa la chiave
+    editModalTitle.textContent=`Modifica: ${keyDisplayNameMap[key] || key}`;
+
     editModalTextarea.style.display='none';editModalInputText.style.display='none';
     editModalInputUrl.style.display='none'; editModalInputEmail.style.display='none'; editModalInputTel.style.display='none';
 
@@ -723,7 +855,7 @@
 
     if (type === 'iframe_src' || type === 'href') {
       editModalFieldLabelText.textContent = (type === 'iframe_src' ? "URL Mappa (src iframe):" : "URL Link:");
-      editModalInputUrl.value = valForInput;
+      editModalInputUrl.value = valForInput; // Use raw valForInput for URLs
       editModalInputUrl.style.display='block'; editModalInputUrl.focus();
     } else if (type === 'email') {
       editModalFieldLabelText.textContent = "Indirizzo Email:";
@@ -737,7 +869,7 @@
       editModalFieldLabelText.textContent="Testo (paragrafo):";
       editModalTextarea.value= plainTextValue;
       editModalTextarea.style.display='block';editModalTextarea.focus();
-    } else {
+    } else { // text
       editModalFieldLabelText.textContent="Testo (titolo/corto):";
       editModalInputText.value= plainTextValue;
       editModalInputText.style.display='block';editModalInputText.focus();
@@ -749,11 +881,17 @@
   if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
   if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{
     const contentsToSave = { ...currentPageDbContents };
+    // Raccogli i dati aggiornati direttamente dagli elementi DOM per sicurezza
     document.querySelectorAll('[data-content-key]').forEach(el => {
       const key = el.dataset.contentKey;
-      if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') { contentsToSave[key] = el.src; }
+      // For phone numbers and names, we want to save the plain text content without the strong tag
+      if (key === 'card1PhoneNumber1' || key === 'card1PhoneName1' ||
+              key === 'card1PhoneNumber2' || key === 'card1PhoneName2') {
+        contentsToSave[key] = currentPageDbContents[key]; // Already updated with raw value
+      }
+      else if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') { contentsToSave[key] = el.src; }
       else if (el.tagName === 'A' && key === 'locationDirectionsButtonHref') { contentsToSave[key] = el.href; }
-      else { contentsToSave[key] = el.innerHTML; }
+      else { contentsToSave[key] = currentPageDbContents[key]; } // Use the raw value from currentPageDbContents
     });
     const btn=savePageChangesBtn;const oldHtml=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
     try{
@@ -778,7 +916,10 @@
       if(!elToEdit){console.error(`Elemento con id content-${key} non trovato`);return;}
       if (type === 'iframe_src') { currentVal = elToEdit.src; }
       else if (type === 'href') { currentVal = elToEdit.href; }
-      else { currentVal = elToEdit.innerHTML; }
+      else { // text, textarea, email, tel
+        // For these, always fetch the raw (potentially un-HTML-formatted) value
+        currentVal = currentPageDbContents[key] !== undefined ? currentPageDbContents[key] : defaultPageContents[key];
+      }
       openEditModal(key, type, currentVal);
     }
   });
@@ -803,19 +944,18 @@
     } else if(currentEditingType === 'tel'){
       newValueRaw = editModalInputTel.value.trim();
       formattedNewValue = formatHTMLContent(newValueRaw);
-    } else if(currentEditingType==='textarea'){
-      newValueRaw = editModalTextarea.value;
-      formattedNewValue = formatHTMLContent(newValueRaw);
-    } else {
-      newValueRaw = editModalInputText.value;
+    } else { // text or textarea
+      newValueRaw = currentEditingType === 'textarea' ? editModalTextarea.value : editModalInputText.value;
       formattedNewValue = formatHTMLContent(newValueRaw);
     }
 
+    // Apply the new value to the element on the page
     if(currentEditingType === 'iframe_src') { targetElement.src = formattedNewValue; }
     else if (currentEditingType === 'href') { targetElement.href = formattedNewValue; }
     else { targetElement.innerHTML = formattedNewValue; }
 
-    currentPageDbContents[currentEditingKey] = (currentEditingType === 'iframe_src' || currentEditingType === 'href') ? newValueRaw : formattedNewValue;
+    // Update currentPageDbContents with the plain text value for saving
+    currentPageDbContents[currentEditingKey] = newValueRaw;
 
     if (currentEditingKey === 'card2Email') {
       const mailLink = gebi('mailtoLinkCard2');

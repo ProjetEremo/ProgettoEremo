@@ -27,32 +27,32 @@
     /* Stili Modifica Pagina Admin */
     #editPageBtnContainer {
       position: fixed;
-      bottom: 20px; /* Riportato in basso */
-      left: 50%; /* Centra orizzontalmente */
-      transform: translateX(-50%) translateY(100px); /* Inizialmente spostato in basso per l'animazione */
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
       z-index: 1001;
-      display: flex; /* Usa flex per allineare i bottoni */
-      gap: 10px; /* Spazio tra i bottoni */
-      opacity: 0; /* Inizialmente invisibile */
-      transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Animazione più fluida */
+      display: flex;
+      gap: 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
     }
 
     #editPageBtnContainer.active {
       opacity: 1;
-      transform: translateX(-50%) translateY(0); /* Ritorna alla posizione normale */
+      transform: translateX(-50%) translateY(0);
     }
 
     #editPageBtn, #savePageChangesBtn, #cancelPageChangesBtn {
       background-color: var(--accent);
       color: white;
-      padding: 12px 20px; /* Dimensione leggermente ridotta ma ancora evidente */
+      padding: 12px 20px;
       border: none;
       border-radius: 50px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Ombra più pronunciata */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       cursor: pointer;
-      font-size: 1rem; /* Dimensione font */
+      font-size: 1rem;
       transition: background-color 0.2s, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-      white-space: nowrap; /* Evita che il testo vada a capo */
+      white-space: nowrap;
     }
     #editPageBtn i, #savePageChangesBtn i, #cancelPageChangesBtn i { margin-right: 8px; }
     #savePageChangesBtn { background-color: var(--success); }
@@ -64,108 +64,85 @@
     .editable-text-wrapper { position: relative; display: block; width:100%; }
     .editable-iframe-wrapper, .editable-href-wrapper { position: relative; display: block; }
 
-    /* Stili per le icone di modifica */
     .edit-icon-text, .edit-icon-iframe, .edit-icon-href {
-      display: none; /* Gestito via JS per apparire solo in modalità edit */
+      display: none;
       position: absolute;
       background: var(--accent);
       color: white;
-      width: 28px; /* Aumentato per maggiore visibilità */
-      height: 28px; /* Aumentato per maggiore visibilità */
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      font-size: 0.9em; /* Dimensione font icona */
+      font-size: 0.9em;
       cursor: pointer;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      display: flex; /* Usa flexbox per centrare l'icona */
+      /* display: flex; */ /* Rimosso per evitare conflitti, gestito da JS */
       align-items: center;
       justify-content: center;
       z-index: 5;
-      opacity: 0; /* Inizialmente invisibile per l'animazione */
-      transform: scale(0.8); /* Inizialmente più piccolo per l'animazione */
+      opacity: 0;
+      transform: scale(0.8);
       transition: opacity 0.2s ease-out, transform 0.2s ease-out;
     }
 
-    /* Apparizione delle icone al passaggio del mouse sul wrapper */
     .editable-text-wrapper:hover .edit-icon-text,
     .editable-iframe-wrapper:hover .edit-icon-iframe,
     .editable-href-wrapper:hover .edit-icon-href {
+      display: flex; /* Mostra con flex quando serve */
       opacity: 1;
       transform: scale(1);
     }
-
-    /* Posizionamento specifico delle icone */
-    /* Regola generale per posizionare l'icona fuori dall'angolo in alto a destra */
     .edit-icon-text, .edit-icon-iframe, .edit-icon-href {
       top: 0;
       right: 0;
-      transform: translate(50%, -50%) scale(0.8); /* Sposta di metà larghezza/altezza fuori dall'angolo */
+      transform: translate(50%, -50%) scale(0.8);
     }
-
-    /* Regola per l'H1 principale, centrandola verticalmente rispetto all'altezza del testo */
     .main-title-editable-wrapper > h1 + .edit-icon-text {
       top: 50%;
       right: 0;
       transform: translate(50%, -50%) scale(0.8);
     }
-
-    /* Regole più specifiche per evitare sovrapposizioni in base al layout */
-    /* Per gli h2 all'interno di location-description (e simili) */
     .location-description .editable-text-wrapper h2 + .edit-icon-text {
-      top: 0; /* Allinea in alto */
+      top: 0;
       right: 0;
-      transform: translate(calc(100% + 5px), -50%) scale(0.8); /* Sposta completamente a destra del testo, più un margine */
+      transform: translate(calc(100% + 5px), -50%) scale(0.8);
     }
-
-    /* Per i p all'interno di location-description (Indirizzo, Indicazioni, Parcheggio) */
     .location-description .editable-text-wrapper p + .edit-icon-text {
-      top: 50%; /* Centra verticalmente con la riga di testo */
+      top: 50%;
       right: 0;
-      transform: translate(calc(100% + 5px), -50%) scale(0.8); /* Sposta a destra del testo, più un margine */
+      transform: translate(calc(100% + 5px), -50%) scale(0.8);
     }
-
-    /* Per i bottoni di azione (Indicazioni Stradali, Contattaci) */
     .location-actions .editable-href-wrapper .edit-icon-href {
       top: 50%;
       right: 0;
       transform: translate(calc(100% + 5px), -50%) scale(0.8);
     }
-
-    /* Per gli h2 all'interno delle info-cards */
-    .location-info-cards .editable-text-wrapper h2 + .edit-icon-text {
-      top: 0;
-      right: 0;
-      transform: translate(50%, -50%) scale(0.8); /* Torna alla regola generale per angoli */
-    }
-
-    /* Per i p all'interno delle info-cards */
-    .card-content .editable-text-wrapper p + .edit-icon-text {
+    .location-info-cards .editable-text-wrapper h2 + .edit-icon-text { /* Assumendo che anche questo titolo sia modificabile */
       top: 0;
       right: 0;
       transform: translate(50%, -50%) scale(0.8);
     }
-
-    /* For the iframe map */
-    .map-container .edit-icon-iframe {
+    .card-content .editable-text-wrapper p + .edit-icon-text { /* Per i paragrafi nelle card info */
       top: 0;
       right: 0;
       transform: translate(50%, -50%) scale(0.8);
     }
-
-    /* Hover per le icone, mantiene la posizione mentre scala */
+    .map-container .edit-icon-iframe { /* Specifico per l'iframe della mappa */
+      top: 10px; /* Esempio: Spostato un po' più in basso */
+      right: 10px; /* Esempio: Spostato un po' più a sinistra */
+      transform: translate(0, 0) scale(0.8); /* Rimosso il translate(50%, -50%) se dà problemi */
+    }
     .editable-text-wrapper:hover .edit-icon-text,
     .editable-iframe-wrapper:hover .edit-icon-iframe,
     .editable-href-wrapper:hover .edit-icon-href {
       opacity: 1;
-      transform: translate(50%, -50%) scale(1);
+      transform: translate(50%, -50%) scale(1); /* Ripristinato per uniformità, aggiustare se necessario */
     }
-
-    /* Eccezioni per hover dove la posizione è diversa */
     .main-title-editable-wrapper:hover > h1 + .edit-icon-text,
     .location-description .editable-text-wrapper:hover h2 + .edit-icon-text,
     .location-description .editable-text-wrapper:hover p + .edit-icon-text,
-    .location-actions .editable-href-wrapper:hover .edit-icon-href {
+    .location-actions .editable-href-wrapper:hover .edit-icon-href,
+    .map-container.editable-iframe-wrapper:hover .edit-icon-iframe { /* Aggiunto per la mappa */
       opacity: 1;
-      /* Mantiene la traslazione specifica ma scala */
       transform: translate(var(--custom-translate-x, 50%), var(--custom-translate-y, -50%)) scale(1);
     }
 
@@ -180,7 +157,42 @@
     .edit-content-modal-actions { margin-top: 20px; text-align: right; } .edit-content-modal-actions button { margin-left: 10px; }
     .close-modal-btn { position: absolute; top: 10px; right: 15px; font-size: 1.8rem; color: var(--gray-medium); background: none; border: none; cursor: pointer; line-height: 1;}
     .close-modal-btn:hover { color: var(--dark); }
-    #pageOverallStatus { position: fixed; bottom: 70px; right: 20px; background-color: var(--primary); color: white; padding: 8px 15px; border-radius: 5px; z-index: 1000; display: none; font-size: 0.9em; }
+
+    /* Stili per #pageOverallStatus - Standardizzati */
+    #pageOverallStatus {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      z-index: 1000;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      text-align: center;
+      background-color: var(--primary);
+      color: white;
+      display: block;
+      opacity: 0;
+      transform: translateX(-50%) translateY(30px);
+      transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275), transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275);
+      pointer-events: none;
+      max-width: 90%;
+      box-sizing: border-box;
+    }
+
+    #pageOverallStatus.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    #pageOverallStatus.success {
+      background-color: var(--success, green);
+    }
+
+    #pageOverallStatus.error {
+      background-color: var(--danger, red);
+    }
   </style>
 </head>
 <body>
@@ -381,7 +393,7 @@
   <button id="savePageChangesBtn" style="display:none;"><i class="fas fa-save"></i> Salva Modifiche Pagina</button>
   <button id="cancelPageChangesBtn" style="display:none;"><i class="fas fa-times"></i> Annulla Modifiche</button>
 </div>
-<div id="pageOverallStatus" class="form-message" style="position: fixed; bottom: 70px; right: 20px; z-index: 1000; display: none; font-size: 0.9em;"></div>
+<div id="pageOverallStatus"></div>
 
 <div id="editContentModal" class="edit-content-modal">
   <div class="edit-content-modal-content">
@@ -434,7 +446,7 @@
 
   const defaultPageContents = {
     pageTitle: "Dove Siamo",
-    mapIframeSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2791.778205780889!2d9.747583015500093!3d45.74087297910504!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47814f7b104783bf%3A0xde070acb563411c3!2sChiesa%20di%20San%20Vito!5e0!3m2!1sit!2sit!4v1620000000000!5m2!1sit!2sit", // Esempio URL Google Maps
+    mapIframeSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2791.778205780889!2d9.747583015500093!3d45.74087297910504!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47814f7b104783bf%3A0xde070acb563411c3!2sChiesa%20di%20San%20Vito!5e0!3m2!1sit!2sit!4v1620000000000!5m2!1sit!2sit",
     locationHeading: "Raggiungici a San Vito di Nembro",
     locationText1: "L'Eremo Frate Francesco si trova in una posizione tranquilla e suggestiva, ideale per il raccoglimento, nella frazione di San Vito a Nembro (BG).",
     locationAddress: "<strong>Indirizzo: </strong> Via San Vito, 24027 Nembro BG (Presso la Chiesa di San Vito)",
@@ -450,11 +462,32 @@
     accessibilitaCardText2: "Faremo il possibile per accogliervi al meglio."
   };
 
+  // New object for user-friendly display names
+  const keyDisplayNames = {
+    pageTitle: "Titolo Pagina",
+    mapIframeSrc: "URL Mappa",
+    locationHeading: "Titolo Sezione Descrizione Luogo",
+    locationText1: "Testo Descrizione Luogo 1",
+    locationAddress: "Indirizzo",
+    locationDirections: "Indicazioni Stradali",
+    locationParking: "Info Parcheggio",
+    locationDirectionsButtonHref: "Link Bottone Indicazioni Stradali",
+    infoUtiliHeading: "Titolo Sezione Info Utili",
+    orariCardText1: "Testo Orari Card 1",
+    orariCardText2: "Testo Orari Card 2",
+    contattiRapidiCardText1: "Testo Contatti Rapidi Card 1",
+    contattiRapidiCardText2: "Testo Contatti Rapidi Card 2",
+    accessibilitaCardText1: "Testo Accessibilità Card 1",
+    accessibilitaCardText2: "Testo Accessibilità Card 2"
+  };
+
+
   function gebi(id) { return document.getElementById(id); }
   function formatHTMLContent(str) { if (typeof str !== 'string') str = String(str || ''); return str.replace(/\r\n|\r|\n/g, '<br>'); }
   function loadUserData() { const uds = localStorage.getItem('userDataEFF'); if (uds) { try { currentUserData = JSON.parse(uds); if (!currentUserData || typeof currentUserData.email === 'undefined') {currentUserData = null; localStorage.removeItem('userDataEFF');}} catch (e) { console.error("Err parsing userDataEFF:", e); currentUserData = null; localStorage.removeItem('userDataEFF');}} else { currentUserData = null; }}
 
   async function fetchAndUpdateUserDisplayDataFromApi() {
+    // Non fare fetch per admin qui, i dati sono ok
     if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
       updateNavbarUI();
       return;
@@ -492,29 +525,51 @@
     const mobileMenuSeparator = gebi('mobileMenuSeparator');
     const editPageBtnContainer = gebi('editPageBtnContainer');
 
-    [loginBtnDesktop, userDropdownContainer, navProfilo, navMiePrenotazioni, navDashboard, navGestioneEventiAdmin, logoutLinkDesktop, gebi('login-btn-mobile'), mobileNavProfilo, mobileNavPrenotazioni, mobileNavDashboard, mobileNavGestioneEventiAdmin, mobileLogoutLink, mobileMenuSeparator].forEach(el => { if (el) el.style.display = 'none'; });
+    // Reset iniziale di tutti gli item specifici dell'utente/admin
+    [loginBtnDesktop, userDropdownContainer, navDashboard, navGestioneEventiAdmin, logoutLinkDesktop, gebi('login-btn-mobile'), mobileNavDashboard, mobileNavGestioneEventiAdmin, mobileLogoutLink, mobileMenuSeparator].forEach(el => { if (el) el.style.display = 'none'; });
+    if (navProfilo) navProfilo.style.display = 'none';
+    if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'none';
+    if (mobileNavProfilo) mobileNavProfilo.style.display = 'none';
+    if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
 
-    if (currentUserData) {
+
+    if (currentUserData) { // Utente Loggato
       if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
       if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
       const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
       if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
-      [navProfilo, navMiePrenotazioni, logoutLinkDesktop, mobileNavProfilo, mobileNavPrenotazioni, mobileLogoutLink, mobileMenuSeparator].forEach(el => { if(el) el.style.display = 'block'; });
+      if (logoutLinkDesktop) logoutLinkDesktop.style.display = 'block'; // Mostra Logout Desktop
+      if (mobileLogoutLink) mobileLogoutLink.style.display = 'block';
+      if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
 
-      if (currentUserData.isAdmin) {
+
+      if (currentUserData.isAdmin) { // ADMIN LOGGATO
         if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
-        [navDashboard, navGestioneEventiAdmin, mobileNavDashboard, mobileNavGestioneEventiAdmin].forEach(el => { if(el) el.style.display = 'block'; });
-        // The visibility of the button container is handled by toggleEditMode
-        // if (editPageBtnContainer) { editPageBtnContainer.style.display = 'flex'; gebi('editPageBtn').style.display = isEditModeActive ? 'none' : 'inline-block'; gebi('savePageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; gebi('cancelPageChangesBtn').style.display = isEditModeActive ? 'inline-block' : 'none'; }
-      } else {
+        if (navProfilo) navProfilo.style.display = 'block';
+        if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
+        if (navDashboard) navDashboard.style.display = 'block';
+        if (mobileNavDashboard) mobileNavDashboard.style.display = 'block';
+
+        // Nascondi "Le mie prenotazioni" e "Gestione Eventi" per admin
+        if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'none';
+        if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
+        if (navGestioneEventiAdmin) navGestioneEventiAdmin.style.display = 'none';
+        if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none';
+
+      } else { // UTENTE NORMALE LOGGATO
         if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
-        if(editPageBtnContainer) editPageBtnContainer.classList.remove('active'); // Hide if not admin
+        if (navProfilo) navProfilo.style.display = 'block';
+        if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
+        if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'block';
+        if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
+        // Dashboard e Gestione Eventi rimangono 'none' dal reset iniziale
+        if(editPageBtnContainer) editPageBtnContainer.classList.remove('active');
       }
-    } else {
+    } else { // UTENTE NON LOGGATO
       if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
       if (gebi('login-btn-mobile')) gebi('login-btn-mobile').style.display = 'block';
       if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
-      if(editPageBtnContainer) editPageBtnContainer.classList.remove('active'); // Hide if not logged in
+      if(editPageBtnContainer) editPageBtnContainer.classList.remove('active');
     }
   }
 
@@ -529,98 +584,85 @@
   gebi('login-btn-desktop')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();}); gebi('login-btn-mobile')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();closeMobileMenu();});
   if(closeLoginPopupBtn)closeLoginPopupBtn.addEventListener('click',closeLoginPopup); if(loginOverlay)loginOverlay.addEventListener('click',(e)=>{if(e.target===loginOverlay)closeLoginPopup();});
   loginTabs.forEach(t=>t.addEventListener('click',()=>{const id=t.dataset.tab;loginTabs.forEach(tb=>tb.classList.remove('active'));t.classList.add('active');loginForms.forEach(f=>{f.classList.remove('active');if(f.id===`${id}Form`){f.classList.add('active');f.querySelector('input:not([type="hidden"])')?.focus();}});resetFormErrorsAndMessages();}));
-  loginFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=loginFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';try{const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath,isAdmin:j.is_admin===true||j.is_admin===1};localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));await fetchAndUpdateUserDisplayDataFromApi();closeLoginPopup();await loadPageContentsFromServer();showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");}else{loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}}}catch(err){console.error("Errore login:",err);if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
+
+  loginFormEl?.addEventListener('submit',async(e)=>{
+    e.preventDefault();
+    resetFormErrorsAndMessages();
+    const b=loginFormEl.querySelector('button[type="submit"]');
+    const o=b.innerHTML;
+    b.disabled=true;
+    b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';
+    try{
+      const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});
+      const j=await r.json();
+      if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);
+      if(j.success){
+        currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath,isAdmin:j.is_admin===true||j.is_admin===1};
+        localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));
+
+        updateNavbarUI();
+        closeLoginPopup();
+        await loadPageContentsFromServer();
+
+        if (currentUserData.isAdmin) {
+          toggleEditMode(false);
+        }
+        showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");
+
+      }else{
+        loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));
+        if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}
+      }
+    }catch(err){
+      console.error("Errore login:",err);
+      if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}
+    }finally{
+      b.disabled=false;
+      b.innerHTML=o;
+    }
+  });
+
   registerFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=registerFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Registrazione...<div class="spinner-mini-light"></div>';try{const r=await fetch('registrati.php',{method:'POST',body:new FormData(registerFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){alert(j.message||"Registrazione completata! Ora puoi accedere.");const loginTabButton=document.querySelector('.login-tab[data-tab="login"]');if(loginTabButton)loginTabButton.click();const loginEmailInput=gebi('login-email');const registerEmailInput=gebi('register-email');if(loginEmailInput&&registerEmailInput)loginEmailInput.value=registerEmailInput.value;e.target.reset();}else{if(registerErrorMessageEl){registerErrorMessageEl.textContent=j.message||"Errore registrazione.";registerErrorMessageEl.style.display='block';}if(j.errors){for(const f in j.errors)gebi(`register-${f}`)?.classList.add('error-border');}}}catch(err){console.error("Errore registrazione:",err);if(registerErrorMessageEl){registerErrorMessageEl.textContent="Errore connessione o server.";registerErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
   gebi('logout-link-desktop')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();}); gebi('mobileLogoutLink')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenu();});
 
-  // === INIZIO FUNZIONALITÀ RECUPERO PASSWORD (per dovesiamo.html) ===
   const forgotPasswordLink = document.getElementById('forgotPasswordLink');
   const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
   const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
   const closeForgotPasswordPopupBtn = document.getElementById('closeForgotPasswordPopupBtn');
   const forgotPasswordForm = document.getElementById('forgotPasswordForm');
   const forgotPasswordMessage = document.getElementById('forgot-password-message');
-
-  function openForgotPasswordPopup() {
-    if (typeof closeLoginPopup === 'function' && loginPopup?.classList.contains('active')) {
-      closeLoginPopup();
-    }
-    if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active');
-    if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
-    const forgotEmailInput = document.getElementById('forgot-email');
-    if(forgotEmailInput) forgotEmailInput.focus();
-  }
-
-  function closeForgotPasswordPopup() {
-    if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active');
-    if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active');
-
-    let anyOtherPagePopupActive = document.querySelector('#loginPopup.active, #editContentModal.active'); // Popup specifici di questa pagina
-    if (!anyOtherPagePopupActive) {
-      document.body.style.overflow = '';
-    }
-    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
-    if(forgotPasswordForm) forgotPasswordForm.reset();
-  }
-
-  if (forgotPasswordLink) {
-    forgotPasswordLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      openForgotPasswordPopup();
-    });
-  }
+  function openForgotPasswordPopup() { if (typeof closeLoginPopup === 'function' && loginPopup?.classList.contains('active')) { closeLoginPopup(); } if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active'); document.body.style.overflow = 'hidden'; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; const forgotEmailInput = document.getElementById('forgot-email'); if(forgotEmailInput) forgotEmailInput.focus(); }
+  function closeForgotPasswordPopup() { if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active'); let anyOtherPagePopupActive = document.querySelector('#loginPopup.active, #editContentModal.active'); if (!anyOtherPagePopupActive) { document.body.style.overflow = ''; } if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; if(forgotPasswordForm) forgotPasswordForm.reset(); }
+  if (forgotPasswordLink) { forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); openForgotPasswordPopup(); }); }
   if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
   if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
-
-  if (forgotPasswordForm) {
-    forgotPasswordForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (forgotPasswordMessage) {
-        forgotPasswordMessage.style.display = 'none';
-        forgotPasswordMessage.className = 'form-message';
-      }
-      const emailInput = document.getElementById('forgot-email');
-      const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]');
-      const originalBtnText = submitBtn.innerHTML;
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = 'Invio...<div class="spinner-mini-light"></div>';
-
-      try {
-        const formData = new FormData(forgotPasswordForm);
-        const response = await fetch('richiesta_recupero_password.php', {
-          method: 'POST',
-          body: formData
-        });
-        const result = await response.json();
-
-        if (result.success) {
-          forgotPasswordMessage.textContent = result.message;
-          forgotPasswordMessage.classList.add('success');
-          if(emailInput) emailInput.value = '';
-        } else {
-          forgotPasswordMessage.textContent = result.message || "Si è verificato un errore.";
-          forgotPasswordMessage.classList.add('error');
-        }
-      } catch (error) {
-        console.error('Errore richiesta recupero password:', error);
-        forgotPasswordMessage.textContent = "Errore di connessione o del server.";
-        forgotPasswordMessage.classList.add('error');
-      } finally {
-        if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block';
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnText;
-      }
-    });
-  }
-  // === FINE FUNZIONALITÀ RECUPERO PASSWORD (per dovesiamo.html) ===
+  if (forgotPasswordForm) { forgotPasswordForm.addEventListener('submit', async (e) => { e.preventDefault(); if (forgotPasswordMessage) { forgotPasswordMessage.style.display = 'none'; forgotPasswordMessage.className = 'form-message'; } const emailInput = document.getElementById('forgot-email'); const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML; submitBtn.disabled = true; submitBtn.innerHTML = 'Invio...<div class="spinner-mini-light"></div>'; try { const formData = new FormData(forgotPasswordForm); const response = await fetch('richiesta_recupero_password.php', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { forgotPasswordMessage.textContent = result.message; forgotPasswordMessage.classList.add('success'); if(emailInput) emailInput.value = ''; } else { forgotPasswordMessage.textContent = result.message || "Si è verificato un errore."; forgotPasswordMessage.classList.add('error'); } } catch (error) { console.error('Errore richiesta recupero password:', error); forgotPasswordMessage.textContent = "Errore di connessione o del server."; forgotPasswordMessage.classList.add('error'); } finally { if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } }); }
 
   const editPageBtn=gebi('editPageBtn');const savePageChangesBtn=gebi('savePageChangesBtn'); const cancelPageChangesBtn=gebi('cancelPageChangesBtn');
   const editContentModal=gebi('editContentModal'); const closeEditContentModalBtn=gebi('closeEditContentModalBtn');const editModalTitle=gebi('editModalTitle'); const editModalTextarea=gebi('editModalTextarea');const editModalInputText=gebi('editModalInputText'); const editModalInputUrl = gebi('editModalInputUrl'); const editModalFieldLabelText=gebi('editModalFieldLabelText'); const saveEditModalBtn=gebi('saveEditModalBtn');const cancelEditModalBtn=gebi('cancelEditModalBtn'); const editModalMessage=gebi('editModalMessage');const pageOverallStatus=gebi('pageOverallStatus');
   let currentEditingKey=null;let currentEditingType='text';
 
-  function showPageStatus(message,type='info',duration=3000){if(!pageOverallStatus)return;pageOverallStatus.textContent=message;pageOverallStatus.className='form-message';if(type==='success')pageOverallStatus.classList.add('success');else if(type==='error')pageOverallStatus.classList.add('error');else{pageOverallStatus.style.backgroundColor='var(--primary)';pageOverallStatus.style.color='white';pageOverallStatus.classList.remove('success','error');} pageOverallStatus.style.display='block';setTimeout(()=>{pageOverallStatus.style.display='none';},duration);}
+  function showPageStatus(message, type = 'info', duration = 3000) {
+    if (!pageOverallStatus) return;
+    pageOverallStatus.textContent = message;
+    pageOverallStatus.className = 'form-message';
+    pageOverallStatus.classList.remove('success', 'error', 'active');
+
+    if (type === 'success') {
+      pageOverallStatus.classList.add('success');
+    } else if (type === 'error') {
+      pageOverallStatus.classList.add('error');
+    }
+    if (pageOverallStatus.hideTimeout) {
+      clearTimeout(pageOverallStatus.hideTimeout);
+    }
+    void pageOverallStatus.offsetHeight;
+    pageOverallStatus.classList.add('active');
+
+    pageOverallStatus.hideTimeout = setTimeout(() => {
+      pageOverallStatus.classList.remove('active');
+    }, duration);
+  }
 
   async function loadPageContentsFromServer(){
     showPageStatus("Caricamento contenuti...","info",1500);
@@ -666,53 +708,67 @@
 
   function toggleEditMode(enable){
     isEditModeActive=enable;
-    // Modificato: Le icone ora appaiono e scompaiono con transizioni CSS, non con display: none/inline-flex
     document.querySelectorAll('.edit-icon-text, .edit-icon-iframe, .edit-icon-href').forEach(icon => {
       if (currentUserData?.isAdmin && enable) {
-        icon.style.display = 'flex'; /* Mantieni flex per centratura */
-        // Imposta le variabili CSS per le trasformazioni specifiche
+        icon.style.display = 'flex'; // Usa flex per centrare l'icona
         const parentWrapper = icon.closest('.editable-text-wrapper, .editable-iframe-wrapper, .editable-href-wrapper');
         if (parentWrapper) {
           let translateX = '50%';
           let translateY = '-50%';
-
+          // Aggiustamenti specifici per il posizionamento dell'icona
           if (parentWrapper.classList.contains('main-title-editable-wrapper')) {
-            translateX = '50%';
+            translateX = '50%'; // Default va bene
             translateY = '-50%';
           } else if (parentWrapper.closest('.location-description')) {
-            const tagName = parentWrapper.querySelector('[data-content-key]')?.tagName;
-            if (tagName === 'H2') {
-              translateX = 'calc(100% + 5px)';
-              translateY = '-50%';
-            } else if (tagName === 'P') {
-              translateX = 'calc(100% + 5px)';
+            const targetEl = parentWrapper.querySelector('[data-content-key]');
+            if (targetEl && (targetEl.tagName === 'H2' || targetEl.tagName === 'P')) {
+              translateX = 'calc(100% + 5px)'; // Sposta a destra del testo
               translateY = '-50%';
             }
-          } else if (parentWrapper.closest('.location-actions')) {
-            translateX = 'calc(100% + 5px)';
+          } else if (parentWrapper.closest('.location-actions') && icon.classList.contains('edit-icon-href')) {
+            translateX = 'calc(100% + 5px)'; // Sposta a destra del bottone
             translateY = '-50%';
-          } else if (parentWrapper.closest('.location-info-cards')) {
-            translateX = '50%';
+          } else if (parentWrapper.closest('.location-info-cards .editable-text-wrapper')) {
+            // Se è un H2 dentro location-info-cards
+            const targetH2 = parentWrapper.querySelector('h2[data-content-key="infoUtiliHeading"]');
+            if (targetH2 && targetH2 === parentWrapper.querySelector('[data-content-key]')) {
+              translateX = '50%'; // Per il titolo grande Info Utili, centro
+              translateY = '-50%';
+            } else { // Per i paragrafi nelle card
+              translateX = '50%'; // Centro rispetto al paragrafo
+              translateY = '-50%';
+            }
+          } else if (parentWrapper.classList.contains('map-container') && icon.classList.contains('edit-icon-iframe')) {
+            translateX = '50%'; // Per l'icona della mappa
             translateY = '-50%';
-          } else if (parentWrapper.classList.contains('map-container')) {
-            translateX = '50%';
-            translateY = '-50%';
+            // Sovrascrivi per posizionare in alto a destra DELL'IFRAME, non del contenitore
+            icon.style.top = '10px';
+            icon.style.right = '10px';
+            icon.style.transform = 'translate(0,0) scale(0.8)'; // Rimuovi il translate 50%
+            icon.style.setProperty('--custom-translate-x', '0'); // Non usare il translate generale
+            icon.style.setProperty('--custom-translate-y', '0');
           }
-
           icon.style.setProperty('--custom-translate-x', translateX);
           icon.style.setProperty('--custom-translate-y', translateY);
         }
-
-        setTimeout(() => { // Piccolo ritardo per permettere a display di applicarsi prima della transizione
+        setTimeout(() => {
           icon.style.opacity = '1';
-          icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(1)`;
+          if (! (icon.classList.contains('edit-icon-iframe') && parentWrapper.classList.contains('map-container') ) ) { // Non applicare a icona mappa
+            icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(1)`;
+          } else {
+            icon.style.transform = `translate(0,0) scale(1)`; //  Per icona mappa
+          }
         }, 10);
       } else {
         icon.style.opacity = '0';
-        icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(0.8)`;
-        setTimeout(() => { // Ritardo per nascondere solo dopo la transizione
+        if (! (icon.classList.contains('edit-icon-iframe') && icon.closest('.map-container')) ) {
+          icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(0.8)`;
+        } else {
+          icon.style.transform = `translate(0,0) scale(0.8)`;
+        }
+        setTimeout(() => {
           icon.style.display = 'none';
-        }, 300); // Deve corrispondere alla durata della transizione
+        }, 300);
       }
     });
 
@@ -722,12 +778,12 @@
     const cancelBtn=gebi('cancelPageChangesBtn');
     if(editContainer) {
       if (currentUserData?.isAdmin) {
-        editContainer.classList.add('active'); // Attiva l'animazione di entrata
+        editContainer.classList.add('active');
         if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block';
         if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none';
         if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none';
       } else {
-        editContainer.classList.remove('active'); // Nascondi se non admin
+        editContainer.classList.remove('active');
         if(editBtn) editBtn.style.display = 'none';
         if(saveBtn) saveBtn.style.display = 'none';
         if(cancelBtn) cancelBtn.style.display = 'none';
@@ -740,7 +796,7 @@
     currentEditingKey=key;currentEditingType=type;
     if(!editContentModal||!editModalMessage)return;
     editModalMessage.style.display='none';editModalMessage.textContent='';
-    editModalTitle.textContent=`Modifica: ${key}`;
+    editModalTitle.textContent=`Modifica: ${keyDisplayNames[key] || key}`;
     editModalTextarea.style.display='none';editModalInputText.style.display='none';
     editModalInputUrl.style.display='none';
 
@@ -758,7 +814,7 @@
       editModalFieldLabelText.textContent="Testo (paragrafo):";
       editModalTextarea.value=valForInput.replace(/<br\s*\/?>/gi, "\n");
       editModalTextarea.style.display='block';editModalTextarea.focus();
-    } else { // type === 'text'
+    } else { // text
       const tmp = document.createElement('div'); tmp.innerHTML = currentValue;
       valForInput = tmp.textContent || "";
       editModalFieldLabelText.textContent="Testo (titolo/corto):";
@@ -772,21 +828,29 @@
   if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
   if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{
     const contentsToSave = { ...currentPageDbContents };
+    // Raccogli i dati aggiornati direttamente dagli elementi DOM per sicurezza
     document.querySelectorAll('[data-content-key]').forEach(el => {
-      const key = el.dataset.contentKey; // Corretto da content-key a contentKey
+      const key = el.dataset.contentKey;
       if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') {
         contentsToSave[key] = el.src;
       } else if (el.tagName === 'A' && key === 'locationDirectionsButtonHref') {
         contentsToSave[key] = el.href;
       } else {
-        contentsToSave[key] = el.innerHTML;
+        // Per testi, è meglio salvare il valore grezzo che era in currentPageDbContents[key]
+        // o, se modificato, quello che sarebbe stato inserito da openEditModal (quindi il textContent pulito, non l'innerHTML)
+        // Tuttavia, per semplicità e dato che l'editing avviene tramite modal che aggiorna currentPageDbContents,
+        // possiamo fidarci che currentPageDbContents sia già aggiornato.
+        // L'unica cosa è che i testi con HTML devono essere salvati come HTML.
+        // `currentPageDbContents[key]` dovrebbe già contenere il valore corretto (grezzo o HTML)
+        // a seguito della logica in `saveEditModalBtn` event listener.
+        contentsToSave[key] = currentPageDbContents[key];
       }
     });
     const btn=savePageChangesBtn;const oldHtml=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
     try{
       const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});
       const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");
-      currentPageDbContents = JSON.parse(JSON.stringify(contentsToSave));
+      // currentPageDbContents è già aggiornato localmente prima del salvataggio
       originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents));
       showPageStatus(j.message||'Modifiche salvate!','success');toggleEditMode(false);
     }catch(err){console.error("Errore salvataggio:",err);showPageStatus(`Errore: ${err.message}`,'error');}
@@ -800,7 +864,7 @@
     let elToEdit,key,type,currentVal;
 
     if(editIcon){
-      e.stopPropagation(); // Impedisce la propagazione dell'evento
+      e.stopPropagation();
       key=editIcon.dataset.key; type=editIcon.dataset.type;
       elToEdit=gebi(`content-${key}`);
       if(!elToEdit){console.error(`Elemento con id content-${key} non trovato`);return;}
@@ -808,8 +872,11 @@
         currentVal = elToEdit.src;
       } else if (type === 'href') {
         currentVal = elToEdit.href;
-      } else {
-        currentVal = elToEdit.innerHTML;
+      } else { // text o textarea
+        currentVal = currentPageDbContents[key] || defaultPageContents[key]; // Usa il valore grezzo da currentPageDbContents
+        if (typeof currentVal === 'object' && currentVal !== null) { // Caso speciale per infoQuandoText
+          currentVal = JSON.stringify(currentVal); // Potrebbe non servire se la modale lo gestisce come oggetto
+        }
       }
       openEditModal(key, type, currentVal);
     }
@@ -830,27 +897,13 @@
       else targetElement.href = newValueFromModal;
       currentPageDbContents[currentEditingKey] = newValueFromModal;
     } else if(currentEditingType==='textarea'){
-      newValueFromModal = editModalTextarea.value;
-      let processedValue = newValueFromModal;
-      if (currentEditingKey === 'locationAddress' || currentEditingKey === 'locationDirections') {
-        const prefixText = currentEditingKey === 'locationAddress' ? 'Indirizzo:' : 'Indicazioni:';
-        if (processedValue.startsWith(prefixText) && !processedValue.startsWith('<strong>')) {
-          processedValue = `<strong>${prefixText}</strong>` + processedValue.substring(prefixText.length);
-        }
-      }
-      targetElement.innerHTML = formatHTMLContent(processedValue);
-      currentPageDbContents[currentEditingKey] = targetElement.innerHTML;
-    } else { // type 'text'
-      newValueFromModal = editModalInputText.value;
-      let processedValue = newValueFromModal;
-      if (currentEditingKey === 'locationParking') {
-        const prefixText = 'Parcheggio:';
-        if (processedValue.startsWith(prefixText) && !processedValue.startsWith('<strong>')) {
-          processedValue = `<strong>${prefixText}</strong>` + processedValue.substring(prefixText.length).trimStart();
-        }
-      }
-      targetElement.innerHTML = formatHTMLContent(processedValue);
-      currentPageDbContents[currentEditingKey] = targetElement.innerHTML;
+      newValueFromModal = editModalTextarea.value; // Ottieni valore grezzo dalla textarea
+      targetElement.innerHTML = formatHTMLContent(newValueFromModal); // Aggiorna UI con HTML formattato
+      currentPageDbContents[currentEditingKey] = newValueFromModal; // Salva valore grezzo per il DB
+    } else { // text
+      newValueFromModal = editModalInputText.value; // Ottieni valore grezzo dall'input
+      targetElement.innerHTML = formatHTMLContent(newValueFromModal); // Aggiorna UI
+      currentPageDbContents[currentEditingKey] = newValueFromModal; // Salva valore grezzo per il DB
     }
     closeEditContentModal();
   });
@@ -861,16 +914,13 @@
       console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in dovesiamo.html.");
       return;
     }
-
-    const defaultLogoPath = 'images/Logo_eremo.png'; // Ensure this path is correct
-
+    const defaultLogoPath = 'images/Logo_eremo.png';
     try {
       const response = await fetch('api_get_page_content.php?page=index');
       if (!response.ok) {
         throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
       }
       const data = await response.json();
-
       if (data.success && data.contents && data.contents.navbarLogo) {
         logoImgTag.src = data.contents.navbarLogo;
       } else {
@@ -886,21 +936,19 @@
   document.addEventListener('DOMContentLoaded',async()=> {
     const c=gebi('currentYear');if(c)c.textContent=new Date().getFullYear();
     loadUserData();
-    updateNavbarUI(); // Call updateNavbarUI initially
+    updateNavbarUI(); // Chiamata qui prima di fetch/load così i pulsanti base sono subito corretti
     await loadNavbarLogo();
-    await loadPageContentsFromServer();
-    await fetchAndUpdateUserDisplayDataFromApi(); // This internally calls updateNavbarUI again.
+    await loadPageContentsFromServer(); // Carica i contenuti specifici della pagina dovesiamo
+    await fetchAndUpdateUserDisplayDataFromApi(); // Aggiorna di nuovo la UI navbar con dati utente freschi, se disponibili
 
-    // Ensure edit UI is correctly initialized based on admin status
     if (currentUserData && currentUserData.isAdmin) {
-      toggleEditMode(false); // Initialize edit mode buttons and icons
+      toggleEditMode(false);
     } else {
+      toggleEditMode(false);
       const editContainer=gebi('editPageBtnContainer');
-      if(editContainer) editContainer.classList.remove('active'); // Ensure button container is hidden
-      document.querySelectorAll('.edit-icon-text,.edit-icon-iframe,.edit-icon-href').forEach(i=>i.style.display='none');
+      if(editContainer) editContainer.classList.remove('active');
     }
 
-    // Event listener for ESC updated
     document.addEventListener('keydown',(e)=>{
       if(e.key==='Escape'){
         if(loginPopup?.classList.contains('active')) closeLoginPopup();

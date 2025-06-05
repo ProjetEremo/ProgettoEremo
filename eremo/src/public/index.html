@@ -193,7 +193,7 @@
 </header>
 
 <main>
-  <section class="hero-section" id="heroSection" style="background-image: url('images/eremo.jpg');">
+  <section class="hero-section" id="heroSection">
     <div class="hero-content">
       <div class="editable-text-wrapper">
         <h1 class="hero-title" id="content-heroTitle" data-content-key="heroTitle">Eremo Frate Francesco</h1>
@@ -375,6 +375,8 @@
   let isEditModeActive = false;
   let originalPageContentsForCancel = {};
   let currentPageDbContents = {};
+  let currentUserData = null; // Definita globalmente
+  const defaultUserIconPath = 'uploads/icons/default_user.png'; // Definita globalmente
 
   const defaultPageContents = {
     heroTitle: "Eremo Frate Francesco",
@@ -402,70 +404,87 @@
       userDropdownContainer:document.getElementById('userDropdownContainer'),
       navbarUsername:document.getElementById('navbar-username'),
       navbarAvatarImg:document.querySelector('#navbar-avatar img'),
+      navProfilo: document.getElementById('nav-profilo'),
+      navMiePrenotazioni: document.getElementById('nav-mie-prenotazioni'),
       navDashboard:document.getElementById('nav-dashboard'),
-      mobileNavDashboard:document.getElementById('mobile-nav-dashboard'),
+      navGestioneEventiAdmin: document.getElementById('nav-gestione-eventi-admin'),
       mobileNavProfilo:document.getElementById('mobile-nav-profilo'),
       mobileNavMiePrenotazioni:document.getElementById('mobile-nav-mie-prenotazioni'),
+      mobileNavDashboard:document.getElementById('mobile-nav-dashboard'),
+      mobileNavGestioneEventiAdminLink: document.getElementById('mobile-nav-gestione-eventi-admin-link'),
       mobileLogoutLink:document.getElementById('mobile-logout-link'),
       mobileMenuSeparator:document.getElementById('mobile-menu-separator'),
       navbarTitle:document.getElementById('navbar-title'),
-      editPageBtnContainer:document.getElementById('editPageBtnContainer'),
-      navGestioneEventiAdmin: document.getElementById('nav-gestione-eventi-admin'),
-      mobileNavGestioneEventiAdminLink: document.getElementById('mobile-nav-gestione-eventi-admin-link'),
-      navProfilo: document.getElementById('nav-profilo'), // Aggiunto per coerenza
-      navMiePrenotazioni: document.getElementById('nav-mie-prenotazioni') // Aggiunto per coerenza
+      editPageBtnContainer:document.getElementById('editPageBtnContainer')
+      // Aggiungi qui altri elementi se necessario, ma gli ID rilevanti sono già presenti
     };
 
+    // Reset iniziale di tutti gli item specifici dell'utente/admin
     if(el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'none';
     if(el.loginBtnMobile) el.loginBtnMobile.style.display = 'none';
     if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'none';
+
+    if(el.navProfilo) el.navProfilo.style.display = 'none';
+    if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
     if(el.navDashboard) el.navDashboard.style.display = 'none';
-    if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
     if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
-    if(el.mobileNavGestioneEventiAdminLink) el.mobileNavGestioneEventiAdminLink.style.display = 'none';
+
     if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
     if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
+    if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
+    if(el.mobileNavGestioneEventiAdminLink) el.mobileNavGestioneEventiAdminLink.style.display = 'none';
+
     if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
     if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
-    if(el.navProfilo) el.navProfilo.style.display = 'none'; // Aggiunto reset
-    if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none'; // Aggiunto reset
 
 
-    if (currentUserData) {
-      if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block';
-      if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
-      if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
-      if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
-      if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
+    if (currentUserData) { // Utente Loggato
+      if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block'; // Mostra il contenitore del dropdown
+      if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block'; // Mostra logout mobile
+      if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block'; // Mostra separatore mobile
+
       if (el.navbarUsername) el.navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
       if(el.navbarAvatarImg){
         el.navbarAvatarImg.src = currentUserData.iconPath || defaultUserIconPath;
         el.navbarAvatarImg.alt = `Avatar di ${currentUserData.nome||'utente'}`;
         el.navbarAvatarImg.onerror=function(){this.src=defaultUserIconPath;};
       }
-      // Mostra sempre profilo e prenotazioni se loggato
-      if(el.navProfilo) el.navProfilo.style.display = 'block';
-      if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block';
 
+      if(currentUserData.isAdmin){ // ADMIN LOGGATO
+        if(el.navProfilo) el.navProfilo.style.display = 'block'; // MOSTRA PROFILO (DESKTOP)
+        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block'; // MOSTRA PROFILO (MOBILE)
 
-      if(currentUserData.isAdmin){
-        if(el.navDashboard) el.navDashboard.style.display = 'block';
-        if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
-        if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'block';
-        if(el.mobileNavGestioneEventiAdminLink) el.mobileNavGestioneEventiAdminLink.style.display = 'block';
+        if(el.navDashboard) el.navDashboard.style.display = 'block'; // MOSTRA DASHBOARD (DESKTOP)
+        if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block'; // MOSTRA DASHBOARD (MOBILE)
+
+        // Nascondi "Le mie prenotazioni" e "Gestione Eventi" per admin SU INDEX.HTML
+        if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
+        if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
+        if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
+        if(el.mobileNavGestioneEventiAdminLink) el.mobileNavGestioneEventiAdminLink.style.display = 'none';
+
         if(el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
-        // La visibilità di editPageBtnContainer è gestita da toggleEditMode
-      } else {
+        // La visibilità di editPageBtnContainer è gestita da toggleEditMode che viene chiamato dopo
+      } else { // UTENTE NORMALE LOGGATO (NON ADMIN)
+        if(el.navProfilo) el.navProfilo.style.display = 'block'; // Mostra Profilo (Desktop)
+        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block'; // Mostra Profilo (Mobile)
+
+        if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block'; // Mostra Mie Prenotazioni (Desktop)
+        if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block'; // Mostra Mie Prenotazioni (Mobile)
+
+        // "Dashboard Admin" e "Gestione Eventi" sono già nascosti dal reset iniziale, non serve nasconderli di nuovo qui.
+
         if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
-        if(el.editPageBtnContainer) el.editPageBtnContainer.classList.remove('active');
+        if(el.editPageBtnContainer && el.editPageBtnContainer.classList) el.editPageBtnContainer.classList.remove('active');
       }
-    } else {
+    } else { // UTENTE NON LOGGATO
       if(el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'inline-block';
       if(el.loginBtnMobile) el.loginBtnMobile.style.display = 'block';
       if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
-      if(el.editPageBtnContainer) el.editPageBtnContainer.classList.remove('active');
+      if(el.editPageBtnContainer && el.editPageBtnContainer.classList) el.editPageBtnContainer.classList.remove('active');
     }
   }
+
 
   let lastScroll = 0; const navbarContainer = document.getElementById("navbarContainer"); if (navbarContainer) { window.addEventListener("scroll", function () { const cS = window.pageYOffset||document.documentElement.scrollTop; if(cS<=50){navbarContainer.classList.remove("hidden");lastScroll=0;return;} if(cS>lastScroll&&!navbarContainer.classList.contains("hidden"))navbarContainer.classList.add("hidden"); else if(cS<lastScroll&&navbarContainer.classList.contains("hidden"))navbarContainer.classList.remove("hidden"); lastScroll=cS<=0?0:cS;}, false);}
   const mobileMenu = document.getElementById("mobileMenu"); const hamburgerBtn = document.getElementById("hamburgerBtn"); function toggleMobileMenu(){if(mobileMenu&&hamburgerBtn){const iO=mobileMenu.classList.toggle("open");hamburgerBtn.setAttribute("aria-expanded",String(iO));document.body.style.overflow=iO?"hidden":"";}} function closeMobileMenuOnLinkClick(){if(mobileMenu&&hamburgerBtn&&mobileMenu.classList.contains("open")){mobileMenu.classList.remove("open");hamburgerBtn.setAttribute("aria-expanded","false");document.body.style.overflow="";}} if(hamburgerBtn)hamburgerBtn.addEventListener("click",toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l=>{if(l.id!=='login-btn-mobile'&&l.id!=='mobile-logout-link'&&l.id!=='mobile-nav-gestione-eventi-admin-link')l.addEventListener("click",closeMobileMenuOnLinkClick);}); document.addEventListener("click",function(e){if(mobileMenu&&mobileMenu.classList.contains("open")&&hamburgerBtn&&!mobileMenu.contains(e.target)&&!hamburgerBtn.contains(e.target))toggleMobileMenu();});
@@ -481,7 +500,9 @@
     ];
     return popupsToCheck.some(p => {
       if (!p) return false;
-      return p.classList.contains('active') || p.style.display === 'flex' || p.style.display === 'block';
+      // Verifica sia la classe 'active' che lo stile 'display' per una maggiore robustezza
+      const style = window.getComputedStyle(p);
+      return p.classList.contains('active') || style.display === 'flex' || style.display === 'block';
     });
   }
 
@@ -511,11 +532,10 @@
         closeLoginPopup(); // Chiudi il popup di login
         await loadPageContentsFromServer(); // Ricarica i contenuti della pagina (potrebbe essere necessario per admin)
 
-        // MODIFICA: Chiama toggleEditMode se l'utente è admin
         if (currentUserData.isAdmin) {
           toggleEditMode(false); // Attiva i controlli admin, mostrando "Attiva Modifiche"
         }
-        showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success"); // Mostra messaggio di benvenuto
+        showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");
 
       }else{
         loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));
@@ -552,11 +572,10 @@
   const editPageBtn=document.getElementById('editPageBtn');const savePageChangesBtn=document.getElementById('savePageChangesBtn'); const cancelPageChangesBtn=document.getElementById('cancelPageChangesBtn');const editContentModal=document.getElementById('editContentModal'); const closeEditContentModalBtn=document.getElementById('closeEditContentModalBtn');const editModalTitle=document.getElementById('editModalTitle'); const editModalTextarea=document.getElementById('editModalTextarea');const editModalInputText=document.getElementById('editModalInputText'); const editModalInputImage=document.getElementById('editModalInputImage');const editModalFieldLabelText=document.getElementById('editModalFieldLabelText'); const saveEditModalBtn=document.getElementById('saveEditModalBtn');const cancelEditModalBtn=document.getElementById('cancelEditModalBtn'); const editModalMessage=document.getElementById('editModalMessage');const pageOverallStatus=document.getElementById('pageOverallStatus'); const editModalInputFile=document.getElementById('editModalInputFile'); const editModalFileLabel=document.getElementById('editModalFileLabel'); const editModalFileNote = document.getElementById('editModalFileNote');
   let currentEditingKey=null;let currentEditingType='text';
 
-  // Funzione showPageStatus standardizzata
   function showPageStatus(message, type = 'info', duration = 3000) {
     if (!pageOverallStatus) return;
     pageOverallStatus.textContent = message;
-    pageOverallStatus.className = 'form-message'; // Reset base class
+    pageOverallStatus.className = 'form-message';
     pageOverallStatus.classList.remove('success', 'error', 'active');
 
     if (type === 'success') {
@@ -564,12 +583,10 @@
     } else if (type === 'error') {
       pageOverallStatus.classList.add('error');
     }
-    // Per 'info', si affida agli stili CSS di #pageOverallStatus e .active
-
     if (pageOverallStatus.hideTimeout) {
       clearTimeout(pageOverallStatus.hideTimeout);
     }
-    void pageOverallStatus.offsetHeight; // Forza reflow per riavviare animazione CSS
+    void pageOverallStatus.offsetHeight;
     pageOverallStatus.classList.add('active');
 
     pageOverallStatus.hideTimeout = setTimeout(() => {
@@ -830,15 +847,14 @@
     loadUserData();
     updateNavbarUI();
     await loadPageContentsFromServer();
-    // MODIFICA: Assicura che toggleEditMode sia chiamato dopo che i dati utente sono completamente caricati e la UI navbar è aggiornata
     if (currentUserData && currentUserData.isAdmin) {
-      toggleEditMode(false); // Mostra "Attiva Modifiche" se admin
+      toggleEditMode(false);
     } else {
-      toggleEditMode(false); // Assicura che i controlli admin siano nascosti se non admin
+      toggleEditMode(false);
       const editContainer=document.getElementById('editPageBtnContainer');
-      if(editContainer) editContainer.classList.remove('active');
+      if(editContainer && editContainer.classList) editContainer.classList.remove('active');
     }
-    document.removeEventListener('keydown', handleGlobalKeyDown);
+    document.removeEventListener('keydown', handleGlobalKeyDown); // Rimuovi per evitare duplicati se lo script viene ricaricato
     document.addEventListener('keydown', handleGlobalKeyDown);
   });
 </script>
