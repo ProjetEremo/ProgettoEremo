@@ -378,7 +378,7 @@
 
   // Aggiorna i dati dell'utente (nome, icona) dalla API se necessario e aggiorna la UI della navbar
   async function fetchAndUpdateUserDisplayData() {
-    if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
+    if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) { // Non fare fetch per admin qui, i dati sono ok
       updateNavbarUI(); // Aggiorna UI anche per admin o non loggato
       return;
     }
@@ -403,7 +403,7 @@
   // Aggiorna l'interfaccia utente della navbar in base allo stato di login e al ruolo dell'utente
   function updateNavbarUI() {
     const logoLink = gebi('logoLink');
-    if (logoLink) logoLink.href = "index.html"; // Link logo sempre a index.html
+    if (logoLink) logoLink.href = "index.html";
     const navbarTitle = gebi('navbarTitle');
     const loginBtnDesktop = gebi('login-btn-desktop');
     const userDropdownContainer = gebi('userDropdownContainer');
@@ -414,17 +414,17 @@
     const dropdownProfilo = gebi('dropdownProfilo');
     const dropdownPrenotazioni = gebi('dropdownPrenotazioni');
     const dropdownDashboard = gebi('dropdownDashboard');
-    const dropdownGestioneEventi = gebi('dropdownGestioneEventi');
+    const dropdownGestioneEventi = gebi('dropdownGestioneEventi'); // Questo punta a eventiincorso.html
 
     // Link nel menu mobile
     const loginBtnMobile = gebi('login-btn-mobile');
     const mobileNavProfilo = gebi('mobileNavProfilo');
     const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni');
     const mobileNavDashboard = gebi('mobileNavDashboard');
-    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin');
+    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); // Questo punta a eventiincorso.html
     const mobileLogoutLink = gebi('mobileLogoutLink');
     const mobileMenuSeparator = gebi('mobileMenuSeparator');
-    const mainPageTitle = gebi('mainPageTitle'); // Titolo principale della pagina
+    const mainPageTitle = gebi('mainPageTitle');
 
     // Reset degli stati iniziali per tutti i link specifici del ruolo
     if(loginBtnDesktop) loginBtnDesktop.style.display = 'none';
@@ -446,55 +446,49 @@
 
     if (currentUserData) { // Utente loggato
       if(userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
-      if(navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0]; // Mostra nome o parte email
+      if(navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
       const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
       if(avatarImgEl) {
         avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath;
         avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`;
-        avatarImgEl.onerror = function() { this.src = defaultUserIconPath; }; // Fallback icona default
+        avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };
       }
 
-      if(mobileLogoutLink) mobileLogoutLink.style.display = 'block'; // Mostra logout mobile
-      if(mobileMenuSeparator) mobileMenuSeparator.style.display = 'block'; // Mostra separatore mobile
+      if(mobileLogoutLink) mobileLogoutLink.style.display = 'block';
+      if(mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
 
-      if (currentUserData.isAdmin) {
-        // Admin: "Il mio profilo", "Dashboard Admin", "Gestione Eventi" (link)
+      if (currentUserData.isAdmin) { // ADMIN LOGGATO
         if(navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
-        if(mainPageTitle) mainPageTitle.textContent = "Gestione Archivio Attività"; // Titolo pagina per Admin
+        if(mainPageTitle) mainPageTitle.textContent = "Gestione Archivio Attività";
 
-        if(dropdownProfilo) dropdownProfilo.style.display = 'block';
-        if(mobileNavProfilo) mobileNavProfilo.style.display = 'block';
+        if(dropdownProfilo) dropdownProfilo.style.display = 'block'; // Mostra Profilo (Desktop)
+        if(mobileNavProfilo) mobileNavProfilo.style.display = 'block'; // Mostra Profilo (Mobile)
 
-        if(dropdownDashboard) dropdownDashboard.style.display = 'block';
-        if(mobileNavDashboard) mobileNavDashboard.style.display = 'block';
+        if(dropdownDashboard) dropdownDashboard.style.display = 'block'; // Mostra Dashboard (Desktop)
+        if(mobileNavDashboard) mobileNavDashboard.style.display = 'block'; // Mostra Dashboard (Mobile)
 
-        if(dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'block';
-        if(mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'block';
-
-        // Nascondi link non pertinenti per admin (prenotazioni utente)
+        // Nascondi "Le mie prenotazioni" e "Gestione Eventi" per admin (come da richiesta per index.html)
         if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none';
         if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
+        if(dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none'; // NASCONDI
+        if(mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none'; // NASCONDI
 
-      } else {
-        // Utente Standard: "Il mio profilo", "Le mie prenotazioni"
+      } else { // UTENTE NORMALE LOGGATO
         if(navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
-        if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate"; // Titolo pagina per Utente
+        if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate";
 
         if(dropdownProfilo) dropdownProfilo.style.display = 'block';
         if(mobileNavProfilo) mobileNavProfilo.style.display = 'block';
 
         if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block';
         if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
-
-        // I link admin (dropdownDashboard, dropdownGestioneEventi e versioni mobile) rimangono 'none'
-        // come da reset iniziale, quindi non serve nasconderli esplicitamente qui.
+        // Dashboard e Gestione Eventi rimangono 'none' dal reset iniziale.
       }
     } else { // Utente non loggato
-      if(loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block'; // Mostra Accedi desktop
-      if(loginBtnMobile) loginBtnMobile.style.display = 'block'; // Mostra Accedi mobile
+      if(loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
+      if(loginBtnMobile) loginBtnMobile.style.display = 'block';
       if(navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
-      if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate"; // Titolo pagina per non loggato
-      // Tutti i link specifici del dropdown/mobile menu rimangono 'none' come da reset iniziale.
+      if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate";
     }
   }
 
@@ -504,10 +498,8 @@
     localStorage.removeItem('userDataEFF');
     currentUserData = null;
     updateNavbarUI();
-    loadPastEvents(); // Ricarica gli eventi per mostrare la vista da non loggato/admin
-    // Potrebbe essere utile un messaggio di conferma logout, ma alert() è bloccante.
-    // Considerare un messaggio non bloccante se necessario.
-    alert('Logout effettuato.'); // Semplice alert per ora
+    loadPastEvents();
+    alert('Logout effettuato.');
   }
 
   // Gestione navbar che scompare allo scroll (invariata)
@@ -515,51 +507,51 @@
   // Gestione menu mobile (hamburger) (invariata)
   const mobileMenuEl = gebi("mobileMenu"); const hamburgerButton = gebi("hamburgerBtn"); function toggleMobileMenu() { if (mobileMenuEl && hamburgerButton) { const iO = mobileMenuEl.classList.toggle("open"); hamburgerButton.classList.toggle("open"); hamburgerButton.setAttribute("aria-expanded", String(iO)); document.body.style.overflow = iO ? "hidden" : ""; } } function closeMobileMenu() { if (mobileMenuEl && hamburgerButton && mobileMenuEl.classList.contains("open")) { mobileMenuEl.classList.remove("open"); hamburgerButton.classList.remove("open"); hamburgerButton.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; } }
   if (hamburgerButton) hamburgerButton.addEventListener("click", toggleMobileMenu);
-  document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobileLogoutLink') { l.addEventListener("click", closeMobileMenu); }}); // Chiude menu mobile al click su link (escluso login/logout)
-  document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) closeMobileMenu(); }); // Chiude menu se si clicca fuori
+  document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobileLogoutLink') { l.addEventListener("click", closeMobileMenu); }});
+  document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) closeMobileMenu(); });
   // Gestione dropdown utente (invariata)
   const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iS = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iS ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iS)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl && userDropdownMenuEl.style.display === 'block' && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
   // Elementi del DOM per il popup di login/registrazione
-  const loginOverlayEl = gebi("loginOverlay"); const loginPopupEl = gebi("loginPopup"); const closePopupBtnEl = gebi("closeLoginPopupBtn"); const loginTabsEls = document.querySelectorAll(".login-tab"); const loginFormsEls = document.querySelectorAll("#loginPopup .login-form"); // Specifica per popup login
+  const loginOverlayEl = gebi("loginOverlay"); const loginPopupEl = gebi("loginPopup"); const closePopupBtnEl = gebi("closeLoginPopupBtn"); const loginTabsEls = document.querySelectorAll(".login-tab"); const loginFormsEls = document.querySelectorAll("#loginPopup .login-form");
   const loginErrorMessagePopupEl = gebi('login-error-message-popup'); const registerErrorMessagePopupEl = gebi('register-error-message-popup');
 
-  // Apre il popup di login/registrazione
+  function isAnyPopupActive() {
+    // Funzione helper per controllare se un popup è attivo (considera sia classe che display style)
+    const isActive = (el) => el && (el.classList.contains('active') || window.getComputedStyle(el).display !== 'none');
+    return isActive(loginPopupEl) ||
+            isActive(gebi('forgotPasswordPopup')) ||
+            isActive(gebi('loginRequiredPopup')) ||
+            isActive(gebi('eventPopupAdmin'));
+  }
   function openLoginPopup() {
-    if(loginRequiredPopupEl?.classList.contains('active')) closeLoginRequiredPopup(); // Chiudi popup accesso richiesto se aperto
+    if(gebi('loginRequiredPopup')?.classList.contains('active')) closeLoginRequiredPopup();
     if (loginOverlayEl) loginOverlayEl.classList.add("active");
     if (loginPopupEl) loginPopupEl.classList.add("active");
-    document.body.style.overflow = "hidden"; // Impedisce scroll pagina sottostante
-    resetFormErrors(); // Resetta errori form
-    // Attiva tab login e focus sul primo input
+    document.body.style.overflow = "hidden";
+    resetFormErrors();
     const loginTabToActivate = loginPopupEl.querySelector('.login-tab[data-tab="login"]');
     if (loginTabToActivate) loginTabToActivate.click();
     const firstInput = loginPopupEl.querySelector('#login-email-popup');
     if (firstInput) firstInput.focus();
   }
-  // Chiude il popup di login/registrazione
   function closeLoginPopup() {
     if (loginOverlayEl) loginOverlayEl.classList.remove("active");
     if (loginPopupEl) loginPopupEl.classList.remove("active");
-    // Ripristina scroll solo se nessun altro popup modale principale è attivo
-    if (!loginRequiredPopupEl?.classList.contains('active') && !eventPopupAdminEl?.classList.contains('active') && !forgotPasswordPopup?.classList.contains('active') ) {
+    if (!isAnyPopupActive()) { // Modificato per usare isAnyPopupActive
       document.body.style.overflow = "";
     }
     resetFormErrors();
   }
-  // Resetta i messaggi di errore e i bordi rossi nei form del popup
   function resetFormErrors() {
     loginFormsEls.forEach(form => { form.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border')); });
     if (loginErrorMessagePopupEl) loginErrorMessagePopupEl.style.display = 'none';
     if (registerErrorMessagePopupEl) registerErrorMessagePopupEl.style.display = 'none';
   }
-  // Event listener per aprire il popup di login
   gebi("login-btn-desktop")?.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); });
   gebi("login-btn-mobile")?.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); closeMobileMenu(); });
-  // Event listener per chiudere il popup
   if (closePopupBtnEl) closePopupBtnEl.addEventListener("click", closeLoginPopup);
-  if (loginOverlayEl) loginOverlayEl.addEventListener("click", (e) => { if (e.target === loginOverlayEl) closeLoginPopup(); }); // Chiude cliccando sull'overlay
+  if (loginOverlayEl) loginOverlayEl.addEventListener("click", (e) => { if (e.target === loginOverlayEl) closeLoginPopup(); });
 
-  // Gestione tab Login/Registrazione nel popup
   loginTabsEls.forEach((tab) => {
     tab.addEventListener("click", () => {
       const tabId = tab.getAttribute("data-tab");
@@ -569,19 +561,16 @@
         form.classList.remove("active");
         if (form.id === `${tabId}FormPopup`) {
           form.classList.add("active");
-          form.querySelector('input:not([type="hidden"])')?.focus(); // Focus sul primo input visibile
+          form.querySelector('input:not([type="hidden"])')?.focus();
         }
       });
-      resetFormErrors(); // Resetta errori al cambio tab
+      resetFormErrors();
     });
   });
 
-  // Gestione submit form di login
-  gebi("loginFormPopup")?.addEventListener("submit", async (e) => { e.preventDefault(); const loginButton = e.target.querySelector('button[type="submit"]'); const originalButtonText = loginButton.textContent; loginButton.disabled = true; loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>'; const emailInput = gebi('login-email-popup'); const passwordInput = gebi('login-password-popup'); emailInput.classList.remove('error-border'); passwordInput.classList.remove('error-border'); if(loginErrorMessagePopupEl) loginErrorMessagePopupEl.style.display = 'none'; try { const response = await fetch('login.php', { method: 'POST', body: new FormData(e.target) }); if (!response.ok) { let errorData = { message: `Errore HTTP: ${response.status}` }; try { errorData = await response.json(); } catch (parseError) {} throw new Error(errorData.message || `Errore HTTP: ${response.status}`); } const result = await response.json(); if (result.success) { currentUserData = { nome: result.nome, email: result.email, iconPath: result.iconPath, isAdmin: result.is_admin === true || result.is_admin === 1 }; localStorage.setItem('userDataEFF', JSON.stringify(currentUserData)); await fetchAndUpdateUserDisplayData(); closeLoginPopup(); loadPastEvents(); /* Ricarica eventi per UI admin/utente */ } else { emailInput.classList.add('error-border'); passwordInput.classList.add('error-border'); if(loginErrorMessagePopupEl) { loginErrorMessagePopupEl.textContent = result.message || "Credenziali non valide."; loginErrorMessagePopupEl.style.display = 'block'; } } } catch (error) { emailInput.classList.add('error-border'); passwordInput.classList.add('error-border'); if(loginErrorMessagePopupEl) { loginErrorMessagePopupEl.textContent = "Errore di connessione o risposta non valida."; loginErrorMessagePopupEl.style.display = 'block'; } } finally { loginButton.disabled = false; loginButton.innerHTML = originalButtonText; } });
-  // Gestione submit form di registrazione
-  gebi("registerFormPopup")?.addEventListener("submit", async (e) => { e.preventDefault(); const registerButton = e.target.querySelector('button[type="submit"]'); const originalButtonText = registerButton.textContent; registerButton.disabled = true; registerButton.innerHTML = 'Registrazione... <div class="spinner-mini-light"></div>'; if(registerErrorMessagePopupEl) registerErrorMessagePopupEl.style.display = 'none'; e.target.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border')); try { const response = await fetch('registrati.php', { method: 'POST', body: new FormData(e.target) }); if (!response.ok) { let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`; try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; } catch(err) {} throw new Error(errorMsg); } const result = await response.json(); if (result.success) { alert(result.message || "Registrazione completata! Ora puoi effettuare il login."); const loginTabButton = document.querySelector('#loginPopup .login-tab[data-tab="login"]'); if (loginTabButton) loginTabButton.click(); const loginEmailPopup = gebi('login-email-popup'); const registerEmailPopup = gebi('register-email-popup'); if (loginEmailPopup && registerEmailPopup) loginEmailPopup.value = registerEmailPopup.value; /* Precompila email login */ e.target.reset(); } else { if(registerErrorMessagePopupEl) { registerErrorMessagePopupEl.textContent = result.message || "Errore durante la registrazione."; registerErrorMessagePopupEl.style.display = 'block'; } if (result.errors) { /* Evidenzia campi con errori specifici */ for (const fieldNameFromError in result.errors) { const inputElement = e.target.elements[fieldNameFromError] || gebi(`register-${fieldNameFromError}-popup`); if (inputElement) inputElement.classList.add('error-border'); } } } } catch (error) { if(registerErrorMessagePopupEl) { registerErrorMessagePopupEl.textContent = "Errore: " + error.message; registerErrorMessagePopupEl.style.display = 'block'; } } finally { registerButton.disabled = false; registerButton.innerHTML = originalButtonText; } });
+  gebi("loginFormPopup")?.addEventListener("submit", async (e) => { e.preventDefault(); const loginButton = e.target.querySelector('button[type="submit"]'); const originalButtonText = loginButton.textContent; loginButton.disabled = true; loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>'; const emailInput = gebi('login-email-popup'); const passwordInput = gebi('login-password-popup'); emailInput.classList.remove('error-border'); passwordInput.classList.remove('error-border'); if(loginErrorMessagePopupEl) loginErrorMessagePopupEl.style.display = 'none'; try { const response = await fetch('login.php', { method: 'POST', body: new FormData(e.target) }); if (!response.ok) { let errorData = { message: `Errore HTTP: ${response.status}` }; try { errorData = await response.json(); } catch (parseError) {} throw new Error(errorData.message || `Errore HTTP: ${response.status}`); } const result = await response.json(); if (result.success) { currentUserData = { nome: result.nome, email: result.email, iconPath: result.iconPath, isAdmin: result.is_admin === true || result.is_admin === 1 }; localStorage.setItem('userDataEFF', JSON.stringify(currentUserData)); await fetchAndUpdateUserDisplayData(); closeLoginPopup(); loadPastEvents(); } else { emailInput.classList.add('error-border'); passwordInput.classList.add('error-border'); if(loginErrorMessagePopupEl) { loginErrorMessagePopupEl.textContent = result.message || "Credenziali non valide."; loginErrorMessagePopupEl.style.display = 'block'; } } } catch (error) { emailInput.classList.add('error-border'); passwordInput.classList.add('error-border'); if(loginErrorMessagePopupEl) { loginErrorMessagePopupEl.textContent = "Errore di connessione o risposta non valida."; loginErrorMessagePopupEl.style.display = 'block'; } } finally { loginButton.disabled = false; loginButton.innerHTML = originalButtonText; } });
+  gebi("registerFormPopup")?.addEventListener("submit", async (e) => { e.preventDefault(); const registerButton = e.target.querySelector('button[type="submit"]'); const originalButtonText = registerButton.textContent; registerButton.disabled = true; registerButton.innerHTML = 'Registrazione... <div class="spinner-mini-light"></div>'; if(registerErrorMessagePopupEl) registerErrorMessagePopupEl.style.display = 'none'; e.target.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border')); try { const response = await fetch('registrati.php', { method: 'POST', body: new FormData(e.target) }); if (!response.ok) { let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`; try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; } catch(err) {} throw new Error(errorMsg); } const result = await response.json(); if (result.success) { alert(result.message || "Registrazione completata! Ora puoi effettuare il login."); const loginTabButton = document.querySelector('#loginPopup .login-tab[data-tab="login"]'); if (loginTabButton) loginTabButton.click(); const loginEmailPopup = gebi('login-email-popup'); const registerEmailPopup = gebi('register-email-popup'); if (loginEmailPopup && registerEmailPopup) loginEmailPopup.value = registerEmailPopup.value; e.target.reset(); } else { if(registerErrorMessagePopupEl) { registerErrorMessagePopupEl.textContent = result.message || "Errore durante la registrazione."; registerErrorMessagePopupEl.style.display = 'block'; } if (result.errors) { for (const fieldNameFromError in result.errors) { const inputElement = e.target.elements[fieldNameFromError] || gebi(`register-${fieldNameFromError}-popup`); if (inputElement) inputElement.classList.add('error-border'); } } } } catch (error) { if(registerErrorMessagePopupEl) { registerErrorMessagePopupEl.textContent = "Errore: " + error.message; registerErrorMessagePopupEl.style.display = 'block'; } } finally { registerButton.disabled = false; registerButton.innerHTML = originalButtonText; } });
 
-  // === INIZIO FUNZIONALITÀ RECUPERO PASSWORD ===
   const forgotPasswordLink = document.getElementById('forgotPasswordLink');
   const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
   const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
@@ -591,26 +580,24 @@
 
   function openForgotPasswordPopup() {
     if (typeof closeLoginPopup === 'function' && loginPopupEl?.classList.contains('active')) {
-      closeLoginPopup(); // Chiude popup login se aperto
+      closeLoginPopup();
     }
     if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active');
     if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active');
     document.body.style.overflow = 'hidden';
-    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; // Resetta messaggio
+    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
     const forgotEmailInput = document.getElementById('forgot-email');
-    if(forgotEmailInput) forgotEmailInput.focus(); // Focus sull'input email
+    if(forgotEmailInput) forgotEmailInput.focus();
   }
 
   function closeForgotPasswordPopup() {
     if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active');
     if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active');
-    // Ripristina scroll solo se nessun altro popup modale principale è attivo
-    let anyOtherPagePopupActive = document.querySelector('#loginPopup.active, #loginRequiredPopup.active, #eventPopupAdmin.active');
-    if (!anyOtherPagePopupActive) {
+    if (!isAnyPopupActive()) { // Modificato per usare isAnyPopupActive
       document.body.style.overflow = '';
     }
     if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
-    if(forgotPasswordForm) forgotPasswordForm.reset(); // Resetta il form
+    if(forgotPasswordForm) forgotPasswordForm.reset();
   }
 
   if (forgotPasswordLink) {
@@ -627,7 +614,7 @@
       e.preventDefault();
       if (forgotPasswordMessage) {
         forgotPasswordMessage.style.display = 'none';
-        forgotPasswordMessage.className = 'form-message'; // Resetta classi messaggio
+        forgotPasswordMessage.className = 'form-message';
       }
       const emailInput = document.getElementById('forgot-email');
       const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]');
@@ -646,7 +633,7 @@
         if (result.success) {
           forgotPasswordMessage.textContent = result.message;
           forgotPasswordMessage.classList.add('success');
-          if(emailInput) emailInput.value = ''; // Pulisce campo email
+          if(emailInput) emailInput.value = '';
         } else {
           forgotPasswordMessage.textContent = result.message || "Si è verificato un errore.";
           forgotPasswordMessage.classList.add('error');
@@ -662,60 +649,43 @@
       }
     });
   }
-  // === FINE FUNZIONALITÀ RECUPERO PASSWORD ===
-
-  // Elementi del DOM per il popup "Accesso Richiesto"
   const loginRequiredOverlayEl = gebi("loginRequiredOverlay"); const loginRequiredPopupEl = gebi("loginRequiredPopup"); const closeLoginRequiredPopupBtnEl = gebi("closeLoginRequiredPopupBtn"); const loginRequiredLoginBtnEl = gebi("loginRequiredLoginBtn");
-  // Mostra il popup "Accesso Richiesto"
   function showLoginRequiredPopup(event) { if (event) event.preventDefault(); if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.add("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.add("active"); document.body.style.overflow = "hidden"; }
-  // Chiude il popup "Accesso Richiesto"
-  function closeLoginRequiredPopup() { if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.remove("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.remove("active"); if (!loginPopupEl?.classList.contains('active') && !eventPopupAdminEl?.classList.contains('active') && !forgotPasswordPopup?.classList.contains('active')) { document.body.style.overflow = ""; } }
-  // Event listener per chiudere il popup "Accesso Richiesto"
+  function closeLoginRequiredPopup() { if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.remove("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.remove("active"); if (!isAnyPopupActive()) { document.body.style.overflow = ""; } } // Modificato per usare isAnyPopupActive
   if (closeLoginRequiredPopupBtnEl) closeLoginRequiredPopupBtnEl.addEventListener("click", closeLoginRequiredPopup);
   if (loginRequiredOverlayEl) loginRequiredOverlayEl.addEventListener("click", (e) => { if (e.target === loginRequiredOverlayEl) closeLoginRequiredPopup(); });
-  if (loginRequiredLoginBtnEl) { loginRequiredLoginBtnEl.addEventListener("click", () => { closeLoginRequiredPopup(); openLoginPopup(); }); } // Apre popup login al click
+  if (loginRequiredLoginBtnEl) { loginRequiredLoginBtnEl.addEventListener("click", () => { closeLoginRequiredPopup(); openLoginPopup(); }); }
 
-  // Elementi del DOM per il popup di modifica evento (Admin)
   const eventPopupOverlayAdminEl = gebi('eventPopupOverlayAdmin'); const eventPopupAdminEl = gebi('eventPopupAdmin'); const closeEventPopupBtnAdminEl = gebi('closeEventPopupBtnAdmin'); const editPastEventFormAdminEl = gebi('editPastEventFormAdmin'); const eventPopupTitleAdminEl = gebi('eventPopupTitleAdmin'); const adminEventIdInput = gebi('admin-event-id'); const adminVoluntaryCheckbox = gebi('admin-event-voluntary'); const adminPriceContainer = gebi('admin-event-price-container'); const adminEventPriceInput = gebi('admin-event-price'); const editPastEventFormMessageAdminEl = gebi('editPastEventFormMessageAdmin'); const adminCurrentImagePreview = gebi('current-event-image-preview'); const adminCurrentFlyerPreview = gebi('current-event-flyer-preview');
-  // Aggiorna visibilità campo prezzo in base a checkbox "offerta libera"
   function updateAdminPriceFieldVisibility() { if (adminVoluntaryCheckbox && adminPriceContainer && adminEventPriceInput) { const isVoluntary = adminVoluntaryCheckbox.checked; adminPriceContainer.style.display = isVoluntary ? 'none' : 'block'; adminEventPriceInput.required = !isVoluntary; if (isVoluntary) adminEventPriceInput.value = ''; } } if (adminVoluntaryCheckbox) adminVoluntaryCheckbox.addEventListener('change', updateAdminPriceFieldVisibility);
-  // Apre il popup per modificare un evento passato (solo Admin)
   function openEditPastEventPopup(eventData) { if (!currentUserData || !currentUserData.isAdmin) return; if (!editPastEventFormAdminEl || !eventPopupAdminEl || !eventPopupOverlayAdminEl) return; editPastEventFormAdminEl.reset(); if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.style.display = 'none'; editPastEventFormMessageAdminEl.className = 'form-message'; } if(adminCurrentImagePreview) { adminCurrentImagePreview.style.display = 'none'; adminCurrentImagePreview.src = '#';} if(adminCurrentFlyerPreview) adminCurrentFlyerPreview.innerHTML = ''; if(eventPopupTitleAdminEl) eventPopupTitleAdminEl.textContent = 'Modifica Evento Passato'; if(adminEventIdInput) adminEventIdInput.value = eventData.idevento; gebi('admin-event-title').value = eventData.titolo || ''; gebi('admin-event-date').value = eventData.datainizio ? eventData.datainizio.substring(0,10) : ''; gebi('admin-event-time').value = eventData.durata || ''; gebi('admin-event-short-desc').value = eventData.descrizione || ''; gebi('admin-event-long-desc').value = eventData.descrizione_estesa || ''; gebi('admin-event-prefix').value = eventData.prefisso_relatore || ''; gebi('admin-event-speaker').value = eventData.relatore || ''; gebi('admin-event-association').value = eventData.associazione || ''; gebi('admin-event-seats').value = eventData.posti_disponibili !== null ? eventData.posti_disponibili : ''; gebi('admin-event-booking').checked = !!eventData.flagprenotabile; if(adminVoluntaryCheckbox) adminVoluntaryCheckbox.checked = parseFloat(eventData.costo) === 0.00; updateAdminPriceFieldVisibility(); if (adminEventPriceInput && !adminVoluntaryCheckbox.checked && eventData.costo && parseFloat(eventData.costo) > 0) { adminEventPriceInput.value = parseFloat(eventData.costo).toFixed(2); } else if (adminEventPriceInput) { adminEventPriceInput.value = ''; } if (adminCurrentImagePreview && eventData.immagine_url) { adminCurrentImagePreview.src = eventData.immagine_url; adminCurrentImagePreview.style.display = 'block'; } if (adminCurrentFlyerPreview && eventData.volantino_url) { const fileName = eventData.volantino_url.split('/').pop(); adminCurrentFlyerPreview.innerHTML = `<p>Volantino attuale: <a href="${eventData.volantino_url}" target="_blank">${fileName}</a></p>`; } eventPopupOverlayAdminEl.style.display = 'block'; eventPopupAdminEl.style.display = 'block'; setTimeout(() => { eventPopupOverlayAdminEl.classList.add('active'); eventPopupAdminEl.classList.add('active'); }, 10); document.body.style.overflow = 'hidden'; gebi('admin-event-title').focus(); }
-  // Chiude il popup di modifica evento
-  function closeEditPastEventPopup() { if (!eventPopupAdminEl || !eventPopupOverlayAdminEl) return; eventPopupOverlayAdminEl.classList.remove('active'); eventPopupAdminEl.classList.remove('active'); setTimeout(() => { eventPopupOverlayAdminEl.style.display = 'none'; eventPopupAdminEl.style.display = 'none'; if (!loginPopupEl?.classList.contains('active') && !loginRequiredPopupEl?.classList.contains('active') && !forgotPasswordPopup?.classList.contains('active')) { document.body.style.overflow = ''; } }, 300); }
+  function closeEditPastEventPopup() { if (!eventPopupAdminEl || !eventPopupOverlayAdminEl) return; eventPopupOverlayAdminEl.classList.remove('active'); eventPopupAdminEl.classList.remove('active'); setTimeout(() => { eventPopupOverlayAdminEl.style.display = 'none'; eventPopupAdminEl.style.display = 'none'; if (!isAnyPopupActive()) { document.body.style.overflow = ''; } }, 300); } // Modificato per usare isAnyPopupActive
   if (closeEventPopupBtnAdminEl) closeEventPopupBtnAdminEl.addEventListener('click', closeEditPastEventPopup); if (eventPopupOverlayAdminEl) eventPopupOverlayAdminEl.addEventListener('click', (e) => { if (e.target === eventPopupOverlayAdminEl) closeEditPastEventPopup(); });
-  // Gestione submit form modifica evento (Admin)
   editPastEventFormAdminEl?.addEventListener('submit', async function(e) { e.preventDefault(); if (!currentUserData || !currentUserData.isAdmin) return; const submitBtn = this.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML; submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...'; if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.style.display = 'none'; editPastEventFormMessageAdminEl.className = 'form-message'; } try { const formData = new FormData(this); formData.append('action', 'update_event'); const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData }); const responseText = await response.text(); let result; try { result = JSON.parse(responseText); } catch (jsonError) { throw new Error(`Risposta non JSON: ${responseText.substring(0,200)}`); } if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`); if (result.success) { if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.textContent = result.message || 'Evento aggiornato!'; editPastEventFormMessageAdminEl.classList.add('success'); } loadPastEvents(); setTimeout(closeEditPastEventPopup, 1500); } else { throw new Error(result.message || 'Errore aggiornamento.'); } } catch (error) { if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.textContent = `Errore: ${error.message}`; editPastEventFormMessageAdminEl.classList.add('error'); } } finally { if(editPastEventFormMessageAdminEl) editPastEventFormMessageAdminEl.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } });
 
-  // Formatta una stringa data (YYYY-MM-DD o ISO) in formato leggibile (es. "1 gennaio 2023")
   function formatDate(dateString) {
     if (!dateString) return "Data non disponibile";
     try {
-      // Prova a normalizzare la stringa data per una migliore compatibilità con new Date()
-      // Se è solo YYYY-MM-DD, aggiungi T00:00:00Z per considerarla UTC
       const normalizedDateString = dateString.length === 10 ? dateString + "T00:00:00Z" : dateString.replace(" ", "T") + (dateString.endsWith("Z") ? "" : "Z");
       const date = new Date(normalizedDateString);
-      if (isNaN(date.getTime())) { // Se la data non è valida
-        // Fallback per formati YYYY-MM-DD semplici che potrebbero non essere interpretati come UTC da tutti i browser
+      if (isNaN(date.getTime())) {
         if (/^\d{4}-\d{2}-\d{2}$/.test(dateString.substring(0,10))) {
           const parts = dateString.substring(0,10).split('-');
           const utcDate = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
           if (!isNaN(utcDate.getTime())) return utcDate.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
         }
-        return dateString; // Ritorna la stringa originale se non parsabile
+        return dateString;
       }
-      return date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' }); // Specifica timeZone UTC per consistenza
+      return date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
     } catch (e) {
-      return dateString; // Fallback in caso di errore
+      return dateString;
     }
   }
 
-  // Popola il filtro degli anni dinamicamente
   function populateYearFilter() {
     const currentYr = new Date().getFullYear();
-    let minYear = currentYr; // Inizia con l'anno corrente come minimo
+    let minYear = currentYr;
 
-    // Trova l'anno minimo tra gli eventi passati
     if (allPastEventsData && allPastEventsData.length > 0) {
       allPastEventsData.forEach(event => {
         if (event.datainizio) {
@@ -726,36 +696,33 @@
         }
       });
     } else {
-      minYear = currentYr - 4; // Fallback se non ci sono eventi, mostra gli ultimi 5 anni
+      minYear = currentYr - 4;
     }
 
     if (searchYearEl) {
-      searchYearEl.innerHTML = '<option value="">Tutti gli anni</option>'; // Opzione default "Tutti gli anni"
+      searchYearEl.innerHTML = '<option value="">Tutti gli anni</option>';
       for (let y = currentYr; y >= minYear; y--) {
         const option = document.createElement('option');
         option.value = y;
         option.textContent = y;
         searchYearEl.appendChild(option);
       }
-      // MODIFICA: Imposta l'anno corrente come selezionato di default
       searchYearEl.value = currentYr.toString();
     }
   }
 
 
-  // Crea una card HTML per un evento passato
   function createPastEventCard(event) {
     const card = document.createElement("article");
     card.className = "card";
-    if (currentUserData && currentUserData.isAdmin) card.classList.add('admin-card'); // Classe per admin
-    // Aggiungi data-attributes per facilitare il filtraggio client-side se necessario (non usati attivamente qui)
+    if (currentUserData && currentUserData.isAdmin) card.classList.add('admin-card');
     card.dataset.title = event.titolo?.toLowerCase() || '';
     card.dataset.date = event.datainizio || '';
     card.dataset.speaker = event.relatore?.toLowerCase() || '';
 
-    let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event-past.jpg"; // Immagine di default
+    let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event-past.jpg";
 
-    if (currentUserData && currentUserData.isAdmin) { // Vista Admin
+    if (currentUserData && currentUserData.isAdmin) {
       let volantinoAdminLinkHTML = '';
       if (event.volantino_url && event.volantino_url.trim() !== "") { volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em;"><b>Volantino:</b> <a href="${event.volantino_url}" target="_blank">Visualizza volantino</a></p>`; }
       card.innerHTML = `
@@ -771,10 +738,9 @@
             <button class="card-btn btn-delete card-btn-primary" data-event-id="${event.idevento}">Elimina</button>
           </div>
         </div>`;
-      // Aggiungi event listener per i bottoni admin
       card.querySelector('.btn-edit').addEventListener('click', function() { const eventToEdit = allPastEventsData.find(e => e.idevento == this.dataset.eventId); if (eventToEdit) openEditPastEventPopup(eventToEdit); else alert("Dettagli evento non trovati per la modifica."); });
-      card.querySelector('.btn-delete').addEventListener('click', async function() { const eventId = this.dataset.eventId; const eventToDelete = allPastEventsData.find(e => e.idevento == eventId); if (confirm(`Sei sicuro di voler eliminare l'evento "${eventToDelete?.titolo || "questo evento"}"? L'azione è irreversibile.`)) { const btn = this; const oldTxt = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini" style="border-top-color:white;"></div>'; try { const fd = new FormData(); fd.append('action', 'delete_event'); fd.append('event_id', eventId); const r = await fetch('gestione_eventi.php', { method: 'POST', body: fd }); const rt = await r.text(); let res; try { res = JSON.parse(rt); } catch { throw new Error("Risposta non JSON dal server durante l'eliminazione."); } if (!r.ok || !res.success) throw new Error(res.message || "Eliminazione fallita."); alert(res.message || 'Evento eliminato con successo.'); loadPastEvents(); /* Ricarica la lista */ } catch (err) { alert(`Errore durante l'eliminazione: ${err.message}`); } finally { btn.disabled = false; btn.innerHTML = oldTxt; } } });
-    } else { // Vista Utente Standard / Non Loggato
+      card.querySelector('.btn-delete').addEventListener('click', async function() { const eventId = this.dataset.eventId; const eventToDelete = allPastEventsData.find(e => e.idevento == eventId); if (confirm(`Sei sicuro di voler eliminare l'evento "${eventToDelete?.titolo || "questo evento"}"? L'azione è irreversibile.`)) { const btn = this; const oldTxt = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini" style="border-top-color:white;"></div>'; try { const fd = new FormData(); fd.append('action', 'delete_event'); fd.append('event_id', eventId); const r = await fetch('gestione_eventi.php', { method: 'POST', body: fd }); const rt = await r.text(); let res; try { res = JSON.parse(rt); } catch { throw new Error("Risposta non JSON dal server durante l'eliminazione."); } if (!r.ok || !res.success) throw new Error(res.message || "Eliminazione fallita."); alert(res.message || 'Evento eliminato con successo.'); loadPastEvents(); } catch (err) { alert(`Errore durante l'eliminazione: ${err.message}`); } finally { btn.disabled = false; btn.innerHTML = oldTxt; } } });
+    } else {
       const actionsHTML = currentUserData ?
               ` <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Dettagli</a>
           <a href="evento_dettaglio_accesso.html?id=${event.idevento}#event-comments" class="card-btn card-btn-primary">Commenti</a>` :
@@ -793,54 +759,45 @@
     return card;
   }
 
-  // Carica gli eventi passati dalla API
   async function loadPastEvents() {
     if (!eventiPassatiGridEl || !loadingIndicatorEl) return;
-    loadingIndicatorEl.classList.add("visible"); // Mostra indicatore di caricamento
-    eventiPassatiGridEl.innerHTML = ""; // Pulisce la griglia
+    loadingIndicatorEl.classList.add("visible");
+    eventiPassatiGridEl.innerHTML = "";
     try {
-      const response = await fetch("get_past_events.php"); // Chiamata API
+      const response = await fetch("get_past_events.php");
       if (!response.ok) throw new Error( `Errore HTTP: ${response.status} ${response.statusText}` );
       const result = await response.json();
       if (result.success && result.data) {
-        allPastEventsData = result.data; // Salva i dati globalmente
-        populateYearFilter(); // Popola il filtro anni (ora imposterà il default)
-        // Non resettare i filtri qui, così se l'utente aveva già filtrato e ricarica, i filtri rimangono
-        // Se si vuole resettare i filtri ad ogni loadPastEvents, decommentare:
-        // if (searchYearEl) searchYearEl.value = new Date().getFullYear().toString(); // Default all'anno corrente
-        // if (searchMonthEl) searchMonthEl.value = "";
-        // if (searchTitleEl) searchTitleEl.value = "";
-        // if (searchSpeakerEl) searchSpeakerEl.value = "";
-        filterEvents(); // Applica i filtri (ora con l'anno corrente pre-selezionato)
+        allPastEventsData = result.data;
+        populateYearFilter();
+        filterEvents();
       } else { throw new Error( result.message || "Errore nel caricamento degli eventi passati." ); }
     } catch (error) {
-      // Mostra messaggio di errore nella griglia
       if(eventiPassatiGridEl) eventiPassatiGridEl.innerHTML = `<p class="no-events error-message" style="text-align:center; padding:20px;">Errore durante il caricamento degli eventi. (${error.message}) <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>`;
     } finally {
-      if(loadingIndicatorEl) loadingIndicatorEl.classList.remove("visible"); // Nasconde indicatore
+      if(loadingIndicatorEl) loadingIndicatorEl.classList.remove("visible");
     }
   }
 
-  // Filtra e visualizza gli eventi in base ai valori dei filtri
   function filterEvents() {
     if (!eventiPassatiGridEl) return;
     const titleFilter = searchTitleEl ? searchTitleEl.value.toLowerCase().trim() : "";
     const monthFilter = searchMonthEl ? searchMonthEl.value : "";
-    const yearFilterStr = searchYearEl ? searchYearEl.value : ""; // Questo sarà l'anno corrente al primo caricamento
+    const yearFilterStr = searchYearEl ? searchYearEl.value : "";
     const speakerFilter = searchSpeakerEl ? searchSpeakerEl.value.toLowerCase().trim() : "";
 
-    eventiPassatiGridEl.innerHTML = ''; // Pulisce la griglia
+    eventiPassatiGridEl.innerHTML = '';
     let visibleCardsCount = 0;
 
     const filteredEvents = allPastEventsData.filter(event => {
       const eventTitle = event.titolo?.toLowerCase() || "";
       const eventDateStr = event.datainizio || "";
-      let eventMatchesYear = (yearFilterStr === ""); // True se "Tutti gli anni" è selezionato
-      let eventMatchesMonth = (monthFilter === ""); // True se "Tutti i mesi" è selezionato
+      let eventMatchesYear = (yearFilterStr === "");
+      let eventMatchesMonth = (monthFilter === "");
 
       if (eventDateStr) {
         const eventYear = parseInt(eventDateStr.substring(0, 4));
-        const eventMonthNum = eventDateStr.substring(5, 7); // Formato MM
+        const eventMonthNum = eventDateStr.substring(5, 7);
 
         if (yearFilterStr !== "" && !isNaN(eventYear) && eventYear === parseInt(yearFilterStr)) {
           eventMatchesYear = true;
@@ -861,7 +818,6 @@
       visibleCardsCount = filteredEvents.length;
     }
 
-    // Gestione messaggio "Nessun risultato"
     const existingNoResultsMessage = gebi("noResultsMessage");
     if (existingNoResultsMessage) existingNoResultsMessage.remove();
 
@@ -871,15 +827,12 @@
       p.className = "no-events";
       if (allPastEventsData.length === 0 && !titleFilter && !monthFilter && !yearFilterStr && !speakerFilter) {
         p.textContent = "Nessun evento passato trovato in archivio.";
-      } else if (titleFilter || monthFilter || yearFilterStr || speakerFilter) { // Mostra se ci sono filtri attivi
+      } else if (titleFilter || monthFilter || yearFilterStr || speakerFilter) {
         p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
       }
-      // Non mostrare nulla se non ci sono filtri e ci sono eventi (ma non corrispondono, caso strano)
-      // o se non ci sono eventi e non ci sono filtri (già coperto sopra)
       if (p.textContent) eventiPassatiGridEl.appendChild(p);
     }
   }
-  // Funzione per caricare dinamicamente il logo della navbar
   async function loadNavbarLogo() {
     const logoImgTag = document.getElementById('navbarLogoImgTag');
     if (!logoImgTag) {
@@ -887,10 +840,10 @@
       return;
     }
 
-    const defaultLogoPath = 'images/Logo_eremo.png'; // Assicurati che questo percorso sia corretto
+    const defaultLogoPath = 'images/Logo_eremo.png';
 
     try {
-      const response = await fetch('api_get_page_content.php?page=index'); // Recupera i contenuti di 'index'
+      const response = await fetch('api_get_page_content.php?page=index');
       if (!response.ok) {
         throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
       }
@@ -904,32 +857,28 @@
       }
     } catch (error) {
       console.error("Errore nel caricare dinamicamente il logo navbar:", error);
-      logoImgTag.src = defaultLogoPath; // Fallback in caso di errore
+      logoImgTag.src = defaultLogoPath;
     }
   }
 
 
-  // Event listener al caricamento del DOM
   document.addEventListener("DOMContentLoaded", async () => {
-    const currentYearEl = gebi("currentYear"); // Per il footer
+    const currentYearEl = gebi("currentYear");
     if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
-    loadUserData(); // Carica dati utente da localStorage
-    await fetchAndUpdateUserDisplayData(); // Aggiorna UI navbar (generale)
-    await loadNavbarLogo(); // <<< AGGIUNGI QUESTA CHIAMATA QUI
-    // Aggiungi event listener ai filtri per il filtraggio "live"
+    loadUserData();
+    await fetchAndUpdateUserDisplayData();
+    await loadNavbarLogo();
     searchTitleEl?.addEventListener("input", filterEvents);
     searchMonthEl?.addEventListener("change", filterEvents);
     searchYearEl?.addEventListener("change", filterEvents);
     searchSpeakerEl?.addEventListener("input", filterEvents);
 
-    await loadPastEvents(); // Carica e visualizza gli eventi passati (con anno corrente pre-selezionato)
+    await loadPastEvents();
 
-    // Event listener per il logout
     gebi('dropdownLogout')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
     gebi('mobileLogoutLink')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenu(); });
 
-    // Event listener per chiudere i popup con il tasto ESC
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         if (loginPopupEl?.classList.contains("active")) closeLoginPopup();
@@ -939,7 +888,6 @@
       }
     });
 
-    // Inizializza visibilità campo prezzo per admin (se già loggato come admin)
     if (currentUserData && currentUserData.isAdmin && typeof updateAdminPriceFieldVisibility === 'function') {
       updateAdminPriceFieldVisibility();
     }

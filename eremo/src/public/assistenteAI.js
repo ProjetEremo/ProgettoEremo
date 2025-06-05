@@ -990,5 +990,5 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
         }
     });
 
-}); // Chiusura del listener DOMContentLoaded
+}); // Chiusura del listener per DOMContentLoaded
 ; // Assicura che l'istruzione addEventListener termini con un punto e virgola.
