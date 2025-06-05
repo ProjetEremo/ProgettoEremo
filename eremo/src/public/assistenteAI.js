@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let GROQ_API_KEY_FOR_ASSISTANT = null; // Chiave API Groq per l'assistente principale
     const GROQ_MODEL_NAME_ASSISTANT = "meta-llama/llama-4-scout-17b-16e-instruct"; // Modello Groq per l'assistente principale (aggiornato)
-    const GROQ_MODEL_NAME_TTS_OPTIMIZER = "meta-llama/llama-4-scout-17b-16e-instruct"; // Modello Groq per l'ottimizzazione TTS (aggiornato, più piccolo)
+    const GROQ_MODEL_NAME_TTS_OPTIMIZER = "compound-beta"; // Modello Groq per l'ottimizzazione TTS (aggiornato, più piccolo)
 
     let IS_USER_LOGGED_IN = false; // Stato login utente
     let CURRENT_USER_EMAIL = null; // Email utente loggato
