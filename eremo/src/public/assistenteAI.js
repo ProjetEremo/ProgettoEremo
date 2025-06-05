@@ -1,14 +1,15 @@
-// File: assistenteAI.js (Versione Rivoluzionata e Corretta v14 - Migliorata Risposta Prenotazione e Completo + GET_PAGE_CONTENT)
+// File: assistenteAI.js (Versione Rivoluzionata e Corretta v14 - Pulsante TTS Integrato)
 document.addEventListener('DOMContentLoaded', () => {
     const aiAssistantFabEl = document.getElementById('ai-assistant-fab');
     const aiChatPopupEl = document.getElementById('ai-chat-popup');
     const aiChatCloseBtnEl = document.getElementById('ai-chat-close-btn');
+    const aiChatHeaderEl = document.getElementById('ai-chat-header'); // Variabile per l'header della chat
     const aiChatMessagesContainerEl = document.getElementById('ai-chat-messages');
     const aiChatInputEl = document.getElementById('ai-chat-input');
     const aiChatSendBtnEl = document.getElementById('ai-chat-send-btn');
 
     // Verifica esistenza elementi UI fondamentali
-    if (!aiAssistantFabEl || !aiChatPopupEl || !aiChatCloseBtnEl || !aiChatMessagesContainerEl || !aiChatInputEl || !aiChatSendBtnEl) {
+    if (!aiAssistantFabEl || !aiChatPopupEl || !aiChatCloseBtnEl || !aiChatHeaderEl || !aiChatMessagesContainerEl || !aiChatInputEl || !aiChatSendBtnEl) {
         console.warn("AssistenteAI: Elementi UI fondamentali non trovati. L'assistente potrebbe non funzionare correttamente.");
         if (aiAssistantFabEl) aiAssistantFabEl.style.display = 'none'; // Nasconde il FAB se mancano componenti critici
         return; // Interrompe l'inizializzazione se mancano elementi cruciali
@@ -26,8 +27,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAX_SEATS_PER_SINGLE_BOOKING_REQUEST = 5; // Massimo posti prenotabili per singola richiesta
     const MAX_TOTAL_SEATS_PER_USER_PER_EVENT = 5; // Massimo posti totali prenotabili da un utente per un evento
 
-    let isTTSEnabled = true; // Abilitazione Sintesi Vocale (TTS)
+    // let isTTSEnabled = true; // Rimosso, useremo isTTSEnabledByUser
     let speechSynthesisVoices = []; // Array per memorizzare le voci disponibili per TTS
+
+    // --- INIZIO MODIFICHE PER PULSANTE TTS ---
+    let isTTSEnabledByUser = true; // Default: TTS abilitato dall'utente, gestito da localStorage
+    const TTS_USER_PREFERENCE_KEY = 'aiChatTTSEnabledByUser'; // Chiave per localStorage
+    let ttsToggleButton = null; // Riferimento al pulsante TTS che creeremo
+
+    // Carica la preferenza TTS dell'utente da localStorage
+    function loadTTSUserPreference() {
+        const storedPreference = localStorage.getItem(TTS_USER_PREFERENCE_KEY);
+        if (storedPreference !== null) {
+            isTTSEnabledByUser = storedPreference === 'true';
+        }
+        // Altrimenti, usa il default (true) impostato all'inizio
+        updateTTSButtonUI(); // Aggiorna l'UI del pulsante dopo aver caricato la preferenza
+    }
+
+    // Salva la preferenza TTS dell'utente in localStorage
+    function saveTTSUserPreference() {
+        localStorage.setItem(TTS_USER_PREFERENCE_KEY, isTTSEnabledByUser);
+    }
+
+    // Aggiorna l'aspetto del pulsante TTS (icona e tooltip)
+    function updateTTSButtonUI() {
+        if (ttsToggleButton) { // Assicurati che il pulsante esista
+            ttsToggleButton.innerHTML = isTTSEnabledByUser ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+            ttsToggleButton.setAttribute('aria-label', isTTSEnabledByUser ? 'Disabilita sintesi vocale' : 'Abilita sintesi vocale');
+            ttsToggleButton.title = isTTSEnabledByUser ? 'Disabilita sintesi vocale' : 'Abilita sintesi vocale';
+        }
+    }
+
+    // Funzione per attivare/disattivare il TTS da parte dell'utente
+    function toggleUserTTSPreference() {
+        isTTSEnabledByUser = !isTTSEnabledByUser;
+        saveTTSUserPreference();
+        updateTTSButtonUI();
+        if (!isTTSEnabledByUser && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // Ferma la lettura se TTS viene disabilitato durante la riproduzione
+        }
+        console.log(`AssistenteAI: Sintesi vocale ${isTTSEnabledByUser ? 'abilitata' : 'disabilitata'} dall'utente.`);
+    }
+
+    // Crea e aggiunge il pulsante TTS all'header della chat
+    function createAndInjectTTSButton() {
+        // Evita di aggiungere duplicati se la funzione viene chiamata più volte accidentalmente
+        if (document.getElementById('ai-chat-tts-toggle-btn')) return;
+
+        ttsToggleButton = document.createElement('button');
+        ttsToggleButton.id = 'ai-chat-tts-toggle-btn';
+        ttsToggleButton.className = 'ai-chat-header-btn'; // Usa una classe simile a close-btn per lo stile base
+        // updateTTSButtonUI() sarà chiamato da loadTTSUserPreference dopo che il pulsante è stato creato
+        ttsToggleButton.addEventListener('click', toggleUserTTSPreference);
+
+        // Inserisce il pulsante TTS prima del pulsante di chiusura, se esistono
+        if (aiChatHeaderEl && aiChatCloseBtnEl) {
+            aiChatHeaderEl.insertBefore(ttsToggleButton, aiChatCloseBtnEl);
+        } else {
+            console.error("AssistenteAI: Impossibile inserire il pulsante TTS. Elemento header o bottone chiusura mancanti.");
+        }
+    }
+    // --- FINE MODIFICHE PER PULSANTE TTS ---
+
 
     // Carica le voci disponibili per la sintesi vocale
     function loadVoices() {
@@ -44,8 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Funzione per la sintesi vocale del testo
     function speakText(text) {
-        if (!isTTSEnabled || !('speechSynthesis' in window)) {
-            return; // Non fare nulla se TTS disabilitato o non supportato
+        // MODIFICA: Controllo basato sulla preferenza dell'utente
+        if (!isTTSEnabledByUser || !('speechSynthesis' in window)) {
+            return; // Non fare nulla se TTS disabilitato dall'utente o non supportato
         }
         if (!aiChatPopupEl.classList.contains('active')) {
             window.speechSynthesis.cancel(); // Interrompe la lettura se la chat non è attiva
@@ -463,7 +526,8 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
         }
 
         // Gestione TTS per la risposta reale dell'assistente
-        if (isTTSEnabled && aiChatPopupEl.classList.contains('active') && !isThinkingMessage) {
+        // MODIFICA: Controllo isTTSEnabledByUser
+        if (isTTSEnabledByUser && aiChatPopupEl.classList.contains('active') && !isThinkingMessage) {
             let textToSpeak = chatResponseText;
 
             try {
@@ -1018,12 +1082,13 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
     // Inizializzazione dell'assistente al caricamento della pagina
     fetchAndPrepareAssistantApiKey().then(keyReady => {
         if (keyReady) {
-            console.log("AssistenteAI: Pronto. Il saluto iniziale verrà generato all'apertura della chat.");
-            // Il saluto e l'inizializzazione completa della chat avvengono in toggleAiChat la prima volta.
+            console.log("AssistenteAI: Pronto.");
+            // --- INIZIO MODIFICHE PER PULSANTE TTS ---
+            createAndInjectTTSButton(); // Crea e inserisce il pulsante TTS
+            loadTTSUserPreference();    // Carica la preferenza TTS dell'utente e aggiorna l'UI del pulsante
+            // --- FINE MODIFICHE PER PULSANTE TTS ---
         } else {
             console.warn("AssistenteAI: Chiave API non caricata o non valida. L'assistente potrebbe non funzionare.");
-            // Il FAB potrebbe essere nascosto da fetchAndPrepareAssistantApiKey in caso di fallimento critico.
-            // Se il FAB è visibile, toggleAiChat mostrerà un errore all'utente quando tenta di aprirlo.
         }
     });
 

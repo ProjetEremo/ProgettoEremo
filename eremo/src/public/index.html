@@ -375,8 +375,8 @@
   let isEditModeActive = false;
   let originalPageContentsForCancel = {};
   let currentPageDbContents = {};
-  let currentUserData = null; // Definita globalmente
-  const defaultUserIconPath = 'uploads/icons/default_user.png'; // Definita globalmente
+  let currentUserData = null;
+  const defaultUserIconPath = 'uploads/icons/default_user.png';
 
   const defaultPageContents = {
     heroTitle: "Eremo Frate Francesco",
@@ -397,6 +397,61 @@
   function sanitizeTextForHTML(str) { if (typeof str !== 'string') str = String(str || ''); const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML.replace(/\r\n|\r|\n/g, '<br>');}
   function loadUserData() { const uds = localStorage.getItem('userDataEFF'); if (uds) { try { currentUserData = JSON.parse(uds); if (!currentUserData || typeof currentUserData.email === 'undefined') {currentUserData = null; localStorage.removeItem('userDataEFF');}} catch (e) { console.error("Err parsing userDataEFF:", e); currentUserData = null; localStorage.removeItem('userDataEFF');}} else { currentUserData = null; }}
 
+  // Funzione API call (copiata da areapersonale.html)
+  async function callApi(url, method = 'GET', data = null) {
+    const headers = { 'Content-Type': 'application/json' };
+    const options = { method, headers, credentials: 'same-origin' };
+    if (data && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
+      options.body = JSON.stringify(data);
+    }
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        let errorData;
+        let rawErrorText = '';
+        try {
+          rawErrorText = await response.text();
+          errorData = JSON.parse(rawErrorText);
+        } catch (e) {
+          errorData = { message: rawErrorText || `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
+        }
+        if (!errorData.status) errorData.status = response.status;
+        throw errorData;
+      }
+      if (response.status === 204) return {};
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        return await response.json();
+      } else {
+        const textResponse = await response.text();
+        return { success: true, data: textResponse, message: textResponse };
+      }
+    } catch (error) {
+      console.error(`Fallimento chiamata API ${url}:`, error.message || error);
+      if (error && !error.status && error.message && error.message.includes("HTTP")) {
+        const match = error.message.match(/HTTP (\d+)/);
+        if (match && match[1]) error.status = parseInt(match[1]);
+      }
+      throw error;
+    }
+  }
+
+  // Funzione checkUserSessionActive (copiata da areapersonale.html)
+  async function checkUserSessionActive() {
+    try {
+      await callApi('api/api_check_session.php'); // Assicurati che esista e usi require_login()
+      return true;
+    } catch (error) {
+      if (error && (error.status === 401 || error.status === 403)) {
+        console.warn("Session check: Sessione server non attiva (401/403).");
+        return false;
+      }
+      console.warn("Errore durante il check della sessione (non 401/403):", error.message || error);
+      return true;
+    }
+  }
+
+
   function updateNavbarUI() {
     const el = {
       loginBtnDesktop:document.getElementById('login-btn-desktop'),
@@ -416,32 +471,26 @@
       mobileMenuSeparator:document.getElementById('mobile-menu-separator'),
       navbarTitle:document.getElementById('navbar-title'),
       editPageBtnContainer:document.getElementById('editPageBtnContainer')
-      // Aggiungi qui altri elementi se necessario, ma gli ID rilevanti sono già presenti
     };
 
-    // Reset iniziale di tutti gli item specifici dell'utente/admin
     if(el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'none';
     if(el.loginBtnMobile) el.loginBtnMobile.style.display = 'none';
     if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'none';
-
     if(el.navProfilo) el.navProfilo.style.display = 'none';
     if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
     if(el.navDashboard) el.navDashboard.style.display = 'none';
     if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
-
     if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
     if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
     if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
     if(el.mobileNavGestioneEventiAdminLink) el.mobileNavGestioneEventiAdminLink.style.display = 'none';
-
     if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
     if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
 
-
-    if (currentUserData) { // Utente Loggato
-      if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block'; // Mostra il contenitore del dropdown
-      if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block'; // Mostra logout mobile
-      if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block'; // Mostra separatore mobile
+    if (currentUserData) {
+      if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block';
+      if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
+      if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
 
       if (el.navbarUsername) el.navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
       if(el.navbarAvatarImg){
@@ -450,41 +499,31 @@
         el.navbarAvatarImg.onerror=function(){this.src=defaultUserIconPath;};
       }
 
-      if(currentUserData.isAdmin){ // ADMIN LOGGATO
-        if(el.navProfilo) el.navProfilo.style.display = 'block'; // MOSTRA PROFILO (DESKTOP)
-        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block'; // MOSTRA PROFILO (MOBILE)
-
-        if(el.navDashboard) el.navDashboard.style.display = 'block'; // MOSTRA DASHBOARD (DESKTOP)
-        if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block'; // MOSTRA DASHBOARD (MOBILE)
-
-        // Nascondi "Le mie prenotazioni" e "Gestione Eventi" per admin SU INDEX.HTML
+      if(currentUserData.isAdmin){
+        if(el.navProfilo) el.navProfilo.style.display = 'block';
+        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
+        if(el.navDashboard) el.navDashboard.style.display = 'block';
+        if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
         if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
         if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
         if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
         if(el.mobileNavGestioneEventiAdminLink) el.mobileNavGestioneEventiAdminLink.style.display = 'none';
-
         if(el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
-        // La visibilità di editPageBtnContainer è gestita da toggleEditMode che viene chiamato dopo
-      } else { // UTENTE NORMALE LOGGATO (NON ADMIN)
-        if(el.navProfilo) el.navProfilo.style.display = 'block'; // Mostra Profilo (Desktop)
-        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block'; // Mostra Profilo (Mobile)
-
-        if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block'; // Mostra Mie Prenotazioni (Desktop)
-        if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block'; // Mostra Mie Prenotazioni (Mobile)
-
-        // "Dashboard Admin" e "Gestione Eventi" sono già nascosti dal reset iniziale, non serve nasconderli di nuovo qui.
-
+      } else {
+        if(el.navProfilo) el.navProfilo.style.display = 'block';
+        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
+        if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block';
+        if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
         if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
         if(el.editPageBtnContainer && el.editPageBtnContainer.classList) el.editPageBtnContainer.classList.remove('active');
       }
-    } else { // UTENTE NON LOGGATO
+    } else {
       if(el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'inline-block';
       if(el.loginBtnMobile) el.loginBtnMobile.style.display = 'block';
       if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
       if(el.editPageBtnContainer && el.editPageBtnContainer.classList) el.editPageBtnContainer.classList.remove('active');
     }
   }
-
 
   let lastScroll = 0; const navbarContainer = document.getElementById("navbarContainer"); if (navbarContainer) { window.addEventListener("scroll", function () { const cS = window.pageYOffset||document.documentElement.scrollTop; if(cS<=50){navbarContainer.classList.remove("hidden");lastScroll=0;return;} if(cS>lastScroll&&!navbarContainer.classList.contains("hidden"))navbarContainer.classList.add("hidden"); else if(cS<lastScroll&&navbarContainer.classList.contains("hidden"))navbarContainer.classList.remove("hidden"); lastScroll=cS<=0?0:cS;}, false);}
   const mobileMenu = document.getElementById("mobileMenu"); const hamburgerBtn = document.getElementById("hamburgerBtn"); function toggleMobileMenu(){if(mobileMenu&&hamburgerBtn){const iO=mobileMenu.classList.toggle("open");hamburgerBtn.setAttribute("aria-expanded",String(iO));document.body.style.overflow=iO?"hidden":"";}} function closeMobileMenuOnLinkClick(){if(mobileMenu&&hamburgerBtn&&mobileMenu.classList.contains("open")){mobileMenu.classList.remove("open");hamburgerBtn.setAttribute("aria-expanded","false");document.body.style.overflow="";}} if(hamburgerBtn)hamburgerBtn.addEventListener("click",toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l=>{if(l.id!=='login-btn-mobile'&&l.id!=='mobile-logout-link'&&l.id!=='mobile-nav-gestione-eventi-admin-link')l.addEventListener("click",closeMobileMenuOnLinkClick);}); document.addEventListener("click",function(e){if(mobileMenu&&mobileMenu.classList.contains("open")&&hamburgerBtn&&!mobileMenu.contains(e.target)&&!hamburgerBtn.contains(e.target))toggleMobileMenu();});
@@ -500,7 +539,6 @@
     ];
     return popupsToCheck.some(p => {
       if (!p) return false;
-      // Verifica sia la classe 'active' che lo stile 'display' per una maggiore robustezza
       const style = window.getComputedStyle(p);
       return p.classList.contains('active') || style.display === 'flex' || style.display === 'block';
     });
@@ -528,12 +566,12 @@
         currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath||defaultUserIconPath,isAdmin:j.is_admin===true||j.is_admin===1};
         localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));
 
-        updateNavbarUI(); // Aggiorna la navbar con i dati utente
-        closeLoginPopup(); // Chiudi il popup di login
-        await loadPageContentsFromServer(); // Ricarica i contenuti della pagina (potrebbe essere necessario per admin)
+        updateNavbarUI();
+        closeLoginPopup();
+        await loadPageContentsFromServer();
 
         if (currentUserData.isAdmin) {
-          toggleEditMode(false); // Attiva i controlli admin, mostrando "Attiva Modifiche"
+          toggleEditMode(false);
         }
         showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");
 
@@ -552,6 +590,36 @@
 
   registerFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=registerFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Registrazione...<div class="spinner-mini-light"></div>';try{const r=await fetch('registrati.php',{method:'POST',body:new FormData(registerFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){document.querySelector('.login-tab[data-tab="login"]')?.click();document.getElementById('login-email').value=document.getElementById('register-email').value;registerFormEl.reset();}else{if(registerErrorMessageEl){registerErrorMessageEl.textContent=j.message||"Errore registrazione.";registerErrorMessageEl.style.display='block';}if(j.errors){for(const f in j.errors)document.getElementById(`register-${f}`)?.classList.add('error-border');}}}catch(err){console.error("Errore registrazione:",err);if(registerErrorMessageEl){registerErrorMessageEl.textContent="Errore connessione o server.";if(registerErrorMessageEl)registerErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
 
+  function handleLogout(showAlert = true) {
+    const wasLoggedIn = !!localStorage.getItem('userDataEFF');
+    localStorage.removeItem('userDataEFF');
+    currentUserData = null;
+    isEditModeActive = false;
+
+    fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                if (showAlert && wasLoggedIn) showPageStatus('Logout effettuato con successo.', 'info');
+              } else {
+                if (showAlert && wasLoggedIn) showPageStatus('Logout dal server fallito, ma i dati locali sono stati rimossi.', 'warning');
+              }
+            })
+            .catch(error => {
+              console.error("Errore API logout:", error);
+              if (showAlert && wasLoggedIn) showPageStatus('Errore durante il logout dal server.', 'error');
+            })
+            .finally(() => {
+              updateNavbarUI();
+              loadPageContentsFromServer(); // Ricarica i contenuti per la vista da ospite
+              const editContainer = document.getElementById('editPageBtnContainer');
+              if (editContainer) editContainer.classList.remove('active');
+              // Non reindirizzare per index.html, ma aggiorna la pagina
+            });
+  }
+  document.getElementById('logout-link-desktop')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();});
+  document.getElementById('mobile-logout-link')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenuOnLinkClick();});
+
   const forgotPasswordLink = document.getElementById('forgotPasswordLink');
   const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
   const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
@@ -564,10 +632,6 @@
   if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
   if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
   forgotPasswordForm?.addEventListener('submit', async (e) => { e.preventDefault(); if (forgotPasswordMessage) { forgotPasswordMessage.style.display = 'none'; forgotPasswordMessage.className = 'form-message'; } const emailInput = document.getElementById('forgot-email'); const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML; submitBtn.disabled = true; submitBtn.innerHTML = 'Invio...<div class="spinner-mini-light"></div>'; try { const formData = new FormData(forgotPasswordForm); const response = await fetch('richiesta_recupero_password.php', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { forgotPasswordMessage.textContent = result.message; forgotPasswordMessage.classList.add('success'); emailInput.value = ''; } else { forgotPasswordMessage.textContent = result.message || "Si è verificato un errore."; forgotPasswordMessage.classList.add('error'); } } catch (error) { console.error('Errore richiesta recupero password:', error); forgotPasswordMessage.textContent = "Errore di connessione o del server."; forgotPasswordMessage.classList.add('error'); } finally { if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } });
-
-  function handleLogout(){localStorage.removeItem('userDataEFF'); localStorage.removeItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`); currentUserData=null;isEditModeActive=false;updateNavbarUI();loadPageContentsFromServer();const editContainer=document.getElementById('editPageBtnContainer');if(editContainer)editContainer.classList.remove('active');showPageStatus('Logout effettuato.','info');}
-  document.getElementById('logout-link-desktop')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();});
-  document.getElementById('mobile-logout-link')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenuOnLinkClick();});
 
   const editPageBtn=document.getElementById('editPageBtn');const savePageChangesBtn=document.getElementById('savePageChangesBtn'); const cancelPageChangesBtn=document.getElementById('cancelPageChangesBtn');const editContentModal=document.getElementById('editContentModal'); const closeEditContentModalBtn=document.getElementById('closeEditContentModalBtn');const editModalTitle=document.getElementById('editModalTitle'); const editModalTextarea=document.getElementById('editModalTextarea');const editModalInputText=document.getElementById('editModalInputText'); const editModalInputImage=document.getElementById('editModalInputImage');const editModalFieldLabelText=document.getElementById('editModalFieldLabelText'); const saveEditModalBtn=document.getElementById('saveEditModalBtn');const cancelEditModalBtn=document.getElementById('cancelEditModalBtn'); const editModalMessage=document.getElementById('editModalMessage');const pageOverallStatus=document.getElementById('pageOverallStatus'); const editModalInputFile=document.getElementById('editModalInputFile'); const editModalFileLabel=document.getElementById('editModalFileLabel'); const editModalFileNote = document.getElementById('editModalFileNote');
   let currentEditingKey=null;let currentEditingType='text';
@@ -614,11 +678,20 @@
 
     try {
       const r = await fetch(`api_get_page_content.php?page=${PAGE_NAME_FOR_CONTENT}`);
-      if (r.status === 401 || r.status === 403) {
-        console.warn("Sessione scaduta o non valida.");
-        if (currentUserData) { handleLogout(); showPageStatus("Sessione scaduta. Effettua login.", "error", 5000); }
-        if (!appliedFromCache) { currentPageDbContents = { ...defaultPageContents }; applyContentsToPage(currentPageDbContents); originalPageContentsForCancel = { ...currentPageDbContents }; }
-        updateNavbarUI(); return;
+      if (r.status === 401 || r.status === 403) { // Gestione sessione scaduta anche qui
+        console.warn("Sessione scaduta o non valida durante il caricamento dei contenuti di index.html.");
+        if (currentUserData) {
+          handleLogout(false); // Esegui logout client-side senza alert, perché lo status lo mostrerà
+          showPageStatus("Sessione scaduta. Effettua login.", "error", 5000);
+        }
+        // Se non c'era cache, o la cache è diversa, mostra i default
+        if (!appliedFromCache || (cachedContents && JSON.stringify(cachedContents) !== JSON.stringify(defaultPageContents))) {
+          currentPageDbContents = { ...defaultPageContents };
+          applyContentsToPage(currentPageDbContents);
+          originalPageContentsForCancel = { ...currentPageDbContents };
+        }
+        updateNavbarUI(); // Aggiorna la navbar per riflettere lo stato di logout
+        return;
       }
       if (!r.ok) throw new Error(`Errore server: ${r.status}`);
       const d = await r.json();
@@ -681,7 +754,7 @@
 
     if(editContainer) {
       if (currentUserData?.isAdmin) {
-        editContainer.classList.add('active'); // Sempre .active se admin, i bottoni dentro cambiano
+        editContainer.classList.add('active');
         if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block';
         if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none';
         if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none';
@@ -735,7 +808,7 @@
       editModalInputFile.style.display = 'block';
       editModalFileLabel.style.display = 'block';
       editModalFileNote.style.display = 'block';
-    } else { // 'text'
+    } else {
       editModalTitle.textContent = `Modifica Testo Breve (ID: ${key})`;
       editModalFieldLabelText.textContent = "Testo (titolo/corto):";
       editModalInputText.value = valForInput;
@@ -844,9 +917,21 @@
 
   document.addEventListener('DOMContentLoaded',async()=>{
     const c=document.getElementById('currentYear');if(c)c.textContent=new Date().getFullYear();
-    loadUserData();
+    loadUserData(); // Carica da localStorage
+
+    if (currentUserData) { // Se c'erano dati in localStorage
+      const sessionIsValidOnServer = await checkUserSessionActive();
+      if (!sessionIsValidOnServer) {
+        console.warn("Sessione server non valida rilevata all'avvio di index.html.");
+        handleLogout(false); // Esegui logout client-side, non mostrare alert (lo status lo farà)
+        // Non c'è bisogno di chiamare showPageStatus qui perché loadPageContentsFromServer lo farà
+        // se rileva un errore di sessione.
+      }
+    }
+    // Queste funzioni aggiorneranno la UI basandosi su currentUserData (che potrebbe essere stato annullato da handleLogout)
     updateNavbarUI();
     await loadPageContentsFromServer();
+
     if (currentUserData && currentUserData.isAdmin) {
       toggleEditMode(false);
     } else {
@@ -854,7 +939,7 @@
       const editContainer=document.getElementById('editPageBtnContainer');
       if(editContainer && editContainer.classList) editContainer.classList.remove('active');
     }
-    document.removeEventListener('keydown', handleGlobalKeyDown); // Rimuovi per evitare duplicati se lo script viene ricaricato
+    document.removeEventListener('keydown', handleGlobalKeyDown);
     document.addEventListener('keydown', handleGlobalKeyDown);
   });
 </script>
