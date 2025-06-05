@@ -77,7 +77,6 @@
       font-size: 0.9em;
       cursor: pointer;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      /* display: flex; */ /* Rimosso per evitare conflitti, gestito da JS */
       align-items: center;
       justify-content: center;
       z-index: 5;
@@ -89,7 +88,7 @@
     .editable-text-wrapper:hover .edit-icon-text,
     .editable-iframe-wrapper:hover .edit-icon-iframe,
     .editable-href-wrapper:hover .edit-icon-href {
-      display: flex; /* Mostra con flex quando serve */
+      display: flex;
       opacity: 1;
       transform: scale(1);
     }
@@ -103,116 +102,23 @@
       right: 0;
       transform: translate(50%, -50%) scale(0.8);
     }
-    .location-description .editable-text-wrapper h2 + .edit-icon-text {
+    .contatto-card .editable-text-wrapper .edit-icon-text {
       top: 0;
       right: 0;
-      transform: translate(calc(100% + 5px), -50%) scale(0.8);
+      transform: translate(calc(100% + 0px), -50%) scale(0.8); /* Adjusted for tighter fit */
     }
-    .location-description .editable-text-wrapper p + .edit-icon-text {
-      top: 50%;
-      right: 0;
-      transform: translate(calc(100% + 5px), -50%) scale(0.8);
-    }
-    .location-actions .editable-href-wrapper .edit-icon-href {
-      top: 50%;
-      right: 0;
-      transform: translate(calc(100% + 5px), -50%) scale(0.8);
-    }
-    .location-info-cards .editable-text-wrapper h2 + .edit-icon-text {
-      top: 0;
-      right: 0;
-      transform: translate(50%, -50%) scale(0.8);
-    }
-    .card-content .editable-text-wrapper p + .edit-icon-text {
-      top: 0;
-      right: 0;
-      transform: translate(50%, -50%) scale(0.8);
-    }
-    .map-container .edit-icon-iframe {
-      top: 0;
-      right: 0;
-      transform: translate(50%, -50%) scale(0.8);
-    }
-    .editable-text-wrapper:hover .edit-icon-text,
-    .editable-iframe-wrapper:hover .edit-icon-iframe,
-    .editable-href-wrapper:hover .edit-icon-href {
+
+    .editable-text-wrapper:hover .edit-icon-text {
       opacity: 1;
-      transform: translate(50%, -50%) scale(1);
+      transform: translate(var(--custom-translate-x, calc(100% + 0px)), var(--custom-translate-y, -50%)) scale(1);
     }
-    .main-title-editable-wrapper:hover > h1 + .edit-icon-text,
-    .location-description .editable-text-wrapper:hover h2 + .edit-icon-text,
-    .location-description .editable-text-wrapper:hover p + .edit-icon-text,
-    .location-actions .editable-href-wrapper:hover .edit-icon-href {
+    .main-title-editable-wrapper:hover > h1 + .edit-icon-text {
       opacity: 1;
       transform: translate(var(--custom-translate-x, 50%), var(--custom-translate-y, -50%)) scale(1);
     }
 
-    /* Specific styles for phone number section */
-    .contatto-card .contatto-valore {
-      text-align: center; /* Center the content within .contatto-valore */
-      display: flex; /* Use flexbox to center content horizontally */
-      justify-content: center; /* Center horizontally in flex container */
-      align-items: center; /* Vertically align items if they have different heights */
-      flex-wrap: wrap; /* Allow content to wrap if too long */
-    }
 
-    .contatto-card .contatto-valore .editable-text-wrapper {
-      display: inline-flex; /* Treat as inline block but with flex properties */
-      align-items: center; /* Vertically align items within this wrapper */
-      position: relative; /* Crucial for positioning the absolute icon */
-      vertical-align: middle; /* Align with surrounding text */
-      /* Remove width: 100% which was causing extra space */
-    }
-
-    /* Adjust specific elements inside .contatto-valore for better spacing */
-    .contatto-card .contatto-valore strong {
-      display: inline; /* Ensure strong tag doesn't break line unnecessarily */
-    }
-
-    .contatto-card .contatto-valore .editable-text-wrapper .edit-icon-text {
-      position: absolute; /* Position absolutely relative to its flex parent */
-      top: 50%; /* Center vertically */
-      left: 100%; /* Position it right at the end of the text/wrapper */
-      transform: translate(5px, -50%) scale(0.8); /* Shift 5px to the right and vertically center */
-
-      /* Ensure it's always visible and on top when active */
-      z-index: 10;
-      opacity: 0; /* Start hidden */
-      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-    }
-
-    .contatto-card .contatto-valore .editable-text-wrapper:hover .edit-icon-text {
-      opacity: 1;
-      transform: translate(5px, -50%) scale(1); /* Maintain 5px shift and scale up */
-    }
-    /* Specific style for card1PhoneName1 and card1PhoneName2 icons */
-    /* Ensure the edit icon for the *name* is relative to its own span, not the phone number's span */
-    .contatto-card .contatto-valore .editable-text-wrapper > .edit-icon-text { /* Target icon for phone number itself */
-      top: 50%;
-      left: 100%;
-      transform: translate(5px, -50%) scale(0.8);
-    }
-
-    .contatto-card .contatto-valore .editable-text-wrapper > .edit-icon-text:hover {
-      opacity: 1;
-      transform: translate(5px, -50%) scale(1);
-    }
-
-    /* Icon for the name inside parentheses:
-       It's a child of its own .editable-text-wrapper which is inside the main phone .editable-text-wrapper.
-       So, its position should be relative to its immediate parent. */
-    .contatto-card .contatto-valore .editable-text-wrapper .editable-text-wrapper .edit-icon-text {
-      top: 50%; /* Vertically center relative to its parent (the inner span) */
-      left: 100%; /* Position right after the text it modifies */
-      transform: translate(5px, -50%) scale(0.8); /* Small horizontal offset */
-    }
-
-    .contatto-card .contatto-valore .editable-text-wrapper .editable-text-wrapper:hover .edit-icon-text {
-      opacity: 1;
-      transform: translate(5px, -50%) scale(1);
-    }
-
-
+    /* Generic Edit Modal Styles */
     .edit-content-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(var(--dark-rgb, 30, 59, 47), 0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center;}
     .edit-content-modal-content { background-color: var(--white); padding: 25px; border-radius: var(--border-radius-medium); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;}
     .edit-content-modal-content h3 { margin-top: 0; color: var(--primary); }
@@ -224,10 +130,25 @@
     .close-modal-btn { position: absolute; top: 10px; right: 15px; font-size: 1.8rem; color: var(--gray-medium); background: none; border: none; cursor: pointer; line-height: 1;}
     .close-modal-btn:hover { color: var(--dark); }
 
+    /* Phone Numbers Modal Specific Styles */
+    #editPhoneNumbersModal .phone-entry { display: flex; align-items: center; margin-bottom: 10px; padding: 10px; border: 1px solid #eee; border-radius: 8px; background-color: #f9f9f9; }
+    #editPhoneNumbersModal .phone-entry-details { flex-grow: 1; display: flex; gap: 10px; }
+    #editPhoneNumbersModal .phone-entry-details span { font-size: 0.9em; }
+    #editPhoneNumbersModal .phone-entry-actions button { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size:0.8em; }
+    #editPhoneNumbersModal .phone-entry-actions button:hover { background: #c0392b; }
+    #editPhoneNumbersModal .add-phone-form { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;}
+    #editPhoneNumbersModal .add-phone-form .form-group { flex: 1 1 150px; margin-bottom: 0;}
+    #editPhoneNumbersModal .add-phone-form button { flex-basis: 100%; margin-top:10px; background-color: var(--success); }
+    @media (min-width: 768px) { /* Desktop view for add phone form */
+      #editPhoneNumbersModal .add-phone-form button { flex-basis: auto; margin-top:0px;}
+    }
+    #editPhoneNumbersModal #phoneNumbersListContainer { max-height: 250px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px;}
+
+
     /* Stili per #pageOverallStatus - Standardizzati */
     #pageOverallStatus {
       position: fixed;
-      bottom: 80px;
+      bottom: 80px; /* Adjusted to be above admin buttons */
       left: 50%;
       z-index: 1000;
       padding: 10px 20px;
@@ -235,21 +156,21 @@
       font-size: 0.9em;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
-      background-color: var(--primary);
+      background-color: var(--primary); /* Default color */
       color: white;
-      display: block;
+      display: block; /* Initially block but invisible */
       opacity: 0;
-      transform: translateX(-50%) translateY(30px);
+      transform: translateX(-50%) translateY(30px); /* Start off-screen */
       transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275), transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275);
-      pointer-events: none;
+      pointer-events: none; /* Prevent interaction when hidden */
       max-width: 90%;
       box-sizing: border-box;
     }
 
     #pageOverallStatus.active {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      pointer-events: auto;
+      transform: translateX(-50%) translateY(0); /* Slide in */
+      pointer-events: auto; /* Allow interaction when visible */
     }
 
     #pageOverallStatus.success {
@@ -259,6 +180,32 @@
     #pageOverallStatus.error {
       background-color: var(--danger, red);
     }
+    .phone-display-entry {
+      margin-bottom: 8px;
+      font-size: 1.3rem;
+      text-align: center;
+    }
+    .phone-buttons-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px; /* Space between buttons */
+      justify-content: center; /* Center buttons if they don't fill the row */
+      margin-top: 15px;
+    }
+
+    .phone-buttons-group .btn-contatto {
+      flex: 1 1 auto; /* Allow buttons to grow and shrink but maintain base size */
+      min-width: 150px; /* Minimum width for each button */
+      text-align: center;
+    }
+
+    /* Responsive: On smaller screens, stack buttons if needed */
+    @media (max-width: 480px) {
+      .phone-buttons-group .btn-contatto {
+        flex-basis: 100%; /* Each button takes full width on small screens */
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -337,40 +284,15 @@
           <span class="edit-icon-text" data-key="card1Description" data-type="textarea" title="Modifica Descrizione Card">✎</span>
         </div>
 
-        <div class="contatto-valore">
-          <div class="editable-text-wrapper">
-            <strong><span id="content-card1PhoneNumber1" data-content-key="card1PhoneNumber1"></span></strong>
-            (
-            <div class="editable-text-wrapper" style="display: inline-block;">
-              <strong><span id="content-card1PhoneName1" data-content-key="card1PhoneName1"></span></strong>
-              <span class="edit-icon-text" data-key="card1PhoneName1" data-type="text" title="Modifica Nome Referente">✎</span>
-            </div>
-            )
-            <span class="edit-icon-text" data-key="card1PhoneNumber1" data-type="tel" title="Modifica Numero Telefono">✎</span>
-          </div>
-        </div>
+        <button id="manageCard1PhonesBtn" class="btn-contatto btn-secondary" style="display:none; margin-top: 10px; margin-bottom:10px; background-color: var(--accent); color:white;">
+          <i class="fas fa-phone-square-alt"></i> Gestisci Numeri Telefono
+        </button>
 
-        <div class="contatto-valore">
-          <div class="editable-text-wrapper">
-            <strong><span id="content-card1PhoneNumber2" data-content-key="card1PhoneNumber2"></span></strong>
-            (
-            <div class="editable-text-wrapper" style="display: inline-block;">
-              <strong><span id="content-card1PhoneName2" data-content-key="card1PhoneName2"></span></strong>
-              <span class="edit-icon-text" data-key="card1PhoneName2" data-type="text" title="Modifica Nome Referente">✎</span>
-            </div>
-            )
-            <span class="edit-icon-text" data-key="card1PhoneNumber2" data-type="tel" title="Modifica Numero Telefono">✎</span>
-          </div>
+        <div id="card1PhoneNumbersContainer" class="mb-3" style="margin-top:15px;">
+          <!-- I numeri di telefono verranno inseriti qui dinamicamente -->
         </div>
-
-        <br>
-        <div class="phone-buttons-group">
-          <button class="btn-contatto half-btn" id="copyPhoneBtnCard1_1">
-            <i class="fas fa-copy"></i> Copia Numero 1
-          </button>
-          <button class="btn-contatto half-btn" id="copyPhoneBtnCard1_2">
-            <i class="fas fa-copy"></i> Copia Numero 2
-          </button>
+        <div id="card1PhoneCopyButtonsContainer" class="phone-buttons-group">
+          <!-- I pulsanti Copia Numero verranno inseriti qui dinamicamente -->
         </div>
       </div>
 
@@ -410,6 +332,7 @@
   </div>
 </main>
 
+<!-- Login Popup -->
 <div class="login-popup-overlay" id="loginOverlay"></div>
 <div class="login-popup" id="loginPopup">
   <button class="close-popup" id="closeLoginPopupBtn" aria-label="Chiudi popup"> × </button>
@@ -434,6 +357,7 @@
   </form>
 </div>
 
+<!-- Forgot Password Popup -->
 <div class="login-popup-overlay" id="forgotPasswordOverlay"></div>
 <div class="login-popup" id="forgotPasswordPopup">
   <button class="close-popup" id="closeForgotPasswordPopupBtn" aria-label="Chiudi popup">×</button>
@@ -450,13 +374,16 @@
     </div>
   </form>
 </div>
+
+<!-- Admin Edit Buttons Container -->
 <div id="editPageBtnContainer">
   <button id="editPageBtn"><i class="fas fa-pencil-alt"></i> Attiva Modifiche</button>
   <button id="savePageChangesBtn" style="display:none;"><i class="fas fa-save"></i> Salva Modifiche Pagina</button>
   <button id="cancelPageChangesBtn" style="display:none;"><i class="fas fa-times"></i> Annulla Modifiche</button>
 </div>
-<div id="pageOverallStatus"></div>
+<div id="pageOverallStatus"></div> <!-- Status Message Area -->
 
+<!-- Generic Content Edit Modal -->
 <div id="editContentModal" class="edit-content-modal">
   <div class="edit-content-modal-content">
     <button class="close-modal-btn" id="closeEditContentModalBtn" aria-label="Chiudi">×</button>
@@ -476,6 +403,41 @@
     </div>
   </div>
 </div>
+
+<!-- MODAL PER GESTIONE NUMERI TELEFONO -->
+<div id="editPhoneNumbersModal" class="edit-content-modal">
+  <div class="edit-content-modal-content">
+    <button class="close-modal-btn" id="closeEditPhoneNumbersModalBtn" aria-label="Chiudi">×</button>
+    <h3 id="editPhoneNumbersModalTitle">Gestisci Numeri di Telefono</h3>
+
+    <div id="phoneNumbersListContainer">
+      <!-- Lista dei numeri di telefono verrà popolata qui -->
+    </div>
+    <div id="editPhoneModalMessage" class="form-message" style="margin-bottom:1rem;"></div>
+
+    <form id="addPhoneForm" class="add-phone-form">
+      <div class="form-group">
+        <label for="phonePrefixInput">Prefisso (es. +39)</label>
+        <input type="text" id="phonePrefixInput" class="form-control" placeholder="+39" value="+39">
+      </div>
+      <div class="form-group">
+        <label for="phoneNumberInput">Numero</label>
+        <input type="tel" id="phoneNumberInput" class="form-control" placeholder="3331234567" required>
+      </div>
+      <div class="form-group">
+        <label for="phoneNameInput">Nome Referente</label>
+        <input type="text" id="phoneNameInput" class="form-control" placeholder="Nome" required>
+      </div>
+      <button type="submit" class="btn-popup"><i class="fas fa-plus"></i> Aggiungi Numero</button>
+    </form>
+
+    <div class="edit-content-modal-actions">
+      <button type="button" class="btn-popup btn-secondary" id="cancelEditPhoneNumbersModalBtn">Annulla</button>
+      <button type="button" class="btn-popup" id="savePhoneNumbersModalBtn">Salva Modifiche Numeri</button>
+    </div>
+  </div>
+</div>
+
 
 <div id="ai-assistant-fab" title="Assistente Virtuale Eremo">
   <i class="fas fa-headset"></i>
@@ -506,17 +468,18 @@
   let currentUserData = null;
   let isEditModeActive = false;
   let originalPageContentsForCancel = {};
-  let currentPageDbContents = {};
+  let currentPageDbContents = {}; // Questo conterrà i dati caricati dal server o i default
+  let tempPhoneNumbers = []; // Array temporaneo per modifiche nel modal dei telefoni
 
   const defaultPageContents = {
     pageTitle: "Contattaci",
     pageIntroText: "Siamo a disposizione per informazioni sulle nostre attività, sull'ospitalità o per qualsiasi altra domanda. Non esitare a contattarci!",
     card1Title: "Referenti Ospitalità",
     card1Description: "Per informazioni specifiche sui ritiri e l'accoglienza.",
-    card1PhoneNumber1: "+39 347 1900434",
-    card1PhoneName1: "Antonella",
-    card1PhoneNumber2: "+39 329 2142414",
-    card1PhoneName2: "Marina",
+    card1PhoneNumbers: [ // NUOVA STRUTTURA PER I NUMERI
+      { id: 'default-pn1', prefix: "+39", number: "3471900434", name: "Antonella" },
+      { id: 'default-pn2', prefix: "+39", number: "3292142414", name: "Marina" }
+    ],
     card2Title: "Indirizzo Email",
     card2Description: "Per richieste scritte e invio documentazione.",
     card2Email: "info.eremofrancesco@email.it",
@@ -524,22 +487,17 @@
     doveTrovarciAddress: "Via San Vito, 24027 Nembro BG"
   };
 
-  // Mappa per i nomi visualizzati nel modale di modifica
   const keyDisplayNameMap = {
     pageTitle: "Titolo Pagina",
     pageIntroText: "Testo Introduttivo",
     card1Title: "Titolo Card Telefono",
     card1Description: "Descrizione Card Telefono",
-    card1PhoneNumber1: "Numero Telefono 1",
-    card1PhoneName1: "Nome Referente 1",
-    card1PhoneNumber2: "Numero Telefono 2",
-    card1PhoneName2: "Nome Referente 2",
+    // card1PhoneNumbers non necessita di un display name qui perché ha un modal dedicato
     card2Title: "Titolo Card Email",
     card2Description: "Descrizione Card Email",
     card2Email: "Indirizzo Email",
     doveTrovarciHeading: "Titolo Sezione 'Dove Trovarci'",
     doveTrovarciAddress: "Indirizzo Eremo"
-    // Aggiungi qui altre chiavi se necessario per altre pagine
   };
 
 
@@ -575,53 +533,49 @@
     const dropdownProfilo = gebi('dropdownProfilo');
     const dropdownPrenotazioni = gebi('dropdownPrenotazioni');
     const dropdownDashboard = gebi('dropdownDashboard');
-    const dropdownGestioneEventi = gebi('dropdownGestioneEventi'); // Modificato per usare un ID univoco
-    const dropdownLogout = gebi('dropdownLogout'); // Assicurati che questo esista
+    const dropdownGestioneEventi = gebi('dropdownGestioneEventi');
+    const dropdownLogout = gebi('dropdownLogout');
     const loginBtnMobile = gebi('login-btn-mobile');
     const mobileNavProfilo = gebi('mobileNavProfilo');
     const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni');
     const mobileNavDashboard = gebi('mobileNavDashboard');
-    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); // Modificato per usare un ID univoco
+    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin');
     const mobileLogoutLink = gebi('mobileLogoutLink');
     const mobileMenuSeparator = gebi('mobileMenuSeparator');
     const editPageBtnContainer = gebi('editPageBtnContainer');
 
-    // Reset iniziale di tutti gli item specifici dell'utente/admin
     [loginBtnDesktop, userDropdownContainer, dropdownProfilo, dropdownPrenotazioni, dropdownDashboard, dropdownGestioneEventi, loginBtnMobile, mobileNavProfilo, mobileNavPrenotazioni, mobileNavDashboard, mobileNavGestioneEventiAdmin, mobileLogoutLink, mobileMenuSeparator].forEach(el => { if (el) el.style.display = 'none'; });
-    if(dropdownLogout) dropdownLogout.style.display = 'none'; // Nascondi anche logout inizialmente
+    if(dropdownLogout) dropdownLogout.style.display = 'none';
 
-    if (currentUserData) { // Utente Loggato
+    if (currentUserData) {
       if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
       if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
       const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
       if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
-      if (dropdownLogout) dropdownLogout.style.display = 'block'; // Mostra Logout Desktop
+      if (dropdownLogout) dropdownLogout.style.display = 'block';
       if (mobileLogoutLink) mobileLogoutLink.style.display = 'block';
       if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
 
-      if (currentUserData.isAdmin) { // ADMIN LOGGATO
+      if (currentUserData.isAdmin) {
         if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
         if (dropdownProfilo) dropdownProfilo.style.display = 'block';
         if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
         if (dropdownDashboard) dropdownDashboard.style.display = 'block';
         if (mobileNavDashboard) mobileNavDashboard.style.display = 'block';
-
-        // Nascondi "Le mie prenotazioni" e "Gestione Eventi" per admin
         if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none';
         if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
         if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none';
         if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none';
 
-      } else { // UTENTE NORMALE LOGGATO
+      } else {
         if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
         if (dropdownProfilo) dropdownProfilo.style.display = 'block';
         if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
         if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block';
         if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
-        // Dashboard e Gestione Eventi rimangono 'none' dal reset iniziale
         if(editPageBtnContainer) editPageBtnContainer.classList.remove('active');
       }
-    } else { // UTENTE NON LOGGATO
+    } else {
       if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
       if (loginBtnMobile) loginBtnMobile.style.display = 'block';
       if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
@@ -662,7 +616,7 @@
         await loadPageContentsFromServer();
 
         if (currentUserData.isAdmin) {
-          toggleEditMode(false);
+          toggleEditMode(false); // Inizializza la modalità modifica (ma non la attiva)
         }
         showPageStatus(`Benvenuto/a ${currentUserData.nome}!`, "success");
 
@@ -689,7 +643,7 @@
   const forgotPasswordForm = document.getElementById('forgotPasswordForm');
   const forgotPasswordMessage = document.getElementById('forgot-password-message');
   function openForgotPasswordPopup() { if (typeof closeLoginPopup === 'function' && loginPopup?.classList.contains('active')) { closeLoginPopup(); } if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active'); document.body.style.overflow = 'hidden'; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; const forgotEmailInput = document.getElementById('forgot-email'); if(forgotEmailInput) forgotEmailInput.focus(); }
-  function closeForgotPasswordPopup() { if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active'); let anyOtherPagePopupActive = document.querySelector('#loginPopup.active, #editContentModal.active'); if (!anyOtherPagePopupActive) { document.body.style.overflow = ''; } if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; if(forgotPasswordForm) forgotPasswordForm.reset(); }
+  function closeForgotPasswordPopup() { if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active'); let anyOtherPagePopupActive = document.querySelector('#loginPopup.active, #editContentModal.active, #editPhoneNumbersModal.active'); if (!anyOtherPagePopupActive) { document.body.style.overflow = ''; } if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; if(forgotPasswordForm) forgotPasswordForm.reset(); }
   if (forgotPasswordLink) { forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); openForgotPasswordPopup(); }); }
   if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
   if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
@@ -699,22 +653,37 @@
   const editContentModal=gebi('editContentModal'); const closeEditContentModalBtn=gebi('closeEditContentModalBtn');const editModalTitle=gebi('editModalTitle'); const editModalTextarea=gebi('editModalTextarea');const editModalInputText=gebi('editModalInputText'); const editModalInputUrl = gebi('editModalInputUrl'); const editModalInputEmail = gebi('editModalInputEmail'); const editModalInputTel = gebi('editModalInputTel'); const editModalFieldLabelText=gebi('editModalFieldLabelText'); const saveEditModalBtn=gebi('saveEditModalBtn');const cancelEditModalBtn=gebi('cancelEditModalBtn'); const editModalMessage=gebi('editModalMessage');const pageOverallStatus=gebi('pageOverallStatus');
   let currentEditingKey=null;let currentEditingType='text';
 
+  // NUOVI elementi per il modal dei telefoni
+  const editPhoneNumbersModal = gebi('editPhoneNumbersModal');
+  const closeEditPhoneNumbersModalBtn = gebi('closeEditPhoneNumbersModalBtn');
+  const cancelEditPhoneNumbersModalBtn = gebi('cancelEditPhoneNumbersModalBtn');
+  const savePhoneNumbersModalBtn = gebi('savePhoneNumbersModalBtn');
+  const addPhoneForm = gebi('addPhoneForm');
+  const phoneNumbersListContainer = gebi('phoneNumbersListContainer');
+  const manageCard1PhonesBtn = gebi('manageCard1PhonesBtn');
+  const editPhoneModalMessage = gebi('editPhoneModalMessage');
+
+
   function showPageStatus(message, type = 'info', duration = 3000) {
     if (!pageOverallStatus) return;
     pageOverallStatus.textContent = message;
-    pageOverallStatus.className = 'form-message';
-    pageOverallStatus.classList.remove('success', 'error', 'active');
+    pageOverallStatus.className = ''; // Reset classes
+    pageOverallStatus.classList.add('active'); // Always add active to trigger transition
 
     if (type === 'success') {
       pageOverallStatus.classList.add('success');
     } else if (type === 'error') {
       pageOverallStatus.classList.add('error');
+    } else {
+      pageOverallStatus.classList.add('info'); // Default or 'info' type
     }
+
     if (pageOverallStatus.hideTimeout) {
       clearTimeout(pageOverallStatus.hideTimeout);
     }
+
+    // Force reflow to restart animation if class was already there
     void pageOverallStatus.offsetHeight;
-    pageOverallStatus.classList.add('active');
 
     pageOverallStatus.hideTimeout = setTimeout(() => {
       pageOverallStatus.classList.remove('active');
@@ -727,32 +696,34 @@
       const r=await fetch(`api_get_page_content.php?page=${PAGE_NAME_FOR_CONTENT}`);
       if(!r.ok)throw new Error(`Errore server: ${r.status}`);
       const d=await r.json();
-      if(d.success&&d.contents&&Object.keys(d.contents).length>0){ currentPageDbContents=d.contents; }
-      else { currentPageDbContents=JSON.parse(JSON.stringify(defaultPageContents)); }
+      if(d.success&&d.contents&&Object.keys(d.contents).length>0){
+        currentPageDbContents=d.contents;
+        // Assicura che card1PhoneNumbers sia un array
+        if (!Array.isArray(currentPageDbContents.card1PhoneNumbers)) {
+          currentPageDbContents.card1PhoneNumbers = defaultPageContents.card1PhoneNumbers.map(p => ({...p}));
+        }
+      }
+      else {
+        currentPageDbContents=JSON.parse(JSON.stringify(defaultPageContents));
+      }
     }catch(err){
       console.error("Errore caricamento contenuti:",err);
       currentPageDbContents=JSON.parse(JSON.stringify(defaultPageContents));
       showPageStatus("Errore caricamento. Usati valori predefiniti.","error");
     }
     applyContentsToPage(currentPageDbContents);
-    originalPageContentsForCancel=JSON.parse(JSON.stringify(currentPageDbContents));
+    originalPageContentsForCancel=JSON.parse(JSON.stringify(currentPageDbContents)); // Salva una copia profonda
   }
 
   function applyContentsToPage(contents) {
     document.querySelectorAll('[data-content-key]').forEach(el => {
       const key = el.dataset.contentKey;
-      let contentValue = contents[key] !== undefined ? contents[key] : defaultPageContents[key];
-      if (typeof contentValue !== 'string') contentValue = String(contentValue || '');
+      if (key === 'card1PhoneNumbers') return; // Gestito da renderCard1PhoneNumbers
 
-      // Handle the strong tags for phone numbers and names
-      if (key === 'card1PhoneNumber1' || key === 'card1PhoneName1' ||
-              key === 'card1PhoneNumber2' || key === 'card1PhoneName2') {
-        // We assume the stored content does NOT include the strong tag,
-        // as the HTML structure explicitly adds it.
-        // So, we just set the innerHTML of the span.
-        el.innerHTML = formatHTMLContent(contentValue);
-      }
-      else if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') { el.src = contentValue; }
+      let contentValue = contents[key] !== undefined ? contents[key] : defaultPageContents[key];
+      if (typeof contentValue !== 'string' && key !== 'card1PhoneNumbers') contentValue = String(contentValue || '');
+
+      if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') { el.src = contentValue; }
       else if (el.tagName === 'A' && key === 'locationDirectionsButtonHref') { el.href = contentValue; }
       else { el.innerHTML = formatHTMLContent(contentValue); }
 
@@ -761,7 +732,36 @@
         if (mailLink) mailLink.href = `mailto:${contentValue.trim().replace(/<br\s*\/?>/gi, "")}`;
       }
     });
+    renderCard1PhoneNumbers(contents.card1PhoneNumbers || defaultPageContents.card1PhoneNumbers);
   }
+
+  function renderCard1PhoneNumbers(phoneNumbersArray) {
+    const numbersContainer = gebi('card1PhoneNumbersContainer');
+    const copyButtonsContainer = gebi('card1PhoneCopyButtonsContainer');
+    if (!numbersContainer || !copyButtonsContainer) return;
+
+    numbersContainer.innerHTML = ''; // Pulisci i numeri esistenti
+    copyButtonsContainer.innerHTML = ''; // Pulisci i bottoni copia esistenti
+
+    if (!phoneNumbersArray || phoneNumbersArray.length === 0) {
+      numbersContainer.innerHTML = '<p class="text-center" style="font-style: italic;">Nessun numero di telefono configurato.</p>';
+      return;
+    }
+
+    phoneNumbersArray.forEach((phone, index) => {
+      const numberDiv = document.createElement('div');
+      numberDiv.classList.add('phone-display-entry'); // Per eventuale styling
+      numberDiv.innerHTML = `<strong>${phone.prefix} ${phone.number}</strong> (${phone.name})`;
+      numbersContainer.appendChild(numberDiv);
+
+      const copyBtn = document.createElement('button');
+      copyBtn.classList.add('btn-contatto');
+      copyBtn.innerHTML = `<i class="fas fa-copy"></i> Copia Numero ${phone.name || (index + 1)}`;
+      copyBtn.addEventListener('click', () => copyPhoneNumberToClipboard(`${phone.prefix}${phone.number}`, copyBtn));
+      copyButtonsContainer.appendChild(copyBtn);
+    });
+  }
+
 
   function toggleEditMode(enable){
     isEditModeActive=enable;
@@ -770,37 +770,10 @@
         icon.style.display = 'flex';
         const parentWrapper = icon.closest('.editable-text-wrapper');
         if (parentWrapper) {
-          let translateX = '50%';
-          let translateY = '-50%';
-
-          if (parentWrapper.classList.contains('main-title-editable-wrapper')) {
-            translateX = '50%';
-            translateY = '-50%';
-          } else if (parentWrapper.closest('.contatto-card')) {
-            const dataKey = icon.dataset.key;
-            // Specific positioning for phone numbers and names within the phone card
-            if (dataKey.includes('card1PhoneNumber') || dataKey.includes('card1PhoneName')) {
-              // These are already positioned relative to their parent 'editable-text-wrapper'
-              // in the CSS, so the translate values here are just for the offset.
-              translateX = '5px';
-              translateY = '-50%';
-            } else if (parentWrapper.querySelector('h3')) {
-              translateX = 'calc(100% + 5px)';
-              translateY = '-50%';
-            } else if (parentWrapper.querySelector('p')) {
-              translateX = 'calc(100% + 5px)';
-              translateY = '-50%';
-            }
-          } else if (parentWrapper.closest('.text-center')) {
-            const tagName = parentWrapper.querySelector('[data-content-key]')?.tagName;
-            if (tagName === 'H2') {
-              translateX = 'calc(100% + 5px)';
-              translateY = '-50%';
-            } else if (tagName === 'P') {
-              translateX = 'calc(100% + 5px)';
-              translateY = '-50%';
-            }
-          }
+          let translateX = '50%'; let translateY = '-50%';
+          if (parentWrapper.classList.contains('main-title-editable-wrapper')) {translateX = '50%'; translateY = '-50%';}
+          else if (parentWrapper.closest('.contatto-card')) {translateX = 'calc(100% + 0px)'; translateY = '-50%';}
+          else if (parentWrapper.closest('.text-center')) {translateX = 'calc(100% + 5px)'; translateY = '-50%';}
           icon.style.setProperty('--custom-translate-x', translateX);
           icon.style.setProperty('--custom-translate-y', translateY);
         }
@@ -811,16 +784,17 @@
       } else {
         icon.style.opacity = '0';
         icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(0.8)`;
-        setTimeout(() => {
-          icon.style.display = 'none';
-        }, 300);
+        setTimeout(() => { icon.style.display = 'none'; }, 300);
       }
     });
+
+    if(manageCard1PhonesBtn) manageCard1PhonesBtn.style.display = (currentUserData?.isAdmin && enable) ? 'block' : 'none';
 
     const editContainer=gebi('editPageBtnContainer');
     const editBtn=gebi('editPageBtn');
     const saveBtn=gebi('savePageChangesBtn');
     const cancelBtn=gebi('cancelPageChangesBtn');
+
     if(editContainer) {
       if (currentUserData?.isAdmin) {
         editContainer.classList.add('active');
@@ -841,69 +815,111 @@
     currentEditingKey=key;currentEditingType=type;
     if(!editContentModal||!editModalMessage)return;
     editModalMessage.style.display='none';editModalMessage.textContent='';
-
-    // Usa la mappa per ottenere il nome visualizzato, altrimenti usa la chiave
     editModalTitle.textContent=`Modifica: ${keyDisplayNameMap[key] || key}`;
-
     editModalTextarea.style.display='none';editModalInputText.style.display='none';
     editModalInputUrl.style.display='none'; editModalInputEmail.style.display='none'; editModalInputTel.style.display='none';
 
     let valForInput = currentValue;
-    const tmp = document.createElement('div');
-    tmp.innerHTML = currentValue;
+    const tmp = document.createElement('div'); tmp.innerHTML = currentValue;
     const plainTextValue = (tmp.textContent || "").replace(/<br\s*\/?>/gi, "\n");
 
-    if (type === 'iframe_src' || type === 'href') {
-      editModalFieldLabelText.textContent = (type === 'iframe_src' ? "URL Mappa (src iframe):" : "URL Link:");
-      editModalInputUrl.value = valForInput; // Use raw valForInput for URLs
-      editModalInputUrl.style.display='block'; editModalInputUrl.focus();
-    } else if (type === 'email') {
-      editModalFieldLabelText.textContent = "Indirizzo Email:";
-      editModalInputEmail.value = plainTextValue;
-      editModalInputEmail.style.display='block'; editModalInputEmail.focus();
-    } else if (type === 'tel') {
-      editModalFieldLabelText.textContent = "Numero Telefono:";
-      editModalInputTel.value = plainTextValue;
-      editModalInputTel.style.display='block'; editModalInputTel.focus();
-    } else if (type === 'textarea') {
-      editModalFieldLabelText.textContent="Testo (paragrafo):";
-      editModalTextarea.value= plainTextValue;
-      editModalTextarea.style.display='block';editModalTextarea.focus();
-    } else { // text
-      editModalFieldLabelText.textContent="Testo (titolo/corto):";
-      editModalInputText.value= plainTextValue;
-      editModalInputText.style.display='block';editModalInputText.focus();
-    }
+    if (type === 'iframe_src' || type === 'href') { editModalFieldLabelText.textContent = (type === 'iframe_src' ? "URL Mappa (src iframe):" : "URL Link:"); editModalInputUrl.value = valForInput; editModalInputUrl.style.display='block'; editModalInputUrl.focus(); }
+    else if (type === 'email') { editModalFieldLabelText.textContent = "Indirizzo Email:"; editModalInputEmail.value = plainTextValue; editModalInputEmail.style.display='block'; editModalInputEmail.focus(); }
+    else if (type === 'tel') { editModalFieldLabelText.textContent = "Numero Telefono:"; editModalInputTel.value = plainTextValue; editModalInputTel.style.display='block'; editModalInputTel.focus(); }
+    else if (type === 'textarea') { editModalFieldLabelText.textContent="Testo (paragrafo):"; editModalTextarea.value= plainTextValue; editModalTextarea.style.display='block';editModalTextarea.focus(); }
+    else { editModalFieldLabelText.textContent="Testo (titolo/corto):"; editModalInputText.value= plainTextValue; editModalInputText.style.display='block';editModalInputText.focus(); }
     editContentModal.style.display='flex';
   }
 
   function closeEditContentModal(){if(editContentModal)editContentModal.style.display='none';currentEditingKey=null;}
+
   if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
+
   if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{
-    const contentsToSave = { ...currentPageDbContents };
-    // Raccogli i dati aggiornati direttamente dagli elementi DOM per sicurezza
+    const contentsToSave = JSON.parse(JSON.stringify(currentPageDbContents));
     document.querySelectorAll('[data-content-key]').forEach(el => {
       const key = el.dataset.contentKey;
-      // For phone numbers and names, we want to save the plain text content without the strong tag
-      if (key === 'card1PhoneNumber1' || key === 'card1PhoneName1' ||
-              key === 'card1PhoneNumber2' || key === 'card1PhoneName2') {
-        contentsToSave[key] = currentPageDbContents[key]; // Already updated with raw value
-      }
-      else if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') { contentsToSave[key] = el.src; }
+      if (key === 'card1PhoneNumbers') {
+        if (!Array.isArray(contentsToSave[key])) {
+          contentsToSave[key] = [];
+        }
+      } else if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') { contentsToSave[key] = el.src; }
       else if (el.tagName === 'A' && key === 'locationDirectionsButtonHref') { contentsToSave[key] = el.href; }
-      else { contentsToSave[key] = currentPageDbContents[key]; } // Use the raw value from currentPageDbContents
+      else { contentsToSave[key] = currentPageDbContents[key]; }
     });
-    const btn=savePageChangesBtn;const oldHtml=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
-    try{
-      const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});
-      const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");
+
+    const btn=savePageChangesBtn; const oldHtml=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
+
+    try {
+      const response = await fetch('api_save_page_content.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page_name: PAGE_NAME_FOR_CONTENT, contents: contentsToSave })
+      });
+
+      const responseText = await response.text(); // Ottieni prima la risposta come testo
+
+      if (!response.ok) {
+        // Il server ha restituito un codice di stato di errore (4xx, 5xx)
+        let errorMessage = `Errore server: ${response.status}`;
+        try {
+          // Prova a interpretare come JSON se il tipo di contenuto lo suggerisce
+          if (response.headers.get("content-type")?.includes("application/json")) {
+            const errorJson = JSON.parse(responseText);
+            errorMessage = errorJson.message || responseText;
+          } else {
+            // Altrimenti usa il testo (potrebbe essere un errore HTML da PHP)
+            errorMessage = responseText.substring(0, 300) + (responseText.length > 300 ? "..." : "");
+          }
+        } catch (e) {
+          // Non JSON o JSON malformato. Usa il testo grezzo.
+          errorMessage = responseText.substring(0, 300) + (responseText.length > 300 ? "..." : "");
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Prova a interpretare la risposta come JSON
+      let jsonData;
+      try {
+        jsonData = JSON.parse(responseText);
+      } catch (e) {
+        // Qui è dove verrebbe catturato "Unexpected token '<'" se la risposta è HTML
+        console.error("Errore parsing JSON dalla risposta del server:", e);
+        console.error("Testo della risposta ricevuto dal server:", responseText);
+        throw new Error("Risposta non valida dal server. Controllare la console per i dettagli.");
+      }
+
+      if (!jsonData.success) {
+        throw new Error(jsonData.message || "Errore sconosciuto durante il salvataggio dei contenuti.");
+      }
+
+      // Successo
       currentPageDbContents = JSON.parse(JSON.stringify(contentsToSave));
       originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents));
-      showPageStatus(j.message||'Modifiche salvate!','success');toggleEditMode(false);
-    }catch(err){console.error("Errore salvataggio:",err);showPageStatus(`Errore: ${err.message}`,'error');}
-    finally{btn.disabled=false;btn.innerHTML=oldHtml;}
+      showPageStatus(jsonData.message || 'Modifiche salvate!', 'success');
+      toggleEditMode(false);
+
+    } catch (err) {
+      console.error("Errore durante il salvataggio (catch generale):", err);
+      // Mostra un messaggio di errore più dettagliato se possibile
+      let displayMessage = `Errore: ${err.message}`;
+      if (err.message.includes("Risposta non valida dal server") || err.message.includes("Errore server:")) {
+        // Non aggiungere "Errore:" due volte
+        displayMessage = err.message;
+      }
+      showPageStatus(displayMessage, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = oldHtml;
+    }
   });
-  if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{applyContentsToPage(originalPageContentsForCancel); currentPageDbContents = JSON.parse(JSON.stringify(originalPageContentsForCancel)); toggleEditMode(false);showPageStatus('Modifiche annullate.','info');});
+
+  if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{
+    applyContentsToPage(originalPageContentsForCancel);
+    currentPageDbContents = JSON.parse(JSON.stringify(originalPageContentsForCancel));
+    toggleEditMode(false);
+    showPageStatus('Modifiche annullate.','info');
+  });
 
   document.addEventListener('click',function(e){
     if(!isEditModeActive||!currentUserData?.isAdmin)return;
@@ -916,10 +932,7 @@
       if(!elToEdit){console.error(`Elemento con id content-${key} non trovato`);return;}
       if (type === 'iframe_src') { currentVal = elToEdit.src; }
       else if (type === 'href') { currentVal = elToEdit.href; }
-      else { // text, textarea, email, tel
-        // For these, always fetch the raw (potentially un-HTML-formatted) value
-        currentVal = currentPageDbContents[key] !== undefined ? currentPageDbContents[key] : defaultPageContents[key];
-      }
+      else { currentVal = currentPageDbContents[key] !== undefined ? currentPageDbContents[key] : defaultPageContents[key]; }
       openEditModal(key, type, currentVal);
     }
   });
@@ -932,92 +945,154 @@
     let targetElement = gebi(`content-${currentEditingKey}`);
     if(!targetElement){if(editModalMessage){editModalMessage.textContent="Err: Elem. non trovato.";editModalMessage.className='form-message error';editModalMessage.style.display='block';}return;}
 
-    let newValueRaw='';
-    let formattedNewValue = '';
+    let newValueRaw=''; let formattedNewValue = '';
+    if(currentEditingType === 'iframe_src' || currentEditingType === 'href'){ newValueRaw = editModalInputUrl.value.trim(); formattedNewValue = newValueRaw; }
+    else if(currentEditingType === 'email'){ newValueRaw = editModalInputEmail.value.trim(); formattedNewValue = formatHTMLContent(newValueRaw); }
+    else if(currentEditingType === 'tel'){ newValueRaw = editModalInputTel.value.trim(); formattedNewValue = formatHTMLContent(newValueRaw); }
+    else { newValueRaw = currentEditingType === 'textarea' ? editModalTextarea.value : editModalInputText.value; formattedNewValue = formatHTMLContent(newValueRaw); }
 
-    if(currentEditingType === 'iframe_src' || currentEditingType === 'href'){
-      newValueRaw = editModalInputUrl.value.trim();
-      formattedNewValue = newValueRaw;
-    } else if(currentEditingType === 'email'){
-      newValueRaw = editModalInputEmail.value.trim();
-      formattedNewValue = formatHTMLContent(newValueRaw);
-    } else if(currentEditingType === 'tel'){
-      newValueRaw = editModalInputTel.value.trim();
-      formattedNewValue = formatHTMLContent(newValueRaw);
-    } else { // text or textarea
-      newValueRaw = currentEditingType === 'textarea' ? editModalTextarea.value : editModalInputText.value;
-      formattedNewValue = formatHTMLContent(newValueRaw);
-    }
-
-    // Apply the new value to the element on the page
     if(currentEditingType === 'iframe_src') { targetElement.src = formattedNewValue; }
     else if (currentEditingType === 'href') { targetElement.href = formattedNewValue; }
     else { targetElement.innerHTML = formattedNewValue; }
-
-    // Update currentPageDbContents with the plain text value for saving
     currentPageDbContents[currentEditingKey] = newValueRaw;
-
-    if (currentEditingKey === 'card2Email') {
-      const mailLink = gebi('mailtoLinkCard2');
-      if (mailLink) mailLink.href = `mailto:${newValueRaw.trim()}`;
-    }
+    if (currentEditingKey === 'card2Email') { const mailLink = gebi('mailtoLinkCard2'); if (mailLink) mailLink.href = `mailto:${newValueRaw.trim()}`; }
     closeEditContentModal();
   });
 
-  function copyDisplayedPhoneNumber(elementId, button) {
-    const phoneElement = gebi(elementId);
-    if (phoneElement) {
-      const phoneNumber = phoneElement.textContent.trim();
-      navigator.clipboard.writeText(phoneNumber).then(() => {
-        const originalText = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check" style="margin-right: 5px;"></i> Copiato!';
-        setTimeout(() => {
-          button.innerHTML = originalText;
-        }, 2000);
-      }).catch(err => {
-        console.error("Errore durante la copia: ", err);
-        alert("Errore nella copia del numero. Selezionalo manualmente.");
-      });
+  function copyPhoneNumberToClipboard(phoneNumber, button) {
+    navigator.clipboard.writeText(phoneNumber).then(() => {
+      const originalText = button.innerHTML;
+      button.innerHTML = '<i class="fas fa-check" style="margin-right: 5px;"></i> Copiato!';
+      setTimeout(() => { button.innerHTML = originalText; }, 2000);
+    }).catch(err => {
+      console.error("Errore durante la copia: ", err);
+      // Non usare alert, usa showPageStatus o un messaggio nel modal
+      showPageStatus("Errore copia numero. Seleziona manualmente.", "error");
+    });
+  }
+
+  // ----- LOGICA MODAL GESTIONE NUMERI TELEFONO -----
+  function openEditPhoneNumbersModal() {
+    if (!editPhoneNumbersModal) return;
+    // Clona profondamente i numeri attuali in tempPhoneNumbers per modifiche isolate
+    tempPhoneNumbers = JSON.parse(JSON.stringify(currentPageDbContents.card1PhoneNumbers || []));
+    renderPhoneNumbersInModal();
+    editPhoneModalMessage.style.display = 'none';
+    editPhoneNumbersModal.style.display = 'flex';
+    gebi('phoneNumberInput').focus();
+  }
+
+  function closeEditPhoneNumbersModal() {
+    if (editPhoneNumbersModal) editPhoneNumbersModal.style.display = 'none';
+    addPhoneForm.reset(); // Pulisci il form di aggiunta
+    gebi('phonePrefixInput').value = "+39"; // Reimposta il prefisso
+  }
+
+  function renderPhoneNumbersInModal() {
+    if (!phoneNumbersListContainer) return;
+    phoneNumbersListContainer.innerHTML = ''; // Pulisci lista
+
+    if (tempPhoneNumbers.length === 0) {
+      phoneNumbersListContainer.innerHTML = '<p style="text-align:center; font-style:italic;">Nessun numero aggiunto. Usa il form sotto.</p>';
+      return;
     }
-  }
 
-  const copyPhoneBtn1_1 = gebi('copyPhoneBtnCard1_1');
-  if(copyPhoneBtn1_1) {
-    copyPhoneBtn1_1.addEventListener('click', function() {
-      copyDisplayedPhoneNumber('content-card1PhoneNumber1', this);
+    tempPhoneNumbers.forEach((phone, index) => {
+      const entryDiv = document.createElement('div');
+      entryDiv.classList.add('phone-entry');
+      entryDiv.innerHTML = `
+        <div class="phone-entry-details">
+          <span><strong>Prefisso:</strong> ${phone.prefix}</span>
+          <span><strong>Numero:</strong> ${phone.number}</span>
+          <span><strong>Nome:</strong> ${phone.name}</span>
+        </div>
+        <div class="phone-entry-actions">
+          <button data-index="${index}" class="remove-phone-btn"><i class="fas fa-trash-alt"></i> Rimuovi</button>
+        </div>
+      `;
+      phoneNumbersListContainer.appendChild(entryDiv);
+    });
+
+    // Aggiungi event listener ai nuovi bottoni "Rimuovi"
+    document.querySelectorAll('#editPhoneNumbersModal .remove-phone-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const indexToRemove = parseInt(this.dataset.index, 10);
+        tempPhoneNumbers.splice(indexToRemove, 1);
+        renderPhoneNumbersInModal(); // Ri-renderizza la lista nel modal
+      });
     });
   }
 
-  const copyPhoneBtn1_2 = gebi('copyPhoneBtnCard1_2');
-  if(copyPhoneBtn1_2) {
-    copyPhoneBtn1_2.addEventListener('click', function() {
-      copyDisplayedPhoneNumber('content-card1PhoneNumber2', this);
+  if (addPhoneForm) {
+    addPhoneForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const prefix = gebi('phonePrefixInput').value.trim();
+      const number = gebi('phoneNumberInput').value.trim();
+      const name = gebi('phoneNameInput').value.trim();
+
+      if (!number || !name) {
+        editPhoneModalMessage.textContent = "Numero e Nome sono obbligatori.";
+        editPhoneModalMessage.className = 'form-message error';
+        editPhoneModalMessage.style.display = 'block';
+        return;
+      }
+      if (!/^\d+$/.test(number)) {
+        editPhoneModalMessage.textContent = "Il numero di telefono può contenere solo cifre.";
+        editPhoneModalMessage.className = 'form-message error';
+        editPhoneModalMessage.style.display = 'block';
+        return;
+      }
+      if (prefix && !/^\+\d+$/.test(prefix)) {
+        editPhoneModalMessage.textContent = "Il prefisso deve iniziare con '+' seguito da cifre (es. +39).";
+        editPhoneModalMessage.className = 'form-message error';
+        editPhoneModalMessage.style.display = 'block';
+        return;
+      }
+
+
+      editPhoneModalMessage.style.display = 'none';
+      tempPhoneNumbers.push({ id: `temp-${Date.now()}`, prefix, number, name });
+      renderPhoneNumbersInModal();
+      this.reset(); // Pulisci il form
+      gebi('phonePrefixInput').value = "+39"; // Reimposta il prefisso
+      gebi('phoneNumberInput').focus();
     });
   }
+
+  if (manageCard1PhonesBtn) {
+    manageCard1PhonesBtn.addEventListener('click', openEditPhoneNumbersModal);
+  }
+
+  if (savePhoneNumbersModalBtn) {
+    savePhoneNumbersModalBtn.addEventListener('click', function() {
+      // Salva i numeri da tempPhoneNumbers a currentPageDbContents
+      currentPageDbContents.card1PhoneNumbers = JSON.parse(JSON.stringify(tempPhoneNumbers));
+      renderCard1PhoneNumbers(currentPageDbContents.card1PhoneNumbers); // Aggiorna la visualizzazione principale
+      closeEditPhoneNumbersModal();
+      showPageStatus('Numeri di telefono aggiornati. Ricorda di salvare le modifiche generali della pagina.', 'info', 4000);
+    });
+  }
+
+  if (cancelEditPhoneNumbersModalBtn) {
+    cancelEditPhoneNumbersModalBtn.addEventListener('click', closeEditPhoneNumbersModal);
+  }
+  if (closeEditPhoneNumbersModalBtn) {
+    closeEditPhoneNumbersModalBtn.addEventListener('click', closeEditPhoneNumbersModal);
+  }
+  // ----- FINE LOGICA MODAL GESTIONE NUMERI TELEFONO -----
+
 
   async function loadNavbarLogo() {
     const logoImgTag = document.getElementById('navbarLogoImgTag');
-    if (!logoImgTag) {
-      console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in contatti.html.");
-      return;
-    }
+    if (!logoImgTag) { console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in contatti.html."); return; }
     const defaultLogoPath = 'images/Logo_eremo.png';
     try {
       const response = await fetch('api_get_page_content.php?page=index');
-      if (!response.ok) {
-        throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
-      }
+      if (!response.ok) { throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`); }
       const data = await response.json();
-      if (data.success && data.contents && data.contents.navbarLogo) {
-        logoImgTag.src = data.contents.navbarLogo;
-      } else {
-        console.warn("URL del logo navbar non trovato o errore API. Uso il logo di default.");
-        logoImgTag.src = defaultLogoPath;
-      }
-    } catch (error) {
-      console.error("Errore nel caricare dinamicamente il logo navbar:", error);
-      logoImgTag.src = defaultLogoPath;
-    }
+      if (data.success && data.contents && data.contents.navbarLogo) { logoImgTag.src = data.contents.navbarLogo; }
+      else { console.warn("URL del logo navbar non trovato o errore API. Uso il logo di default."); logoImgTag.src = defaultLogoPath; }
+    } catch (error) { console.error("Errore nel caricare dinamicamente il logo navbar:", error); logoImgTag.src = defaultLogoPath; }
   }
 
   document.addEventListener('DOMContentLoaded',async()=>{
@@ -1030,9 +1105,9 @@
 
     const editContainer = gebi('editPageBtnContainer');
     if (currentUserData && currentUserData.isAdmin) {
-      toggleEditMode(false);
+      toggleEditMode(false); // Inizializza ma non attiva la modalità modifica
     } else {
-      toggleEditMode(false);
+      toggleEditMode(false); // Assicura che sia disattivata per non admin
       if(editContainer) editContainer.classList.remove('active');
     }
 
@@ -1041,6 +1116,7 @@
         if(loginPopup?.classList.contains('active')) closeLoginPopup();
         if(gebi('forgotPasswordPopup')?.classList.contains('active')) closeForgotPasswordPopup();
         if(editContentModal?.style.display==='flex') closeEditContentModal();
+        if(editPhoneNumbersModal?.style.display==='flex') closeEditPhoneNumbersModal(); // Chiudi anche il modal dei telefoni
       }
     });
   });
