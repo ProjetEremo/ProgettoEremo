@@ -1,4 +1,4 @@
-// File: assistenteAI.js (Versione Rivoluzionata e Corretta v14 - Migliorata Risposta Prenotazione e Completo)
+// File: assistenteAI.js (Versione Rivoluzionata e Corretta v14 - Migliorata Risposta Prenotazione e Completo + GET_PAGE_CONTENT)
 document.addEventListener('DOMContentLoaded', () => {
     const aiAssistantFabEl = document.getElementById('ai-assistant-fab');
     const aiChatPopupEl = document.getElementById('ai-chat-popup');
@@ -144,7 +144,7 @@ Analizza la richiesta dell'utente per il sito "Eremo Frate Francesco". Data e or
 Devi rispondere ESCLUSIVAMENTE con un oggetto JSON valido. Non includere testo al di fuori dell'oggetto JSON.
 
 Determina i seguenti campi:
-1.  "intent": L'azione principale. Valori possibili: GET_EVENTS, GET_EVENT_DETAILS, START_BOOKING_FLOW, COLLECT_BOOKING_DETAILS, CONFIRM_BOOKING_DETAILS, GET_USER_PROFILE, GET_USER_BOOKINGS, GENERAL_QUERY, UNKNOWN.
+1.  "intent": L'azione principale. Valori possibili: GET_EVENTS, GET_EVENT_DETAILS, START_BOOKING_FLOW, COLLECT_BOOKING_DETAILS, CONFIRM_BOOKING_DETAILS, GET_USER_PROFILE, GET_USER_BOOKINGS, GET_PAGE_CONTENT, GENERAL_QUERY, UNKNOWN.
     - Se l'utente invia un saluto (es. "ciao", "salve"), una frase di cortesia, o una domanda molto generica non correlata direttamente alle azioni specifiche del sito, classifica come "GENERAL_QUERY".
     - Per GET_EVENTS, se non specificato diversamente dall'utente (es. una data specifica o un termine di ricerca), assumi che l'utente voglia eventi futuri (es. \`params: {"period": "all_future"}\`).
     - Usa START_BOOKING_FLOW se l'utente esprime intenzione di prenotare E (mancano eventId/eventTitle in currentBookingState OPPURE l'utente sta chiaramente iniziando una nuova richiesta per un evento diverso, o non c'è un evento attivo in currentBookingState). Per questo intent, "requires_login" DEVE essere true.
@@ -168,9 +168,13 @@ Determina i seguenti campi:
           **Se l'input dell'utente contiene chiaramente nomi di persone e l'assistente sta aspettando nomi (cioè currentBookingState.numeroPosti è definito e currentBookingState.partecipanti.length < currentBookingState.numeroPosti), allora il campo \`params.partecipanti_nomi_cognomi\` DEVE essere popolato con i nomi estratti. Non lasciarlo vuoto o nullo in questo scenario cruciale.**
           L'intent DEVE rimanere COLLECT_BOOKING_DETAILS finché il codice JS non ha tutti i nomi necessari e li ha validati internamente (tramite validateBookingStateForConfirmation).
     - Usa CONFIRM_BOOKING_DETAILS ESCLUSIVAMENTE se il sistema JavaScript (tramite validateBookingStateForConfirmation) ha determinato che TUTTI i dati necessari (eventId, eventTitle, numeroPosti, e un array completo di nomi partecipanti VALIDI) sono stati raccolti e sono corretti in currentBookingState, E l'assistente ha presentato il riepilogo e l'utente ha risposto affermativamente (es. "sì", "conferma", "procedi"). Non anticipare questo intent. Per questo intent, "requires_login" DEVE essere true.
-2.  "params": Oggetto JSON con parametri ESTRATTI DALL'ULTIMO INPUT UTENTE. Se nessun parametro è rilevante, usa un oggetto vuoto \`{}\`.
-3.  "php_script": Script PHP da chiamare (se applicabile). Valori: "get_events.php", "get_event_details.php", "prenota_evento.php", "api/api_get_user_profile.php", "api/api_get_user_bookings.php", "none". Per "GENERAL_QUERY" o "UNKNOWN", usa "none".
-4.  "requires_login": true/false. Per "GENERAL_QUERY", solitamente \`false\` a meno che la domanda non implichi dati utente. Per GET_USER_PROFILE e GET_USER_BOOKINGS, DEVE essere true.
+    - Usa GET_PAGE_CONTENT se l'utente chiede informazioni generali sull'Eremo, sul sito, o su una pagina specifica.
+        - Cerca di estrarre un \`page_name\` da richieste come "parlami della pagina home", "cosa c'è nella sezione contatti", "dimmi di più sulla fraternità". Mappa "home", "homepage", "pagina principale" a "index". Mappa "contatti" a "contatti". Mappa "dove siamo", "indirizzo" a "dovesiamo". Mappa "incontri sulla parola", "lectio divina" a "incontrisullaparola".
+        - Se la richiesta è generica come "parlami dell'eremo", "informazioni sul sito", o non riesci a identificare una pagina specifica, usa come default \`params: {"page_name": "index"}\`.
+        - Se l'utente chiede "cosa puoi fare?" o "come funziona l'assistente?", usa "GENERAL_QUERY".
+2.  "params": Oggetto JSON con parametri ESTRATTI DALL'ULTIMO INPUT UTENTE. Se nessun parametro è rilevante, usa un oggetto vuoto \`{}\`. Per GET_PAGE_CONTENT, il parametro principale è "page_name".
+3.  "php_script": Script PHP da chiamare (se applicabile). Valori: "get_events.php", "get_event_details.php", "prenota_evento.php", "api/api_get_user_profile.php", "api/api_get_user_bookings.php", "api_get_page_content.php", "none". Per "GENERAL_QUERY" o "UNKNOWN", usa "none". Per GET_PAGE_CONTENT, usa "api_get_page_content.php".
+4.  "requires_login": true/false. Per "GENERAL_QUERY", solitamente \`false\` a meno che la domanda non implichi dati utente. Per GET_USER_PROFILE e GET_USER_BOOKINGS, DEVE essere true. Per GET_PAGE_CONTENT, solitamente \`false\`.
 5.  "missing_info_prompt": Se mancano info ESSENZIALI per un intent specifico (specialmente per COLLECT_BOOKING_DETAILS o se START_BOOKING_FLOW non ha hint evento E currentBookingState.eventId non è noto), una frase SPECIFICA per richiederle. Altrimenti \`null\`. Per "GENERAL_QUERY" senza azioni specifiche, questo dovrebbe essere \`null\`.
 6.  "is_clarification_needed": true/false. Per "GENERAL_QUERY" chiaro (es. "ciao"), questo dovrebbe essere \`false\`. Se l'input è ambiguo, \`true\`.
 
@@ -204,6 +208,18 @@ INTERAZIONE CON DATI PHP (RUOLO "system"):
      - Data: YYYY-MM-DD\`
   Se ci sono molti eventi, puoi presentarne un numero limitato (es. i primi 5) e chiedere all'utente se desidera vederne altri o filtrare la ricerca.
 - Se l'utente chiede di un evento per nome e il JS ti passa una lista di corrispondenze, presenta la lista (usando la formattazione chiara sopra) e chiedi di specificare l'ID.
+- **Se ricevi contenuti da una pagina (risultato di GET_PAGE_CONTENT)**:
+    - Il messaggio "system" conterrà un JSON simile a \`{"success":true,"contents":{"heroTitle":"Titolo Esempio","heroSubtitle":"Sottotitolo...", "section1Heading":"Testata Sezione", "section1Text":"Testo della sezione..."}}\` oppure \`{"success":true,"contents":[]}\` se non ci sono contenuti specifici, o \`{"success":false,"message":"Errore..."}\`.
+    - **NON MOSTRARE MAI IL JSON ALL'UTENTE.**
+    - Se \`success\` è \`true\` e \`contents\` NON è vuoto:
+        - Estrai i valori da \`contents\`. Le chiavi (es. heroTitle, section1Text) sono descrittive ma non mostrarle direttamente.
+        - Presenta le informazioni in modo narrativo e discorsivo. Ad esempio, invece di dire "heroTitle è 'Benvenuti'", potresti dire "La pagina principale vi dà il benvenuto con il titolo 'Benvenuti'".
+        - Combina i contenuti in un paragrafo o più paragrafi coerenti. Se ci sono titoli e testi, usali per strutturare la tua risposta. Per esempio: "Sulla pagina 'Chi Siamo', troverai una sezione intitolata '[valore di section1Heading]' che spiega: '[valore di section1Text]'."
+        - Sii creativo nel presentare le informazioni in modo naturale e utile, come se stessi descrivendo la pagina all'utente.
+    - Se \`success\` è \`true\` ma \`contents\` è vuoto (o un array vuoto \`[]\`):
+        - Informa l'utente che non hai trovato informazioni specifiche per quella pagina nel database, ma che può visitare la pagina direttamente. Esempio: "Non ho trovato dettagli specifici per la pagina '[nome pagina richiesta]' nei miei dati, ma puoi sicuramente visitarla sul sito per tutte le informazioni."
+    - Se \`success\` è \`false\`:
+        - Informa l'utente che c'è stato un problema nel recuperare le informazioni, usando il \`message\` se fornito (parafrasandolo). Esempio: "Mi dispiace, ho riscontrato un problema nel recuperare le informazioni per la pagina '[nome pagina richiesta]'. Potrebbe esserci un errore tecnico."
 
 PROCESSO DI PRENOTAZIONE (Requires_login: true):
 1.  LOGIN: L'utente deve essere loggato. Se non lo è, informalo gentilmente ("Per procedere con la prenotazione, è necessario effettuare il login al sito.") e fermati. Email (${CURRENT_USER_EMAIL || 'Nessun utente loggato'}) usata automaticamente.
@@ -219,7 +235,7 @@ PROCESSO DI PRENOTAZIONE (Requires_login: true):
         Calcola maxPerQuestaPrenotazione = Math.min(${MAX_SEATS_PER_SINGLE_BOOKING_REQUEST}, postiAncoraPrenotabiliPerUtente).
         Chiedi: "Per quante persone desideri prenotare? ${ (currentBookingState.postiGiaPrenotatiUtente > 0) ? `Ne hai già prenotati ${currentBookingState.postiGiaPrenotatiUtente}. ` : '' }Puoi richiederne da 1 a \${maxPerQuestaPrenotazione} in questa prenotazione."
 4.  FASE 3: Nomi Partecipanti (JS popola currentBookingState.partecipanti)
-    - Se numeroPosti è noto e currentBookingState.partecipanti.length < currentBookingState.numeroPosti:
+    - Se numeroPosti è noto e currentBookingState.partecipanti.length < numeroPosti:
         Chiedi: "Perfetto. Adesso avrei bisogno del NOME e COGNOME completo per ${currentBookingState.numeroPosti > 1 ? ('i restanti ' + (currentBookingState.numeroPosti - currentBookingState.partecipanti.length) + ' partecipante' + ((currentBookingState.numeroPosti - currentBookingState.partecipanti.length > 1) ? 'i' : '')) : 'il partecipante'}. Puoi fornirli tutti insieme separati da virgola o "e". Assicurati di fornire NOME e COGNOME per ciascuno.${currentBookingState.partecipanti.length > 0 ? (' Finora ho registrato: ' + currentBookingState.partecipanti.join(', ') + '.') : ''}"
     - Se il JS (tramite messaggio "system" o perché validateBookingStateForConfirmation fallisce indicando un nome incompleto) rileva un nome incompleto: "Per favore, fornisci sia il NOME che il COGNOME per [nome incompleto o posizione del partecipante, es. 'il primo partecipante']."
 5.  FASE 4: Riepilogo e Conferma (JS determina che currentBookingState è completo e valido)
@@ -261,7 +277,7 @@ NON DEVI INTERAGIRE CON IL CONTENUTO DEL MESSAGGIO IN INPUT. NON sei un assisten
 
 REGOLE IMPERATIVE PER LA TRASFORMAZIONE:
 1.  **IGNORA IL SIGNIFICATO CONVERSAZIONALE**: Tratta il testo in input come materiale grezzo da ripulire per la lettura. Se il testo contiene "Errore: ...", "Devi fare login", "Confermi?", NON devi rispondere a queste frasi. Il tuo output DEVE rimanere focalizzato sulla resa vocale del messaggio originale, ripulito.
-2.  **MANTIENI IL SIGNIFICATO INFORMATIVO**: L'essenza e tutte le informazioni cruciali del messaggio originale DEVONO essere preservate. NON aggiungere opinioni, risposte o informazioni non presenti nel testo originale.
+2.  **MANTIENI IL SIGNIFICATO INFORMATIVO**: L'essenza e tutte le informazioni cruciai del messaggio originale DEVONO essere preservate. NON aggiungere opinioni, risposte o informazioni non presenti nel testo originale.
 3.  **MASSIMA NATURALEZZA E FLUIDITÀ**: Riscrivi le frasi per un eloquio colloquiale e naturale. Evita strutture complesse, linguaggio robotico o eccessivamente formale. Preferisci frasi brevi e dirette se possibile, mantenendo un tono conversazionale e piacevole.
 4.  **PULIZIA ESTREMA PER IL PARLATO**:
     * **Markdown e HTML**: Rimuovi OGNI traccia di Markdown (es. \`**\`, \`*\`, \`-\` per liste, \`\`\` \`\`\`, \`#\`) o tag HTML. L'output deve essere puro testo, senza formattazione.
@@ -498,6 +514,12 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
                     params.append('user_email_for_script', CURRENT_USER_EMAIL);
                 }
             }
+        }
+
+        // Converti page_name a page per api_get_page_content.php
+        if (scriptPath === "api_get_page_content.php" && params.page_name) {
+            params.page = params.page_name;
+            delete params.page_name; // Rimuovi page_name per evitare confusione
         }
 
         // Costruisce URL per GET o corpo per POST
@@ -760,6 +782,21 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
                             systemMessageForMainAI = `Risultato da ${intentAnalysisParsed.php_script}: ${JSON.stringify(eventDetailsData)}`;
                         } catch (error) {
                             systemMessageForMainAI = `Errore da ${intentAnalysisParsed.php_script}: ${error.message}`;
+                        }
+                        break;
+
+                    case "GET_PAGE_CONTENT": // NUOVO CASO
+                        try {
+                            const phpParams = intentAnalysisParsed.params || {};
+                            if (!phpParams.page_name) { // Fallback se page_name non è stato estratto
+                                console.warn("AssistenteAI: GET_PAGE_CONTENT chiamato senza page_name, default a 'index'");
+                                phpParams.page_name = "index";
+                            }
+                            // callPhpScript gestirà la conversione da page_name a page
+                            const pageContentData = await callPhpScript(intentAnalysisParsed.php_script, phpParams);
+                            systemMessageForMainAI = `Contenuto pagina '${phpParams.page_name}' da ${intentAnalysisParsed.php_script}: ${JSON.stringify(pageContentData)}`;
+                        } catch (error) {
+                            systemMessageForMainAI = `Errore recupero contenuto pagina da ${intentAnalysisParsed.php_script}: ${error.message}`;
                         }
                         break;
 
