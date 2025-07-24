@@ -121,6 +121,172 @@
     #current-event-flyer-preview a { color: var(--primary); text-decoration: underline; }
     #current-event-flyer-preview a:hover { color: var(--accent); }
 
+    /* === STILI NUOVO POPUP VOLANTINO (Design Ispirato Apple) === */
+    :root {
+      --flyer-text-primary: #1d1d1f;
+      --flyer-modal-bg: #f8f8fa;
+      --flyer-overlay-bg: rgba(0, 0, 0, 0.65);
+    }
+
+    .flyer-overlay-eff {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--flyer-overlay-bg);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95), visibility 0s linear 0.4s;
+    }
+
+    .flyer-overlay-eff.active {
+      opacity: 1;
+      visibility: visible;
+      transition-delay: 0s;
+    }
+
+    .flyer-modal-eff {
+      background-color: var(--flyer-modal-bg);
+      border-radius: 22px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 15px rgba(0, 0, 0, 0.1);
+      width: clamp(320px, 88vw, 1000px);
+      height: clamp(450px, 85vh, 750px);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      opacity: 0;
+      transform: scale(0.92) translateY(15px);
+      transition: opacity 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.05s, transform 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.05s;
+      overflow: hidden;
+    }
+
+    .flyer-overlay-eff.active .flyer-modal-eff {
+      opacity: 1;
+      transform: scale(1) translateY(0px);
+    }
+
+    .flyer-close-btn-eff {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 2rem;
+      color: var(--gray-dark, #777);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      line-height: 1;
+      z-index: 10;
+      transition: color 0.2s ease, transform 0.25s ease-out;
+    }
+
+    .flyer-close-btn-eff:hover,
+    .flyer-close-btn-eff:focus-visible {
+      color: var(--dark, #333);
+      transform: rotate(90deg);
+      background: none;
+    }
+
+    .flyer-content-area-eff {
+      flex-grow: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: inherit;
+    }
+
+    .flyer-media-container-eff {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+
+    .flyer-media-container-eff img,
+    .flyer-media-container-eff iframe {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border: none;
+      border-radius: 8px;
+    }
+
+    .flyer-media-container-eff iframe {
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+    }
+
+    .flyer-message-display-eff {
+      text-align: center;
+      padding: 3rem 1rem;
+      font-size: 1.1rem;
+      color: var(--flyer-text-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+    .flyer-message-display-eff p { margin-bottom: 1rem; }
+    .flyer-message-display-eff a {
+      color: var(--primary);
+      text-decoration: underline; font-weight: 500;
+      padding: 0.6rem 1.2rem; background-color: rgba(0,0,0,0.05); border-radius: 8px;
+    }
+    .flyer-message-display-eff a:hover { background-color: rgba(0,0,0,0.08); }
+
+    body.flyer-popup-active-eff {
+      overflow: hidden;
+    }
+    /* === FINE STILI NUOVO POPUP VOLANTINO === */
+
+        /* === NUOVI STILI PER INFO A "PILLOLE" (CON SPAZIATURA AGGIORNATA) === */
+    .card-info-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1rem 0 1.2rem 0; /* Aumentato lo spazio sopra e sotto */
+        padding-bottom: 1rem; /* Aumentato il padding inferiore */
+        border-bottom: 1px solid var(--gray-lighter);
+    }
+    .info-pill {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--background-light, #f8f9fa);
+        color: var(--primary-dark, #333);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: 1px solid var(--gray-light, #eee);
+        transition: all 0.2s ease-in-out;
+    }
+    .info-pill i {
+        margin-right: 0.5rem;
+        color: var(--primary);
+        font-size: 0.9em;
+    }
+    /* === FINE NUOVI STILI === */
   </style>
 </head>
 <body>
@@ -213,8 +379,6 @@
         <label for="searchSpeaker">Relatore</label>
         <input type="text" id="searchSpeaker" class="form-control" placeholder="Nome relatore..."/>
       </div>
-      <!-- Potrebbe essere utile un bottone per applicare i filtri se non si vuole il filtraggio live
-           <button id="applyFiltersBtn">Applica Filtri</button> -->
     </div>
 
     <div id="eventiGridContainer" style="position: relative"> <div id="loadingIndicator" class="loading-overlay"> <div class="spinner"></div>
@@ -295,7 +459,7 @@
 <div class="login-popup" id="loginRequiredPopup">
   <button class="close-popup" id="closeLoginRequiredPopupBtn" aria-label="Chiudi popup">&times;</button>
   <h2 style="color: var(--primary); margin-top: 0; margin-bottom: 1.5rem; text-align: center; font-size: 1.8rem;">Accesso Richiesto</h2>
-  <p style="text-align: center; margin-bottom: 1.5rem; font-size: 1.2rem; color: var(--dark);">Per visualizzare i dettagli completi dell'evento e i commenti, è necessario effettuare l'accesso.</p>
+  <p style="text-align: center; margin-bottom: 1.5rem; font-size: 1.2rem; color: var(--dark);">Per visualizzare le risorse di questo evento, è necessario effettuare l'accesso.</p>
   <div class="form-actions" style="text-align: center;">
     <button type="button" class="btn-popup" id="loginRequiredLoginBtn">Accedi / Registrati</button>
   </div>
@@ -378,11 +542,10 @@
 
   // Aggiorna i dati dell'utente (nome, icona) dalla API se necessario e aggiorna la UI della navbar
   async function fetchAndUpdateUserDisplayData() {
-    if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) { // Non fare fetch per admin qui, i dati sono ok
-      updateNavbarUI(); // Aggiorna UI anche per admin o non loggato
+    if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
+      updateNavbarUI();
       return;
     }
-    // Per utenti standard, aggiorna i dati potenzialmente obsoleti da localStorage
     try {
       const response = await fetch(`api/api_get_user_profile.php?email=${encodeURIComponent(currentUserData.email)}`);
       if (!response.ok) throw new Error('Errore fetch profilo utente');
@@ -391,8 +554,8 @@
         const freshData = apiResult.data;
         currentUserData.nome = freshData.nome || currentUserData.nome;
         currentUserData.iconPath = freshData.icon || defaultUserIconPath;
-        currentUserData.cognome = freshData.cognome || (currentUserData.cognome || ''); // Aggiunto cognome
-        localStorage.setItem('userDataEFF', JSON.stringify(currentUserData)); // Salva i dati aggiornati
+        currentUserData.cognome = freshData.cognome || (currentUserData.cognome || '');
+        localStorage.setItem('userDataEFF', JSON.stringify(currentUserData));
       }
     } catch (error) {
       console.warn("Impossibile aggiornare i dati del profilo utente:", error);
@@ -409,32 +572,24 @@
     const userDropdownContainer = gebi('userDropdownContainer');
     const navbarAvatarSpan = gebi('navbar-avatar');
     const navbarUsername = gebi('navbar-username');
-
-    // Link nel dropdown desktop
     const dropdownProfilo = gebi('dropdownProfilo');
     const dropdownPrenotazioni = gebi('dropdownPrenotazioni');
     const dropdownDashboard = gebi('dropdownDashboard');
-    const dropdownGestioneEventi = gebi('dropdownGestioneEventi'); // Questo punta a eventiincorso.html
-
-    // Link nel menu mobile
+    const dropdownGestioneEventi = gebi('dropdownGestioneEventi');
     const loginBtnMobile = gebi('login-btn-mobile');
     const mobileNavProfilo = gebi('mobileNavProfilo');
     const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni');
     const mobileNavDashboard = gebi('mobileNavDashboard');
-    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); // Questo punta a eventiincorso.html
+    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin');
     const mobileLogoutLink = gebi('mobileLogoutLink');
     const mobileMenuSeparator = gebi('mobileMenuSeparator');
     const mainPageTitle = gebi('mainPageTitle');
-
-    // Reset degli stati iniziali per tutti i link specifici del ruolo
     if(loginBtnDesktop) loginBtnDesktop.style.display = 'none';
     if(userDropdownContainer) userDropdownContainer.style.display = 'none';
-
     if(dropdownProfilo) dropdownProfilo.style.display = 'none';
     if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none';
     if(dropdownDashboard) dropdownDashboard.style.display = 'none';
     if(dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none';
-
     if(loginBtnMobile) loginBtnMobile.style.display = 'none';
     if(mobileNavProfilo) mobileNavProfilo.style.display = 'none';
     if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
@@ -442,9 +597,7 @@
     if(mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none';
     if(mobileLogoutLink) mobileLogoutLink.style.display = 'none';
     if(mobileMenuSeparator) mobileMenuSeparator.style.display = 'none';
-
-
-    if (currentUserData) { // Utente loggato
+    if (currentUserData) {
       if(userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
       if(navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
       const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
@@ -453,45 +606,34 @@
         avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`;
         avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };
       }
-
       if(mobileLogoutLink) mobileLogoutLink.style.display = 'block';
       if(mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
-
-      if (currentUserData.isAdmin) { // ADMIN LOGGATO
+      if (currentUserData.isAdmin) {
         if(navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
         if(mainPageTitle) mainPageTitle.textContent = "Gestione Archivio Attività";
-
-        if(dropdownProfilo) dropdownProfilo.style.display = 'block'; // Mostra Profilo (Desktop)
-        if(mobileNavProfilo) mobileNavProfilo.style.display = 'block'; // Mostra Profilo (Mobile)
-
-        if(dropdownDashboard) dropdownDashboard.style.display = 'block'; // Mostra Dashboard (Desktop)
-        if(mobileNavDashboard) mobileNavDashboard.style.display = 'block'; // Mostra Dashboard (Mobile)
-
-        // Nascondi "Le mie prenotazioni" e "Gestione Eventi" per admin (come da richiesta per index.html)
-        if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none';
-        if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
-        if(dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none'; // NASCONDI
-        if(mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none'; // NASCONDI
-
-      } else { // UTENTE NORMALE LOGGATO
-        if(navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
-        if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate";
-
         if(dropdownProfilo) dropdownProfilo.style.display = 'block';
         if(mobileNavProfilo) mobileNavProfilo.style.display = 'block';
-
+        if(dropdownDashboard) dropdownDashboard.style.display = 'block';
+        if(mobileNavDashboard) mobileNavDashboard.style.display = 'block';
+        if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none';
+        if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
+        if(dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none';
+        if(mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none';
+      } else {
+        if(navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
+        if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate";
+        if(dropdownProfilo) dropdownProfilo.style.display = 'block';
+        if(mobileNavProfilo) mobileNavProfilo.style.display = 'block';
         if(dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block';
         if(mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
-        // Dashboard e Gestione Eventi rimangono 'none' dal reset iniziale.
       }
-    } else { // Utente non loggato
+    } else {
       if(loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
       if(loginBtnMobile) loginBtnMobile.style.display = 'block';
       if(navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
       if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività Passate";
     }
   }
-
 
   // Gestisce il logout dell'utente
   function handleLogout() {
@@ -502,26 +644,27 @@
     alert('Logout effettuato.');
   }
 
-  // Gestione navbar che scompare allo scroll (invariata)
+  // Gestione navbar che scompare allo scroll
   let lastScrollNav = 0; const navbarContainerEl = gebi("navbarContainer"); if (navbarContainerEl) { window.addEventListener("scroll", function () { const cS = window.pageYOffset || document.documentElement.scrollTop; if (cS <= 50) { navbarContainerEl.classList.remove("hidden"); lastScrollNav = 0; return; } if (cS > lastScrollNav && !navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.add("hidden"); else if (cS < lastScrollNav && navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.remove("hidden"); lastScrollNav = cS <= 0 ? 0 : cS; }, false); }
-  // Gestione menu mobile (hamburger) (invariata)
+  // Gestione menu mobile (hamburger)
   const mobileMenuEl = gebi("mobileMenu"); const hamburgerButton = gebi("hamburgerBtn"); function toggleMobileMenu() { if (mobileMenuEl && hamburgerButton) { const iO = mobileMenuEl.classList.toggle("open"); hamburgerButton.classList.toggle("open"); hamburgerButton.setAttribute("aria-expanded", String(iO)); document.body.style.overflow = iO ? "hidden" : ""; } } function closeMobileMenu() { if (mobileMenuEl && hamburgerButton && mobileMenuEl.classList.contains("open")) { mobileMenuEl.classList.remove("open"); hamburgerButton.classList.remove("open"); hamburgerButton.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; } }
   if (hamburgerButton) hamburgerButton.addEventListener("click", toggleMobileMenu);
   document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobileLogoutLink') { l.addEventListener("click", closeMobileMenu); }}); 
   document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) closeMobileMenu(); }); 
-  // Gestione dropdown utente (invariata)
+  // Gestione dropdown utente
   const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iS = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iS ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iS)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl && userDropdownMenuEl.style.display === 'block' && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
+  
   // Elementi del DOM per il popup di login/registrazione
   const loginOverlayEl = gebi("loginOverlay"); const loginPopupEl = gebi("loginPopup"); const closePopupBtnEl = gebi("closeLoginPopupBtn"); const loginTabsEls = document.querySelectorAll(".login-tab"); const loginFormsEls = document.querySelectorAll("#loginPopup .login-form"); 
   const loginErrorMessagePopupEl = gebi('login-error-message-popup'); const registerErrorMessagePopupEl = gebi('register-error-message-popup');
 
   function isAnyPopupActive() {
-    // Funzione helper per controllare se un popup è attivo (considera sia classe che display style)
     const isActive = (el) => el && (el.classList.contains('active') || window.getComputedStyle(el).display !== 'none');
     return isActive(loginPopupEl) || 
            isActive(gebi('forgotPasswordPopup')) || 
            isActive(gebi('loginRequiredPopup')) || 
-           isActive(gebi('eventPopupAdmin'));
+           isActive(gebi('eventPopupAdmin')) ||
+           (globalFlyerOverlayEff && globalFlyerOverlayEff.classList.contains('active'));
   }
   function openLoginPopup() {
     if(gebi('loginRequiredPopup')?.classList.contains('active')) closeLoginRequiredPopup(); 
@@ -537,7 +680,7 @@
   function closeLoginPopup() {
     if (loginOverlayEl) loginOverlayEl.classList.remove("active");
     if (loginPopupEl) loginPopupEl.classList.remove("active");
-    if (!isAnyPopupActive()) { // Modificato per usare isAnyPopupActive
+    if (!isAnyPopupActive()) {
       document.body.style.overflow = "";
     }
     resetFormErrors();
@@ -593,7 +736,7 @@
   function closeForgotPasswordPopup() {
     if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active');
     if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active');
-    if (!isAnyPopupActive()) { // Modificato per usare isAnyPopupActive
+    if (!isAnyPopupActive()) {
       document.body.style.overflow = '';
     }
     if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
@@ -651,7 +794,7 @@
   }
   const loginRequiredOverlayEl = gebi("loginRequiredOverlay"); const loginRequiredPopupEl = gebi("loginRequiredPopup"); const closeLoginRequiredPopupBtnEl = gebi("closeLoginRequiredPopupBtn"); const loginRequiredLoginBtnEl = gebi("loginRequiredLoginBtn");
   function showLoginRequiredPopup(event) { if (event) event.preventDefault(); if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.add("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.add("active"); document.body.style.overflow = "hidden"; }
-  function closeLoginRequiredPopup() { if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.remove("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.remove("active"); if (!isAnyPopupActive()) { document.body.style.overflow = ""; } } // Modificato per usare isAnyPopupActive
+  function closeLoginRequiredPopup() { if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.remove("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.remove("active"); if (!isAnyPopupActive()) { document.body.style.overflow = ""; } }
   if (closeLoginRequiredPopupBtnEl) closeLoginRequiredPopupBtnEl.addEventListener("click", closeLoginRequiredPopup);
   if (loginRequiredOverlayEl) loginRequiredOverlayEl.addEventListener("click", (e) => { if (e.target === loginRequiredOverlayEl) closeLoginRequiredPopup(); });
   if (loginRequiredLoginBtnEl) { loginRequiredLoginBtnEl.addEventListener("click", () => { closeLoginRequiredPopup(); openLoginPopup(); }); } 
@@ -659,7 +802,7 @@
   const eventPopupOverlayAdminEl = gebi('eventPopupOverlayAdmin'); const eventPopupAdminEl = gebi('eventPopupAdmin'); const closeEventPopupBtnAdminEl = gebi('closeEventPopupBtnAdmin'); const editPastEventFormAdminEl = gebi('editPastEventFormAdmin'); const eventPopupTitleAdminEl = gebi('eventPopupTitleAdmin'); const adminEventIdInput = gebi('admin-event-id'); const adminVoluntaryCheckbox = gebi('admin-event-voluntary'); const adminPriceContainer = gebi('admin-event-price-container'); const adminEventPriceInput = gebi('admin-event-price'); const editPastEventFormMessageAdminEl = gebi('editPastEventFormMessageAdmin'); const adminCurrentImagePreview = gebi('current-event-image-preview'); const adminCurrentFlyerPreview = gebi('current-event-flyer-preview');
   function updateAdminPriceFieldVisibility() { if (adminVoluntaryCheckbox && adminPriceContainer && adminEventPriceInput) { const isVoluntary = adminVoluntaryCheckbox.checked; adminPriceContainer.style.display = isVoluntary ? 'none' : 'block'; adminEventPriceInput.required = !isVoluntary; if (isVoluntary) adminEventPriceInput.value = ''; } } if (adminVoluntaryCheckbox) adminVoluntaryCheckbox.addEventListener('change', updateAdminPriceFieldVisibility);
   function openEditPastEventPopup(eventData) { if (!currentUserData || !currentUserData.isAdmin) return; if (!editPastEventFormAdminEl || !eventPopupAdminEl || !eventPopupOverlayAdminEl) return; editPastEventFormAdminEl.reset(); if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.style.display = 'none'; editPastEventFormMessageAdminEl.className = 'form-message'; } if(adminCurrentImagePreview) { adminCurrentImagePreview.style.display = 'none'; adminCurrentImagePreview.src = '#';} if(adminCurrentFlyerPreview) adminCurrentFlyerPreview.innerHTML = ''; if(eventPopupTitleAdminEl) eventPopupTitleAdminEl.textContent = 'Modifica Evento Passato'; if(adminEventIdInput) adminEventIdInput.value = eventData.idevento; gebi('admin-event-title').value = eventData.titolo || ''; gebi('admin-event-date').value = eventData.datainizio ? eventData.datainizio.substring(0,10) : ''; gebi('admin-event-time').value = eventData.durata || ''; gebi('admin-event-short-desc').value = eventData.descrizione || ''; gebi('admin-event-long-desc').value = eventData.descrizione_estesa || ''; gebi('admin-event-prefix').value = eventData.prefisso_relatore || ''; gebi('admin-event-speaker').value = eventData.relatore || ''; gebi('admin-event-association').value = eventData.associazione || ''; gebi('admin-event-seats').value = eventData.posti_disponibili !== null ? eventData.posti_disponibili : ''; gebi('admin-event-booking').checked = !!eventData.flagprenotabile; if(adminVoluntaryCheckbox) adminVoluntaryCheckbox.checked = parseFloat(eventData.costo) === 0.00; updateAdminPriceFieldVisibility(); if (adminEventPriceInput && !adminVoluntaryCheckbox.checked && eventData.costo && parseFloat(eventData.costo) > 0) { adminEventPriceInput.value = parseFloat(eventData.costo).toFixed(2); } else if (adminEventPriceInput) { adminEventPriceInput.value = ''; } if (adminCurrentImagePreview && eventData.immagine_url) { adminCurrentImagePreview.src = eventData.immagine_url; adminCurrentImagePreview.style.display = 'block'; } if (adminCurrentFlyerPreview && eventData.volantino_url) { const fileName = eventData.volantino_url.split('/').pop(); adminCurrentFlyerPreview.innerHTML = `<p>Volantino attuale: <a href="${eventData.volantino_url}" target="_blank">${fileName}</a></p>`; } eventPopupOverlayAdminEl.style.display = 'block'; eventPopupAdminEl.style.display = 'block'; setTimeout(() => { eventPopupOverlayAdminEl.classList.add('active'); eventPopupAdminEl.classList.add('active'); }, 10); document.body.style.overflow = 'hidden'; gebi('admin-event-title').focus(); }
-  function closeEditPastEventPopup() { if (!eventPopupAdminEl || !eventPopupOverlayAdminEl) return; eventPopupOverlayAdminEl.classList.remove('active'); eventPopupAdminEl.classList.remove('active'); setTimeout(() => { eventPopupOverlayAdminEl.style.display = 'none'; eventPopupAdminEl.style.display = 'none'; if (!isAnyPopupActive()) { document.body.style.overflow = ''; } }, 300); } // Modificato per usare isAnyPopupActive
+  function closeEditPastEventPopup() { if (!eventPopupAdminEl || !eventPopupOverlayAdminEl) return; eventPopupOverlayAdminEl.classList.remove('active'); eventPopupAdminEl.classList.remove('active'); setTimeout(() => { eventPopupOverlayAdminEl.style.display = 'none'; eventPopupAdminEl.style.display = 'none'; if (!isAnyPopupActive()) { document.body.style.overflow = ''; } }, 300); }
   if (closeEventPopupBtnAdminEl) closeEventPopupBtnAdminEl.addEventListener('click', closeEditPastEventPopup); if (eventPopupOverlayAdminEl) eventPopupOverlayAdminEl.addEventListener('click', (e) => { if (e.target === eventPopupOverlayAdminEl) closeEditPastEventPopup(); });
   editPastEventFormAdminEl?.addEventListener('submit', async function(e) { e.preventDefault(); if (!currentUserData || !currentUserData.isAdmin) return; const submitBtn = this.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML; submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...'; if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.style.display = 'none'; editPastEventFormMessageAdminEl.className = 'form-message'; } try { const formData = new FormData(this); formData.append('action', 'update_event'); const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData }); const responseText = await response.text(); let result; try { result = JSON.parse(responseText); } catch (jsonError) { throw new Error(`Risposta non JSON: ${responseText.substring(0,200)}`); } if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`); if (result.success) { if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.textContent = result.message || 'Evento aggiornato!'; editPastEventFormMessageAdminEl.classList.add('success'); } loadPastEvents(); setTimeout(closeEditPastEventPopup, 1500); } else { throw new Error(result.message || 'Errore aggiornamento.'); } } catch (error) { if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.textContent = `Errore: ${error.message}`; editPastEventFormMessageAdminEl.classList.add('error'); } } finally { if(editPastEventFormMessageAdminEl) editPastEventFormMessageAdminEl.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } });
 
@@ -685,7 +828,6 @@
   function populateYearFilter() {
     const currentYr = new Date().getFullYear();
     let minYear = currentYr; 
-
     if (allPastEventsData && allPastEventsData.length > 0) {
       allPastEventsData.forEach(event => {
         if (event.datainizio) {
@@ -698,7 +840,6 @@
     } else {
       minYear = currentYr - 4; 
     }
-
     if (searchYearEl) {
       searchYearEl.innerHTML = '<option value="">Tutti gli anni</option>'; 
       for (let y = currentYr; y >= minYear; y--) {
@@ -711,6 +852,88 @@
     }
   }
 
+  // === NUOVE FUNZIONI PER POPUP VOLANTINO E SANITIZZAZIONE ===
+  let globalFlyerOverlayEff = null;
+  let currentFlyerModalEff = null;
+
+  function sanitizeForAttribute(str) {
+    if (typeof str !== 'string' || str === null) return '';
+    return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+  }
+
+  function sanitizeText(text) {
+    if (text === null || typeof text === 'undefined') return '';
+    const element = document.createElement('div');
+    element.innerText = String(text);
+    return element.innerHTML;
+  }
+
+  function initGlobalFlyerOverlay() {
+    if (!document.getElementById('globalFlyerOverlayEff')) {
+      const overlay = document.createElement('div');
+      overlay.id = 'globalFlyerOverlayEff';
+      overlay.className = 'flyer-overlay-eff';
+      document.body.appendChild(overlay);
+      globalFlyerOverlayEff = overlay;
+      globalFlyerOverlayEff.addEventListener('click', (e) => {
+        if (e.target === globalFlyerOverlayEff) hideFlyerPopupEff();
+      });
+    } else {
+      globalFlyerOverlayEff = document.getElementById('globalFlyerOverlayEff');
+    }
+  }
+
+  function showFlyerPopupEff(volantinoUrl) {
+    if (!globalFlyerOverlayEff) return;
+    if (currentFlyerModalEff) currentFlyerModalEff.remove();
+    document.body.classList.add("flyer-popup-active-eff");
+    globalFlyerOverlayEff.classList.add("active");
+    currentFlyerModalEff = document.createElement("article");
+    currentFlyerModalEff.className = "flyer-modal-eff";
+    let flyerContentHTML = '';
+    const sanitizedUrl = sanitizeForAttribute(volantinoUrl);
+    if (volantinoUrl && volantinoUrl.trim() !== "") {
+      if (volantinoUrl.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i)) {
+        flyerContentHTML = `<img src="${sanitizedUrl}" alt="Volantino Evento">`;
+      } else if (volantinoUrl.endsWith('.pdf')) {
+        flyerContentHTML = `<iframe src="${sanitizedUrl}" type="application/pdf" title="Volantino PDF"></iframe>`;
+      } else {
+        flyerContentHTML = `<div class="flyer-message-display-eff"><p>Il volantino è disponibile come file esterno.</p><a href="${sanitizedUrl}" target="_blank" rel="noopener noreferrer">Visualizza Volantino</a></div>`;
+      }
+    } else {
+      flyerContentHTML = `<div class="flyer-message-display-eff"><p>Volantino non disponibile.</p></div>`;
+    }
+    currentFlyerModalEff.innerHTML = `
+      <button class="flyer-close-btn-eff" aria-label="Chiudi">&times;</button>
+      <div class="flyer-content-area-eff">
+          <div class="flyer-media-container-eff">${flyerContentHTML}</div>
+      </div>`;
+    globalFlyerOverlayEff.appendChild(currentFlyerModalEff);
+    const closeBtn = currentFlyerModalEff.querySelector('.flyer-close-btn-eff');
+    if (closeBtn) { closeBtn.onclick = hideFlyerPopupEff; closeBtn.focus(); }
+  }
+
+  function hideFlyerPopupEff() {
+    if (globalFlyerOverlayEff) globalFlyerOverlayEff.classList.remove("active");
+    if (currentFlyerModalEff) {
+      currentFlyerModalEff.addEventListener('transitionend', function handleTransitionEnd(event) {
+        if (event.propertyName === 'opacity' && currentFlyerModalEff && !globalFlyerOverlayEff.classList.contains('active')) {
+          currentFlyerModalEff.remove(); currentFlyerModalEff = null;
+          event.target.removeEventListener('transitionend', handleTransitionEnd);
+        }
+      });
+      if (currentFlyerModalEff && !globalFlyerOverlayEff.classList.contains('active')) {
+        setTimeout(() => {
+          if (currentFlyerModalEff && !globalFlyerOverlayEff.classList.contains('active')) {
+            currentFlyerModalEff.remove(); currentFlyerModalEff = null;
+          }
+        }, 450);
+      }
+    }
+    document.body.classList.remove("flyer-popup-active-eff");
+  }
+  // === FINE NUOVE FUNZIONI ===
+
 
   function createPastEventCard(event) {
     const card = document.createElement("article");
@@ -722,16 +945,32 @@
 
     let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event-past.jpg"; 
 
+    // --- NUOVA LOGICA PER LE "PILLOLE" INFORMATIVE ---
+    let infoPillsHTML = '<div class="card-info-pills">';
+    if (event.datainizio) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-calendar-alt"></i> ${formatDate(event.datainizio)}</span>`;
+    }
+    if (event.durata) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-clock"></i> ${sanitizeText(event.durata)}</span>`;
+    }
+    if (event.relatore) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-user"></i> ${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>`;
+    }
+    if (event.associazione) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-users"></i> ${sanitizeText(event.associazione)}</span>`;
+    }
+    infoPillsHTML += '</div>';
+    // --- FINE NUOVA LOGICA ---
+
     if (currentUserData && currentUserData.isAdmin) { 
       let volantinoAdminLinkHTML = '';
-      if (event.volantino_url && event.volantino_url.trim() !== "") { volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em;"><b>Volantino:</b> <a href="${event.volantino_url}" target="_blank">Visualizza volantino</a></p>`; }
+      if (event.volantino_url && event.volantino_url.trim() !== "") { volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em;"><b>Volantino:</b> <a href="${sanitizeForAttribute(event.volantino_url)}" target="_blank">Visualizza volantino</a></p>`; }
       card.innerHTML = `
-        <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+        <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
         <div class="card-content">
-          <h3>${event.titolo || "Titolo N/D"}</h3>
-          <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ""}</p>
-          <p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}`: ""}</p>
-          <p class="card-description" style="font-size:0.95em; min-height: 4.5em;">${event.descrizione || "N/D"}</p>
+          <h3>${sanitizeText(event.titolo) || "Titolo N/D"}</h3>
+          ${infoPillsHTML}
+          <p class="card-description" style="font-size:0.95em; min-height: 4.5em;">${sanitizeText(event.descrizione) || "N/D"}</p>
           ${volantinoAdminLinkHTML}
           <div class="card-actions admin-actions">
             <button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
@@ -741,20 +980,41 @@
       card.querySelector('.btn-edit').addEventListener('click', function() { const eventToEdit = allPastEventsData.find(e => e.idevento == this.dataset.eventId); if (eventToEdit) openEditPastEventPopup(eventToEdit); else alert("Dettagli evento non trovati per la modifica."); });
       card.querySelector('.btn-delete').addEventListener('click', async function() { const eventId = this.dataset.eventId; const eventToDelete = allPastEventsData.find(e => e.idevento == eventId); if (confirm(`Sei sicuro di voler eliminare l'evento "${eventToDelete?.titolo || "questo evento"}"? L'azione è irreversibile.`)) { const btn = this; const oldTxt = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini" style="border-top-color:white;"></div>'; try { const fd = new FormData(); fd.append('action', 'delete_event'); fd.append('event_id', eventId); const r = await fetch('gestione_eventi.php', { method: 'POST', body: fd }); const rt = await r.text(); let res; try { res = JSON.parse(rt); } catch { throw new Error("Risposta non JSON dal server durante l'eliminazione."); } if (!r.ok || !res.success) throw new Error(res.message || "Eliminazione fallita."); alert(res.message || 'Evento eliminato con successo.'); loadPastEvents(); } catch (err) { alert(`Errore durante l'eliminazione: ${err.message}`); } finally { btn.disabled = false; btn.innerHTML = oldTxt; } } });
     } else { 
-      const actionsHTML = currentUserData ?
-              ` <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Dettagli</a>
-          <a href="evento_dettaglio_accesso.html?id=${event.idevento}#event-comments" class="card-btn card-btn-primary">Commenti</a>` :
-              ` <a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Dettagli</a>
-          <a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Commenti</a>`;
+      let volantinoBtnHTML = '';
+      const sanitizedUrl = sanitizeForAttribute(event.volantino_url);
+
+      if (event.volantino_url && event.volantino_url.trim() !== "") {
+          volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="${sanitizedUrl}">Volantino</button>`;
+      } else {
+          volantinoBtnHTML = `<button class="card-btn card-btn-secondary" disabled title="Volantino non disponibile">Volantino</button>`;
+      }
+
+      let risorseBtnHTML = '';
+      if (currentUserData) {
+          risorseBtnHTML = `<a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Risorse</a>`;
+      } else {
+          risorseBtnHTML = `<a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Risorse</a>`;
+      }
+
+      const actionsHTML = `${volantinoBtnHTML}${risorseBtnHTML}`;
+      
       card.innerHTML = `
-        <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${event.titolo || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+        <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
         <div class="card-content">
-          <h3>${event.titolo || "Titolo N/D"}</h3>
-          <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario/Durata:</b> ${event.durata}` : ""}</p>
-          <p class="card-info"><b>${event.prefisso_relatore || "Relatore"}:</b> ${event.relatore || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${event.associazione}`: ""}</p>
-          <p class="card-description">${event.descrizione || "Nessuna descrizione breve disponibile."}</p>
+          <h3>${sanitizeText(event.titolo) || "Titolo N/D"}</h3>
+          ${infoPillsHTML}
+          <p class="card-description">${sanitizeText(event.descrizione) || "Nessuna descrizione breve disponibile."}</p>
           <div class="card-actions">${actionsHTML}</div>
         </div>`;
+
+      const viewFlyerBtn = card.querySelector(".btn-visualizza-volantino");
+      if (viewFlyerBtn && !viewFlyerBtn.disabled) {
+          viewFlyerBtn.addEventListener("click", function() {
+              if (typeof showFlyerPopupEff === 'function') {
+                  showFlyerPopupEff(this.dataset.volantinoUrl);
+              }
+          });
+      }
     }
     return card;
   }
@@ -866,6 +1126,7 @@
     const currentYearEl = gebi("currentYear"); 
     if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
+    initGlobalFlyerOverlay(); // Inizializza il popup del volantino
     loadUserData(); 
     await fetchAndUpdateUserDisplayData(); 
     await loadNavbarLogo(); 
@@ -885,6 +1146,7 @@
         if (gebi('forgotPasswordPopup')?.classList.contains("active")) closeForgotPasswordPopup();
         if (loginRequiredPopupEl?.classList.contains("active")) closeLoginRequiredPopup();
         if (eventPopupAdminEl?.classList.contains("active")) closeEditPastEventPopup();
+        if (globalFlyerOverlayEff?.classList.contains("active")) hideFlyerPopupEff(); // Gestisce ESC per il popup volantino
       }
     });
 

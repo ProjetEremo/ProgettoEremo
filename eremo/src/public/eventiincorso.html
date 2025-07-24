@@ -909,6 +909,82 @@
     .custom-confirm-actions .btn-confirm-no:hover {
       background-color: var(--gray-medium);
     }
+
+    /* === NUOVI STILI PER INFO A "PILLOLE" (CON SPAZIATURA AGGIORNATA) === */
+    .card-info-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1rem 0 1.2rem 0; /* Aumentato lo spazio sopra e sotto */
+        padding-bottom: 1rem; /* Aumentato il padding inferiore */
+        border-bottom: 1px solid var(--gray-lighter);
+    }
+    .info-pill {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--background-light, #f8f9fa);
+        color: var(--primary-dark, #333);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: 1px solid var(--gray-light, #eee);
+        transition: all 0.2s ease-in-out;
+    }
+    .info-pill i {
+        margin-right: 0.5rem;
+        color: var(--primary);
+        font-size: 0.9em;
+    }
+    /* === FINE NUOVI STILI === */
+
+    /* === NUOVI STILI PER INFO POSTI E COSTO (CON ALLINEAMENTO CENTRATO) === */
+    .card-status-info {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center; /* Aggiunto per centrare le pillole */
+        gap: 0.6rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--gray-lighter, #f0f0f0);
+    }
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.9rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border: 1px solid transparent;
+    }
+    .status-pill i {
+        margin-right: 0.6rem;
+        font-size: 0.9em;
+    }
+    /* Pillola Posti */
+    .status-pill.posti {
+        background-color: rgba(var(--success-rgb, 40, 167, 69), 0.1);
+        color: var(--success-dark, #155724);
+    }
+    .status-pill.posti.low-seats {
+        background-color: rgba(255, 193, 7, 0.15); /* Giallo/Arancio */
+        color: #856404;
+    }
+    .status-pill.posti.sold-out {
+        background-color: rgba(var(--danger-rgb, 220, 53, 69), 0.1);
+        color: var(--danger-dark, #721c24);
+    }
+    /* Pillola Costo */
+    .status-pill.costo {
+        background-color: rgba(var(--primary-rgb, 54, 94, 81), 0.1);
+        color: var(--primary-dark, #2a4b40);
+    }
+    /* Pillola Utente */
+    .status-pill.user-info {
+        background-color: rgba(0, 123, 255, 0.1);
+        color: #004085;
+    }
   </style>
 </head>
 
@@ -1763,9 +1839,26 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
   }
 
-  function createEventCard(event) {
+   function createEventCard(event) {
     const card = document.createElement("article"); card.className = "card"; card.dataset.eventId = event.idevento;
     let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event.jpg";
+
+    // --- LOGICA PER LE "PILLOLE" INFORMATIVE GENERALI ---
+    let infoPillsHTML = '<div class="card-info-pills">';
+    if (event.datainizio) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-calendar-alt"></i> ${formatDate(event.datainizio)}</span>`;
+    }
+    if (event.durata) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-clock"></i> ${sanitizeText(event.durata)}</span>`;
+    }
+    if (event.relatore) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-user"></i> ${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>`;
+    }
+    if (event.associazione) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-users"></i> ${sanitizeText(event.associazione)}</span>`;
+    }
+    infoPillsHTML += '</div>';
+    
     if (currentUserData && currentUserData.isAdmin) {
       card.classList.add('admin-card');
       let volantinoAdminLinkHTML = event.volantino_url?.trim() ? `<p class="card-info" style="font-size:0.9em; margin-bottom: 0.5rem;"><b>Volantino:</b> <a href="${sanitizeForAttribute(event.volantino_url)}" target="_blank" title="Visualizza il volantino dell'evento">Visualizza Volantino</a></p>` : '';
@@ -1773,8 +1866,7 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
             <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
             <div class="card-content">
                 <h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3>
-                <p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario/Durata:</b> ${sanitizeText(event.durata)}` : ""}</p>
-                <p class="card-info"><b>${sanitizeText(event.prefisso_relatore) || "Relatore"}:</b> ${sanitizeText(event.relatore) || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${sanitizeText(event.associazione)}`: ""}</p>
+                ${infoPillsHTML}
                 <p class="card-description" style="font-size:0.95em; min-height: auto;">${sanitizeText(event.descrizione) || "Nessuna descrizione."}</p>
                 <p class="card-info" style="margin-bottom: 0.5rem;">
                     <b>Posti Disp.:</b> <span class="posti-disponibili">${event.posti_disponibili !== null ? event.posti_disponibili : 'N/D'}</span>
@@ -1796,6 +1888,40 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     } else {
       const postiDispEv = parseInt(event.posti_disponibili) || 0; const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
       const inCodaPerP = parseInt(event.in_coda_per_posti) || 0; const flagPrenDB = parseInt(event.flagprenotabile) === 1;
+      
+      // --- LOGICA PER LE "PILLOLE" DI STATO (POSTI E COSTO) ---
+      let statusPillsHTML = '<div class="card-status-info">';
+      let postiClass = 'posti';
+      let postiText = '';
+      if (!flagPrenDB) {
+          postiText = 'Pren. Chiuse';
+          postiClass += ' sold-out';
+      } else if (postiDispEv > 0) {
+          postiText = `${postiDispEv} Posti Disp.`;
+          if (postiDispEv <= 5) {
+              postiClass += ' low-seats';
+          }
+      } else {
+          postiText = 'Esaurito';
+          postiClass += ' sold-out';
+      }
+      statusPillsHTML += `<span class="status-pill ${postiClass}"><i class="fas fa-chair"></i> ${postiText}</span>`;
+
+      if (event.costo !== null) {
+          let costoText = parseFloat(event.costo) > 0 ? `€ ${parseFloat(event.costo).toFixed(2)}` : 'Offerta libera';
+          statusPillsHTML += `<span class="status-pill costo"><i class="fas fa-euro-sign"></i> ${costoText}</span>`;
+      }
+      if (currentUserData) {
+          if (pGiaPrenUt > 0) {
+              statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-check"></i> ${pGiaPrenUt} Posti tuoi</span>`;
+          }
+          if (inCodaPerP > 0) {
+              statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-clock"></i> In coda per ${inCodaPerP}</span>`;
+          }
+      }
+      statusPillsHTML += '</div>';
+      // --- FINE LOGICA PILLOLE DI STATO ---
+
       let primaryBtnHTML = '', volantinoBtnHTML = "";
       if (event.volantino_url?.trim()) { volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${sanitizeForAttribute(event.volantino_url)}">Volantino</button>`; }
       else { volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="">Dettagli</button>`; }
@@ -1804,13 +1930,22 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
       else if (inCodaPerP > 0) primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`;
       else if (postiDispEv > 0) primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`;
       else primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Entra in Coda</button>`;
-      card.innerHTML = `<div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo || "Evento")}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div><div class="card-content"><h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3><p class="card-info"><b>Data:</b> ${formatDate(event.datainizio)}${event.durata ? `<br><b>Orario:</b> ${sanitizeText(event.durata)}` : ""}</p><p class="card-info"><b>${sanitizeText(event.prefisso_relatore) || "Relatore"}:</b> ${sanitizeText(event.relatore) || "N/D"}${event.associazione ? `<br><b>Associazione:</b> ${sanitizeText(event.associazione)}` : ""}</p><p class="card-description">${sanitizeText(event.descrizione) || "Nessuna descrizione."}</p><p class="card-info"><b>Posti Disponibili:</b> <span class="posti-disponibili">${postiDispEv > 0 ? postiDispEv : (flagPrenDB ? 'Esaurito' : 'Pren. Chiuse')}</span>${(currentUserData && pGiaPrenUt > 0) ? `<br><b>Tuoi posti:</b> <span class="posti-disponibili">${pGiaPrenUt}</span>` : ''}${(currentUserData && inCodaPerP > 0) ? `<br><b>In coda per:</b> <span class="posti-disponibili">${inCodaPerP} posti</span>` : ''}${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} €` : (parseFloat(event.costo) === 0.00 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}</p><div class="card-actions">${volantinoBtnHTML}${primaryBtnHTML}</div></div>`;
+      
+      card.innerHTML = `<div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+        <div class="card-content">
+            <h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3>
+            ${infoPillsHTML}
+            <p class="card-description">${sanitizeText(event.descrizione) || "Nessuna descrizione."}</p>
+            ${statusPillsHTML}
+            <div class="card-actions">${volantinoBtnHTML}${primaryBtnHTML}</div>
+        </div>`;
       const actionBtn = card.querySelector('.btn-prenota'); if (actionBtn && !actionBtn.disabled) { actionBtn.addEventListener('click', function () { const act = this.dataset.action; const eId = this.dataset.eventId; const eTitle = this.dataset.eventTitle; const pDisp = parseInt(this.dataset.postiDisponibiliEvento); const pGiaPren = parseInt(this.dataset.postiGiaPrenotatiUtente); if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: act, eventId: eId, eventTitle: eTitle, postiDisp: pDisp, postiGiaPren: pGiaPren })); return; } if (act === 'book') { if (typeof window.openBookingPopup === 'function') window.openBookingPopup(eId, eTitle, pDisp, pGiaPren); } else if (act === 'waitlist') { if (typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(eId, eTitle, pGiaPren); } }); }
       const viewFlyerBtn = card.querySelector(".btn-visualizza-volantino");
       if (viewFlyerBtn) viewFlyerBtn.addEventListener("click", function () { if (typeof showFlyerPopupEff === 'function') showFlyerPopupEff(this.dataset.volantinoUrl); });
     }
     return card;
   }
+
 
   function formatDate(dateString) {
     if (!dateString) return "Data non disponibile";
