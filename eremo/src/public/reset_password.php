@@ -41,7 +41,7 @@ if (isset($_GET['token'])) {
                 $server_timezone = new DateTimeZone('Europe/Rome');
                 $now = new DateTime("now", $server_timezone);
                 $expires = new DateTime($token_data['expires_at'], $server_timezone);
-
+                
                 // error_log("Data/Ora Corrente (Europe/Rome): " . $now->format('Y-m-d H:i:s'));
                 // error_log("Data/Ora Scadenza Token (Europe/Rome): " . $expires->format('Y-m-d H:i:s'));
 
@@ -150,9 +150,9 @@ if (isset($_GET['token'])) {
     const newPasswordInput = document.getElementById('new_password');
     const confirmPasswordInput = document.getElementById('confirm_password');
     const resetInstructionsP = document.getElementById('resetInstructions');
-    const resetPageTitleH1 = document.getElementById('resetPageTitle');
-    const resetLogoContainerDiv = document.getElementById('resetLogoContainer');
-    const tokenErrorMessageContainerDiv = document.getElementById('tokenErrorMessageContainer');
+    const resetPageTitleH1 = document.getElementById('resetPageTitle'); 
+    const resetLogoContainerDiv = document.getElementById('resetLogoContainer'); 
+    const tokenErrorMessageContainerDiv = document.getElementById('tokenErrorMessageContainer'); 
 
     if (resetPasswordForm) {
       resetPasswordForm.addEventListener('submit', async (e) => {
@@ -206,22 +206,22 @@ if (isset($_GET['token'])) {
 
             if(resetPasswordMessage) {
                 resetPasswordMessage.textContent = result.message; // Messaggio da aggiorna_password.php ("Password aggiornata con successo!")
-                resetPasswordMessage.classList.remove('error');
+                resetPasswordMessage.classList.remove('error'); 
                 resetPasswordMessage.classList.add('success');
                 resetPasswordMessage.style.display = 'block';
-                resetPasswordMessage.style.textAlign = 'center';
+                resetPasswordMessage.style.textAlign = 'center'; 
             }
-
+            
             const pLink = document.createElement('p');
             pLink.style.marginTop = '1.5rem';
             pLink.style.fontSize = '0.9em';
-            pLink.style.textAlign = 'center';
+            pLink.style.textAlign = 'center'; 
             const aLink = document.createElement('a');
-            aLink.href = 'index.html';
+            aLink.href = 'index.html'; 
             aLink.textContent = 'Vai alla Home Page per Accedere';
             aLink.style.color = 'var(--primary)';
             pLink.appendChild(aLink);
-
+            
             const resetContainer = document.querySelector('.reset-container');
             if (resetContainer) {
                 // Assicurati che il messaggio di successo sia visibile e aggiunto al contenitore principale
@@ -236,7 +236,7 @@ if (isset($_GET['token'])) {
                 resetContainer.appendChild(pLink);
             }
 
-          } else {
+          } else { 
             if(resetPasswordMessage) {
                 resetPasswordMessage.textContent = result.message || "Si è verificato un errore durante l'aggiornamento.";
                 resetPasswordMessage.classList.remove('success');

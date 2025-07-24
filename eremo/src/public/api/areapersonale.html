@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Area Personale - Eremo Frate Francesco</title>
+  <link rel="stylesheet" href="style.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    /* ... (stili CSS dalla risposta precedente, sono corretti) ... */
+    .avatar-options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px; margin-top: 1rem; margin-bottom: 1rem; }
+    .avatar-option-image { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 3px solid transparent; transition: border-color 0.3s ease; }
+    .avatar-option-image.selected { border-color: var(--primary); box-shadow: 0 0 10px rgba(141, 177, 135, 0.5); }
+    .avatar-container#main-avatar img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--white); box-shadow: var(--shadow-light); }
+    .user-avatar#navbar-avatar img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+    .profile-header .avatar-container { width: 120px; height: 120px; display: flex; justify-content: center; align-items: center; margin-bottom: 0.5rem; }
+    .prenotazione-card-past { opacity: 0.7; background-color: #f9f9f9; }
+    .form-message { margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.95rem; text-align: center; display: none; }
+    .form-message.success { background-color: rgba(46, 204, 113, 0.15); border: 1px solid var(--success, green); color: var(--dark, black); }
+    .form-message.error { background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--danger, red); color: var(--dark, black); }
+    .profile-section form:has(button:disabled) { opacity: 0.7; pointer-events: none; }
+    .profile-section form button:disabled { background-color: var(--gray-medium) !important; cursor: not-allowed; }
+    .profile-section form input:disabled { background-color: #e9ecef !important; }
+  </style>
+</head>
+<body>
+
+<header class="navbar-container" id="navbarContainer">
+  <nav class="navbar">
+    <div class="logo">
+      <a href="indexaccesso.html" style="text-decoration: none; color: inherit;">
+        <span class="emoji">🏔️</span>
+        <h2>Eremo Frate Francesco</h2>
+      </a>
+    </div>
+    <div class="menu">
+      <a href="eventiincorsoaccesso.html">Calendario attività</a>
+      <a href="eventipassatiaccesso.html">Archivio attività</a>
+      <span class="separator">|</span>
+      <a href="incontrisullaparolaaccesso.html">Incontri sulla parola</a>
+      <span class="separator">|</span>
+      <a href="dovesiamoaccesso.html">Dove siamo</a>
+      <a href="contattiaccesso.html">Contatti</a>
+    </div>
+    <div class="right-menu">
+      <div class="user-dropdown" id="userDropdownContainer">
+        <button class="user-btn" onclick="toggleUserMenu(event)" aria-haspopup="true" aria-expanded="false">
+          <span class="user-avatar" id="navbar-avatar"><img src="uploads/icons/default_user.png" alt="User"></span>
+          <span class="user-name" id="navbar-username">Ospite</span>
+          <span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="userDropdownContainer">
+          <a href="areapersonale.html">Il mio profilo</a>
+          <a href="gestisciprenotazioni.html">Le mie prenotazioni</a>
+          <a href="#" onclick="logout()">Esci</a>
+        </div>
+      </div>
+      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="chi-siamoaccesso.html" onclick="closeMobileMenu()">Chi siamo</a>
+    <a href="eventiincorsoaccesso.html" onclick="closeMobileMenu()">Calendario attività</a>
+    <a href="eventipassatiaccesso.html" onclick="closeMobileMenu()">Archivio attività</a>
+    <a href="incontrisullaparolaaccesso.html" onclick="closeMobileMenu()">Incontri sulla parola</a>
+    <a href="dovesiamoaccesso.html" onclick="closeMobileMenu()">Dove siamo</a>
+    <a href="contattiaccesso.html" onclick="closeMobileMenu()">Contatti</a>
+    <hr style="border-color: rgba(255,255,255,0.1);">
+    <a href="areapersonale.html" onclick="closeMobileMenu()">Il mio profilo</a>
+    <a href="gestisciprenotazioni.html" onclick="closeMobileMenu()">Le mie prenotazioni</a>
+    <a href="#" onclick="logout(); closeMobileMenu();">Esci</a>
+  </div>
+</header>
+
+<main>
+  <div class="profile-header">
+    <div class="avatar-container" id="main-avatar">
+      <img src="uploads/icons/default_user.png" alt="Icona Profilo Utente">
+    </div>
+    <h1 id="profile-greeting">Area Personale</h1>
+    <p>Gestisci le tue informazioni personali e le preferenze.</p>
+  </div>
+
+  <div class="container">
+    <section class="profile-section">
+      <h2><i class="fas fa-user-edit" style="margin-right: 8px;"></i> Informazioni Personali</h2>
+      <form id="profile-info-form">
+        <div class="form-grid">
+          <div class="form-group"> <label for="nome">Nome</label> <input type="text" id="nome" name="nome" class="form-control" required> </div>
+          <div class="form-group"> <label for="cognome">Cognome</label> <input type="text" id="cognome" name="cognome" class="form-control" required> </div>
+          <div class="form-group full-width"> <label for="email">Email</label> <input type="email" id="email" name="email" class="form-control" disabled> </div>
+        </div>
+        <button type="submit" class="btn-save">Salva Info Personali</button>
+        <p id="profile-info-message" class="form-message" style="display:none;"></p>
+      </form>
+    </section>
+
+    <section class="profile-section">
+      <h2><i class="fas fa-image" style="margin-right: 8px;"></i> Icona Profilo</h2>
+      <p>Scegli un'icona che ti rappresenti:</p>
+      <div class="avatar-options-grid" id="avatar-options-container"> <p>Caricamento icone disponibili...</p> </div>
+      <button class="btn-save" id="save-icon-btn">Salva Icona</button>
+      <p id="icon-save-message" class="form-message" style="display:none;"></p>
+    </section>
+
+    <section class="profile-section">
+      <h2><i class="fas fa-lock" style="margin-right: 8px;"></i> Sicurezza Account</h2>
+      <form id="password-change-form">
+        <div class="form-grid">
+          <div class="form-group"> <label for="vecchia-password">Password Attuale</label> <input type="password" id="vecchia-password" class="form-control" required> </div>
+          <div class="form-group"> <label for="nuova-password">Nuova Password</label> <input type="password" id="nuova-password" class="form-control" required minlength="8"> <small>Minimo 8 caratteri.</small> </div>
+          <div class="form-group"> <label for="conferma-password">Conferma Nuova Password</label> <input type="password" id="conferma-password" class="form-control" required> </div>
+        </div>
+        <button type="submit" class="btn-save">Cambia Password</button>
+        <p id="password-change-message" class="form-message" style="display:none;"></p>
+      </form>
+    </section>
+
+    <section class="profile-section" id="prenotazioni">
+      <h2><i class="fas fa-calendar-check" style="margin-right: 8px;"></i> Le Mie Prenotazioni</h2>
+      <div id="user-bookings-grid" class="card-grid"> <p style="text-align:center; padding:1rem;">Caricamento prenotazioni...</p> </div>
+      <div id="no-bookings-message" style="display: none; text-align: center; padding: 2rem;">
+        <p>Non hai nessuna prenotazione attiva al momento.</p>
+        <a href="eventiincorsoaccesso.html" class="btn-primary" style="display: inline-block; margin-top: 1rem;">Scopri le attività</a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer> <p>&copy; <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati.</p> </footer>
+
+<script>
+  let lastScroll = 0;
+  const navbarContainer = document.getElementById('navbarContainer');
+  const mobileMenu = document.getElementById("mobileMenu");
+  const hamburger = document.querySelector(".navbar .hamburger");
+  const defaultIconPath = 'uploads/icons/default_user.png'; // Path relativo alla root del sito
+  let selectedIconPath = defaultIconPath;
+  let currentUserDataFromStorage = null;
+
+  // Funzioni UI Navbar e Menu (invariate)
+  if (navbarContainer) { /* ... */ }
+  function toggleMobileMenu() { /* ... */ }
+  function closeMobileMenu() { /* ... */ }
+  function toggleUserMenu(event) { /* ... */ }
+  document.addEventListener('click', function(event) { /* ... */ });
+  function displayMessage(elementId, message, isSuccess) { /* ... */ }
+
+  async function callApi(url, method = 'GET', data = null) {
+    const headers = { 'Content-Type': 'application/json' };
+    const options = { method, headers, credentials: 'omit' };
+    if (data && (method === 'POST' || method === 'PUT')) {
+      options.body = JSON.stringify(data);
+    }
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        let errorData = { message: `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
+        try { errorData = await response.json(); } catch (e) { /* usa default */ }
+        console.error(errorData.message || `Errore API per ${url} con stato ${response.status}`); // Log più dettagliato
+        throw new Error(errorData.message || `Errore del server: ${response.status} per ${url}`);
+      }
+      if (response.status === 204) return {};
+      return await response.json();
+    } catch (error) {
+      // L'errore viene già loggato sopra se è un errore HTTP
+      // Se è un errore di rete (fetch fallita prima di una risposta HTTP), error.message sarà utile
+      console.error(`Fallimento chiamata API a ${url}:`, error.message);
+      throw error; // Rilancia per gestione specifica nel chiamante
+    }
+  }
+
+  function initializeUIForGuest(errorMessage = "Funzionalità non disponibile. Effettua il login.") {
+    const mainAvatarImg = document.querySelector('#main-avatar img');
+    const navbarAvatarImg = document.querySelector('#navbar-avatar img');
+    const navbarUsername = document.getElementById('navbar-username');
+    const profileGreeting = document.getElementById('profile-greeting');
+
+    if(mainAvatarImg) mainAvatarImg.src = defaultIconPath;
+    if(navbarAvatarImg) navbarAvatarImg.src = defaultIconPath;
+    if(navbarUsername) navbarUsername.textContent = 'Ospite';
+    if(profileGreeting) profileGreeting.textContent = 'Area Personale';
+
+    const emailInput = document.getElementById('email');
+    if(emailInput) emailInput.value = '';
+
+    document.querySelectorAll('#profile-info-form input:not(#email), #profile-info-form button').forEach(el => el.disabled = true);
+    document.querySelectorAll('#save-icon-btn, #password-change-form input, #password-change-form button').forEach(el => el.disabled = true);
+    
+    const avatarContainer = document.getElementById('avatar-options-container');
+    if(avatarContainer) avatarContainer.innerHTML = `<p>${errorMessage}</p>`;
+    const bookingsGrid = document.getElementById('user-bookings-grid');
+    if(bookingsGrid) bookingsGrid.innerHTML = `<p style="text-align:center;">${errorMessage}</p>`;
+    const noBookingsMsg = document.getElementById('no-bookings-message');
+    if(noBookingsMsg) noBookingsMsg.style.display = 'none';
+    // Non mostrare un messaggio globale qui, le singole sezioni mostreranno il loro stato
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const currentYearEl = document.getElementById('currentYear');
+    if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
+
+    const userDataString = localStorage.getItem('userDataEFF');
+    if (userDataString) {
+        try {
+            currentUserDataFromStorage = JSON.parse(userDataString);
+            const navbarUsername = document.getElementById('navbar-username');
+            const navbarAvatarImg = document.querySelector('#navbar-avatar img');
+            const mainAvatarImg = document.querySelector('#main-avatar img');
+            const profileGreeting = document.getElementById('profile-greeting');
+
+            if (navbarUsername) navbarUsername.textContent = currentUserDataFromStorage.nome || 'Utente';
+            selectedIconPath = currentUserDataFromStorage.iconPath || defaultIconPath;
+            if (navbarAvatarImg) navbarAvatarImg.src = selectedIconPath;
+            if (mainAvatarImg) mainAvatarImg.src = selectedIconPath;
+            if (profileGreeting) profileGreeting.textContent = `Ciao, ${currentUserDataFromStorage.nome || 'Utente'}!`;
+            const emailInput = document.getElementById('email');
+            if (emailInput) emailInput.value = currentUserDataFromStorage.email || '';
+        } catch(e) {
+            currentUserDataFromStorage = null;
+            initializeUIForGuest("Errore nel caricamento dei dati locali."); // Chiama initializeUIForGuest se localStorage è corrotto
+        }
+    } else {
+        initializeUIForGuest("Effettua il login per accedere a tutte le funzionalità."); // Chiama se localStorage è vuoto
+    }
+
+    if (currentUserDataFromStorage) { // Tenta chiamate API solo se c'è un utente da localStorage
+        await loadUserProfileFromServer();
+        await loadAvailableIcons();
+        await loadUserBookings();
+    }
+
+    if (window.location.hash === '#prenotazioni') { /* ... */ }
+  });
+
+  async function loadUserProfileFromServer() {
+    const mainAvatarImg = document.querySelector('#main-avatar img');
+    const navbarAvatarImg = document.querySelector('#navbar-avatar img');
+    const navbarUsername = document.getElementById('navbar-username');
+    const profileGreeting = document.getElementById('profile-greeting');
+
+    document.querySelectorAll('#profile-info-form input:not([disabled]), #profile-info-form button').forEach(el => el.disabled = false);
+    document.querySelectorAll('#save-icon-btn, #password-change-form input, #password-change-form button').forEach(el => el.disabled = false);
+
+    try {
+      const apiUserData = await callApi('api/api_get_user_profile.php'); // Path corretto con api/
+      if (apiUserData && apiUserData.success) {
+        const data = apiUserData.data;
+        document.getElementById('nome').value = data.nome || '';
+        document.getElementById('cognome').value = data.cognome || '';
+        document.getElementById('email').value = data.email || (currentUserDataFromStorage ? currentUserDataFromStorage.email : 'N/D'); // Fallback a localStorage se API non la manda
+
+        selectedIconPath = data.icon || defaultIconPath;
+        if(mainAvatarImg) mainAvatarImg.src = selectedIconPath;
+        if(navbarAvatarImg) navbarAvatarImg.src = selectedIconPath;
+
+        if(navbarUsername) navbarUsername.textContent = data.nome || 'Utente';
+        if(profileGreeting) profileGreeting.textContent = `Ciao, ${data.nome || 'Utente'}!`;
+        
+        currentUserDataFromStorage = { // Aggiorna i dati locali con quelli freschi dall'API
+            nome: data.nome, 
+            cognome: data.cognome, // Aggiungi cognome
+            email: data.email, 
+            iconPath: selectedIconPath 
+        };
+        localStorage.setItem('userDataEFF', JSON.stringify(currentUserDataFromStorage));
+        updateIconSelectionVisual();
+      } else if (apiUserData && !apiUserData.success) {
+        // L'API ha risposto ma con success:false
+        displayMessage('profile-info-message', apiUserData.message || "Errore recupero profilo.", false);
+      }
+    } catch (error) { // Errore fetch (es. 404, 500, rete)
+      displayMessage('profile-info-message', `Errore caricamento profilo: ${error.message}.`, false);
+      // Non disabilitare i form qui, lascia che initializeUIForGuest lo faccia se currentUserDataFromStorage era null
+    }
+  }
+
+  function updateIconSelectionVisual() { /* ... (invariata) ... */ }
+
+  async function loadAvailableIcons() {
+    const container = document.getElementById('avatar-options-container');
+    if (!container) return;
+    container.innerHTML = '<p>Caricamento icone...</p>';
+    try {
+      const iconsData = await callApi('api/api_get_icons.php'); // Path corretto con api/
+      if (iconsData.success && iconsData.icons && iconsData.icons.length > 0) {
+        container.innerHTML = '';
+        iconsData.icons.forEach(path => { /* ... */ });
+        updateIconSelectionVisual();
+      } else {
+        container.innerHTML = `<p>${iconsData.message || 'Nessuna icona disponibile.'}</p>`;
+      }
+    } catch (error) {
+      container.innerHTML = `<p class="form-message error" style="display:block;">Errore caricamento icone: ${error.message}</p>`;
+    }
+  }
+
+  document.getElementById('save-icon-btn')?.addEventListener('click', async () => { /* ... (URL API modificato: 'api/api_update_user_icon.php') ... */
+    if (!currentUserDataFromStorage) { displayMessage('icon-save-message', 'Devi essere loggato.', false); return; }
+    try {
+      const response = await callApi('api/api_update_user_icon.php', 'PUT', { icon: selectedIconPath });
+      if (response.success) { /* ... */ } else { /* ... */ }
+    } catch (error) { /* ... */ }
+  });
+
+  document.getElementById('profile-info-form')?.addEventListener('submit', async (e) => { /* ... (URL API modificato: 'api/api_update_user_profile.php') ... */
+    e.preventDefault();
+    if (!currentUserDataFromStorage) { displayMessage('profile-info-message', 'Devi essere loggato.', false); return; }
+    const updatedInfo = { nome: document.getElementById('nome').value, cognome: document.getElementById('cognome').value };
+    try {
+      const response = await callApi('api/api_update_user_profile.php', 'PUT', updatedInfo);
+      if (response.success) { /* ... */ } else { /* ... */ }
+    } catch (error) { /* ... */ }
+  });
+
+  document.getElementById('password-change-form')?.addEventListener('submit', async (e) => { /* ... (URL API modificato: 'api/api_change_password.php') ... */
+    e.preventDefault();
+    if (!currentUserDataFromStorage) { displayMessage('password-change-message', 'Devi essere loggato.', false); return; }
+    const oldPassword = document.getElementById('vecchia-password').value;
+    const newPassword = document.getElementById('nuova-password').value;
+    const confirmPassword = document.getElementById('conferma-password').value;
+    if (newPassword !== confirmPassword) { /* ... */ } if (newPassword.length < 8) { /* ... */ }
+    try {
+      const response = await callApi('api/api_change_password.php', 'POST', { oldPassword, newPassword });
+      if (response.success) { /* ... */ } else { /* ... */ }
+    } catch (error) { /* ... */ }
+  });
+
+  async function loadUserBookings() { /* ... (URL API modificato: 'api/api_get_user_bookings.php') ... */
+    const bookingsGrid = document.getElementById('user-bookings-grid');
+    const noBookingsMsg = document.getElementById('no-bookings-message');
+    if (!bookingsGrid || !noBookingsMsg) return;
+    bookingsGrid.innerHTML = '<p style="text-align:center; padding:1rem;">Caricamento prenotazioni...</p>';
+    noBookingsMsg.style.display = 'none';
+    try {
+      const response = await callApi('api/api_get_user_bookings.php');
+      if (response.success && response.bookings) { /* ... */ } else { /* ... */ }
+    } catch (error) { /* ... */ }
+  }
+
+  function attachCancelBookingListeners() { /* ... (invariata) ... */ }
+  async function handleCancelBooking(event) { /* ... (URL API modificato: 'api/api_cancel_booking.php') ... */
+    if (!currentUserDataFromStorage) { /* ... */ }
+    if (confirm('Sei sicuro?')) {
+      try {
+        const response = await callApi('api/api_cancel_booking.php', 'POST', { idPrenotazione: button.dataset.bookingId });
+        if (response.success) { /* ... */ } else { /* ... */ }
+      } catch (error) { /* ... */ }
+    }
+  }
+  function logout() { /* ... (invariata) ... */ }
+
+  // Copia qui le implementazioni complete delle funzioni abbreviate (es. toggleMobileMenu, loadAvailableIcons, etc.)
+  // dalla risposta precedente se necessario, assicurandoti che i percorsi API dentro di esse
+  // siano 'api/nome_script.php'
+
+</script>
+</body>
+</html>

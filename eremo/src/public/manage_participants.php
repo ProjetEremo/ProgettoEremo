@@ -45,7 +45,7 @@ if ($action === 'remove_participant') {
             $stmtUpdatePrenotazione->bind_param("ii", $prenotazioneProgressivo, $eventId);
             $stmtUpdatePrenotazione->execute();
             $stmtUpdatePrenotazione->close();
-
+            
             // 4. Incrementa PostiDisponibili nell'evento
             $stmtUpdateEvent = $conn->prepare("UPDATE eventi SET PostiDisponibili = PostiDisponibili + 1 WHERE IDEvento = ?");
             $stmtUpdateEvent->bind_param("i", $eventId);

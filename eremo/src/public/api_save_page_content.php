@@ -1,7 +1,6 @@
 <?php
+session_start(); // Necessario per controllare lo stato di admin
 header('Content-Type: application/json; charset=utf-8');
-require_once 'config_session.php'; // PRIMA COSA
-require_login(); // Verifica se l'utente è loggato
 require_once 'config/db_config.php'; // Adatta il percorso se necessario
 
 $response = ['success' => false, 'message' => ''];
@@ -13,8 +12,7 @@ if (!$conn || $conn->connect_errno) {
     exit;
 }
 
-// Verifica autenticazione Admin (CONTROLLA CHE LE CHIAVI SESSIONE SIANO CORRETTE)
-// Assumo che login.php imposti $_SESSION['is_admin'] === true per gli admin
+// Verifica autenticazione Admin
 if (!isset($_SESSION['user_email']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     http_response_code(403); // Forbidden
     $response['message'] = 'Accesso non autorizzato. Solo gli amministratori possono salvare i contenuti.';
@@ -30,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $inputJSON = file_get_contents('php://input');
-$input = json_decode($inputJSON, TRUE);
+$input = json_decode($inputJSON, TRUE); // TRUE per avere un array associativo
 
 if (empty($input) || !isset($input['page_name']) || !isset($input['contents']) || !is_array($input['contents'])) {
     http_response_code(400); // Bad Request
@@ -44,6 +42,7 @@ $contentsToSave = $input['contents'];
 
 if (empty($pageName)) {
     $response['message'] = 'Nome pagina non specificato per il salvataggio.';
+    http_response_code(400); // Bad Request
     echo json_encode($response);
     exit;
 }
@@ -57,28 +56,32 @@ try {
     }
 
     $savedCount = 0;
-    $updatedCount = 0;
 
     foreach ($contentsToSave as $key => $value) {
         $keyTrimmed = trim($key);
-        // Assicurati che $value sia una stringa, anche se vuota.
-        // Se il database accetta NULL per valore_contenuto e vuoi salvare stringhe vuote come NULL:
-        // $valueToStore = ($value === '') ? null : $value;
-        $valueToStore = strval($value); // Converte in stringa
+        $valueToStore = '';
+
+        // Se il valore è un array (es. card1PhoneNumbers), lo convertiamo in una stringa JSON.
+        // Altrimenti, lo convertiamo in una stringa normale.
+        if (is_array($value)) {
+            $valueToStore = json_encode($value);
+            if ($valueToStore === false) {
+                // Errore nella codifica JSON, potresti voler loggare o gestire diversamente
+                error_log("Errore json_encode per chiave $keyTrimmed: " . json_last_error_msg());
+                $valueToStore = '[]'; // Salva come array JSON vuoto o gestisci l'errore
+            }
+        } else {
+            $valueToStore = strval($value); // Converte in stringa per altri tipi
+        }
 
         $stmt->bind_param("sss", $pageName, $keyTrimmed, $valueToStore);
         if ($stmt->execute()) {
-            // affected_rows: 1 per INSERT, 2 per UPDATE se il valore cambia, 0 se il valore non cambia
             if ($stmt->affected_rows > 0) {
-                 // Per distinguere tra INSERT e UPDATE, potresti fare una SELECT prima,
-                 // ma ON DUPLICATE KEY UPDATE è più efficiente.
-                 // Per semplicità, contiamo solo se qualcosa è stato "toccato".
                 $savedCount++;
             }
         } else {
             error_log("Errore esecuzione salvataggio per chiave $keyTrimmed: " . $stmt->error);
             // Considera se vuoi interrompere o continuare con gli altri.
-            // Per ora, continuiamo.
         }
     }
     $stmt->close();
@@ -93,6 +96,9 @@ try {
     http_response_code(500);
 }
 
-$conn->close();
+if ($conn) {
+    $conn->close();
+}
+
 echo json_encode($response);
 ?>

@@ -6,7 +6,7 @@ session_start(); // Necessario per identificare l'utente loggato
 // Path fisico alla cartella 'uploads/icons/' relativo alla root del sito.
 // __DIR__ è la cartella corrente (es. /membri/tuosito/api)
 // dirname(__DIR__) è la cartella genitore (es. /membri/tuosito/)
-$base_path = dirname(__DIR__);
+$base_path = dirname(__DIR__); 
 $icons_directory_path = $base_path . '/uploads/icons/'; // Percorso FISICO sul server
 $icons_web_path_prefix = 'uploads/icons/'; // Prefisso del percorso WEB (relativo alla root del sito, senza slash iniziale qui perché lo aggiungiamo dopo)
 

@@ -153,9 +153,9 @@ if ($action === 'upload_media') {
     }
     $mediaItems = [];
     // AGGIORNATO: Query SQL per includere Descrizione
-    $sql = "SELECT Progressivo as id_media, IDEvento, Percorso as url_media, Descrizione
-            FROM media
-            WHERE IDEvento = ?
+    $sql = "SELECT Progressivo as id_media, IDEvento, Percorso as url_media, Descrizione 
+            FROM media 
+            WHERE IDEvento = ? 
             ORDER BY Progressivo DESC";
     $stmt = $conn->prepare($sql);
     if (!$stmt) {

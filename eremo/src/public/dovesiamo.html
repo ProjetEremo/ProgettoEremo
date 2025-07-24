@@ -127,9 +127,9 @@
       transform: translate(50%, -50%) scale(0.8);
     }
     .map-container .edit-icon-iframe { /* Specifico per l'iframe della mappa */
-      top: 10px; /* Esempio: Spostato un po' più in basso */
-      right: 10px; /* Esempio: Spostato un po' più a sinistra */
-      transform: translate(0, 0) scale(0.8); /* Rimosso il translate(50%, -50%) se dà problemi */
+        top: 10px; /* Esempio: Spostato un po' più in basso */
+        right: 10px; /* Esempio: Spostato un po' più a sinistra */
+        transform: translate(0, 0) scale(0.8); /* Rimosso il translate(50%, -50%) se dà problemi */
     }
     .editable-text-wrapper:hover .edit-icon-text,
     .editable-iframe-wrapper:hover .edit-icon-iframe,
@@ -645,7 +645,7 @@
   function showPageStatus(message, type = 'info', duration = 3000) {
     if (!pageOverallStatus) return;
     pageOverallStatus.textContent = message;
-    pageOverallStatus.className = 'form-message';
+    pageOverallStatus.className = 'form-message'; 
     pageOverallStatus.classList.remove('success', 'error', 'active');
 
     if (type === 'success') {
@@ -656,7 +656,7 @@
     if (pageOverallStatus.hideTimeout) {
       clearTimeout(pageOverallStatus.hideTimeout);
     }
-    void pageOverallStatus.offsetHeight;
+    void pageOverallStatus.offsetHeight; 
     pageOverallStatus.classList.add('active');
 
     pageOverallStatus.hideTimeout = setTimeout(() => {
@@ -722,31 +722,31 @@
           } else if (parentWrapper.closest('.location-description')) {
             const targetEl = parentWrapper.querySelector('[data-content-key]');
             if (targetEl && (targetEl.tagName === 'H2' || targetEl.tagName === 'P')) {
-              translateX = 'calc(100% + 5px)'; // Sposta a destra del testo
-              translateY = '-50%';
+               translateX = 'calc(100% + 5px)'; // Sposta a destra del testo
+               translateY = '-50%';
             }
           } else if (parentWrapper.closest('.location-actions') && icon.classList.contains('edit-icon-href')) {
-            translateX = 'calc(100% + 5px)'; // Sposta a destra del bottone
-            translateY = '-50%';
+             translateX = 'calc(100% + 5px)'; // Sposta a destra del bottone
+             translateY = '-50%';
           } else if (parentWrapper.closest('.location-info-cards .editable-text-wrapper')) {
-            // Se è un H2 dentro location-info-cards
-            const targetH2 = parentWrapper.querySelector('h2[data-content-key="infoUtiliHeading"]');
-            if (targetH2 && targetH2 === parentWrapper.querySelector('[data-content-key]')) {
-              translateX = '50%'; // Per il titolo grande Info Utili, centro
-              translateY = '-50%';
-            } else { // Per i paragrafi nelle card
-              translateX = '50%'; // Centro rispetto al paragrafo
-              translateY = '-50%';
-            }
+             // Se è un H2 dentro location-info-cards
+             const targetH2 = parentWrapper.querySelector('h2[data-content-key="infoUtiliHeading"]');
+             if (targetH2 && targetH2 === parentWrapper.querySelector('[data-content-key]')) {
+                translateX = '50%'; // Per il titolo grande Info Utili, centro
+                translateY = '-50%';
+             } else { // Per i paragrafi nelle card
+                translateX = '50%'; // Centro rispetto al paragrafo
+                translateY = '-50%';
+             }
           } else if (parentWrapper.classList.contains('map-container') && icon.classList.contains('edit-icon-iframe')) {
-            translateX = '50%'; // Per l'icona della mappa
-            translateY = '-50%';
-            // Sovrascrivi per posizionare in alto a destra DELL'IFRAME, non del contenitore
-            icon.style.top = '10px';
-            icon.style.right = '10px';
-            icon.style.transform = 'translate(0,0) scale(0.8)'; // Rimuovi il translate 50%
-            icon.style.setProperty('--custom-translate-x', '0'); // Non usare il translate generale
-            icon.style.setProperty('--custom-translate-y', '0');
+             translateX = '50%'; // Per l'icona della mappa
+             translateY = '-50%';
+             // Sovrascrivi per posizionare in alto a destra DELL'IFRAME, non del contenitore
+             icon.style.top = '10px';
+             icon.style.right = '10px';
+             icon.style.transform = 'translate(0,0) scale(0.8)'; // Rimuovi il translate 50%
+             icon.style.setProperty('--custom-translate-x', '0'); // Non usare il translate generale
+             icon.style.setProperty('--custom-translate-y', '0');
           }
           icon.style.setProperty('--custom-translate-x', translateX);
           icon.style.setProperty('--custom-translate-y', translateY);
@@ -756,15 +756,15 @@
           if (! (icon.classList.contains('edit-icon-iframe') && parentWrapper.classList.contains('map-container') ) ) { // Non applicare a icona mappa
             icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(1)`;
           } else {
-            icon.style.transform = `translate(0,0) scale(1)`; //  Per icona mappa
+             icon.style.transform = `translate(0,0) scale(1)`; //  Per icona mappa
           }
         }, 10);
       } else {
         icon.style.opacity = '0';
-        if (! (icon.classList.contains('edit-icon-iframe') && icon.closest('.map-container')) ) {
-          icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(0.8)`;
+         if (! (icon.classList.contains('edit-icon-iframe') && icon.closest('.map-container')) ) {
+            icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(0.8)`;
         } else {
-          icon.style.transform = `translate(0,0) scale(0.8)`;
+            icon.style.transform = `translate(0,0) scale(0.8)`;
         }
         setTimeout(() => {
           icon.style.display = 'none';
@@ -874,9 +874,9 @@
         currentVal = elToEdit.href;
       } else { // text o textarea
         currentVal = currentPageDbContents[key] || defaultPageContents[key]; // Usa il valore grezzo da currentPageDbContents
-        if (typeof currentVal === 'object' && currentVal !== null) { // Caso speciale per infoQuandoText
-          currentVal = JSON.stringify(currentVal); // Potrebbe non servire se la modale lo gestisce come oggetto
-        }
+         if (typeof currentVal === 'object' && currentVal !== null) { // Caso speciale per infoQuandoText
+             currentVal = JSON.stringify(currentVal); // Potrebbe non servire se la modale lo gestisce come oggetto
+         }
       }
       openEditModal(key, type, currentVal);
     }

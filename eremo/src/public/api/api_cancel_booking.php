@@ -33,7 +33,7 @@ function inviaEmailNotificaCoda($destinatarioEmail, $nomeEvento, $postiRichiesti
     $subject = "Posti nuovamente disponibili per l'evento: " . htmlspecialchars($nomeEvento);
     $sitoUrlBase = "https://eremofratefrancesco.altervista.org"; // Assicurati che sia HTTPS se il tuo sito lo supporta
 
-    $linkPaginaEventi = $sitoUrlBase . "/eventiincorsoaccesso.html";
+    $linkPaginaEventi = $sitoUrlBase . "/eventiincorso.html";
 
     $messaggioHTML = "
     <!DOCTYPE html><html lang='it'><head><meta charset='UTF-8'><title>" . htmlspecialchars($subject) . "</title>
@@ -155,7 +155,7 @@ try {
                         JOIN utentiregistrati ur ON uc.Contatto = ur.Contatto
                         WHERE uc.IDEvento = :idEvento
                         ORDER BY uc.Contatto ASC"; // CAMBIA IN uc.TimestampInserimentoCoda ASC SE ESISTE
-
+            
             $stmtCoda = $conn->prepare($sqlCoda);
             $stmtCoda->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
             $stmtCoda->execute();

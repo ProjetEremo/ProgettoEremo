@@ -1,6 +1,8 @@
 <?php
 // NOME FILE: aggiorna_password.php
 header('Content-Type: application/json; charset=utf-8');
+require_once 'config_session.php'; // PRIMA COSA
+require_login(); // Verifica se l'utente è loggato
 
 $host = "localhost";
 $username_db = "eremofratefrancesco";
@@ -83,7 +85,7 @@ try {
     $stmtUpdateUser = $conn->prepare("UPDATE utentiregistrati SET Password = :password WHERE Contatto = :email");
     $stmtUpdateUser->bindParam(':password', $hashed_password, PDO::PARAM_STR);
     $stmtUpdateUser->bindParam(':email', $email_utente, PDO::PARAM_STR);
-
+    
     if ($stmtUpdateUser->execute()) {
         // Password aggiornata, ora cancella il token
         $stmtDeleteToken = $conn->prepare("DELETE FROM password_reset_tokens WHERE token = :token");

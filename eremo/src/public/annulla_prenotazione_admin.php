@@ -1,6 +1,8 @@
 <?php
 // NOME FILE: annulla_prenotazione_admin.php
 header('Content-Type: application/json; charset=utf-8');
+require_once 'config_session.php'; // PRIMA COSA
+require_login(); // Verifica se l'utente è loggato
 // Configurazione e connessione PDO ($conn) come sopra
 
 $config = [ /* ... come sopra ... */ ];
@@ -27,9 +29,9 @@ try {
 function inviaEmailNotificaCoda($destinatarioEmail, $nomeEvento, $postiRichiestiOriginalmenteInCoda, $postiOraDisponibiliEvento, $idEvento, $nomeUtenteDestinatario = 'Utente') {
     $subject = "Posti nuovamente disponibili per l'evento: " . htmlspecialchars($nomeEvento);
     $sitoUrlBase = "https://eremofratefrancesco.altervista.org"; // Assicurati che sia HTTPS se il tuo sito lo supporta
-
+    
     // MODIFICA 1: Link punta a eventiincorsoaccesso.html
-    $linkPaginaEventi = $sitoUrlBase . "/eventiincorsoaccesso.html";
+    $linkPaginaEventi = $sitoUrlBase . "/eventiincorso.html"; 
 
     // MODIFICA 2: Testo dell'email aggiornato
     $messaggioHTML = "
@@ -59,7 +61,7 @@ function inviaEmailNotificaCoda($destinatarioEmail, $nomeEvento, $postiRichiesti
           <p>Gentile " . htmlspecialchars($nomeUtenteDestinatario) . ",</p>
           <p>Buone notizie! Si sono liberati dei posti per l'evento \"<strong>" . htmlspecialchars($nomeEvento) . "</strong>\", per il quale eri in lista d'attesa.</p>
           <p>Al momento, sull'evento risultano nuovamente disponibili <strong>" . $postiOraDisponibiliEvento . "</strong> posti.</p>
-          <p>Se sei ancora interessato/a, ti invitiamo a visitare la nostra pagina del calendario attività per cercare l'evento e procedere con la prenotazione il prima possibile.
+          <p>Se sei ancora interessato/a, ti invitiamo a visitare la nostra pagina del calendario attività per cercare l'evento e procedere con la prenotazione il prima possibile. 
              <strong>Affrettati, i posti sono limitati e verranno assegnati ai primi che completano la prenotazione!</strong></p>
           <p style='text-align:center;'><a href='" . $linkPaginaEventi . "' class='email-button'>Vai al Calendario Attività</a></p>
           <p>Grazie,<br>Lo staff dell'Eremo Frate Francesco</p>
@@ -141,7 +143,7 @@ try {
         $stmtEventoInfo->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
         $stmtEventoInfo->execute();
         $eventoInfo = $stmtEventoInfo->fetch();
-
+        
         $nomeEvento = $eventoInfo ? $eventoInfo['Titolo'] : "Evento ID " . $idEvento;
         $postiOraDisponibiliEvento = $eventoInfo ? (int)$eventoInfo['PostiDisponibili'] : 0;
 
@@ -149,10 +151,10 @@ try {
         if ($postiOraDisponibiliEvento > 0) {
             // Aggiungi una colonna TimestampInserimentoCoda DATETIME DEFAULT CURRENT_TIMESTAMP a utentiincoda e fai ORDER BY TimestampInserimentoCoda ASC
             $stmtCoda = $conn->prepare(
-                "SELECT uc.Contatto, uc.NumeroInCoda, ur.Nome, ur.Cognome
+                "SELECT uc.Contatto, uc.NumeroInCoda, ur.Nome, ur.Cognome 
                  FROM utentiincoda uc
                  JOIN utentiregistrati ur ON uc.Contatto = ur.Contatto
-                 WHERE uc.IDEvento = :idEvento
+                 WHERE uc.IDEvento = :idEvento 
                  ORDER BY uc.Contatto ASC" // AGGIUNGI ORDER BY TimestampInserimentoCoda ASC se aggiungi la colonna
             );
             $stmtCoda->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);
@@ -167,15 +169,15 @@ try {
                 // E se ci sono ancora posti per cui notificare (non necessariamente i *suoi* posti, ma posti in generale)
                 // Questo invierà una notifica a più persone se si liberano molti posti.
                 // Una logica più complessa potrebbe assegnare "slot" di notifica.
-
+                
                 $nomeUtenteDest = trim(($utenteCoda['Nome'] ?? '') . ' ' . ($utenteCoda['Cognome'] ?? ''));
                 if(empty($nomeUtenteDest)) $nomeUtenteDest = "Utente";
 
                 if (inviaEmailNotificaCoda(
-                    $utenteCoda['Contatto'],
-                    $nomeEvento,
+                    $utenteCoda['Contatto'], 
+                    $nomeEvento, 
                     (int)$utenteCoda['NumeroInCoda'],
-                    $postiOraDisponibiliEvento,
+                    $postiOraDisponibiliEvento, 
                     $idEvento,
                     $nomeUtenteDest
                 )) {
@@ -185,7 +187,7 @@ try {
                 // La notifica informa che CI SONO posti, non che sono riservati.
             }
         }
-
+        
         $conn->commit();
         $msgSuccess = "Prenotazione annullata. {$postiDaRipristinare} posto/i ripristinato/i.";
         if ($emailsInviate > 0) {

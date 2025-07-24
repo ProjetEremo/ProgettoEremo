@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_email'])) {
 }
 $user_email = $_SESSION['user_email'];
 
-$sql = "SELECT
+$sql = "SELECT 
             p.Progressivo AS idPrenotazione,
             p.NumeroPosti AS numeroPostiPrenotati,
             p.IDEvento AS idEvento,

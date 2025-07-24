@@ -84,7 +84,7 @@ try {
     // Associa il parametro currentUserEmail. Se $currentUserEmail è null,
     // la condizione p.Contatto = NULL non troverà corrispondenze (risultando correttamente 0).
     $stmt->bindParam(':currentUserEmail', $currentUserEmail, PDO::PARAM_STR);
-
+    
     $stmt->execute();
     $events = $stmt->fetchAll();
 

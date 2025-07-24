@@ -5207,213 +5207,265 @@ li.top-level-comment-item:last-child { border-bottom: none; margin-bottom: 0; }
 .profile-header.profile-header-loading .avatar-container img,
 .profile-header.profile-header-loading #profile-greeting,
 .profile-header.profile-header-loading > p { /* Seleziona il paragrafo diretto figlio di .profile-header */
-  opacity: 0;
-  will-change: transform, opacity; /* Suggerimento per le performance del browser */
+    opacity: 0;
+    will-change: transform, opacity; /* Suggerimento per le performance del browser */
 }
 
 /* Lo stato iniziale specifico per ogni elemento è ora definito all'inizio dei keyframes. */
 
 /* Keyframes per l'animazione dell'avatar: entra scalando, ruotando e con "pop" */
 @keyframes avatarEnterDynamic {
-  0% {
-    opacity: 0;
-    transform: translateY(80px) scale(0.2) rotate(-30deg); /* Parte da più lontano, più piccolo e ruotato */
-  }
-  60% {
-    opacity: 1;
-    transform: translateY(-15px) scale(1.15) rotate(10deg); /* Overshoot più pronunciato */
-  }
-  80% {
-    transform: translateY(5px) scale(0.95) rotate(-7deg); /* Contro-movimento */
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1) rotate(0deg); /* Stato finale */
-  }
+    0% {
+        opacity: 0;
+        transform: translateY(80px) scale(0.2) rotate(-30deg); /* Parte da più lontano, più piccolo e ruotato */
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(-15px) scale(1.15) rotate(10deg); /* Overshoot più pronunciato */
+    }
+    80% {
+        transform: translateY(5px) scale(0.95) rotate(-7deg); /* Contro-movimento */
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0deg); /* Stato finale */
+    }
 }
 
 /* Keyframes per l'animazione del titolo: entra scivolando con un leggero skew */
 @keyframes textEnterDynamicLeft {
-  0% {
-    opacity: 0;
-    transform: translate(-50px, 50px) skewX(-20deg); /* Più spostato e inclinato */
-  }
-  70% {
-    opacity: 1;
-    transform: translate(8px, -8px) skewX(7deg); /* Overshoot e inclinazione opposta */
-  }
-  100% {
-    opacity: 1;
-    transform: translate(0, 0) skewX(0deg); /* Stato finale */
-  }
+    0% {
+        opacity: 0;
+        transform: translate(-50px, 50px) skewX(-20deg); /* Più spostato e inclinato */
+    }
+    70% {
+        opacity: 1;
+        transform: translate(8px, -8px) skewX(7deg); /* Overshoot e inclinazione opposta */
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0, 0) skewX(0deg); /* Stato finale */
+    }
 }
 
 /* Keyframes per l'animazione del paragrafo: entra scivolando con un leggero skew (opposto al titolo) */
 @keyframes textEnterDynamicRight {
-  0% {
-    opacity: 0;
-    transform: translate(50px, 60px) skewX(20deg); /* Più spostato e inclinato */
-  }
-  70% {
-    opacity: 1;
-    transform: translate(-8px, -10px) skewX(-7deg); /* Overshoot e inclinazione opposta */
-  }
-  100% {
-    opacity: 1;
-    transform: translate(0, 0) skewX(0deg); /* Stato finale */
-  }
+    0% {
+        opacity: 0;
+        transform: translate(50px, 60px) skewX(20deg); /* Più spostato e inclinato */
+    }
+    70% {
+        opacity: 1;
+        transform: translate(-8px, -10px) skewX(-7deg); /* Overshoot e inclinazione opposta */
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0, 0) skewX(0deg); /* Stato finale */
+    }
 }
 
 /* Applica le animazioni quando la classe .loaded viene aggiunta a .profile-header */
 .profile-header.loaded .avatar-container img {
-  opacity: 0; /* Assicura che parta invisibile prima che l'animazione inizi */
-  animation: avatarEnterDynamic 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; /* Easing con "bounce" */
-  animation-delay: 0.15s; /* Leggero ritardo per l'avatar */
+    opacity: 0; /* Assicura che parta invisibile prima che l'animazione inizi */
+    animation: avatarEnterDynamic 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; /* Easing con "bounce" */
+    animation-delay: 0.15s; /* Leggero ritardo per l'avatar */
 }
 
 .profile-header.loaded #profile-greeting {
-  opacity: 0; /* Assicura che parta invisibile */
-  animation: textEnterDynamicLeft 0.85s cubic-bezier(0.23, 1, 0.32, 1) forwards; /* Easing "easeOutQuint" */
-  animation-delay: 0.45s; /* Dopo l'avatar */
+    opacity: 0; /* Assicura che parta invisibile */
+    animation: textEnterDynamicLeft 0.85s cubic-bezier(0.23, 1, 0.32, 1) forwards; /* Easing "easeOutQuint" */
+    animation-delay: 0.45s; /* Dopo l'avatar */
 }
 
 .profile-header.loaded > p {
-  opacity: 0; /* Assicura che parta invisibile */
-  animation: textEnterDynamicRight 0.85s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-  animation-delay: 0.6s; /* Dopo il titolo */
+    opacity: 0; /* Assicura che parta invisibile */
+    animation: textEnterDynamicRight 0.85s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    animation-delay: 0.6s; /* Dopo il titolo */
 }
 
 /* === FINE NUOVI STILI ANIMAZIONE HEADER PROFILO (v2) === */
 
 #ai-assistant-fab {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  width: 80px;
-  height: 80px;
-  background-color: var(--primary);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 38px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  z-index: 1002;
-  transition: transform 0.2s ease-in-out, background-color 0.2s ease;
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 80px;
+    height: 80px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 1002; 
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease;
 }
 #ai-assistant-fab:hover {
-  transform: scale(1.1);
-  background-color: var(--accent);
+    transform: scale(1.1);
+    background-color: var(--accent);
 }
 
 #ai-chat-popup {
-  position: fixed;
-  bottom: 95px;
-  right: 25px;
-  width: 360px;
-  max-width: calc(100vw - 40px);
-  height: 520px;
-  max-height: calc(100vh - 120px);
-  background-color: var(--white);
-  border-radius: var(--border-radius-large, 12px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-  z-index: 1001;
-  display: none;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--gray-light, #e0e0e0);
-  transform-origin: bottom right;
+    position: fixed;
+    bottom: 95px; 
+    right: 25px;
+    width: 360px;
+    max-width: calc(100vw - 40px);
+    height: 520px;
+    max-height: calc(100vh - 120px);
+    background-color: var(--white);
+    border-radius: var(--border-radius-large, 12px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    z-index: 1001;
+    display: none; 
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--gray-light, #e0e0e0);
+    transform-origin: bottom right;
 }
 #ai-chat-popup.active {
-  display: flex;
-  animation: chatPopupEnter 0.35s cubic-bezier(0.175, 0.885, 0.320, 1.275);
+    display: flex;
+    animation: chatPopupEnter 0.35s cubic-bezier(0.175, 0.885, 0.320, 1.275);
 }
 @keyframes chatPopupEnter {
-  from { opacity: 0; transform: translateY(30px) scale(0.9); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+    from { opacity: 0; transform: translateY(30px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 #ai-chat-header {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  padding: 12px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 #ai-chat-header h3 {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 600;
-  display: flex; align-items: center; gap: 10px;
-  color: white;
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+    color: white; 
 }
 #ai-chat-header h3 i { opacity: 0.9; }
 #ai-chat-close-btn {
-  background: none; border: none; color: white;
-  font-size: 1.6rem; cursor: pointer; opacity: 0.8;
-  padding: 5px; transition: opacity 0.2s, transform 0.2s;
+    background: none; border: none; color: white;
+    font-size: 1.6rem; cursor: pointer; opacity: 0.8;
+    padding: 5px; transition: opacity 0.2s, transform 0.2s;
 }
 #ai-chat-close-btn:hover { opacity: 1; transform: rotate(90deg); }
 
 #ai-chat-messages {
-  flex-grow: 1; padding: 18px; overflow-y: auto;
-  display: flex; flex-direction: column; gap: 12px;
-  background-color: var(--light, #f8f5ef);
+    flex-grow: 1; padding: 18px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 12px;
+    background-color: var(--light, #f8f5ef);
 }
 .user-message, .ai-message {
-  padding: 10px 15px; border-radius: 20px;
-  max-width: 85%; word-wrap: break-word;
-  font-size: 0.98rem; line-height: 1.55;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    padding: 10px 15px; border-radius: 20px;
+    max-width: 85%; word-wrap: break-word;
+    font-size: 0.98rem; line-height: 1.55;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 .user-message {
-  background-color: var(--secondary); color: white;
-  align-self: flex-end; border-bottom-right-radius: 6px;
+    background-color: var(--secondary); color: white;
+    align-self: flex-end; border-bottom-right-radius: 6px;
 }
 .ai-message {
-  background-color: var(--white); color: var(--dark, #333);
-  align-self: flex-start; border: 1px solid var(--gray-light, #e0e0e0);
-  border-bottom-left-radius: 6px;
+    background-color: var(--white); color: var(--dark, #333);
+    align-self: flex-start; border: 1px solid var(--gray-light, #e0e0e0);
+    border-bottom-left-radius: 6px;
 }
 .ai-message.thinking { font-style: italic; color: var(--gray-dark, #555); }
 .ai-message.thinking span.dots { display: inline-block; }
 .ai-message.thinking span.dots::after {
-  content: '.'; animation: thinkingDotsAnimation 1.2s infinite;
-  display: inline-block; width: 1.5em; text-align: left;
+    content: '.'; animation: thinkingDotsAnimation 1.2s infinite;
+    display: inline-block; width: 1.5em; text-align: left;
 }
 @keyframes thinkingDotsAnimation {
-  0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; }
+    0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; }
 }
 
 #ai-chat-input-container {
-  display: flex; padding: 12px 15px;
-  border-top: 1px solid var(--gray-light, #e0e0e0);
-  background-color: #f5f5f5; align-items: center;
+    display: flex; padding: 12px 15px;
+    border-top: 1px solid var(--gray-light, #e0e0e0);
+    background-color: #f5f5f5; align-items: center;
 }
 #ai-chat-input {
-  flex-grow: 1; padding: 10px 15px;
-  border: 1px solid var(--gray-medium, #cccccc); border-radius: 22px;
-  margin-right: 10px; resize: none; font-size: 0.95rem;
-  line-height: 1.45; max-height: 90px; overflow-y: auto;
-  background-color: white;
+    flex-grow: 1; padding: 10px 15px;
+    border: 1px solid var(--gray-medium, #cccccc); border-radius: 22px;
+    margin-right: 10px; resize: none; font-size: 0.95rem;
+    line-height: 1.45; max-height: 90px; overflow-y: auto;
+    background-color: white;
 }
 #ai-chat-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(var(--accent-rgb, 209, 140, 96), 0.2);
-  outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb, 209, 140, 96), 0.2);
+    outline: none;
 }
 #ai-chat-send-btn {
-  background-color: var(--accent); color: white; border: none;
-  border-radius: 50%; width: 42px; height: 42px;
-  font-size: 18px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background-color 0.2s, transform 0.15s;
+    background-color: var(--accent); color: white; border: none;
+    border-radius: 50%; width: 42px; height: 42px;
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background-color 0.2s, transform 0.15s;
 }
 #ai-chat-send-btn:hover { background-color: var(--primary); transform: scale(1.05); }
 #ai-chat-send-btn:disabled { background-color: var(--gray-medium, #cccccc); cursor: not-allowed; transform: none; }
 #ai-chat-send-btn i { transition: transform 0.2s ease-out; }
 #ai-chat-send-btn:hover i { transform: translateX(1px) rotate(10deg); }
+
+/* Stili per il pulsante TTS nell'header della chat AI */
+#ai-chat-header {
+  /* Assicurati che l'header usi flex per allineare i bottoni */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-chat-header-btn { /* Classe comune per i bottoni nell'header della chat AI */
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem; /* Dimensione simile al close button */
+  cursor: pointer;
+  opacity: 0.8;
+  padding: 5px;
+  margin-left: 8px; /* Spazio tra i bottoni */
+  transition: opacity 0.2s, transform 0.2s;
+  line-height: 1; /* Per un miglior allineamento verticale dell'icona */
+}
+
+.ai-chat-header-btn:hover {
+  opacity: 1;
+  transform: scale(1.1); /* Leggero ingrandimento all'hover */
+}
+
+#ai-chat-tts-toggle-btn {
+  /* Stili specifici se necessari, altrimenti eredita da .ai-chat-header-btn */
+  /* Potrebbe essere utile per ordinare se hai più bottoni */
+  order: -1; /* Mette il pulsante TTS prima del pulsante di chiusura se entrambi usano flex order */
+}
+
+/* Assicurati che il titolo H3 nell'header non occupi tutto lo spazio se usi flex */
+#ai-chat-header h3 {
+  flex-grow: 1; /* Permette al titolo di occupare lo spazio disponibile */
+  margin: 0; /* Rimuovi margini di default se presenti */
+  /* ...altri tuoi stili per h3... */
+}
+
+/* Stile per il feedback di sistema nella chat (Opzionale, se decidi di mostrarlo) */
+.system-feedback-message {
+  font-style: italic;
+  color: var(--gray-dark, #555555);
+  font-size: 0.85em;
+  text-align: center;
+  padding: 8px 15px;
+  margin: 5px auto; /* Centra il messaggio se è un blocco a sé */
+  max-width: 90%;
+  background-color: var(--gray-light, #e9e9e9);
+  border-radius: 10px;
+}

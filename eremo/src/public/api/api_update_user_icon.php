@@ -68,7 +68,7 @@ $real_file_system_path = realpath($file_system_path_to_check);
 if ($real_file_system_path === false || !is_file($real_file_system_path)) {
     // Log per debug
     error_log("Controllo esistenza file icona fallito. Percorso web ricevuto: " . $icon_web_path . ". Percorso filesystem tentato: " . $file_system_path_to_check . ". Risultato realpath(): " . var_export($real_file_system_path, true));
-
+    
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Il file icona specificato non esiste sul server o non è un file valido.']);
     exit;

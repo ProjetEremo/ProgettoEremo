@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($response);
         exit;
     }
-
+    
     $userEmailSanitized = preg_replace("/[^a-zA-Z0-9_]+/", "", strtok($_SESSION['user_email'], '@'));
     $filename = 'ai_icon_' . $userEmailSanitized . '_' . time() . '.png'; // Salva sempre come PNG
     $filepathPhysical = $saveDirPhysical . $filename;

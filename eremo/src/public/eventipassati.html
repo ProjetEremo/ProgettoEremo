@@ -498,7 +498,7 @@
     localStorage.removeItem('userDataEFF');
     currentUserData = null;
     updateNavbarUI();
-    loadPastEvents();
+    loadPastEvents(); 
     alert('Logout effettuato.');
   }
 
@@ -507,28 +507,28 @@
   // Gestione menu mobile (hamburger) (invariata)
   const mobileMenuEl = gebi("mobileMenu"); const hamburgerButton = gebi("hamburgerBtn"); function toggleMobileMenu() { if (mobileMenuEl && hamburgerButton) { const iO = mobileMenuEl.classList.toggle("open"); hamburgerButton.classList.toggle("open"); hamburgerButton.setAttribute("aria-expanded", String(iO)); document.body.style.overflow = iO ? "hidden" : ""; } } function closeMobileMenu() { if (mobileMenuEl && hamburgerButton && mobileMenuEl.classList.contains("open")) { mobileMenuEl.classList.remove("open"); hamburgerButton.classList.remove("open"); hamburgerButton.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; } }
   if (hamburgerButton) hamburgerButton.addEventListener("click", toggleMobileMenu);
-  document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobileLogoutLink') { l.addEventListener("click", closeMobileMenu); }});
-  document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) closeMobileMenu(); });
+  document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobileLogoutLink') { l.addEventListener("click", closeMobileMenu); }}); 
+  document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) closeMobileMenu(); }); 
   // Gestione dropdown utente (invariata)
   const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iS = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iS ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iS)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl && userDropdownMenuEl.style.display === 'block' && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
   // Elementi del DOM per il popup di login/registrazione
-  const loginOverlayEl = gebi("loginOverlay"); const loginPopupEl = gebi("loginPopup"); const closePopupBtnEl = gebi("closeLoginPopupBtn"); const loginTabsEls = document.querySelectorAll(".login-tab"); const loginFormsEls = document.querySelectorAll("#loginPopup .login-form");
+  const loginOverlayEl = gebi("loginOverlay"); const loginPopupEl = gebi("loginPopup"); const closePopupBtnEl = gebi("closeLoginPopupBtn"); const loginTabsEls = document.querySelectorAll(".login-tab"); const loginFormsEls = document.querySelectorAll("#loginPopup .login-form"); 
   const loginErrorMessagePopupEl = gebi('login-error-message-popup'); const registerErrorMessagePopupEl = gebi('register-error-message-popup');
 
   function isAnyPopupActive() {
     // Funzione helper per controllare se un popup è attivo (considera sia classe che display style)
     const isActive = (el) => el && (el.classList.contains('active') || window.getComputedStyle(el).display !== 'none');
-    return isActive(loginPopupEl) ||
-            isActive(gebi('forgotPasswordPopup')) ||
-            isActive(gebi('loginRequiredPopup')) ||
-            isActive(gebi('eventPopupAdmin'));
+    return isActive(loginPopupEl) || 
+           isActive(gebi('forgotPasswordPopup')) || 
+           isActive(gebi('loginRequiredPopup')) || 
+           isActive(gebi('eventPopupAdmin'));
   }
   function openLoginPopup() {
-    if(gebi('loginRequiredPopup')?.classList.contains('active')) closeLoginRequiredPopup();
+    if(gebi('loginRequiredPopup')?.classList.contains('active')) closeLoginRequiredPopup(); 
     if (loginOverlayEl) loginOverlayEl.classList.add("active");
     if (loginPopupEl) loginPopupEl.classList.add("active");
-    document.body.style.overflow = "hidden";
-    resetFormErrors();
+    document.body.style.overflow = "hidden"; 
+    resetFormErrors(); 
     const loginTabToActivate = loginPopupEl.querySelector('.login-tab[data-tab="login"]');
     if (loginTabToActivate) loginTabToActivate.click();
     const firstInput = loginPopupEl.querySelector('#login-email-popup');
@@ -550,7 +550,7 @@
   gebi("login-btn-desktop")?.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); });
   gebi("login-btn-mobile")?.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); closeMobileMenu(); });
   if (closePopupBtnEl) closePopupBtnEl.addEventListener("click", closeLoginPopup);
-  if (loginOverlayEl) loginOverlayEl.addEventListener("click", (e) => { if (e.target === loginOverlayEl) closeLoginPopup(); });
+  if (loginOverlayEl) loginOverlayEl.addEventListener("click", (e) => { if (e.target === loginOverlayEl) closeLoginPopup(); }); 
 
   loginTabsEls.forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -561,10 +561,10 @@
         form.classList.remove("active");
         if (form.id === `${tabId}FormPopup`) {
           form.classList.add("active");
-          form.querySelector('input:not([type="hidden"])')?.focus();
+          form.querySelector('input:not([type="hidden"])')?.focus(); 
         }
       });
-      resetFormErrors();
+      resetFormErrors(); 
     });
   });
 
@@ -580,14 +580,14 @@
 
   function openForgotPasswordPopup() {
     if (typeof closeLoginPopup === 'function' && loginPopupEl?.classList.contains('active')) {
-      closeLoginPopup();
+      closeLoginPopup(); 
     }
     if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active');
     if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active');
     document.body.style.overflow = 'hidden';
-    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
+    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; 
     const forgotEmailInput = document.getElementById('forgot-email');
-    if(forgotEmailInput) forgotEmailInput.focus();
+    if(forgotEmailInput) forgotEmailInput.focus(); 
   }
 
   function closeForgotPasswordPopup() {
@@ -597,7 +597,7 @@
       document.body.style.overflow = '';
     }
     if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
-    if(forgotPasswordForm) forgotPasswordForm.reset();
+    if(forgotPasswordForm) forgotPasswordForm.reset(); 
   }
 
   if (forgotPasswordLink) {
@@ -614,7 +614,7 @@
       e.preventDefault();
       if (forgotPasswordMessage) {
         forgotPasswordMessage.style.display = 'none';
-        forgotPasswordMessage.className = 'form-message';
+        forgotPasswordMessage.className = 'form-message'; 
       }
       const emailInput = document.getElementById('forgot-email');
       const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]');
@@ -633,7 +633,7 @@
         if (result.success) {
           forgotPasswordMessage.textContent = result.message;
           forgotPasswordMessage.classList.add('success');
-          if(emailInput) emailInput.value = '';
+          if(emailInput) emailInput.value = ''; 
         } else {
           forgotPasswordMessage.textContent = result.message || "Si è verificato un errore.";
           forgotPasswordMessage.classList.add('error');
@@ -654,7 +654,7 @@
   function closeLoginRequiredPopup() { if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.remove("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.remove("active"); if (!isAnyPopupActive()) { document.body.style.overflow = ""; } } // Modificato per usare isAnyPopupActive
   if (closeLoginRequiredPopupBtnEl) closeLoginRequiredPopupBtnEl.addEventListener("click", closeLoginRequiredPopup);
   if (loginRequiredOverlayEl) loginRequiredOverlayEl.addEventListener("click", (e) => { if (e.target === loginRequiredOverlayEl) closeLoginRequiredPopup(); });
-  if (loginRequiredLoginBtnEl) { loginRequiredLoginBtnEl.addEventListener("click", () => { closeLoginRequiredPopup(); openLoginPopup(); }); }
+  if (loginRequiredLoginBtnEl) { loginRequiredLoginBtnEl.addEventListener("click", () => { closeLoginRequiredPopup(); openLoginPopup(); }); } 
 
   const eventPopupOverlayAdminEl = gebi('eventPopupOverlayAdmin'); const eventPopupAdminEl = gebi('eventPopupAdmin'); const closeEventPopupBtnAdminEl = gebi('closeEventPopupBtnAdmin'); const editPastEventFormAdminEl = gebi('editPastEventFormAdmin'); const eventPopupTitleAdminEl = gebi('eventPopupTitleAdmin'); const adminEventIdInput = gebi('admin-event-id'); const adminVoluntaryCheckbox = gebi('admin-event-voluntary'); const adminPriceContainer = gebi('admin-event-price-container'); const adminEventPriceInput = gebi('admin-event-price'); const editPastEventFormMessageAdminEl = gebi('editPastEventFormMessageAdmin'); const adminCurrentImagePreview = gebi('current-event-image-preview'); const adminCurrentFlyerPreview = gebi('current-event-flyer-preview');
   function updateAdminPriceFieldVisibility() { if (adminVoluntaryCheckbox && adminPriceContainer && adminEventPriceInput) { const isVoluntary = adminVoluntaryCheckbox.checked; adminPriceContainer.style.display = isVoluntary ? 'none' : 'block'; adminEventPriceInput.required = !isVoluntary; if (isVoluntary) adminEventPriceInput.value = ''; } } if (adminVoluntaryCheckbox) adminVoluntaryCheckbox.addEventListener('change', updateAdminPriceFieldVisibility);
@@ -668,23 +668,23 @@
     try {
       const normalizedDateString = dateString.length === 10 ? dateString + "T00:00:00Z" : dateString.replace(" ", "T") + (dateString.endsWith("Z") ? "" : "Z");
       const date = new Date(normalizedDateString);
-      if (isNaN(date.getTime())) {
+      if (isNaN(date.getTime())) { 
         if (/^\d{4}-\d{2}-\d{2}$/.test(dateString.substring(0,10))) {
           const parts = dateString.substring(0,10).split('-');
           const utcDate = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
           if (!isNaN(utcDate.getTime())) return utcDate.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
         }
-        return dateString;
+        return dateString; 
       }
-      return date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
+      return date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' }); 
     } catch (e) {
-      return dateString;
+      return dateString; 
     }
   }
 
   function populateYearFilter() {
     const currentYr = new Date().getFullYear();
-    let minYear = currentYr;
+    let minYear = currentYr; 
 
     if (allPastEventsData && allPastEventsData.length > 0) {
       allPastEventsData.forEach(event => {
@@ -696,11 +696,11 @@
         }
       });
     } else {
-      minYear = currentYr - 4;
+      minYear = currentYr - 4; 
     }
 
     if (searchYearEl) {
-      searchYearEl.innerHTML = '<option value="">Tutti gli anni</option>';
+      searchYearEl.innerHTML = '<option value="">Tutti gli anni</option>'; 
       for (let y = currentYr; y >= minYear; y--) {
         const option = document.createElement('option');
         option.value = y;
@@ -715,14 +715,14 @@
   function createPastEventCard(event) {
     const card = document.createElement("article");
     card.className = "card";
-    if (currentUserData && currentUserData.isAdmin) card.classList.add('admin-card');
+    if (currentUserData && currentUserData.isAdmin) card.classList.add('admin-card'); 
     card.dataset.title = event.titolo?.toLowerCase() || '';
     card.dataset.date = event.datainizio || '';
     card.dataset.speaker = event.relatore?.toLowerCase() || '';
 
-    let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event-past.jpg";
+    let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event-past.jpg"; 
 
-    if (currentUserData && currentUserData.isAdmin) {
+    if (currentUserData && currentUserData.isAdmin) { 
       let volantinoAdminLinkHTML = '';
       if (event.volantino_url && event.volantino_url.trim() !== "") { volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em;"><b>Volantino:</b> <a href="${event.volantino_url}" target="_blank">Visualizza volantino</a></p>`; }
       card.innerHTML = `
@@ -740,7 +740,7 @@
         </div>`;
       card.querySelector('.btn-edit').addEventListener('click', function() { const eventToEdit = allPastEventsData.find(e => e.idevento == this.dataset.eventId); if (eventToEdit) openEditPastEventPopup(eventToEdit); else alert("Dettagli evento non trovati per la modifica."); });
       card.querySelector('.btn-delete').addEventListener('click', async function() { const eventId = this.dataset.eventId; const eventToDelete = allPastEventsData.find(e => e.idevento == eventId); if (confirm(`Sei sicuro di voler eliminare l'evento "${eventToDelete?.titolo || "questo evento"}"? L'azione è irreversibile.`)) { const btn = this; const oldTxt = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini" style="border-top-color:white;"></div>'; try { const fd = new FormData(); fd.append('action', 'delete_event'); fd.append('event_id', eventId); const r = await fetch('gestione_eventi.php', { method: 'POST', body: fd }); const rt = await r.text(); let res; try { res = JSON.parse(rt); } catch { throw new Error("Risposta non JSON dal server durante l'eliminazione."); } if (!r.ok || !res.success) throw new Error(res.message || "Eliminazione fallita."); alert(res.message || 'Evento eliminato con successo.'); loadPastEvents(); } catch (err) { alert(`Errore durante l'eliminazione: ${err.message}`); } finally { btn.disabled = false; btn.innerHTML = oldTxt; } } });
-    } else {
+    } else { 
       const actionsHTML = currentUserData ?
               ` <a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Dettagli</a>
           <a href="evento_dettaglio_accesso.html?id=${event.idevento}#event-comments" class="card-btn card-btn-primary">Commenti</a>` :
@@ -761,21 +761,21 @@
 
   async function loadPastEvents() {
     if (!eventiPassatiGridEl || !loadingIndicatorEl) return;
-    loadingIndicatorEl.classList.add("visible");
-    eventiPassatiGridEl.innerHTML = "";
+    loadingIndicatorEl.classList.add("visible"); 
+    eventiPassatiGridEl.innerHTML = ""; 
     try {
-      const response = await fetch("get_past_events.php");
+      const response = await fetch("get_past_events.php"); 
       if (!response.ok) throw new Error( `Errore HTTP: ${response.status} ${response.statusText}` );
       const result = await response.json();
       if (result.success && result.data) {
-        allPastEventsData = result.data;
-        populateYearFilter();
-        filterEvents();
+        allPastEventsData = result.data; 
+        populateYearFilter(); 
+        filterEvents(); 
       } else { throw new Error( result.message || "Errore nel caricamento degli eventi passati." ); }
     } catch (error) {
       if(eventiPassatiGridEl) eventiPassatiGridEl.innerHTML = `<p class="no-events error-message" style="text-align:center; padding:20px;">Errore durante il caricamento degli eventi. (${error.message}) <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>`;
     } finally {
-      if(loadingIndicatorEl) loadingIndicatorEl.classList.remove("visible");
+      if(loadingIndicatorEl) loadingIndicatorEl.classList.remove("visible"); 
     }
   }
 
@@ -783,21 +783,21 @@
     if (!eventiPassatiGridEl) return;
     const titleFilter = searchTitleEl ? searchTitleEl.value.toLowerCase().trim() : "";
     const monthFilter = searchMonthEl ? searchMonthEl.value : "";
-    const yearFilterStr = searchYearEl ? searchYearEl.value : "";
+    const yearFilterStr = searchYearEl ? searchYearEl.value : ""; 
     const speakerFilter = searchSpeakerEl ? searchSpeakerEl.value.toLowerCase().trim() : "";
 
-    eventiPassatiGridEl.innerHTML = '';
+    eventiPassatiGridEl.innerHTML = ''; 
     let visibleCardsCount = 0;
 
     const filteredEvents = allPastEventsData.filter(event => {
       const eventTitle = event.titolo?.toLowerCase() || "";
       const eventDateStr = event.datainizio || "";
-      let eventMatchesYear = (yearFilterStr === "");
-      let eventMatchesMonth = (monthFilter === "");
+      let eventMatchesYear = (yearFilterStr === ""); 
+      let eventMatchesMonth = (monthFilter === ""); 
 
       if (eventDateStr) {
         const eventYear = parseInt(eventDateStr.substring(0, 4));
-        const eventMonthNum = eventDateStr.substring(5, 7);
+        const eventMonthNum = eventDateStr.substring(5, 7); 
 
         if (yearFilterStr !== "" && !isNaN(eventYear) && eventYear === parseInt(yearFilterStr)) {
           eventMatchesYear = true;
@@ -827,7 +827,7 @@
       p.className = "no-events";
       if (allPastEventsData.length === 0 && !titleFilter && !monthFilter && !yearFilterStr && !speakerFilter) {
         p.textContent = "Nessun evento passato trovato in archivio.";
-      } else if (titleFilter || monthFilter || yearFilterStr || speakerFilter) {
+      } else if (titleFilter || monthFilter || yearFilterStr || speakerFilter) { 
         p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
       }
       if (p.textContent) eventiPassatiGridEl.appendChild(p);
@@ -840,10 +840,10 @@
       return;
     }
 
-    const defaultLogoPath = 'images/Logo_eremo.png';
+    const defaultLogoPath = 'images/Logo_eremo.png'; 
 
     try {
-      const response = await fetch('api_get_page_content.php?page=index');
+      const response = await fetch('api_get_page_content.php?page=index'); 
       if (!response.ok) {
         throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
       }
@@ -857,24 +857,24 @@
       }
     } catch (error) {
       console.error("Errore nel caricare dinamicamente il logo navbar:", error);
-      logoImgTag.src = defaultLogoPath;
+      logoImgTag.src = defaultLogoPath; 
     }
   }
 
 
   document.addEventListener("DOMContentLoaded", async () => {
-    const currentYearEl = gebi("currentYear");
+    const currentYearEl = gebi("currentYear"); 
     if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
-    loadUserData();
-    await fetchAndUpdateUserDisplayData();
-    await loadNavbarLogo();
+    loadUserData(); 
+    await fetchAndUpdateUserDisplayData(); 
+    await loadNavbarLogo(); 
     searchTitleEl?.addEventListener("input", filterEvents);
     searchMonthEl?.addEventListener("change", filterEvents);
     searchYearEl?.addEventListener("change", filterEvents);
     searchSpeakerEl?.addEventListener("input", filterEvents);
 
-    await loadPastEvents();
+    await loadPastEvents(); 
 
     gebi('dropdownLogout')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
     gebi('mobileLogoutLink')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenu(); });

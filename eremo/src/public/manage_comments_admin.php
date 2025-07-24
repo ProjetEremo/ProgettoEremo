@@ -2,19 +2,17 @@
 // NOME FILE: manage_comments_admin.php
 header('Content-Type: application/json; charset=utf-8');
 ini_set('log_errors', 1);
-// MODIFICA QUESTO PATH SE NECESSARIO, DEVE ESSERE SCRIVIBILE DAL SERVER WEB
-ini_set('error_log', __DIR__ . '/php_errors_manage_comments_admin.log');
+ini_set('error_log', __DIR__ . '/php_errors_manage_comments_admin.log'); 
 
 $host = "localhost";
-$username_db = "eremofratefrancesco"; // Il tuo username DB
-$password_db = ""; // La tua password DB
-$dbname_db = "my_eremofratefrancesco"; // Il tuo nome DB
+$username_db = "eremofratefrancesco"; 
+$password_db = ""; // <<< INSERISCI QUI LA TUA PASSWORD DEL DATABASE
+$dbname_db = "my_eremofratefrancesco"; 
 
-// Definizioni per l'identificazione dell'admin
-$admin_email_identifier = 'admin@eremo.it'; // USA UN EMAIL CHE HAI INSERITO NELLA TABELLA utentiregistrati PER L'ADMIN
-                                                   // Questo è cruciale se hai un foreign key constraint da commenti.Contatto a utentiregistrati.Contatto
-$admin_display_name = 'Eremo Frate Francesco';
-$admin_icon_path = 'images/logo.png'; // Path all'icona dell'admin (relativo alla root del sito)
+// Definizioni globali per l'identificazione e la visualizzazione dell'admin
+$admin_email_identifier = 'admin@eremo.it';         // Email univoca che identifica l'admin
+$admin_display_name     = 'Eremo Frate Francesco (Staff)'; // Nome visualizzato per i commenti dell'admin
+$admin_icon_path        = 'images/logo.png';         // Percorso icona per i commenti dell'admin
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname_db;charset=utf8mb4", $username_db, $password_db, [
@@ -42,10 +40,13 @@ if ($action === 'get_comments') {
     }
     try {
         $stmtComments = $conn->prepare(
-            "SELECT c.Progressivo, c.Descrizione, c.DataPubb, c.CodRisposta, c.Contatto, c.IDEvento, c.NumLike,
-                    ur.Nome as utente_nome_registrato,
-                    ur.Cognome as utente_cognome_registrato,
-                    ur.Icon as utente_icon_path_raw
+            "SELECT c.Progressivo, c.Descrizione, c.DataPubb, c.CodRisposta, 
+                    c.Contatto, -- Email dell'autore del commento 'c'
+                    c.IDEvento, c.NumLike, 
+                    ur.Nome as AuthorNome, 
+                    ur.Cognome as AuthorCognome,
+                    ur.Icon as AuthorIconPathDB, -- Icona dell'autore del commento 'c' dal DB
+                    ur.IsAdmin as AuthorIsAdminFlag -- Flag IsAdmin dell'autore del commento 'c' dal DB
              FROM commenti c
              LEFT JOIN utentiregistrati ur ON c.Contatto = ur.Contatto
              WHERE c.IDEvento = :idEvento
@@ -56,26 +57,41 @@ if ($action === 'get_comments') {
         $allCommentsRaw = $stmtComments->fetchAll();
 
         $commentsById = [];
-        foreach ($allCommentsRaw as $comment) {
-            $comment['is_admin_reply'] = ($comment['Contatto'] === $admin_email_identifier);
+        foreach ($allCommentsRaw as $current_comment_data) {
+            // Determina se QUESTO specifico commento ($current_comment_data) è stato scritto da un admin.
+            $authorIsAdminDB = isset($current_comment_data['AuthorIsAdminFlag']) && (int)$current_comment_data['AuthorIsAdminFlag'] === 1;
+            $authorHasAdminEmail = isset($current_comment_data['Contatto']) && $current_comment_data['Contatto'] === $admin_email_identifier;
+            
+            $isThisCommentAuthoredByAdmin = $authorIsAdminDB || $authorHasAdminEmail;
+            
+            // 'is_admin_reply' è il flag usato dal JavaScript della dashboard
+            $current_comment_data['is_admin_reply'] = $isThisCommentAuthoredByAdmin; 
 
-            if ($comment['is_admin_reply']) {
-                $comment['utente_display_name'] = $admin_display_name;
-                $comment['commenter_icon_path'] = $admin_icon_path;
+            // Imposta il nome visualizzato e l'icona per QUESTO commento
+            if ($isThisCommentAuthoredByAdmin) {
+                // L'autore di QUESTO commento è un admin.
+                $current_comment_data['utente_display_name'] = $admin_display_name;
+                $current_comment_data['commenter_icon_path'] = $admin_icon_path;
             } else {
-                $displayName = trim(($comment['utente_nome_registrato'] ?? '') . ' ' . ($comment['utente_cognome_registrato'] ?? ''));
-                if (empty($displayName)) {
-                    $displayName = !empty($comment['Contatto']) ? explode('@', $comment['Contatto'])[0] : 'Anonimo';
+                // L'autore di QUESTO commento è un utente normale (o sconosciuto).
+                $nome = $current_comment_data['AuthorNome'] ?? '';
+                $cognome = $current_comment_data['AuthorCognome'] ?? '';
+                $nomeCompleto = trim($nome . ' ' . $cognome);
+                if (empty($nomeCompleto)) {
+                    $nomeCompleto = !empty($current_comment_data['Contatto']) ? explode('@', $current_comment_data['Contatto'])[0] : 'Anonimo';
                 }
-                $comment['utente_display_name'] = $displayName;
-                // Assicurati che il path dell'icona sia completo se necessario, o gestiscilo nel frontend
-                $comment['commenter_icon_path'] = !empty($comment['utente_icon_path_raw']) ? $comment['utente_icon_path_raw'] : null;
+                $current_comment_data['utente_display_name'] = $nomeCompleto;
+                $current_comment_data['commenter_icon_path'] = $current_comment_data['AuthorIconPathDB'] ?? null;
+                // Esempio per completare il path se necessario (da adattare):
+                // if ($current_comment_data['commenter_icon_path'] && !filter_var($current_comment_data['commenter_icon_path'], FILTER_VALIDATE_URL) && strpos($current_comment_data['commenter_icon_path'], '/') === false) {
+                //    $current_comment_data['commenter_icon_path'] = 'uploads/user_icons/' . $current_comment_data['commenter_icon_path'];
+                // }
             }
-
-            $comment['data_creazione_formattata'] = isset($comment['DataPubb']) ? date('d/m/Y H:i', strtotime($comment['DataPubb'])) : 'Data non disponibile';
-            $comment['NumLike'] = isset($comment['NumLike']) ? (int)$comment['NumLike'] : 0;
-            $comment['replies'] = [];
-            $commentsById[$comment['Progressivo']] = $comment;
+            
+            $current_comment_data['data_creazione_formattata'] = isset($current_comment_data['DataPubb']) ? date('d/m/Y H:i', strtotime($current_comment_data['DataPubb'])) : 'Data non disponibile';
+            $current_comment_data['NumLike'] = isset($current_comment_data['NumLike']) ? (int)$current_comment_data['NumLike'] : 0;
+            $current_comment_data['replies'] = [];
+            $commentsById[$current_comment_data['Progressivo']] = $current_comment_data;
         }
 
         $commentsThreaded = [];
@@ -97,10 +113,10 @@ if ($action === 'get_comments') {
 
 } elseif ($action === 'submit_admin_reply') {
     $eventId = filter_input(INPUT_POST, 'event_id', FILTER_VALIDATE_INT);
-    $parentCommentId = filter_input(INPUT_POST, 'comment_id', FILTER_VALIDATE_INT); // ID del commento a cui si risponde
+    $parentCommentId = filter_input(INPUT_POST, 'comment_id', FILTER_VALIDATE_INT);
     $replyText = trim($_POST['reply_text'] ?? '');
 
-    if (!$eventId || !$parentCommentId || $replyText === '') { // Controlla anche empty string
+    if (!$eventId || !$parentCommentId || $replyText === '') { 
         $response['message'] = 'Dati mancanti o non validi per la risposta (ID evento, ID commento padre, testo).';
         http_response_code(400);
         echo json_encode($response);
@@ -133,17 +149,15 @@ if ($action === 'get_comments') {
             throw new Exception("Il commento padre (ID: {$parentCommentId}) a cui stai cercando di rispondere non esiste o non appartiene a questo evento (ID: {$eventId}).");
         }
 
-        // IMPORTANTE: Assicurati che $admin_email_identifier esista nella tabella utentiregistrati se hai un FK constraint.
-        // Se non esiste, l'INSERT fallirà con errore di integrità referenziale.
         $sql_insert = "INSERT INTO commenti (Descrizione, Data, DataPubb, OraPubb, CodRisposta, Contatto, IDEvento, NumLike)
                        VALUES (:descrizione, CURDATE(), NOW(), CURTIME(), :codRisposta, :contatto, :idEvento, 0)";
         $stmt = $conn->prepare($sql_insert);
 
         $stmt->bindParam(':descrizione', $replyText, PDO::PARAM_STR);
         $stmt->bindParam(':codRisposta', $parentCommentId, PDO::PARAM_INT);
-        $stmt->bindParam(':contatto', $admin_email_identifier, PDO::PARAM_STR);
+        $stmt->bindParam(':contatto', $admin_email_identifier, PDO::PARAM_STR); // La risposta è dell'admin
         $stmt->bindParam(':idEvento', $eventId, PDO::PARAM_INT);
-
+        
         $stmt->execute();
         $newCommentId = $conn->lastInsertId();
         $conn->commit();
@@ -151,15 +165,14 @@ if ($action === 'get_comments') {
 
     } catch (PDOException $e) {
         if ($conn->inTransaction()) $conn->rollBack();
-        // Log più dettagliato per PDOException
         error_log("Errore PDO in manage_comments_admin (submit_admin_reply) - Evento: {$eventId}, Commento Padre: {$parentCommentId} - Errore: " . $e->getMessage() . " - SQLSTATE: " . $e->getCode() . " - Trace: " . $e->getTraceAsString());
-        $response['message'] = 'Errore database durante l_invio della risposta. Controlla i log del server.'; // Messaggio per il client
+        $response['message'] = 'Errore database durante l_invio della risposta. Controlla i log del server.';
         http_response_code(500);
-    } catch (Exception $e) { // Catch generico per validazioni o altri problemi
+    } catch (Exception $e) { 
         if ($conn->inTransaction()) $conn->rollBack();
         error_log("Errore Applicativo in manage_comments_admin (submit_admin_reply) - Evento: {$eventId}, Commento Padre: {$parentCommentId} - Errore: " . $e->getMessage());
-        $response['message'] = $e->getMessage(); // Mostra il messaggio dell'eccezione custom
-        http_response_code(400); // Bad request se l'evento o il commento padre non esistono
+        $response['message'] = $e->getMessage(); 
+        http_response_code(400); 
     }
 
 } elseif ($action === 'delete_comment') {
@@ -174,35 +187,50 @@ if ($action === 'get_comments') {
         $conn->beginTransaction();
         $descendants = [];
         $idsToCheck = [$commentId];
-        while (!empty($idsToCheck)) {
-            $currentId = array_shift($idsToCheck);
-            $stmtFindChildren = $conn->prepare("SELECT Progressivo FROM commenti WHERE CodRisposta = :parentId");
-            $stmtFindChildren->bindParam(':parentId', $currentId, PDO::PARAM_INT);
+        $currentLevelIds = [$commentId];
+
+        while (!empty($currentLevelIds)) {
+            $placeholders = implode(',', array_fill(0, count($currentLevelIds), '?'));
+            $stmtFindChildren = $conn->prepare("SELECT Progressivo FROM commenti WHERE CodRisposta IN ($placeholders)");
+            // Bind parameters one by one for safety if array_values isn't appropriate for your PDO version/config with IN
+            $paramIndex = 1;
+            foreach($currentLevelIds as $levelId){
+                $stmtFindChildren->bindValue($paramIndex++, $levelId, PDO::PARAM_INT);
+            }
             $stmtFindChildren->execute();
             $children = $stmtFindChildren->fetchAll(PDO::FETCH_COLUMN);
+            
             if (!empty($children)) {
                 $descendants = array_merge($descendants, $children);
-                $idsToCheck = array_merge($idsToCheck, $children);
+                $currentLevelIds = $children; 
+            } else {
+                $currentLevelIds = []; 
             }
         }
+        
         $allToDelete = array_unique(array_merge($descendants, [$commentId]));
         $deletedCount = 0;
+
         if (!empty($allToDelete)) {
-            $placeholders = implode(',', array_fill(0, count($allToDelete), '?'));
-            $stmtDeleteAll = $conn->prepare("DELETE FROM commenti WHERE Progressivo IN ($placeholders)");
-            foreach ($allToDelete as $k => $idToDelete) {
-                $stmtDeleteAll->bindValue(($k + 1), $idToDelete, PDO::PARAM_INT);
+            $placeholders_delete = implode(',', array_fill(0, count($allToDelete), '?'));
+            $stmtDeleteAll = $conn->prepare("DELETE FROM commenti WHERE Progressivo IN ($placeholders_delete)");
+            // Bind parameters one by one
+            $paramIndexDel = 1;
+            foreach($allToDelete as $idToDelete){
+                 $stmtDeleteAll->bindValue($paramIndexDel++, $idToDelete, PDO::PARAM_INT);
             }
+            
             if ($stmtDeleteAll->execute()) {
                  $deletedCount = $stmtDeleteAll->rowCount();
             }
         }
+
         if ($deletedCount > 0) {
             $conn->commit();
             $response = ['success' => true, 'message' => "Commento/i ({$deletedCount}) eliminato/i con successo."];
         } else {
             $conn->rollBack();
-            $response['message'] = 'Commento non trovato o già eliminato.';
+            $response['message'] = 'Commento non trovato o già eliminato (o nessun discendente da eliminare).';
         }
     } catch (PDOException $e) {
         if ($conn->inTransaction()) $conn->rollBack();
@@ -212,8 +240,9 @@ if ($action === 'get_comments') {
     }
 } else {
      error_log("Azione non gestita o parametri mancanti in manage_comments_admin. Action: " . print_r($action, true) . " POST: " . print_r($_POST, true) . " GET: " . print_r($_GET, true));
+     $response['message'] = 'Azione specificata non valida o mancante.'; // Messaggio per il client
+     http_response_code(400); // Bad Request
 }
-
 
 echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 $conn = null;

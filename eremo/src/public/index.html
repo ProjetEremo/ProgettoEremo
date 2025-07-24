@@ -27,7 +27,7 @@
     .terms-checkbox input[type="checkbox"] { margin-right: 0.5rem; vertical-align: middle; }
     .terms-checkbox label { font-weight: normal; color: var(--gray-dark); } .terms-checkbox a { color: var(--primary); text-decoration: underline; }
 
-    /* Stili Modifica Pagina Admin */
+    /* Stili Modifica Pagina Admin - MIGLIORATI */
     #editPageBtnContainer {
       position: fixed;
       bottom: 20px;
@@ -68,25 +68,51 @@
     .editable-text-wrapper { position: relative; display: inline-block; width:100%; }
     .editable-image-wrapper { position: relative; display: block; }
 
-    .editable-text-wrapper:hover .edit-icon-text,
-    .editable-image-wrapper:hover .edit-icon-image,
-    .hero-section:hover .edit-icon-banner-bg {
-      display: inline-flex; align-items: center; justify-content: center;
+    /* Stile icone modifica - CORRETTO */
+    .edit-icon-text, .edit-icon-image, .edit-icon-banner-bg {
+      display: inline-flex; /* Sempre nel layout per animazione */
+      position: absolute;
+      background: var(--accent);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 0.85em;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      z-index: 5;
+      align-items: center;
+      justify-content: center;
+      
+      /* Stato iniziale (nascosto) */
+      opacity: 0;
+      transform: scale(0.5);
+      visibility: hidden;
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), visibility 0.3s;
     }
 
-    .edit-icon-text, .edit-icon-image, .edit-icon-banner-bg {
-      display: none; position: absolute; background: var(--accent); color: white;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%; font-size: 0.8em;
-      cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-      text-align: center; line-height: 24px;
-      z-index:5;
+    /* Stato finale (visibile in modalità modifica) con animazione */
+    body.edit-mode-on .edit-icon-text,
+    body.edit-mode-on .edit-icon-image,
+    body.edit-mode-on .edit-icon-banner-bg {
+        opacity: 1;
+        transform: scale(1);
+        visibility: visible;
+        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), visibility 0s 0s;
     }
-    .edit-icon-text { top: -10px; right: -10px; }
-    .edit-icon-image { top: -10px; right: -10px; }
+
+    /* Effetto hover solo quando le icone sono già visibili */
+    .edit-icon-text:hover, .edit-icon-image:hover, .edit-icon-banner-bg:hover {
+        transform: scale(1.1); /* Mantiene lo scale(1) base e lo aumenta */
+        background-color: #c07b50;
+    }
+    
+    .edit-icon-text { top: -12px; right: -12px; }
+    .edit-icon-image { top: -12px; right: -12px; }
     .edit-icon-banner-bg { bottom: 20px; right: 20px; }
-    img.editable-image-target { border: 3px dashed var(--accent) !important; cursor: pointer; opacity: 0.85; }
+
+    /* Bordo tratteggiato visibile solo in modalità modifica */
+    body.edit-mode-on img.editable-image-target { border: 3px dashed var(--accent) !important; cursor: pointer; opacity: 0.85; }
 
     .edit-content-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(var(--dark-rgb, 30, 59, 47), 0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center;}
     .edit-content-modal-content { background-color: var(--white); padding: 25px; border-radius: var(--border-radius-medium); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;}
@@ -127,13 +153,8 @@
       pointer-events: auto;
     }
 
-    #pageOverallStatus.success {
-      background-color: var(--success, green);
-    }
-
-    #pageOverallStatus.error {
-      background-color: var(--danger, red);
-    }
+    #pageOverallStatus.success { background-color: var(--success, green); }
+    #pageOverallStatus.error { background-color: var(--danger, red); }
 
     .image-loading-spinner { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-color: var(--gray-light); border-radius: var(--border-radius-large); z-index: 1; }
     .image-loading-spinner .spinner { display: flex; justify-content: center; align-items: center; width: auto; height: 58px; }
@@ -142,18 +163,18 @@
     .image-loading-spinner .spinner .bounce2 { animation-delay: -0.16s; }
     .image-load-error-display { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-color: var(--gray-light); border-radius: var(--border-radius-large); color: var(--gray-dark); text-align: center; padding: 1rem; z-index: 1; }
     .image-load-error-display p { margin: 0.2rem 0; font-size: 0.9em;}
-
+    
   </style>
 </head>
 
-<body class="page-index">
+<body class="page-index"> <!-- La classe 'edit-mode-on' verrà aggiunta qui da JS -->
 <header class="navbar-container" id="navbarContainer">
   <nav class="navbar">
     <div class="logo">
       <a href="index.html">
         <div class="editable-image-wrapper navbar-logo-wrapper">
           <img src="images/Logo_eremo.png" alt="Logo Eremo Frate Francesco" class="navbar-logo-img" id="content-navbarLogo" data-content-key="navbarLogo">
-          <span class="edit-icon-image" data-key="navbarLogo" data-type="image" title="Modifica logo" style="top: -5px; right: -5px; width:24px; height:24px; font-size:0.8em;">&#9998;</span>
+          <span class="edit-icon-image" data-key="navbarLogo" data-type="image" title="Modifica logo"><i class="fas fa-pencil-alt"></i></span>
         </div>
         <h2 id="navbar-title">Eremo Frate Francesco</h2>
       </a>
@@ -178,7 +199,7 @@
           <a href="#" id="logout-link-desktop">Esci</a>
         </div>
       </div>
-      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
@@ -196,15 +217,15 @@
   <section class="hero-section" id="heroSection">
     <div class="hero-content">
       <div class="editable-text-wrapper">
-        <h1 class="hero-title" id="content-heroTitle" data-content-key="heroTitle">Eremo Frate Francesco</h1>
-        <span class="edit-icon-text" data-key="heroTitle" data-type="text" title="Modifica titolo">&#9998;</span>
+        <h1 class="hero-title" id="content-heroTitle" data-content-key="heroTitle"></h1>
+        <span class="edit-icon-text" data-key="heroTitle" data-type="text" title="Modifica titolo"><i class="fas fa-pencil-alt"></i></span>
       </div>
       <div class="editable-text-wrapper">
-        <p class="hero-subtitle" id="content-heroSubtitle" data-content-key="heroSubtitle">Uno spazio sacro per il dialogo tra l'umano e il divino, immerso nella quiete delle Prealpi Bergamasche.</p>
-        <span class="edit-icon-text" data-key="heroSubtitle" data-type="textarea" title="Modifica sottotitolo">&#9998;</span>
+        <p class="hero-subtitle" id="content-heroSubtitle" data-content-key="heroSubtitle"></p>
+        <span class="edit-icon-text" data-key="heroSubtitle" data-type="textarea" title="Modifica sottotitolo"><i class="fas fa-pencil-alt"></i></span>
       </div>
     </div>
-    <span class="edit-icon-banner-bg" data-key="heroBackgroundImage" data-type="backgroundImage" title="Modifica immagine di sfondo banner">&#9998;</span>
+    <span class="edit-icon-banner-bg" data-key="heroBackgroundImage" data-type="backgroundImage" title="Modifica immagine di sfondo banner"><i class="fas fa-pencil-alt"></i></span>
   </section>
 
   <section class="section-padding">
@@ -216,17 +237,17 @@
               <div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>
             </div>
           </div>
-          <img src="" alt="La Fraternità" class="chi-siamo-image" id="content-fraternitaImage" data-content-key="fraternitaImage" style="display: none;">
-          <span class="edit-icon-image" data-key="fraternitaImage" data-type="image" title="Modifica immagine">&#9998;</span>
+          <img src="" alt="La Fraternità" class="chi-siamo-image editable-image-target" id="content-fraternitaImage" data-content-key="fraternitaImage" style="display: none;">
+          <span class="edit-icon-image" data-key="fraternitaImage" data-type="image" title="Modifica immagine"><i class="fas fa-pencil-alt"></i></span>
         </div>
         <div class="chi-siamo-content">
           <div class="editable-text-wrapper">
-            <h2 id="content-fraternitaHeading" data-content-key="fraternitaHeading">La Fraternità</h2>
-            <span class="edit-icon-text" data-key="fraternitaHeading" data-type="text" title="Modifica titolo">&#9998;</span>
+            <h2 id="content-fraternitaHeading" data-content-key="fraternitaHeading"></h2>
+            <span class="edit-icon-text" data-key="fraternitaHeading" data-type="text" title="Modifica titolo"><i class="fas fa-pencil-alt"></i></span>
           </div>
           <div class="editable-text-wrapper">
             <p id="content-fraternitaText" data-content-key="fraternitaText"></p>
-            <span class="edit-icon-text" data-key="fraternitaText" data-type="textarea" title="Modifica testo">&#9998;</span>
+            <span class="edit-icon-text" data-key="fraternitaText" data-type="textarea" title="Modifica testo"><i class="fas fa-pencil-alt"></i></span>
           </div>
         </div>
       </section>
@@ -234,12 +255,12 @@
       <section class="chi-siamo-section section-padding" id="ascoltoSection">
         <div class="chi-siamo-content">
           <div class="editable-text-wrapper">
-            <h2 id="content-ascoltoHeading" data-content-key="ascoltoHeading">L'Ascolto</h2>
-            <span class="edit-icon-text" data-key="ascoltoHeading" data-type="text" title="Modifica titolo">&#9998;</span>
+            <h2 id="content-ascoltoHeading" data-content-key="ascoltoHeading"></h2>
+            <span class="edit-icon-text" data-key="ascoltoHeading" data-type="text" title="Modifica titolo"><i class="fas fa-pencil-alt"></i></span>
           </div>
           <div class="editable-text-wrapper">
             <p id="content-ascoltoText" data-content-key="ascoltoText"></p>
-            <span class="edit-icon-text" data-key="ascoltoText" data-type="textarea" title="Modifica testo">&#9998;</span>
+            <span class="edit-icon-text" data-key="ascoltoText" data-type="textarea" title="Modifica testo"><i class="fas fa-pencil-alt"></i></span>
           </div>
         </div>
         <div class="chi-siamo-image-container editable-image-wrapper">
@@ -248,8 +269,8 @@
               <div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>
             </div>
           </div>
-          <img src="" alt="Momento di ascolto" class="chi-siamo-image" id="content-ascoltoImage" data-content-key="ascoltoImage" style="display: none;">
-          <span class="edit-icon-image" data-key="ascoltoImage" data-type="image" title="Modifica immagine">&#9998;</span>
+          <img src="" alt="Momento di ascolto" class="chi-siamo-image editable-image-target" id="content-ascoltoImage" data-content-key="ascoltoImage" style="display: none;">
+          <span class="edit-icon-image" data-key="ascoltoImage" data-type="image" title="Modifica immagine"><i class="fas fa-pencil-alt"></i></span>
         </div>
       </section>
 
@@ -260,17 +281,17 @@
               <div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>
             </div>
           </div>
-          <img src="" alt="Accoglienza all'Eremo" class="chi-siamo-image" id="content-accoglienzaImage" data-content-key="accoglienzaImage" style="display: none;">
-          <span class="edit-icon-image" data-key="accoglienzaImage" data-type="image" title="Modifica immagine">&#9998;</span>
+          <img src="" alt="Accoglienza all'Eremo" class="chi-siamo-image editable-image-target" id="content-accoglienzaImage" data-content-key="accoglienzaImage" style="display: none;">
+          <span class="edit-icon-image" data-key="accoglienzaImage" data-type="image" title="Modifica immagine"><i class="fas fa-pencil-alt"></i></span>
         </div>
         <div class="chi-siamo-content">
           <div class="editable-text-wrapper">
-            <h2 id="content-accoglienzaHeading" data-content-key="accoglienzaHeading">L'Accoglienza</h2>
-            <span class="edit-icon-text" data-key="accoglienzaHeading" data-type="text" title="Modifica titolo">&#9998;</span>
+            <h2 id="content-accoglienzaHeading" data-content-key="accoglienzaHeading"></h2>
+            <span class="edit-icon-text" data-key="accoglienzaHeading" data-type="text" title="Modifica titolo"><i class="fas fa-pencil-alt"></i></span>
           </div>
           <div class="editable-text-wrapper">
             <p id="content-accoglienzaText" data-content-key="accoglienzaText"></p>
-            <span class="edit-icon-text" data-key="accoglienzaText" data-type="textarea" title="Modifica testo">&#9998;</span>
+            <span class="edit-icon-text" data-key="accoglienzaText" data-type="textarea" title="Modifica testo"><i class="fas fa-pencil-alt"></i></span>
           </div>
         </div>
       </section>
@@ -375,8 +396,8 @@
   let isEditModeActive = false;
   let originalPageContentsForCancel = {};
   let currentPageDbContents = {};
-  let currentUserData = null;
-  const defaultUserIconPath = 'uploads/icons/default_user.png';
+  let currentUserData = null; 
+  const defaultUserIconPath = 'uploads/icons/default_user.png'; 
 
   const defaultPageContents = {
     heroTitle: "Eremo Frate Francesco",
@@ -416,9 +437,9 @@
           errorData = { message: rawErrorText || `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
         }
         if (!errorData.status) errorData.status = response.status;
-        throw errorData;
+        throw errorData; 
       }
-      if (response.status === 204) return {};
+      if (response.status === 204) return {}; 
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.indexOf("application/json") !== -1) {
         return await response.json();
@@ -432,7 +453,7 @@
         const match = error.message.match(/HTTP (\d+)/);
         if (match && match[1]) error.status = parseInt(match[1]);
       }
-      throw error;
+      throw error; 
     }
   }
 
@@ -440,14 +461,14 @@
   async function checkUserSessionActive() {
     try {
       await callApi('api/api_check_session.php'); // Assicurati che esista e usi require_login()
-      return true;
+      return true; 
     } catch (error) {
       if (error && (error.status === 401 || error.status === 403)) {
         console.warn("Session check: Sessione server non attiva (401/403).");
-        return false;
+        return false; 
       }
       console.warn("Errore durante il check della sessione (non 401/403):", error.message || error);
-      return true;
+      return true; 
     }
   }
 
@@ -476,8 +497,8 @@
     if(el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'none';
     if(el.loginBtnMobile) el.loginBtnMobile.style.display = 'none';
     if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'none';
-    if(el.navProfilo) el.navProfilo.style.display = 'none';
-    if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
+    if(el.navProfilo) el.navProfilo.style.display = 'none'; 
+    if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none'; 
     if(el.navDashboard) el.navDashboard.style.display = 'none';
     if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
     if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
@@ -487,10 +508,10 @@
     if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
     if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
 
-    if (currentUserData) {
-      if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block';
-      if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
-      if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
+    if (currentUserData) { 
+      if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block'; 
+      if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block'; 
+      if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block'; 
 
       if (el.navbarUsername) el.navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
       if(el.navbarAvatarImg){
@@ -499,25 +520,25 @@
         el.navbarAvatarImg.onerror=function(){this.src=defaultUserIconPath;};
       }
 
-      if(currentUserData.isAdmin){
-        if(el.navProfilo) el.navProfilo.style.display = 'block';
-        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
-        if(el.navDashboard) el.navDashboard.style.display = 'block';
-        if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
+      if(currentUserData.isAdmin){ 
+        if(el.navProfilo) el.navProfilo.style.display = 'block'; 
+        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block'; 
+        if(el.navDashboard) el.navDashboard.style.display = 'block'; 
+        if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block'; 
         if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
         if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
         if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
         if(el.mobileNavGestioneEventiAdminLink) el.mobileNavGestioneEventiAdminLink.style.display = 'none';
         if(el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
-      } else {
-        if(el.navProfilo) el.navProfilo.style.display = 'block';
-        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
-        if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block';
-        if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
+      } else { 
+        if(el.navProfilo) el.navProfilo.style.display = 'block'; 
+        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block'; 
+        if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block'; 
+        if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block'; 
         if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
         if(el.editPageBtnContainer && el.editPageBtnContainer.classList) el.editPageBtnContainer.classList.remove('active');
       }
-    } else {
+    } else { 
       if(el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'inline-block';
       if(el.loginBtnMobile) el.loginBtnMobile.style.display = 'block';
       if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
@@ -566,12 +587,12 @@
         currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath||defaultUserIconPath,isAdmin:j.is_admin===true||j.is_admin===1};
         localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));
 
-        updateNavbarUI();
-        closeLoginPopup();
-        await loadPageContentsFromServer();
+        updateNavbarUI(); 
+        closeLoginPopup(); 
+        await loadPageContentsFromServer(); 
 
         if (currentUserData.isAdmin) {
-          toggleEditMode(false);
+          toggleEditMode(false); 
         }
         showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");
 
@@ -594,28 +615,31 @@
     const wasLoggedIn = !!localStorage.getItem('userDataEFF');
     localStorage.removeItem('userDataEFF');
     currentUserData = null;
-    isEditModeActive = false;
+    
+    // Disattiva la modalità modifica se era attiva
+    if (isEditModeActive) {
+      toggleEditMode(false);
+    }
 
     fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                if (showAlert && wasLoggedIn) showPageStatus('Logout effettuato con successo.', 'info');
-              } else {
-                if (showAlert && wasLoggedIn) showPageStatus('Logout dal server fallito, ma i dati locali sono stati rimossi.', 'warning');
-              }
-            })
-            .catch(error => {
-              console.error("Errore API logout:", error);
-              if (showAlert && wasLoggedIn) showPageStatus('Errore durante il logout dal server.', 'error');
-            })
-            .finally(() => {
-              updateNavbarUI();
-              loadPageContentsFromServer(); // Ricarica i contenuti per la vista da ospite
-              const editContainer = document.getElementById('editPageBtnContainer');
-              if (editContainer) editContainer.classList.remove('active');
-              // Non reindirizzare per index.html, ma aggiorna la pagina
-            });
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          if (showAlert && wasLoggedIn) showPageStatus('Logout effettuato con successo.', 'info');
+        } else {
+          if (showAlert && wasLoggedIn) showPageStatus('Logout dal server fallito, ma i dati locali sono stati rimossi.', 'warning');
+        }
+      })
+      .catch(error => {
+        console.error("Errore API logout:", error);
+        if (showAlert && wasLoggedIn) showPageStatus('Errore durante il logout dal server.', 'error');
+      })
+      .finally(() => {
+        updateNavbarUI();
+        loadPageContentsFromServer(); // Ricarica i contenuti per la vista da ospite
+        const editContainer = document.getElementById('editPageBtnContainer');
+        if (editContainer) editContainer.classList.remove('active');
+      });
   }
   document.getElementById('logout-link-desktop')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();});
   document.getElementById('mobile-logout-link')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenuOnLinkClick();});
@@ -639,7 +663,7 @@
   function showPageStatus(message, type = 'info', duration = 3000) {
     if (!pageOverallStatus) return;
     pageOverallStatus.textContent = message;
-    pageOverallStatus.className = 'form-message';
+    pageOverallStatus.className = 'form-message'; 
     pageOverallStatus.classList.remove('success', 'error', 'active');
 
     if (type === 'success') {
@@ -650,7 +674,7 @@
     if (pageOverallStatus.hideTimeout) {
       clearTimeout(pageOverallStatus.hideTimeout);
     }
-    void pageOverallStatus.offsetHeight;
+    void pageOverallStatus.offsetHeight; 
     pageOverallStatus.classList.add('active');
 
     pageOverallStatus.hideTimeout = setTimeout(() => {
@@ -659,38 +683,43 @@
   }
 
   async function loadPageContentsFromServer() {
-    showPageStatus("Caricamento contenuti...", "info", 1500);
+    showPageStatus("Caricamento contenuti...", "info", 1500); // REINSERITA LA SCRITTA
     const cacheKey = `pageContent_${PAGE_NAME_FOR_CONTENT}`;
     let cachedContents = null;
     let appliedFromCache = false;
 
     try {
-      const cachedData = localStorage.getItem(cacheKey);
-      if (cachedData) {
-        cachedContents = JSON.parse(cachedData);
-        applyContentsToPage(cachedContents);
-        console.log("Contenuti caricati dalla cache.");
-        originalPageContentsForCancel = { ...cachedContents };
-        currentPageDbContents = { ...cachedContents };
-        appliedFromCache = true;
-      }
-    } catch (e) { console.error("Errore caricamento cache:", e); localStorage.removeItem(cacheKey); }
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+            cachedContents = JSON.parse(cachedData);
+            applyContentsToPage(cachedContents);
+            console.log("Contenuti caricati dalla cache.");
+            originalPageContentsForCancel = { ...cachedContents };
+            currentPageDbContents = { ...cachedContents };
+            appliedFromCache = true;
+        } else {
+            applyContentsToPage(defaultPageContents);
+        }
+    } catch (e) {
+        console.error("Errore caricamento cache:", e);
+        localStorage.removeItem(cacheKey);
+        applyContentsToPage(defaultPageContents);
+    }
 
     try {
       const r = await fetch(`api_get_page_content.php?page=${PAGE_NAME_FOR_CONTENT}`);
-      if (r.status === 401 || r.status === 403) { // Gestione sessione scaduta anche qui
-        console.warn("Sessione scaduta o non valida durante il caricamento dei contenuti di index.html.");
-        if (currentUserData) {
-          handleLogout(false); // Esegui logout client-side senza alert, perché lo status lo mostrerà
-          showPageStatus("Sessione scaduta. Effettua login.", "error", 5000);
+      if (r.status === 401 || r.status === 403) {
+        console.warn("Sessione scaduta o non valida durante il caricamento dei contenuti.");
+        if (currentUserData) { 
+          handleLogout(false);
+          showPageStatus("Sessione scaduta. Effettua login.", "error", 5000); 
         }
-        // Se non c'era cache, o la cache è diversa, mostra i default
-        if (!appliedFromCache || (cachedContents && JSON.stringify(cachedContents) !== JSON.stringify(defaultPageContents))) {
-          currentPageDbContents = { ...defaultPageContents };
-          applyContentsToPage(currentPageDbContents);
-          originalPageContentsForCancel = { ...currentPageDbContents };
+        if (cachedContents) {
+            applyContentsToPage(defaultPageContents);
+            currentPageDbContents = {...defaultPageContents};
+            originalPageContentsForCancel = {...defaultPageContents};
         }
-        updateNavbarUI(); // Aggiorna la navbar per riflettere lo stato di logout
+        updateNavbarUI();
         return;
       }
       if (!r.ok) throw new Error(`Errore server: ${r.status}`);
@@ -698,15 +727,23 @@
       let serverContents = (d.success && d.contents && Object.keys(d.contents).length > 0) ? d.contents : { ...defaultPageContents };
 
       if (!cachedContents || JSON.stringify(cachedContents) !== JSON.stringify(serverContents)) {
-        currentPageDbContents = serverContents; applyContentsToPage(currentPageDbContents);
+        currentPageDbContents = serverContents; 
+        applyContentsToPage(currentPageDbContents);
         localStorage.setItem(cacheKey, JSON.stringify(currentPageDbContents));
         console.log("Contenuti aggiornati dal server e cache salvata.");
-        if (cachedContents) showPageStatus("Contenuti aggiornati.", "info", 2000);
-      } else { console.log("Contenuti dal server identici alla cache."); }
+      } else if (!appliedFromCache) {
+        // Se la cache era vuota ma i dati del server corrispondono ai default,
+        // assicuriamoci che i dati siano applicati.
+        applyContentsToPage(serverContents);
+      }
       originalPageContentsForCancel = { ...currentPageDbContents };
     } catch (err) {
       console.error("Errore caricamento contenuti dal server:", err);
-      if (!appliedFromCache) { currentPageDbContents = { ...defaultPageContents }; applyContentsToPage(currentPageDbContents); originalPageContentsForCancel = { ...currentPageDbContents };}
+      if (!appliedFromCache) { 
+          currentPageDbContents = { ...defaultPageContents }; 
+          applyContentsToPage(currentPageDbContents); 
+          originalPageContentsForCancel = { ...currentPageDbContents };
+      }
       showPageStatus("Errore caricamento server. Mostrati dati locali/predefiniti.", "error");
     }
   }
@@ -726,11 +763,13 @@
         if (errorDisplay) errorDisplay.style.display = 'none';
         const finalSrc = contentValue || defaultPageContents[key];
         if (finalSrc) {
-          if (spinnerContainer) spinnerContainer.style.display = 'none';
-          imageElement.src = finalSrc; imageElement.style.display = 'block';
-          imageElement.alt = (defaultPageContents[key]?.alt || `Immagine per ${key}`).replace(" - Caricamento...", "");
+          if (spinnerContainer) spinnerContainer.style.display = 'flex';
+          imageElement.style.display = 'none'; // Nascondi prima del caricamento
+          imageElement.src = finalSrc; 
+          imageElement.alt = (defaultPageContents[key]?.alt || `Immagine per ${key}`);
           imageElement.onload = function() {
             if (spinnerContainer) spinnerContainer.style.display = 'none';
+            imageElement.style.display = 'block';
           }
           imageElement.onerror = function() {
             this.style.display = 'none'; if (spinnerContainer) spinnerContainer.style.display = 'none';
@@ -743,18 +782,18 @@
   }
 
   function toggleEditMode(enable){
-    isEditModeActive=enable;
-    document.querySelectorAll('.edit-icon-text, .edit-icon-image, .edit-icon-banner-bg').forEach(icon => icon.style.display = (currentUserData?.isAdmin && enable) ? 'inline-flex' : 'none');
-    document.querySelectorAll('img.chi-siamo-image').forEach(img => { (currentUserData?.isAdmin && enable) ? img.classList.add('editable-image-target') : img.classList.remove('editable-image-target'); });
+    isEditModeActive = enable;
+    
+    document.body.classList.toggle('edit-mode-on', enable && currentUserData?.isAdmin);
 
-    const editContainer=document.getElementById('editPageBtnContainer');
-    const editBtn=document.getElementById('editPageBtn');
-    const saveBtn=document.getElementById('savePageChangesBtn');
-    const cancelBtn=document.getElementById('cancelPageChangesBtn');
+    const editContainer = document.getElementById('editPageBtnContainer');
+    const editBtn = document.getElementById('editPageBtn');
+    const saveBtn = document.getElementById('savePageChangesBtn');
+    const cancelBtn = document.getElementById('cancelPageChangesBtn');
 
     if(editContainer) {
       if (currentUserData?.isAdmin) {
-        editContainer.classList.add('active');
+        editContainer.classList.add('active'); 
         if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block';
         if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none';
         if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none';
@@ -791,7 +830,8 @@
     if (type === 'textarea' || type === 'text') {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = currentValue;
-      valForInput = tempDiv.textContent || tempDiv.innerText;
+      // FIX: decodifica i caratteri HTML nel testo puro prima di mostrarli
+      valForInput = tempDiv.textContent || tempDiv.innerText || "";
       valForInput = valForInput.replace(/<br\s*\/?>/gi, "\n");
     }
 
@@ -808,7 +848,7 @@
       editModalInputFile.style.display = 'block';
       editModalFileLabel.style.display = 'block';
       editModalFileNote.style.display = 'block';
-    } else {
+    } else { 
       editModalTitle.textContent = `Modifica Testo Breve (ID: ${key})`;
       editModalFieldLabelText.textContent = "Testo (titolo/corto):";
       editModalInputText.value = valForInput;
@@ -845,7 +885,37 @@
   }
 
   if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
-  if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{ const contentsToSave={}; const heroSectionForSave = document.getElementById('heroSection'); if (heroSectionForSave && heroSectionForSave.style.backgroundImage) { const bgStyle = heroSectionForSave.style.backgroundImage; const urlMatch = bgStyle.match(/url\("?([^"]*)"?\)/); if (urlMatch && urlMatch[1]) { contentsToSave.heroBackgroundImage = urlMatch[1]; } else { contentsToSave.heroBackgroundImage = defaultPageContents.heroBackgroundImage || ''; }} else if (heroSectionForSave) { contentsToSave.heroBackgroundImage = defaultPageContents.heroBackgroundImage || ''; } document.querySelectorAll('[data-content-key]').forEach(el=>{const key=el.dataset.contentKey; if (key === 'heroBackgroundImage') return; if (el.tagName === 'IMG') { contentsToSave[key] = el.src; } else { contentsToSave[key] = el.innerHTML || ''; }}); const btn=savePageChangesBtn; const oldHtml=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...'; try{ const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})}); const j=await r.json(); if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio."); currentPageDbContents={...contentsToSave}; originalPageContentsForCancel={...currentPageDbContents}; localStorage.setItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`, JSON.stringify(currentPageDbContents)); showPageStatus(j.message||'Modifiche salvate!','success'); toggleEditMode(false); }catch(err){ console.error("Errore salvataggio:",err); showPageStatus(`Errore: ${err.message}`,'error'); }finally{ btn.disabled=false; btn.innerHTML=oldHtml; }});
+  
+  if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=> {
+      const contentsToSave = { ...currentPageDbContents };
+
+      const btn = savePageChangesBtn;
+      const oldHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
+      try {
+          const r = await fetch('api_save_page_content.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ page_name: PAGE_NAME_FOR_CONTENT, contents: contentsToSave })
+          });
+          const j = await r.json();
+          if (!r.ok || !j.success) throw new Error(j.message || "Errore salvataggio.");
+
+          originalPageContentsForCancel = { ...currentPageDbContents };
+          
+          localStorage.setItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`, JSON.stringify(currentPageDbContents));
+          showPageStatus(j.message || 'Modifiche salvate!', 'success');
+          toggleEditMode(false);
+      } catch (err) {
+          console.error("Errore salvataggio:", err);
+          showPageStatus(`Errore: ${err.message}`, 'error');
+      } finally {
+          btn.disabled = false;
+          btn.innerHTML = oldHtml;
+      }
+  });
+
   if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{ applyContentsToPage(originalPageContentsForCancel); currentPageDbContents = {...originalPageContentsForCancel}; toggleEditMode(false); showPageStatus('Modifiche annullate.','info');});
 
   document.addEventListener('click',function(e){
@@ -865,17 +935,14 @@
       type = editIcon.dataset.type;
 
       if (type === 'backgroundImage' && key === 'heroBackgroundImage') {
-        elToEdit = document.getElementById('heroSection');
-        const bgStyle = elToEdit.style.backgroundImage;
-        const urlMatch = bgStyle.match(/url\("?([^"]*)"?\)/);
-        currentVal = (urlMatch && urlMatch[1]) ? urlMatch[1] : (defaultPageContents.heroBackgroundImage || '');
+        currentVal = currentPageDbContents.heroBackgroundImage || '';
       } else {
         elToEdit = document.getElementById(`content-${key}`);
         if(!elToEdit){
           console.error(`Elemento content-${key} non trovato`);
           return;
         }
-        currentVal = elToEdit.tagName === 'IMG' ? elToEdit.src : elToEdit.innerHTML;
+        currentVal = elToEdit.tagName === 'IMG' ? elToEdit.src : currentPageDbContents[key];
       }
       openEditModal(key,type,currentVal);
 
@@ -894,7 +961,7 @@
 
   if(closeEditContentModalBtn)closeEditContentModalBtn.addEventListener('click',closeEditContentModal);
   if(cancelEditModalBtn)cancelEditModalBtn.addEventListener('click',closeEditContentModal);
-  if(saveEditModalBtn)saveEditModalBtn.addEventListener('click',async()=>{ if(!currentEditingKey)return; let targetElement; if (currentEditingType === 'backgroundImage' && currentEditingKey === 'heroBackgroundImage') { targetElement = document.getElementById('heroSection'); } else { targetElement = document.getElementById(`content-${currentEditingKey}`);} if(!targetElement){if(editModalMessage){editModalMessage.textContent="Err: Elem. non trovato.";editModalMessage.className='form-message error';editModalMessage.style.display='block';}return;} let newValue=''; const fileInput=document.getElementById('editModalInputFile'); const saveModalButton=saveEditModalBtn;const originalSaveModalButtonHtml=saveModalButton.innerHTML; let closeTheModal = true; if((currentEditingType==='image' || currentEditingType === 'backgroundImage') && fileInput.files[0]){ saveModalButton.disabled=true;saveModalButton.innerHTML='<i class="fas fa-spinner fa-spin"></i> Caricamento...'; const formData=new FormData();formData.append('imageFile',fileInput.files[0]);formData.append('page_name',PAGE_NAME_FOR_CONTENT);formData.append('content_key',currentEditingKey); try{ const r=await fetch('api_upload_image.php',{method:'POST',body:formData}); const j=await r.json(); if(!r.ok||!j.success)throw new Error(j.message||"Errore upload file."); newValue=j.filePath; if (currentEditingType === 'backgroundImage') { targetElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${newValue.replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29")}')`; } else { targetElement.src=newValue; } currentPageDbContents[currentEditingKey] = newValue; if(editModalMessage)editModalMessage.style.display='none';} catch(err){ console.error("Errore upload immagine:",err); if(editModalMessage){editModalMessage.textContent=`Errore upload: ${err.message}`;editModalMessage.className='form-message error';editModalMessage.style.display='block';} closeTheModal = false; } finally{saveModalButton.disabled=false;saveModalButton.innerHTML=originalSaveModalButtonHtml;}} else if (currentEditingType==='image' || currentEditingType === 'backgroundImage'){ newValue = editModalInputImage.value.trim(); if (currentEditingType === 'backgroundImage') { targetElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.52),rgba(0,0,0,0.52)),url('${newValue.replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29")}')`; } else { targetElement.src=newValue; } currentPageDbContents[currentEditingKey] = newValue;} else if(currentEditingType==='textarea'){ newValue=sanitizeTextForHTML(editModalTextarea.value);targetElement.innerHTML=newValue; currentPageDbContents[currentEditingKey] = editModalTextarea.value;} else { newValue=sanitizeTextForHTML(editModalInputText.value);targetElement.innerHTML=newValue; currentPageDbContents[currentEditingKey] = editModalInputText.value;} if (closeTheModal) closeEditContentModal();});
+  if(saveEditModalBtn)saveEditModalBtn.addEventListener('click',async()=>{ if(!currentEditingKey)return; let targetElement; if (currentEditingType === 'backgroundImage' && currentEditingKey === 'heroBackgroundImage') { targetElement = document.getElementById('heroSection'); } else { targetElement = document.getElementById(`content-${currentEditingKey}`);} if(!targetElement){if(editModalMessage){editModalMessage.textContent="Err: Elem. non trovato.";editModalMessage.className='form-message error';editModalMessage.style.display='block';}return;} let newValue=''; const fileInput=document.getElementById('editModalInputFile'); const saveModalButton=saveEditModalBtn;const originalSaveModalButtonHtml=saveModalButton.innerHTML; let closeTheModal = true; if((currentEditingType==='image' || currentEditingType === 'backgroundImage') && fileInput.files[0]){ saveModalButton.disabled=true;saveModalButton.innerHTML='<i class="fas fa-spinner fa-spin"></i> Caricamento...'; const formData=new FormData();formData.append('imageFile',fileInput.files[0]);formData.append('page_name',PAGE_NAME_FOR_CONTENT);formData.append('content_key',currentEditingKey); try{ const r=await fetch('api_upload_image.php',{method:'POST',body:formData}); const j=await r.json(); if(!r.ok||!j.success)throw new Error(j.message||"Errore upload file."); newValue=j.filePath; if (currentEditingType === 'backgroundImage') { targetElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.1)),url('${newValue.replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29")}')`; } else { targetElement.src=newValue; } currentPageDbContents[currentEditingKey] = newValue; if(editModalMessage)editModalMessage.style.display='none';} catch(err){ console.error("Errore upload immagine:",err); if(editModalMessage){editModalMessage.textContent=`Errore upload: ${err.message}`;editModalMessage.className='form-message error';editModalMessage.style.display='block';} closeTheModal = false; } finally{saveModalButton.disabled=false;saveModalButton.innerHTML=originalSaveModalButtonHtml;}} else if (currentEditingType==='image' || currentEditingType === 'backgroundImage'){ newValue = editModalInputImage.value.trim(); if (currentEditingType === 'backgroundImage') { targetElement.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.1)),url('${newValue.replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29")}')`; } else { targetElement.src=newValue; } currentPageDbContents[currentEditingKey] = newValue;} else if(currentEditingType==='textarea'){ newValue = editModalTextarea.value; targetElement.innerHTML=sanitizeTextForHTML(newValue); currentPageDbContents[currentEditingKey] = newValue;} else { newValue = editModalInputText.value; targetElement.innerHTML=sanitizeTextForHTML(newValue); currentPageDbContents[currentEditingKey] = newValue;} if (closeTheModal) closeEditContentModal();});
 
   function handleGlobalKeyDown(event) {
     if (event.key === "Escape") {
@@ -920,26 +987,24 @@
     loadUserData(); // Carica da localStorage
 
     if (currentUserData) { // Se c'erano dati in localStorage
-      const sessionIsValidOnServer = await checkUserSessionActive();
-      if (!sessionIsValidOnServer) {
-        console.warn("Sessione server non valida rilevata all'avvio di index.html.");
-        handleLogout(false); // Esegui logout client-side, non mostrare alert (lo status lo farà)
-        // Non c'è bisogno di chiamare showPageStatus qui perché loadPageContentsFromServer lo farà
-        // se rileva un errore di sessione.
-      }
+        const sessionIsValidOnServer = await checkUserSessionActive();
+        if (!sessionIsValidOnServer) {
+            console.warn("Sessione server non valida rilevata all'avvio.");
+            handleLogout(false);
+        }
     }
-    // Queste funzioni aggiorneranno la UI basandosi su currentUserData (che potrebbe essere stato annullato da handleLogout)
+    
     updateNavbarUI();
-    await loadPageContentsFromServer();
+    await loadPageContentsFromServer(); 
 
     if (currentUserData && currentUserData.isAdmin) {
-      toggleEditMode(false);
+      toggleEditMode(false); 
     } else {
-      toggleEditMode(false);
+      toggleEditMode(false); 
       const editContainer=document.getElementById('editPageBtnContainer');
       if(editContainer && editContainer.classList) editContainer.classList.remove('active');
     }
-    document.removeEventListener('keydown', handleGlobalKeyDown);
+    document.removeEventListener('keydown', handleGlobalKeyDown); 
     document.addEventListener('keydown', handleGlobalKeyDown);
   });
 </script>

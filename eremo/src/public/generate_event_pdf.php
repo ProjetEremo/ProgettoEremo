@@ -47,9 +47,9 @@ $stmtEvent->close();
 // Recupera partecipanti
 // La query sembra corretta per ottenere nome, cognome del partecipante e contatto di chi ha prenotato
 $stmtParticipants = $conn->prepare(
-    "SELECT p.Nome, p.Cognome, pr.Contatto
-     FROM Partecipanti p
-     JOIN prenotazioni pr ON p.Progressivo = pr.Progressivo
+    "SELECT p.Nome, p.Cognome, pr.Contatto 
+     FROM Partecipanti p 
+     JOIN prenotazioni pr ON p.Progressivo = pr.Progressivo 
      WHERE pr.IDEvento = ? ORDER BY p.Cognome, p.Nome"
 );
 if (!$stmtParticipants) {
@@ -105,7 +105,7 @@ class PDF_Event_Participants extends FPDF {
         } elseif (!empty($this->eventData['Associazione'])) {
              $this->Cell(0, 7, utf8_decode("Organizzato da: " . $this->eventData['Associazione']), 0, 1, 'C');
         }
-
+        
         $this->Ln(7); // Spazio prima della tabella o del contenuto principale
     }
 
@@ -122,16 +122,16 @@ class PDF_Event_Participants extends FPDF {
         $this->SetTextColor(0);
         $this->SetDrawColor(128, 128, 128); // Colore bordi tabella
         $this->SetFont('Arial','B',10);
-
+        
         // Larghezze colonne: Num., Cognome, Nome, Contatto Email
         // Larghezza totale A4 (210mm) - margini (15mm sx + 15mm dx = 30mm) = 180mm disponibili
         $w = array(15, 55, 55, 55); // Adatta queste larghezze se necessario
-
+        
         for($i=0; $i<count($header); $i++) {
             $this->Cell($w[$i], 8, utf8_decode($header[$i]), 1, 0, 'C', true); // Header con sfondo
         }
         $this->Ln();
-
+        
         $this->SetFont('Arial','',9); // Font più piccolo per i dati della tabella
         $this->SetFillColor(245, 245, 245); // Sfondo alternato per righe (opzionale)
         $fill = false;
@@ -182,7 +182,7 @@ $pdfFileName = 'Lista_Partecipanti_' . preg_replace('/[^A-Za-z0-9_\-]/', '_', $e
 // 'I': invia al browser inline
 // 'F': salva su file locale
 // 'S': restituisce come stringa
-$pdf->Output('D', $pdfFileName);
+$pdf->Output('D', $pdfFileName); 
 exit; // Termina lo script dopo aver inviato il PDF
 
 ?>

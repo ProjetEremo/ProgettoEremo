@@ -58,7 +58,7 @@ if ($action === 'get_setting') {
         $conn->close(); // Chiudi qui se esci
         exit;
     }
-
+    
     // Il JavaScript invierà sempre '0', '1', '2', o '3', quindi $_POST['value'] sarà sempre impostato.
     // Se volessi essere più restrittivo e assicurarti che il valore sia uno di quelli attesi:
     // if (!$value_is_provided || !in_array((string)$value, ['0', '1', '2', '3'], true)) {
@@ -93,7 +93,7 @@ if ($action === 'get_setting') {
             }
             $stmt->bind_param("sss", $pagina_nome_const, $key, $value);
         }
-
+        
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => 'Impostazione salvata con successo.']);
         } else {

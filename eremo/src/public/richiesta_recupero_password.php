@@ -112,12 +112,12 @@ try {
         $stmtDeleteOld = $conn->prepare("DELETE FROM password_reset_tokens WHERE email = :email");
         $stmtDeleteOld->bindParam(':email', $email, PDO::PARAM_STR);
         $stmtDeleteOld->execute();
-
+        
         $stmtInsert = $conn->prepare("INSERT INTO password_reset_tokens (email, token, expires_at) VALUES (:email, :token, :expires_at)");
         $stmtInsert->bindParam(':email', $email, PDO::PARAM_STR);
         $stmtInsert->bindParam(':token', $token, PDO::PARAM_STR);
         $stmtInsert->bindParam(':expires_at', $expires_at, PDO::PARAM_STR);
-
+        
         if ($stmtInsert->execute()) {
             $nomeUtente = trim(($user['Nome'] ?? '') . ' ' . ($user['Cognome'] ?? ''));
             if(empty($nomeUtente)) $nomeUtente = "Utente";

@@ -37,7 +37,7 @@ $user_email = $_SESSION['user_email'];
 $waitlistEntries = [];
 
 try {
-    $sql = "SELECT
+    $sql = "SELECT 
                 uc.IDEvento AS idEvento,
                 uc.NumeroInCoda AS numeroPostiInCoda,
                 e.Titolo AS eventTitolo,

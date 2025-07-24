@@ -72,7 +72,7 @@ try {
     if ($postiGiaPrenotatiUtente >= 5) {
          throw new Exception("Hai già raggiunto il limite massimo di 5 prenotazioni confermate per questo evento. Non è possibile aggiungersi ulteriormente alla lista d'attesa.");
     }
-
+    
     // (Opzionale) Potremmo anche limitare il numero di posti in coda + prenotati a 5.
     // Per ora, il controllo è solo sui prenotati.
 
@@ -91,7 +91,7 @@ try {
         // throw new Exception("L'evento ha ancora posti disponibili. Si prega di prenotare direttamente.");
         // Oppure si potrebbe procedere, ma la UI dovrebbe prevenire questo scenario.
     }
-
+    
     // 3. Inserisci o aggiorna la richiesta nella tabella utentiincoda
     // La PK è (Contatto, IDEvento), quindi un utente ha una sola entry per evento in coda.
     // Se l'utente è già in coda, aggiorniamo il NumeroInCoda sommando i nuovi posti richiesti,
@@ -106,16 +106,16 @@ try {
     if ($queueEntry) { // L'utente è già in coda
         $postiFinaliInCoda = $queueEntry['NumeroInCoda'] + $numeroPostiRichiestiCoda;
     }
-
+    
     // Limita i posti in coda a un massimo di 5 per questa richiesta/aggiornamento.
     if ($postiFinaliInCoda > 5) {
-        $postiFinaliInCoda = 5;
+        $postiFinaliInCoda = 5; 
     }
     // Esegui un UPSERT (INSERT ... ON DUPLICATE KEY UPDATE)
-    $sqlUpsertCoda = "INSERT INTO utentiincoda (Contatto, IDEvento, NumeroInCoda)
+    $sqlUpsertCoda = "INSERT INTO utentiincoda (Contatto, IDEvento, NumeroInCoda) 
                       VALUES (:contatto, :idEvento, :numInCoda)
                       ON DUPLICATE KEY UPDATE NumeroInCoda = :numInCodaUpdate";
-
+    
     $stmtUpsertCoda = $conn->prepare($sqlUpsertCoda);
     $stmtUpsertCoda->bindParam(':contatto', $contattoUtente, PDO::PARAM_STR);
     $stmtUpsertCoda->bindParam(':idEvento', $eventId, PDO::PARAM_INT);
@@ -125,7 +125,7 @@ try {
 
     $conn->commit();
     echo json_encode([
-        'success' => true,
+        'success' => true, 
         'message' => "Sei stato aggiunto/aggiornato nella lista d'attesa per l'evento '" . htmlspecialchars($evento['Titolo']) . "' con {$postiFinaliInCoda} posto/i."
     ]);
 

@@ -5,8 +5,9 @@ error_reporting(E_ALL); // Logga tutti gli errori
 // Solo per debug, puoi temporaneamente impostare display_errors a 1:
 // ini_set('display_errors', 1);
 
-session_start();
 header('Content-Type: application/json; charset=utf-8');
+require_once 'config_session.php'; // PRIMA COSA
+require_login(); // Verifica se l'utente è loggato
 
 $response = ['success' => false, 'message' => 'Errore generico upload.', 'filePath' => null];
 
