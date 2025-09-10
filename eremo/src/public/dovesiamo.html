@@ -25,177 +25,125 @@
     .terms-checkbox label { font-weight: normal; color: var(--gray-dark); } .terms-checkbox a { color: var(--primary); text-decoration: underline; }
 
     /* Stili Modifica Pagina Admin */
-    #editPageBtnContainer {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      z-index: 1001;
-      display: flex;
-      gap: 10px;
-      opacity: 0;
-      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-    }
-
-    #editPageBtnContainer.active {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    #editPageBtn, #savePageChangesBtn, #cancelPageChangesBtn {
-      background-color: var(--accent);
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 50px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.2s, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-      white-space: nowrap;
-    }
+    #editPageBtnContainer { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); z-index: 1001; display: flex; gap: 10px; opacity: 0; transition: opacity 0.3s ease-out, transform 0.3s ease-out; }
+    #editPageBtnContainer.active { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #editPageBtn, #savePageChangesBtn, #cancelPageChangesBtn { background-color: var(--accent); color: white; padding: 12px 20px; border: none; border-radius: 50px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); cursor: pointer; font-size: 1rem; transition: background-color 0.2s, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; white-space: nowrap; }
     #editPageBtn i, #savePageChangesBtn i, #cancelPageChangesBtn i { margin-right: 8px; }
     #savePageChangesBtn { background-color: var(--success); }
     #cancelPageChangesBtn { background-color: var(--gray-dark); }
     #editPageBtn:hover { background-color: #c07b50; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
     #savePageChangesBtn:hover { background-color: #27ae60; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
     #cancelPageChangesBtn:hover { background-color: var(--dark); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
-
     .editable-text-wrapper { position: relative; display: block; width:100%; }
-    .editable-iframe-wrapper, .editable-href-wrapper { position: relative; display: block; }
-
-    .edit-icon-text, .edit-icon-iframe, .edit-icon-href {
-      display: none;
-      position: absolute;
-      background: var(--accent);
-      color: white;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      font-size: 0.9em;
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      /* display: flex; */ /* Rimosso per evitare conflitti, gestito da JS */
-      align-items: center;
-      justify-content: center;
-      z-index: 5;
-      opacity: 0;
-      transform: scale(0.8);
-      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-    }
-
-    .editable-text-wrapper:hover .edit-icon-text,
-    .editable-iframe-wrapper:hover .edit-icon-iframe,
-    .editable-href-wrapper:hover .edit-icon-href {
-      display: flex; /* Mostra con flex quando serve */
-      opacity: 1;
-      transform: scale(1);
-    }
-    .edit-icon-text, .edit-icon-iframe, .edit-icon-href {
-      top: 0;
-      right: 0;
-      transform: translate(50%, -50%) scale(0.8);
-    }
-    .main-title-editable-wrapper > h1 + .edit-icon-text {
-      top: 50%;
-      right: 0;
-      transform: translate(50%, -50%) scale(0.8);
-    }
-    .location-description .editable-text-wrapper h2 + .edit-icon-text {
-      top: 0;
-      right: 0;
-      transform: translate(calc(100% + 5px), -50%) scale(0.8);
-    }
-    .location-description .editable-text-wrapper p + .edit-icon-text {
-      top: 50%;
-      right: 0;
-      transform: translate(calc(100% + 5px), -50%) scale(0.8);
-    }
-    .location-actions .editable-href-wrapper .edit-icon-href {
-      top: 50%;
-      right: 0;
-      transform: translate(calc(100% + 5px), -50%) scale(0.8);
-    }
-    .location-info-cards .editable-text-wrapper h2 + .edit-icon-text { /* Assumendo che anche questo titolo sia modificabile */
-      top: 0;
-      right: 0;
-      transform: translate(50%, -50%) scale(0.8);
-    }
-    .card-content .editable-text-wrapper p + .edit-icon-text { /* Per i paragrafi nelle card info */
-      top: 0;
-      right: 0;
-      transform: translate(50%, -50%) scale(0.8);
-    }
-    .map-container .edit-icon-iframe { /* Specifico per l'iframe della mappa */
-        top: 10px; /* Esempio: Spostato un po' più in basso */
-        right: 10px; /* Esempio: Spostato un po' più a sinistra */
-        transform: translate(0, 0) scale(0.8); /* Rimosso il translate(50%, -50%) se dà problemi */
-    }
-    .editable-text-wrapper:hover .edit-icon-text,
-    .editable-iframe-wrapper:hover .edit-icon-iframe,
-    .editable-href-wrapper:hover .edit-icon-href {
-      opacity: 1;
-      transform: translate(50%, -50%) scale(1); /* Ripristinato per uniformità, aggiustare se necessario */
-    }
-    .main-title-editable-wrapper:hover > h1 + .edit-icon-text,
-    .location-description .editable-text-wrapper:hover h2 + .edit-icon-text,
-    .location-description .editable-text-wrapper:hover p + .edit-icon-text,
-    .location-actions .editable-href-wrapper:hover .edit-icon-href,
-    .map-container.editable-iframe-wrapper:hover .edit-icon-iframe { /* Aggiunto per la mappa */
-      opacity: 1;
-      transform: translate(var(--custom-translate-x, 50%), var(--custom-translate-y, -50%)) scale(1);
-    }
-
-
+    .editable-iframe-wrapper, .editable-href-wrapper { position: relative; display: inline-block; }
+    .edit-icon-text, .edit-icon-iframe, .edit-icon-href { display: none; position: absolute; top: 0; right: 0; transform: translate(50%, -50%); background: var(--accent); color: white; width: 28px; height: 28px; border-radius: 50%; font-size: 0.9em; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); align-items: center; justify-content: center; z-index: 5; opacity: 0; transition: opacity 0.2s ease-out, transform 0.2s ease-out; }
+    .editable-text-wrapper:hover .edit-icon-text, .editable-iframe-wrapper:hover .edit-icon-iframe, .editable-href-wrapper:hover .edit-icon-href { display: flex; opacity: 1; transform: translate(50%, -50%) scale(1); }
+    .map-container.editable-iframe-wrapper { display: block; }
+    .map-container .edit-icon-iframe { top: 15px; right: 15px; transform: translate(0, 0); }
+    .map-container:hover .edit-icon-iframe { transform: translate(0, 0) scale(1); }
     .edit-content-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(var(--dark-rgb, 30, 59, 47), 0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center;}
     .edit-content-modal-content { background-color: var(--white); padding: 25px; border-radius: var(--border-radius-medium); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;}
-    .edit-content-modal-content h3 { margin-top: 0; color: var(--primary); }
-    .edit-content-modal .form-group { margin-bottom: 15px; }
-    .edit-content-modal .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: var(--dark); text-align: left; }
-    .edit-content-modal .form-group input[type="text"], .edit-content-modal .form-group textarea, .edit-content-modal .form-group input[type="url"] { width: 100%; padding: 10px; border: 1px solid var(--gray-medium); border-radius: 8px; font-size: 1rem;}
-    .edit-content-modal .form-group textarea { min-height: 100px; resize: vertical; }
-    .edit-content-modal-actions { margin-top: 20px; text-align: right; } .edit-content-modal-actions button { margin-left: 10px; }
     .close-modal-btn { position: absolute; top: 10px; right: 15px; font-size: 1.8rem; color: var(--gray-medium); background: none; border: none; cursor: pointer; line-height: 1;}
-    .close-modal-btn:hover { color: var(--dark); }
+    #pageOverallStatus { position: fixed; bottom: 80px; left: 50%; z-index: 1000; padding: 10px 20px; border-radius: 8px; font-size: 0.9em; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: center; background-color: var(--primary); color: white; display: block; opacity: 0; transform: translateX(-50%) translateY(30px); transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275), transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275); pointer-events: none; max-width: 90%; box-sizing: border-box; }
+    #pageOverallStatus.active { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    #pageOverallStatus.success { background-color: var(--success, green); }
+    #pageOverallStatus.error { background-color: var(--danger, red); }
 
-    /* Stili per #pageOverallStatus - Standardizzati */
-    #pageOverallStatus {
-      position: fixed;
-      bottom: 80px;
-      left: 50%;
-      z-index: 1000;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 0.9em;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    /* NUOVI STILI "PERFETTI" PER LA PAGINA "DOVE SIAMO" */
+    .title-wrapper {
       text-align: center;
-      background-color: var(--primary);
-      color: white;
-      display: block;
-      opacity: 0;
-      transform: translateX(-50%) translateY(30px);
-      transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275), transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275);
-      pointer-events: none;
-      max-width: 90%;
-      box-sizing: border-box;
+      margin-bottom: 2.5rem;
     }
-
-    #pageOverallStatus.active {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      pointer-events: auto;
+    .map-section {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch; /* Chiave per l'altezza uguale */
+      gap: 2.5rem;
     }
-
-    #pageOverallStatus.success {
-      background-color: var(--success, green);
+    .map-container {
+      flex: 1 1 58%;
+      min-width: 0;
+      border-radius: var(--border-radius-large, 16px);
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      height: auto; /* Permette al contenitore di allungarsi */
     }
-
-    #pageOverallStatus.error {
-      background-color: var(--danger, red);
+    .iframe-map {
+      width: 100%;
+      height: 100%; /* L'iframe riempie il suo contenitore */
+      border: none;
+    }
+    .location-description {
+      flex: 1 1 42%;
+      min-width: 0;
+      background: var(--white, #fff);
+      padding: 2.5rem;
+      border-radius: var(--border-radius-large, 16px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+    }
+    .location-description h2 {
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+    }
+    .location-description > .editable-text-wrapper > p {
+        margin-bottom: 2rem;
+        font-size: 1.05rem;
+        color: var(--gray-dark);
+        line-height: 1.6;
+    }
+    .details-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+      border-top: 1px solid var(--gray-light, #eee);
+      padding-top: 2rem;
+      flex-grow: 1;
+    }
+    .detail-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .detail-item .icon {
+      font-size: 1.4rem;
+      color: var(--accent);
+      margin-top: 3px;
+      flex-shrink: 0;
+      width: 25px;
+      text-align: center;
+    }
+    .detail-item .text-content {
+      line-height: 1.6;
+    }
+    .detail-item .text-content p {
+      margin: 0;
+    }
+    .detail-item .text-content .editable-text-wrapper:not(:last-child) {
+        margin-bottom: 0.5rem;
+    }
+    .final-actions {
+      text-align: center;
+      margin-top: 2.5rem;
+    }
+    /* Responsive */
+    @media (max-width: 992px) {
+      .map-section {
+        flex-direction: column;
+      }
+      .iframe-map {
+        /* Aggiungiamo un'altezza minima per mobile per evitare che collassi se il testo è corto */
+        min-height: 450px;
+      }
+      .location-description {
+        padding: 2rem;
+      }
     }
   </style>
 </head>
 <body>
+
 <header class="navbar-container" id="navbarContainer">
   <nav class="navbar">
     <div class="logo">
@@ -249,19 +197,18 @@
 </header>
 
 <main>
-  <div class="container section-padding pb-0">
-    <div class="editable-text-wrapper main-title-editable-wrapper" style="text-align: center;">
+  <div class="container section-padding">
+    <div class="editable-text-wrapper title-wrapper">
       <h1 id="content-pageTitle" data-content-key="pageTitle"></h1>
       <span class="edit-icon-text" data-key="pageTitle" data-type="text" title="Modifica Titolo Pagina">✎</span>
     </div>
-  </div>
 
-  <div class="container section-padding pt-0">
     <section class="map-section">
       <div class="map-container editable-iframe-wrapper">
         <iframe class="iframe-map" id="content-mapIframeSrc" data-content-key="mapIframeSrc" src="" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mappa Eremo Frate Francesco"></iframe>
         <span class="edit-icon-iframe" data-key="mapIframeSrc" data-type="iframe_src" title="Modifica URL Mappa">✎</span>
       </div>
+      
       <div class="location-description">
         <div class="editable-text-wrapper">
           <h2 id="content-locationHeading" data-content-key="locationHeading"></h2>
@@ -271,82 +218,79 @@
           <p id="content-locationText1" data-content-key="locationText1"></p>
           <span class="edit-icon-text" data-key="locationText1" data-type="textarea" title="Modifica Testo">✎</span>
         </div>
-        <div class="editable-text-wrapper">
-          <p id="content-locationAddress" data-content-key="locationAddress"></p>
-          <span class="edit-icon-text" data-key="locationAddress" data-type="textarea" title="Modifica Indirizzo">✎</span>
+
+        <div class="details-list">
+          <div class="detail-item">
+            <i class="fas fa-map-marker-alt icon"></i>
+            <div class="text-content">
+              <div class="editable-text-wrapper">
+                <p id="content-locationAddress" data-content-key="locationAddress"></p>
+                <span class="edit-icon-text" data-key="locationAddress" data-type="textarea" title="Modifica Indirizzo">✎</span>
+              </div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-route icon"></i>
+            <div class="text-content">
+              <div class="editable-text-wrapper">
+                <p id="content-locationDirections" data-content-key="locationDirections"></p>
+                <span class="edit-icon-text" data-key="locationDirections" data-type="textarea" title="Modifica Indicazioni">✎</span>
+              </div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-parking icon"></i>
+            <div class="text-content">
+              <div class="editable-text-wrapper">
+                <p id="content-locationParking" data-content-key="locationParking"></p>
+                <span class="edit-icon-text" data-key="locationParking" data-type="text" title="Modifica Info Parcheggio">✎</span>
+              </div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-clock icon"></i>
+            <div class="text-content">
+              <div class="editable-text-wrapper">
+                <p id="content-orariCardText1" data-content-key="orariCardText1"></p>
+                <span class="edit-icon-text" data-key="orariCardText1" data-type="textarea" title="Modifica Testo Orari">✎</span>
+              </div>
+              <div class="editable-text-wrapper">
+                <p id="content-orariCardText2" data-content-key="orariCardText2"></p>
+                <span class="edit-icon-text" data-key="orariCardText2" data-type="textarea" title="Modifica Testo Orari (link)">✎</span>
+              </div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-wheelchair icon"></i>
+            <div class="text-content">
+              <div class="editable-text-wrapper">
+                <p id="content-accessibilitaCardText1" data-content-key="accessibilitaCardText1"></p>
+                <span class="edit-icon-text" data-key="accessibilitaCardText1" data-type="textarea" title="Modifica Testo Accessibilità">✎</span>
+              </div>
+              <div class="editable-text-wrapper">
+                <p id="content-accessibilitaCardText2" data-content-key="accessibilitaCardText2"></p>
+                <span class="edit-icon-text" data-key="accessibilitaCardText2" data-type="text" title="Modifica Testo Accessibilità">✎</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="editable-text-wrapper">
-          <p id="content-locationDirections" data-content-key="locationDirections"></p>
-          <span class="edit-icon-text" data-key="locationDirections" data-type="textarea" title="Modifica Indicazioni">✎</span>
-        </div>
-        <div class="editable-text-wrapper">
-          <p id="content-locationParking" data-content-key="locationParking"></p>
-          <span class="edit-icon-text" data-key="locationParking" data-type="text" title="Modifica Info Parcheggio">✎</span>
-        </div>
-        <div class="location-actions">
+
+        <div class="final-actions">
           <div class="editable-href-wrapper">
             <a id="content-locationDirectionsButtonHref" data-content-key="locationDirectionsButtonHref" href="" target="_blank" rel="noopener noreferrer" class="btn-primary">
-              <i class="fas fa-directions"></i> Indicazioni Stradali
+              <i class="fas fa-directions"></i> Ottieni Indicazioni
             </a>
             <span class="edit-icon-href" data-key="locationDirectionsButtonHref" data-type="href" title="Modifica Link Indicazioni">✎</span>
-          </div>
-          <a href="contatti.html" class="btn-secondary">
-            <i class="fas fa-envelope"></i> Contattaci
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <section class="location-info-cards">
-      <div class="editable-text-wrapper">
-        <h2 class="text-center mb-4" id="content-infoUtiliHeading" data-content-key="infoUtiliHeading"></h2>
-        <span class="edit-icon-text" data-key="infoUtiliHeading" data-type="text" title="Modifica Titolo Sezione">✎</span>
-      </div>
-      <div class="card-grid">
-        <div class="card">
-          <div class="card-content">
-            <h3><i class="fas fa-clock"></i> Orari</h3>
-            <div class="editable-text-wrapper">
-              <p id="content-orariCardText1" data-content-key="orariCardText1"></p>
-              <span class="edit-icon-text" data-key="orariCardText1" data-type="textarea" title="Modifica Testo Orari">✎</span>
-            </div>
-            <div class="editable-text-wrapper">
-              <p id="content-orariCardText2" data-content-key="orariCardText2"></p>
-              <span class="edit-icon-text" data-key="orariCardText2" data-type="textarea" title="Modifica Testo Orari (link)">✎</span>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-content">
-            <h3><i class="fas fa-phone-alt"></i> Contatti Rapidi</h3>
-            <div class="editable-text-wrapper">
-              <p id="content-contattiRapidiCardText1" data-content-key="contattiRapidiCardText1"></p>
-              <span class="edit-icon-text" data-key="contattiRapidiCardText1" data-type="text" title="Modifica Testo Contatti">✎</span>
-            </div>
-            <div class="editable-text-wrapper">
-              <p id="content-contattiRapidiCardText2" data-content-key="contattiRapidiCardText2"></p>
-              <span class="edit-icon-text" data-key="contattiRapidiCardText2" data-type="textarea" title="Modifica Dettagli Contatto">✎</span>
-            </div>
-            <a href="contatti.html" class="card-btn card-btn-secondary" style="margin-top: 1rem">Vedi tutti i contatti</a>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-content">
-            <h3><i class="fas fa-wheelchair"></i> Accessibilità</h3>
-            <div class="editable-text-wrapper">
-              <p id="content-accessibilitaCardText1" data-content-key="accessibilitaCardText1"></p>
-              <span class="edit-icon-text" data-key="accessibilitaCardText1" data-type="textarea" title="Modifica Testo Accessibilità">✎</span>
-            </div>
-            <div class="editable-text-wrapper">
-              <p id="content-accessibilitaCardText2" data-content-key="accessibilitaCardText2"></p>
-              <span class="edit-icon-text" data-key="accessibilitaCardText2" data-type="text" title="Modifica Testo Accessibilità">✎</span>
-            </div>
           </div>
         </div>
       </div>
     </section>
   </div>
 </main>
+
+<footer>
+  <p>© <span id="currentYear"></span> Eremo Frate Francesco. OdV Via San Vito 2, Nembro. C.F.:90004060167. Sviluppato da 5AII 2024-2025 Majorana Seriate.</p>
+</footer>
 
 <div class="login-popup-overlay" id="loginOverlay"></div>
 <div class="login-popup" id="loginPopup">
@@ -388,6 +332,7 @@
     </div>
   </form>
 </div>
+
 <div id="editPageBtnContainer">
   <button id="editPageBtn"><i class="fas fa-pencil-alt"></i> Attiva Modifiche</button>
   <button id="savePageChangesBtn" style="display:none;"><i class="fas fa-save"></i> Salva Modifiche Pagina</button>
@@ -431,10 +376,6 @@
   </div>
 </div>
 
-<footer>
-  <p>© <span id="currentYear"></span> Eremo Frate Francesco ODV. Tutti i diritti riservati.</p>
-</footer>
-
 <script src="assistenteAI.js" defer></script>
 <script>
   const PAGE_NAME_FOR_CONTENT = 'dovesiamo';
@@ -446,48 +387,39 @@
 
   const defaultPageContents = {
     pageTitle: "Dove Siamo",
-    mapIframeSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2791.778205780889!2d9.747583015500093!3d45.74087297910504!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47814f7b104783bf%3A0xde070acb563411c3!2sChiesa%20di%20San%20Vito!5e0!3m2!1sit!2sit!4v1620000000000!5m2!1sit!2sit",
-    locationHeading: "Raggiungici a San Vito di Nembro",
+    mapIframeSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2794.319762193568!2d9.748721615560037!3d45.744549979105!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x478661380965e635%3A0x66f2d26211874133!2sChiesa%20di%20San%20Vito!5e0!3m2!1sit!2sit!4v1625141386753!5m2!1sit!2sit",
+    locationHeading: "Raggiungici all'Eremo",
     locationText1: "L'Eremo Frate Francesco si trova in una posizione tranquilla e suggestiva, ideale per il raccoglimento, nella frazione di San Vito a Nembro (BG).",
-    locationAddress: "<strong>Indirizzo: </strong> Via San Vito, 24027 Nembro BG (Presso la Chiesa di San Vito)",
-    locationDirections: "<strong>Indicazioni: </strong> Dalla SP35, seguire per Nembro centro e poi per San Vito. L'eremo si trova nella parte alta della frazione.",
-    locationParking: "<strong>Parcheggio: </strong> Disponibile nelle vicinanze.",
-    locationDirectionsButtonHref: "https://maps.app.goo.gl/exampleLink",
-    infoUtiliHeading: "Informazioni Utili",
-    orariCardText1: "L'accesso all'Eremo è legato alle attività programmate. Per visite o ritiri personali, è necessario contattarci preventivamente.",
-    orariCardText2: "Le celebrazioni seguono orari specifici (consultare <a href=\"eventiincorso.html\">calendario</a>).",
-    contattiRapidiCardText1: "Per info su attività, ritiri o ospitalità:",
-    contattiRapidiCardText2: "<strong>Tel:</strong> +39 123 456789<br /><strong>Email:</strong> info@eremo.it",
-    accessibilitaCardText1: "L'area presenta percorsi con pendenze. Per esigenze specifiche di accessibilità, vi preghiamo di contattarci per discutere le possibilità.",
-    accessibilitaCardText2: "Faremo il possibile per accogliervi al meglio."
+    locationAddress: "<strong>Indirizzo:</strong> Via San Vito, 24027 Nembro BG",
+    locationDirections: "<strong>Come arrivare:</strong> Dalla SP35, seguire per Nembro e poi per la frazione di San Vito. L'eremo si trova nella parte alta della frazione.",
+    locationParking: "<strong>Parcheggio:</strong> Ampio parcheggio gratuito disponibile nelle immediate vicinanze.",
+    locationDirectionsButtonHref: "https://maps.google.com/?q=Chiesa+di+San+Vito,Nembro+BG",
+    orariCardText1: "L'accesso all'Eremo e alla chiesa è generalmente libero durante il giorno. Per ritiri o visite, è consigliato contattarci per confermare la disponibilità.",
+    orariCardText2: "Le celebrazioni seguono orari specifici consultabili nel <a href=\"eventiincorso.html\">calendario attività</a>.",
+    accessibilitaCardText1: "L'area esterna e la chiesa sono accessibili. Alcuni percorsi interni presentano pendenze e terreno irregolare.",
+    accessibilitaCardText2: "Per esigenze specifiche, vi preghiamo di contattarci in anticipo per accogliervi al meglio."
   };
 
-  // New object for user-friendly display names
   const keyDisplayNames = {
     pageTitle: "Titolo Pagina",
     mapIframeSrc: "URL Mappa",
-    locationHeading: "Titolo Sezione Descrizione Luogo",
-    locationText1: "Testo Descrizione Luogo 1",
+    locationHeading: "Titolo Box Informazioni",
+    locationText1: "Testo Introduttivo",
     locationAddress: "Indirizzo",
     locationDirections: "Indicazioni Stradali",
     locationParking: "Info Parcheggio",
-    locationDirectionsButtonHref: "Link Bottone Indicazioni Stradali",
-    infoUtiliHeading: "Titolo Sezione Info Utili",
-    orariCardText1: "Testo Orari Card 1",
-    orariCardText2: "Testo Orari Card 2",
-    contattiRapidiCardText1: "Testo Contatti Rapidi Card 1",
-    contattiRapidiCardText2: "Testo Contatti Rapidi Card 2",
-    accessibilitaCardText1: "Testo Accessibilità Card 1",
-    accessibilitaCardText2: "Testo Accessibilità Card 2"
+    locationDirectionsButtonHref: "Link Bottone Indicazioni",
+    orariCardText1: "Testo Orari 1",
+    orariCardText2: "Testo Orari 2 (con link)",
+    accessibilitaCardText1: "Testo Accessibilità 1",
+    accessibilitaCardText2: "Testo Accessibilità 2"
   };
-
 
   function gebi(id) { return document.getElementById(id); }
   function formatHTMLContent(str) { if (typeof str !== 'string') str = String(str || ''); return str.replace(/\r\n|\r|\n/g, '<br>'); }
   function loadUserData() { const uds = localStorage.getItem('userDataEFF'); if (uds) { try { currentUserData = JSON.parse(uds); if (!currentUserData || typeof currentUserData.email === 'undefined') {currentUserData = null; localStorage.removeItem('userDataEFF');}} catch (e) { console.error("Err parsing userDataEFF:", e); currentUserData = null; localStorage.removeItem('userDataEFF');}} else { currentUserData = null; }}
 
   async function fetchAndUpdateUserDisplayDataFromApi() {
-    // Non fare fetch per admin qui, i dati sono ok
     if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
       updateNavbarUI();
       return;
@@ -525,47 +457,40 @@
     const mobileMenuSeparator = gebi('mobileMenuSeparator');
     const editPageBtnContainer = gebi('editPageBtnContainer');
 
-    // Reset iniziale di tutti gli item specifici dell'utente/admin
     [loginBtnDesktop, userDropdownContainer, navDashboard, navGestioneEventiAdmin, logoutLinkDesktop, gebi('login-btn-mobile'), mobileNavDashboard, mobileNavGestioneEventiAdmin, mobileLogoutLink, mobileMenuSeparator].forEach(el => { if (el) el.style.display = 'none'; });
     if (navProfilo) navProfilo.style.display = 'none';
     if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'none';
     if (mobileNavProfilo) mobileNavProfilo.style.display = 'none';
     if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
 
-
-    if (currentUserData) { // Utente Loggato
+    if (currentUserData) { 
       if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
       if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
       const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
       if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
-      if (logoutLinkDesktop) logoutLinkDesktop.style.display = 'block'; // Mostra Logout Desktop
+      if (logoutLinkDesktop) logoutLinkDesktop.style.display = 'block';
       if (mobileLogoutLink) mobileLogoutLink.style.display = 'block';
       if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
 
-
-      if (currentUserData.isAdmin) { // ADMIN LOGGATO
+      if (currentUserData.isAdmin) { 
         if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
         if (navProfilo) navProfilo.style.display = 'block';
         if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
         if (navDashboard) navDashboard.style.display = 'block';
         if (mobileNavDashboard) mobileNavDashboard.style.display = 'block';
-
-        // Nascondi "Le mie prenotazioni" e "Gestione Eventi" per admin
         if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'none';
         if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
         if (navGestioneEventiAdmin) navGestioneEventiAdmin.style.display = 'none';
         if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none';
-
-      } else { // UTENTE NORMALE LOGGATO
+      } else { 
         if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
         if (navProfilo) navProfilo.style.display = 'block';
         if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
         if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'block';
         if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
-        // Dashboard e Gestione Eventi rimangono 'none' dal reset iniziale
         if(editPageBtnContainer) editPageBtnContainer.classList.remove('active');
       }
-    } else { // UTENTE NON LOGGATO
+    } else { 
       if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
       if (gebi('login-btn-mobile')) gebi('login-btn-mobile').style.display = 'block';
       if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
@@ -578,7 +503,16 @@
   const mobileMenu = gebi("mobileMenu"); const hamburgerBtn = gebi("hamburgerBtn"); function toggleMobileMenu(){if(mobileMenu&&hamburgerBtn){const iO=mobileMenu.classList.toggle("open");hamburgerBtn.classList.toggle("open"); hamburgerBtn.setAttribute("aria-expanded",String(iO));document.body.style.overflow=iO?"hidden":"";}} function closeMobileMenu(){if(mobileMenu&&hamburgerBtn&&mobileMenu.classList.contains("open")){mobileMenu.classList.remove("open");hamburgerBtn.classList.remove("open");hamburgerBtn.setAttribute("aria-expanded","false");document.body.style.overflow="";}} if(hamburgerBtn)hamburgerBtn.addEventListener("click",toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l=>{if(l.id!=='login-btn-mobile'&&l.id!=='mobileLogoutLink')l.addEventListener("click",closeMobileMenu);}); document.addEventListener("click",function(e){if(mobileMenu&&mobileMenu.classList.contains("open")&&hamburgerBtn&&!mobileMenu.contains(e.target)&&!hamburgerBtn.contains(e.target))closeMobileMenu();});
   const userBtnTrigger = gebi('userBtnTrigger'); const userDropdownMenu = gebi('userDropdownMenu'); if(userBtnTrigger&&userDropdownMenu){userBtnTrigger.addEventListener('click',function(e){e.stopPropagation();const iS=userDropdownMenu.style.display==='block';userDropdownMenu.style.display=iS?'none':'block';this.setAttribute('aria-expanded',String(!iS));}); document.addEventListener('click',function(e){if(userDropdownMenu&&userDropdownMenu.style.display==='block'&&!userBtnTrigger.contains(e.target)&&!userDropdownMenu.contains(e.target)){userDropdownMenu.style.display='none';userBtnTrigger.setAttribute('aria-expanded','false');}});}
   const loginOverlay = gebi('loginOverlay'); const loginPopup = gebi('loginPopup'); const closeLoginPopupBtn = gebi('closeLoginPopupBtn'); const loginTabs = document.querySelectorAll('#loginPopup .login-tab'); const loginForms = document.querySelectorAll('#loginPopup .login-form'); const loginFormEl = gebi('loginForm'); const registerFormEl = gebi('registerForm'); const loginErrorMessageEl = gebi('login-error-message'); const registerErrorMessageEl = gebi('register-error-message');
-  function openLoginPopup(){if(loginOverlay)loginOverlay.classList.add('active');if(loginPopup)loginPopup.classList.add('active');document.body.style.overflow='hidden';resetFormErrorsAndMessages();const loginTabToActivate = loginPopup.querySelector('.login-tab[data-tab="login"]'); if(loginTabToActivate) loginTabToActivate.click(); gebi('login-email')?.focus();}
+  
+  function openLoginPopup(){
+      if(loginOverlay) loginOverlay.classList.add('active');
+      if(loginPopup) loginPopup.classList.add('active');
+      document.body.style.overflow='hidden';
+      resetFormErrorsAndMessages();
+      const loginTabToActivate = loginPopup.querySelector('.login-tab[data-tab="login"]'); 
+      if(loginTabToActivate) loginTabToActivate.click(); 
+      gebi('login-email')?.focus();
+  }
   function closeLoginPopup(){if(loginOverlay)loginOverlay.classList.remove('active');if(loginPopup)loginPopup.classList.remove('active');document.body.style.overflow='';resetFormErrorsAndMessages();}
   function resetFormErrorsAndMessages(){loginForms.forEach(f=>f.querySelectorAll('.form-control.error-border').forEach(i=>i.classList.remove('error-border')));if(loginErrorMessageEl)loginErrorMessageEl.style.display='none';if(registerErrorMessageEl)registerErrorMessageEl.style.display='none';}
   gebi('login-btn-desktop')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();}); gebi('login-btn-mobile')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();closeMobileMenu();});
@@ -599,16 +533,13 @@
       if(j.success){
         currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath,isAdmin:j.is_admin===true||j.is_admin===1};
         localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));
-
         updateNavbarUI();
         closeLoginPopup();
         await loadPageContentsFromServer();
-
         if (currentUserData.isAdmin) {
           toggleEditMode(false);
         }
         showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");
-
       }else{
         loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));
         if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}
@@ -645,27 +576,18 @@
   function showPageStatus(message, type = 'info', duration = 3000) {
     if (!pageOverallStatus) return;
     pageOverallStatus.textContent = message;
-    pageOverallStatus.className = 'form-message'; 
-    pageOverallStatus.classList.remove('success', 'error', 'active');
-
-    if (type === 'success') {
-      pageOverallStatus.classList.add('success');
-    } else if (type === 'error') {
-      pageOverallStatus.classList.add('error');
-    }
-    if (pageOverallStatus.hideTimeout) {
-      clearTimeout(pageOverallStatus.hideTimeout);
-    }
-    void pageOverallStatus.offsetHeight; 
+    pageOverallStatus.className = '';
     pageOverallStatus.classList.add('active');
-
-    pageOverallStatus.hideTimeout = setTimeout(() => {
+    if (type === 'success') pageOverallStatus.classList.add('success');
+    else if (type === 'error') pageOverallStatus.classList.add('error');
+    
+    setTimeout(() => {
       pageOverallStatus.classList.remove('active');
     }, duration);
   }
 
   async function loadPageContentsFromServer(){
-    showPageStatus("Caricamento contenuti...","info",1500);
+    showPageStatus("Caricamento contenuti...", "info", 1500);
     try{
       const r=await fetch(`api_get_page_content.php?page=${PAGE_NAME_FOR_CONTENT}`);
       if(!r.ok)throw new Error(`Errore server: ${r.status}`);
@@ -709,67 +631,8 @@
   function toggleEditMode(enable){
     isEditModeActive=enable;
     document.querySelectorAll('.edit-icon-text, .edit-icon-iframe, .edit-icon-href').forEach(icon => {
-      if (currentUserData?.isAdmin && enable) {
-        icon.style.display = 'flex'; // Usa flex per centrare l'icona
-        const parentWrapper = icon.closest('.editable-text-wrapper, .editable-iframe-wrapper, .editable-href-wrapper');
-        if (parentWrapper) {
-          let translateX = '50%';
-          let translateY = '-50%';
-          // Aggiustamenti specifici per il posizionamento dell'icona
-          if (parentWrapper.classList.contains('main-title-editable-wrapper')) {
-            translateX = '50%'; // Default va bene
-            translateY = '-50%';
-          } else if (parentWrapper.closest('.location-description')) {
-            const targetEl = parentWrapper.querySelector('[data-content-key]');
-            if (targetEl && (targetEl.tagName === 'H2' || targetEl.tagName === 'P')) {
-               translateX = 'calc(100% + 5px)'; // Sposta a destra del testo
-               translateY = '-50%';
-            }
-          } else if (parentWrapper.closest('.location-actions') && icon.classList.contains('edit-icon-href')) {
-             translateX = 'calc(100% + 5px)'; // Sposta a destra del bottone
-             translateY = '-50%';
-          } else if (parentWrapper.closest('.location-info-cards .editable-text-wrapper')) {
-             // Se è un H2 dentro location-info-cards
-             const targetH2 = parentWrapper.querySelector('h2[data-content-key="infoUtiliHeading"]');
-             if (targetH2 && targetH2 === parentWrapper.querySelector('[data-content-key]')) {
-                translateX = '50%'; // Per il titolo grande Info Utili, centro
-                translateY = '-50%';
-             } else { // Per i paragrafi nelle card
-                translateX = '50%'; // Centro rispetto al paragrafo
-                translateY = '-50%';
-             }
-          } else if (parentWrapper.classList.contains('map-container') && icon.classList.contains('edit-icon-iframe')) {
-             translateX = '50%'; // Per l'icona della mappa
-             translateY = '-50%';
-             // Sovrascrivi per posizionare in alto a destra DELL'IFRAME, non del contenitore
-             icon.style.top = '10px';
-             icon.style.right = '10px';
-             icon.style.transform = 'translate(0,0) scale(0.8)'; // Rimuovi il translate 50%
-             icon.style.setProperty('--custom-translate-x', '0'); // Non usare il translate generale
-             icon.style.setProperty('--custom-translate-y', '0');
-          }
-          icon.style.setProperty('--custom-translate-x', translateX);
-          icon.style.setProperty('--custom-translate-y', translateY);
-        }
-        setTimeout(() => {
-          icon.style.opacity = '1';
-          if (! (icon.classList.contains('edit-icon-iframe') && parentWrapper.classList.contains('map-container') ) ) { // Non applicare a icona mappa
-            icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(1)`;
-          } else {
-             icon.style.transform = `translate(0,0) scale(1)`; //  Per icona mappa
-          }
-        }, 10);
-      } else {
-        icon.style.opacity = '0';
-         if (! (icon.classList.contains('edit-icon-iframe') && icon.closest('.map-container')) ) {
-            icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(0.8)`;
-        } else {
-            icon.style.transform = `translate(0,0) scale(0.8)`;
-        }
-        setTimeout(() => {
-          icon.style.display = 'none';
-        }, 300);
-      }
+        icon.style.display = (currentUserData?.isAdmin && enable) ? 'flex' : 'none';
+        icon.style.opacity = (currentUserData?.isAdmin && enable) ? '1' : '0';
     });
 
     const editContainer=gebi('editPageBtnContainer');
@@ -828,29 +691,10 @@
   if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
   if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{
     const contentsToSave = { ...currentPageDbContents };
-    // Raccogli i dati aggiornati direttamente dagli elementi DOM per sicurezza
-    document.querySelectorAll('[data-content-key]').forEach(el => {
-      const key = el.dataset.contentKey;
-      if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') {
-        contentsToSave[key] = el.src;
-      } else if (el.tagName === 'A' && key === 'locationDirectionsButtonHref') {
-        contentsToSave[key] = el.href;
-      } else {
-        // Per testi, è meglio salvare il valore grezzo che era in currentPageDbContents[key]
-        // o, se modificato, quello che sarebbe stato inserito da openEditModal (quindi il textContent pulito, non l'innerHTML)
-        // Tuttavia, per semplicità e dato che l'editing avviene tramite modal che aggiorna currentPageDbContents,
-        // possiamo fidarci che currentPageDbContents sia già aggiornato.
-        // L'unica cosa è che i testi con HTML devono essere salvati come HTML.
-        // `currentPageDbContents[key]` dovrebbe già contenere il valore corretto (grezzo o HTML)
-        // a seguito della logica in `saveEditModalBtn` event listener.
-        contentsToSave[key] = currentPageDbContents[key];
-      }
-    });
     const btn=savePageChangesBtn;const oldHtml=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
     try{
       const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});
       const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");
-      // currentPageDbContents è già aggiornato localmente prima del salvataggio
       originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents));
       showPageStatus(j.message||'Modifiche salvate!','success');toggleEditMode(false);
     }catch(err){console.error("Errore salvataggio:",err);showPageStatus(`Errore: ${err.message}`,'error');}
@@ -861,23 +705,18 @@
   document.addEventListener('click',function(e){
     if(!isEditModeActive||!currentUserData?.isAdmin)return;
     const editIcon=e.target.closest('.edit-icon-text,.edit-icon-iframe,.edit-icon-href');
-    let elToEdit,key,type,currentVal;
-
     if(editIcon){
       e.stopPropagation();
-      key=editIcon.dataset.key; type=editIcon.dataset.type;
-      elToEdit=gebi(`content-${key}`);
+      const key=editIcon.dataset.key; 
+      const type=editIcon.dataset.type;
+      const elToEdit=gebi(`content-${key}`);
       if(!elToEdit){console.error(`Elemento con id content-${key} non trovato`);return;}
-      if (type === 'iframe_src') {
-        currentVal = elToEdit.src;
-      } else if (type === 'href') {
-        currentVal = elToEdit.href;
-      } else { // text o textarea
-        currentVal = currentPageDbContents[key] || defaultPageContents[key]; // Usa il valore grezzo da currentPageDbContents
-         if (typeof currentVal === 'object' && currentVal !== null) { // Caso speciale per infoQuandoText
-             currentVal = JSON.stringify(currentVal); // Potrebbe non servire se la modale lo gestisce come oggetto
-         }
-      }
+      
+      let currentVal;
+      if (type === 'iframe_src') currentVal = elToEdit.src;
+      else if (type === 'href') currentVal = elToEdit.href;
+      else currentVal = currentPageDbContents[key] || defaultPageContents[key];
+      
       openEditModal(key, type, currentVal);
     }
   });
@@ -895,40 +734,28 @@
       newValueFromModal = editModalInputUrl.value.trim();
       if(currentEditingType === 'iframe_src') targetElement.src = newValueFromModal;
       else targetElement.href = newValueFromModal;
-      currentPageDbContents[currentEditingKey] = newValueFromModal;
     } else if(currentEditingType==='textarea'){
-      newValueFromModal = editModalTextarea.value; // Ottieni valore grezzo dalla textarea
-      targetElement.innerHTML = formatHTMLContent(newValueFromModal); // Aggiorna UI con HTML formattato
-      currentPageDbContents[currentEditingKey] = newValueFromModal; // Salva valore grezzo per il DB
-    } else { // text
-      newValueFromModal = editModalInputText.value; // Ottieni valore grezzo dall'input
-      targetElement.innerHTML = formatHTMLContent(newValueFromModal); // Aggiorna UI
-      currentPageDbContents[currentEditingKey] = newValueFromModal; // Salva valore grezzo per il DB
+      newValueFromModal = editModalTextarea.value;
+      targetElement.innerHTML = formatHTMLContent(newValueFromModal);
+    } else {
+      newValueFromModal = editModalInputText.value;
+      targetElement.innerHTML = formatHTMLContent(newValueFromModal);
     }
+    currentPageDbContents[currentEditingKey] = newValueFromModal;
     closeEditContentModal();
   });
 
   async function loadNavbarLogo() {
     const logoImgTag = document.getElementById('navbarLogoImgTag');
-    if (!logoImgTag) {
-      console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in dovesiamo.html.");
-      return;
-    }
+    if (!logoImgTag) return;
     const defaultLogoPath = 'images/Logo_eremo.png';
     try {
       const response = await fetch('api_get_page_content.php?page=index');
-      if (!response.ok) {
-        throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
-      }
+      if (!response.ok) throw new Error(`Errore HTTP ${response.status}`);
       const data = await response.json();
-      if (data.success && data.contents && data.contents.navbarLogo) {
-        logoImgTag.src = data.contents.navbarLogo;
-      } else {
-        console.warn("URL del logo navbar non trovato o errore API. Uso il logo di default.");
-        logoImgTag.src = defaultLogoPath;
-      }
+      logoImgTag.src = (data.success && data.contents && data.contents.navbarLogo) ? data.contents.navbarLogo : defaultLogoPath;
     } catch (error) {
-      console.error("Errore nel caricare dinamicamente il logo navbar:", error);
+      console.error("Errore nel caricare il logo navbar:", error);
       logoImgTag.src = defaultLogoPath;
     }
   }
@@ -936,10 +763,10 @@
   document.addEventListener('DOMContentLoaded',async()=> {
     const c=gebi('currentYear');if(c)c.textContent=new Date().getFullYear();
     loadUserData();
-    updateNavbarUI(); // Chiamata qui prima di fetch/load così i pulsanti base sono subito corretti
+    updateNavbarUI(); 
     await loadNavbarLogo();
-    await loadPageContentsFromServer(); // Carica i contenuti specifici della pagina dovesiamo
-    await fetchAndUpdateUserDisplayDataFromApi(); // Aggiorna di nuovo la UI navbar con dati utente freschi, se disponibili
+    await loadPageContentsFromServer();
+    await fetchAndUpdateUserDisplayDataFromApi();
 
     if (currentUserData && currentUserData.isAdmin) {
       toggleEditMode(false);

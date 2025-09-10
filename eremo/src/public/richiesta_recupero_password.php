@@ -1,5 +1,5 @@
 <?php
-// NOME FILE: richiesta_recupero_password.php
+// NOME FILE: richiesta_recupero_password.php prova
 header('Content-Type: application/json; charset=utf-8');
 
 // Configurazione DB (adattala se necessario)

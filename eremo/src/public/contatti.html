@@ -180,32 +180,61 @@
     #pageOverallStatus.error {
       background-color: var(--danger, red);
     }
-    .phone-display-entry {
-        margin-bottom: 8px;
-        font-size: 1.3rem;
-        text-align: center;
+    
+    /* NUOVI STILI PER LA PAGINA CONTATTI */
+    .contatti-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        align-items: stretch; /* Allinea le card sulla stessa altezza */
     }
-    .phone-buttons-group {
+
+    .contatto-card {
+        background-color: #ffffff;
+        border-radius: 1rem; /* Angoli più arrotondati */
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+        padding: 2.5rem;
+        text-align: center;
         display: flex;
-        flex-wrap: wrap;
-        gap: 10px; /* Space between buttons */
-        justify-content: center; /* Center buttons if they don't fill the row */
-        margin-top: 15px;
+        flex-direction: column;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .phone-buttons-group .btn-contatto {
-        flex: 1 1 auto; /* Allow buttons to grow and shrink but maintain base size */
-        min-width: 150px; /* Minimum width for each button */
-        text-align: center;
+    .contatto-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .contatto-card .card-content {
+        flex-grow: 1; /* Fa espandere l'area del contenuto per riempire lo spazio */
     }
 
-    /* Responsive: On smaller screens, stack buttons if needed */
-    @media (max-width: 480px) {
-        .phone-buttons-group .btn-contatto {
-            flex-basis: 100%; /* Each button takes full width on small screens */
-        }
+    .contatto-card .contatto-icon {
+        margin-bottom: 1.5rem;
     }
 
+    .contatto-card h3 {
+        margin-bottom: 1.5rem; /* Aumentato il margine inferiore per più spazio */
+    }
+    
+    .contatto-card .contatto-valore {
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: var(--primary);
+        word-break: break-all;
+        margin-bottom: 0; /* Rimuove lo spazio sotto l'email */
+    }
+
+    .phone-display-entry {
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--primary);
+    }
+
+    .contatto-card .btn-contatto, .contatto-card .btn-secondary {
+        width: 100%; /* Bottone a larghezza piena */
+    }
   </style>
 </head>
 <body>
@@ -268,67 +297,51 @@
       <span class="edit-icon-text" data-key="pageTitle" data-type="text" title="Modifica Titolo Pagina">✎</span>
     </div>
     <div class="editable-text-wrapper">
-      <p id="content-pageIntroText" data-content-key="pageIntroText" class="text-center mb-4" style="max-width: 700px; margin-left: auto; margin-right: auto;"></p>
+      <p id="content-pageIntroText" data-content-key="pageIntroText" class="text-center mb-5" style="max-width: 700px; margin-left: auto; margin-right: auto;"></p>
       <span class="edit-icon-text" data-key="pageIntroText" data-type="textarea" title="Modifica Introduzione">✎</span>
     </div>
 
     <div class="contatti-grid">
+      <!-- Card Contatto Telefonico -->
       <div class="contatto-card">
-        <div class="contatto-icon"><i class="fas fa-mobile-alt fa-2x" style="color: var(--secondary)"></i></div>
-        <div class="editable-text-wrapper">
-          <h3 id="content-card1Title" data-content-key="card1Title"></h3>
-          <span class="edit-icon-text" data-key="card1Title" data-type="text" title="Modifica Titolo Card">✎</span>
+        <div class="card-content">
+          <div class="contatto-icon"><i class="fas fa-mobile-alt fa-3x" style="color: var(--secondary)"></i></div>
+          <div class="editable-text-wrapper">
+            <h3 id="content-card1Title" data-content-key="card1Title"></h3>
+            <span class="edit-icon-text" data-key="card1Title" data-type="text" title="Modifica Titolo Card">✎</span>
+          </div>
+          <div id="card1PhoneNumbersContainer">
+            <!-- I numeri di telefono verranno inseriti qui dinamicamente -->
+          </div>
         </div>
-        <div class="editable-text-wrapper">
-          <p id="content-card1Description" data-content-key="card1Description"></p>
-          <span class="edit-icon-text" data-key="card1Description" data-type="textarea" title="Modifica Descrizione Card">✎</span>
-        </div>
-        
-        <button id="manageCard1PhonesBtn" class="btn-contatto btn-secondary" style="display:none; margin-top: 10px; margin-bottom:10px; background-color: var(--accent); color:white;">
-            <i class="fas fa-phone-square-alt"></i> Gestisci Numeri Telefono
-        </button>
-
-        <div id="card1PhoneNumbersContainer" class="mb-3" style="margin-top:15px;">
-          <!-- I numeri di telefono verranno inseriti qui dinamicamente -->
-        </div>
-        <div id="card1PhoneCopyButtonsContainer" class="phone-buttons-group">
-          <!-- I pulsanti Copia Numero verranno inseriti qui dinamicamente -->
+        <div class="card-actions">
+            <button id="manageCard1PhonesBtn" class="btn-contatto btn-secondary" style="display:none; background-color: var(--accent); color:white;">
+                <i class="fas fa-phone-square-alt"></i> Gestisci Numeri
+            </button>
         </div>
       </div>
 
+      <!-- Card Contatto Email -->
       <div class="contatto-card">
-        <div class="contatto-icon"><i class="fas fa-envelope fa-2x" style="color: var(--secondary)"></i></div>
-        <div class="editable-text-wrapper">
-          <h3 id="content-card2Title" data-content-key="card2Title"></h3>
-          <span class="edit-icon-text" data-key="card2Title" data-type="text" title="Modifica Titolo Card">✎</span>
+        <div class="card-content">
+            <div class="contatto-icon"><i class="fas fa-envelope fa-3x" style="color: var(--secondary)"></i></div>
+            <div class="editable-text-wrapper">
+              <h3 id="content-card2Title" data-content-key="card2Title"></h3>
+              <span class="edit-icon-text" data-key="card2Title" data-type="text" title="Modifica Titolo Card">✎</span>
+            </div>
+            <div class="editable-text-wrapper">
+              <p class="contatto-valore" id="content-card2Email" data-content-key="card2Email"></p>
+              <span class="edit-icon-text" data-key="card2Email" data-type="email" title="Modifica Email">✎</span>
+            </div>
         </div>
-        <div class="editable-text-wrapper">
-          <p id="content-card2Description" data-content-key="card2Description"></p>
-          <span class="edit-icon-text" data-key="card2Description" data-type="textarea" title="Modifica Descrizione Card">✎</span>
+        <div class="card-actions">
+            <a id="mailtoLinkCard2" href="" class="btn-contatto">
+              <i class="fas fa-paper-plane" style="margin-right: 8px"></i> Scrivici una Email
+            </a>
         </div>
-        <div class="editable-text-wrapper">
-          <p class="contatto-valore" id="content-card2Email" data-content-key="card2Email"></p>
-          <span class="edit-icon-text" data-key="card2Email" data-type="email" title="Modifica Email">✎</span>
-        </div>
-        <a id="mailtoLinkCard2" href="" class="btn-contatto">
-          <i class="fas fa-paper-plane" style="margin-right: 5px"></i> Scrivici
-        </a>
       </div>
     </div>
 
-    <div class="text-center mt-4">
-      <div class="editable-text-wrapper">
-        <h2 class="mb-3" id="content-doveTrovarciHeading" data-content-key="doveTrovarciHeading"></h2>
-        <span class="edit-icon-text" data-key="doveTrovarciHeading" data-type="text" title="Modifica Titolo Sezione">✎</span>
-      </div>
-      <div class="editable-text-wrapper">
-        <p id="content-doveTrovarciAddress" data-content-key="doveTrovarciAddress"></p>
-        <span class="edit-icon-text" data-key="doveTrovarciAddress" data-type="text" title="Modifica Indirizzo">✎</span>
-      </div>
-      <a href="dovesiamo.html" class="btn-contatto" style="background-color: var(--accent);">
-        <i class="fas fa-map-marked-alt" style="margin-right: 5px"></i> Vedi Mappa e Indicazioni
-      </a>
-    </div>
   </div>
 </main>
 
@@ -458,7 +471,7 @@
 </div>
 
 <footer>
-  <p>© <span id="currentYear"></span> Eremo Frate Francesco ODV. Tutti i diritti riservati.</p>
+  <p>© <span id="currentYear"></span> Eremo Frate Francesco. OdV Via San Vito 2, Nembro. C.F.:90004060167. Sviluppato da 5AII 2024-2025 Majorana Seriate.</p>
 </footer>
 
 <script src="assistenteAI.js" defer></script>
@@ -475,29 +488,20 @@
     pageTitle: "Contattaci",
     pageIntroText: "Siamo a disposizione per informazioni sulle nostre attività, sull'ospitalità o per qualsiasi altra domanda. Non esitare a contattarci!",
     card1Title: "Referenti Ospitalità",
-    card1Description: "Per informazioni specifiche sui ritiri e l'accoglienza.",
     card1PhoneNumbers: [ // NUOVA STRUTTURA PER I NUMERI
       { id: 'default-pn1', prefix: "+39", number: "3471900434", name: "Antonella" },
       { id: 'default-pn2', prefix: "+39", number: "3292142414", name: "Marina" }
     ],
     card2Title: "Indirizzo Email",
-    card2Description: "Per richieste scritte e invio documentazione.",
-    card2Email: "info.eremofrancesco@email.it",
-    doveTrovarciHeading: "Dove Trovarci",
-    doveTrovarciAddress: "Via San Vito, 24027 Nembro BG"
+    card2Email: "info.eremofrancesco@email.it"
   };
 
   const keyDisplayNameMap = {
     pageTitle: "Titolo Pagina",
     pageIntroText: "Testo Introduttivo",
     card1Title: "Titolo Card Telefono",
-    card1Description: "Descrizione Card Telefono",
-    // card1PhoneNumbers non necessita di un display name qui perché ha un modal dedicato
     card2Title: "Titolo Card Email",
-    card2Description: "Descrizione Card Email",
-    card2Email: "Indirizzo Email",
-    doveTrovarciHeading: "Titolo Sezione 'Dove Trovarci'",
-    doveTrovarciAddress: "Indirizzo Eremo"
+    card2Email: "Indirizzo Email"
   };
 
 
@@ -737,28 +741,20 @@
 
   function renderCard1PhoneNumbers(phoneNumbersArray) {
     const numbersContainer = gebi('card1PhoneNumbersContainer');
-    const copyButtonsContainer = gebi('card1PhoneCopyButtonsContainer');
-    if (!numbersContainer || !copyButtonsContainer) return;
+    if (!numbersContainer) return;
 
     numbersContainer.innerHTML = ''; // Pulisci i numeri esistenti
-    copyButtonsContainer.innerHTML = ''; // Pulisci i bottoni copia esistenti
 
     if (!phoneNumbersArray || phoneNumbersArray.length === 0) {
         numbersContainer.innerHTML = '<p class="text-center" style="font-style: italic;">Nessun numero di telefono configurato.</p>';
         return;
     }
     
-    phoneNumbersArray.forEach((phone, index) => {
+    phoneNumbersArray.forEach((phone) => {
       const numberDiv = document.createElement('div');
-      numberDiv.classList.add('phone-display-entry'); // Per eventuale styling
+      numberDiv.classList.add('phone-display-entry');
       numberDiv.innerHTML = `<strong>${phone.prefix} ${phone.number}</strong> (${phone.name})`;
       numbersContainer.appendChild(numberDiv);
-
-      const copyBtn = document.createElement('button');
-      copyBtn.classList.add('btn-contatto');
-      copyBtn.innerHTML = `<i class="fas fa-copy"></i> Copia Numero ${phone.name || (index + 1)}`;
-      copyBtn.addEventListener('click', () => copyPhoneNumberToClipboard(`${phone.prefix}${phone.number}`, copyBtn));
-      copyButtonsContainer.appendChild(copyBtn);
     });
   }
 
@@ -857,33 +853,27 @@
         body: JSON.stringify({ page_name: PAGE_NAME_FOR_CONTENT, contents: contentsToSave })
       });
 
-      const responseText = await response.text(); // Ottieni prima la risposta come testo
+      const responseText = await response.text(); 
 
       if (!response.ok) {
-        // Il server ha restituito un codice di stato di errore (4xx, 5xx)
         let errorMessage = `Errore server: ${response.status}`;
         try {
-            // Prova a interpretare come JSON se il tipo di contenuto lo suggerisce
             if (response.headers.get("content-type")?.includes("application/json")) {
                 const errorJson = JSON.parse(responseText);
                 errorMessage = errorJson.message || responseText;
             } else {
-                // Altrimenti usa il testo (potrebbe essere un errore HTML da PHP)
                 errorMessage = responseText.substring(0, 300) + (responseText.length > 300 ? "..." : "");
             }
         } catch (e) {
-            // Non JSON o JSON malformato. Usa il testo grezzo.
              errorMessage = responseText.substring(0, 300) + (responseText.length > 300 ? "..." : "");
         }
         throw new Error(errorMessage);
       }
 
-      // Prova a interpretare la risposta come JSON
       let jsonData;
       try {
         jsonData = JSON.parse(responseText);
       } catch (e) {
-        // Qui è dove verrebbe catturato "Unexpected token '<'" se la risposta è HTML
         console.error("Errore parsing JSON dalla risposta del server:", e);
         console.error("Testo della risposta ricevuto dal server:", responseText);
         throw new Error("Risposta non valida dal server. Controllare la console per i dettagli.");
@@ -893,7 +883,6 @@
         throw new Error(jsonData.message || "Errore sconosciuto durante il salvataggio dei contenuti.");
       }
 
-      // Successo
       currentPageDbContents = JSON.parse(JSON.stringify(contentsToSave));
       originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents));
       showPageStatus(jsonData.message || 'Modifiche salvate!', 'success');
@@ -901,10 +890,8 @@
 
     } catch (err) {
       console.error("Errore durante il salvataggio (catch generale):", err);
-      // Mostra un messaggio di errore più dettagliato se possibile
       let displayMessage = `Errore: ${err.message}`;
       if (err.message.includes("Risposta non valida dal server") || err.message.includes("Errore server:")) {
-          // Non aggiungere "Errore:" due volte
           displayMessage = err.message;
       }
       showPageStatus(displayMessage, 'error');
@@ -958,18 +945,6 @@
     if (currentEditingKey === 'card2Email') { const mailLink = gebi('mailtoLinkCard2'); if (mailLink) mailLink.href = `mailto:${newValueRaw.trim()}`; }
     closeEditContentModal();
   });
-
-  function copyPhoneNumberToClipboard(phoneNumber, button) {
-    navigator.clipboard.writeText(phoneNumber).then(() => {
-      const originalText = button.innerHTML;
-      button.innerHTML = '<i class="fas fa-check" style="margin-right: 5px;"></i> Copiato!';
-      setTimeout(() => { button.innerHTML = originalText; }, 2000);
-    }).catch(err => {
-      console.error("Errore durante la copia: ", err);
-      // Non usare alert, usa showPageStatus o un messaggio nel modal
-      showPageStatus("Errore copia numero. Seleziona manualmente.", "error");
-    });
-  }
   
   // ----- LOGICA MODAL GESTIONE NUMERI TELEFONO -----
   function openEditPhoneNumbersModal() {

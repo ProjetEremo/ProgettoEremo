@@ -19,6 +19,60 @@
             object-fit: cover; flex-shrink: 0;
         }
 
+        /* === NUOVI STILI PER IMMAGINE COPERTINA WIDE === */
+        .event-cover-image-container {
+            width: 100%;
+            aspect-ratio: 21 / 9; /* Formato wide */
+            border-radius: var(--border-radius-large, 12px);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            cursor: pointer;
+            position: relative;
+            background-color: var(--gray-lighter);
+            display: none; /* Nascosto finché non c'è l'immagine */
+        }
+        .event-cover-image-container .event-cover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* L'immagine copre l'area mantenendo le proporzioni */
+            transition: transform 0.4s ease, filter 0.4s ease;
+        }
+        .event-cover-image-container:hover .event-cover-image {
+            transform: scale(1.05);
+            filter: brightness(0.9);
+        }
+        .cover-image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .event-cover-image-container:hover .cover-image-overlay {
+            opacity: 1;
+        }
+        .cover-image-overlay i {
+            font-size: 3rem;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        /* =============================================== */
+
+          /* === FIX PER DOPPIO BOX COMMENTI (Soluzione Definitiva) === */
+        .comments-section {
+            background-color: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+        }
+        /* =================================== */
+
         /* Stili aggiunti per modifica/eliminazione commenti */
         .comment-edit-form {
             margin-top: 0.8rem;
@@ -371,10 +425,15 @@
 <main>
     <div class="container event-detail-container section-padding">
         <h1 id="eventTitleHeader">Dettaglio Evento</h1>
-        <img id="eventCoverImage" class="event-cover-image" src="" alt="Copertina evento" style="display:none;">
-        <div id="eventMetaInfo" class="event-meta-info" style="display:none;"></div>
+        
+        <div id="eventCoverImageContainer" class="event-cover-image-container">
+            <img id="eventCoverImage" class="event-cover-image" src="" alt="Copertina evento">
+            <div class="cover-image-overlay">
+                <i class="fas fa-search-plus"></i>
+            </div>
+        </div>
+
         <div id="eventDescriptionFull" class="event-description-full" style="display:none;"></div>
-        <div id="eventVolantinoContainer" class="volantino-link-container" style="display:none;"></div>
 
         <div id="pageLoadingIndicator" class="loading-overlay visible" style="min-height:200px; background:transparent; position:relative;">
             <div class="spinner"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>
@@ -416,7 +475,7 @@
             <p id="login-to-comment-message" class="no-content-message" style="display:none;">
                 Per lasciare un commento, <a href="#" id="loginLinkFromEventPage">accedi</a>.
             </p>
-            <h3>Commenti:</h3>
+            <h3>Commenti</h3>
             <div class="comments-list-wrapper">
                 <ul id="commentsListUL" class="comments-list-ul"></ul>
             </div>
@@ -479,7 +538,7 @@
 </div>
 
 <footer>
-  <p>© <span id="currentYear"></span> Eremo Frate Francesco. Tutti i diritti riservati. OdV Via San Vito 2, Nembro. C.F.:90004060167</p>
+  <p>© <span id="currentYear"></span> Eremo Frate Francesco. OdV Via San Vito 2, Nembro. C.F.:90004060167. Sviluppato da 5AII 2024-2025 Majorana Seriate.</p>
 </footer>
 
 <script src="assistenteAI.js" defer></script>
@@ -737,50 +796,69 @@
 
     async function fetchEventDetails(eventId) {
         const pageLoadingEl = document.getElementById('pageLoadingIndicator'); const errorDisplayEl = document.getElementById('eventLoadingError');
-        const eventTitleHeaderEl = document.getElementById('eventTitleHeader'); const eventCoverImageEl = document.getElementById('eventCoverImage');
-        const eventMetaInfoEl = document.getElementById('eventMetaInfo'); const eventDescriptionFullEl = document.getElementById('eventDescriptionFull');
-        const eventVolantinoContainerEl = document.getElementById('eventVolantinoContainer'); const gallerySectionEl = document.getElementById('event-gallery');
+        const eventTitleHeaderEl = document.getElementById('eventTitleHeader'); 
+        const eventCoverImageContainerEl = document.getElementById('eventCoverImageContainer');
+        const eventCoverImageEl = document.getElementById('eventCoverImage');
+        const eventDescriptionFullEl = document.getElementById('eventDescriptionFull');
+        const gallerySectionEl = document.getElementById('event-gallery');
         const galleryGridEl = document.getElementById('galleryGrid'); const noMediaMessageEl = document.getElementById('no-media-message');
         const commentsSectionEl = document.getElementById('event-comments'); const commentsListULEL = document.getElementById('commentsListUL');
         const noCommentsMessageEl = document.getElementById('no-comments-message');
         if(errorDisplayEl) errorDisplayEl.style.display = 'none'; if (pageLoadingEl) pageLoadingEl.style.display = 'flex';
-        [gallerySectionEl, commentsSectionEl, eventCoverImageEl, eventMetaInfoEl, eventDescriptionFullEl, eventVolantinoContainerEl].forEach(el => { if(el) el.style.display = 'none'; });
+        [gallerySectionEl, commentsSectionEl, eventCoverImageContainerEl, eventDescriptionFullEl].forEach(el => { if(el) el.style.display = 'none'; });
         try {
             const result = await callApi('get_event_details.php?id=' + encodeURIComponent(eventId));
             if (result.success && result.data) {
                 const event = result.data.details; const mediaItems = result.data.media || []; const fetchedComments = result.data.comments || [];
                 if (eventTitleHeaderEl && event?.Titolo) { eventTitleHeaderEl.textContent = event.Titolo; document.title = event.Titolo + ' - Eremo Frate Francesco'; }
                 else if (eventTitleHeaderEl) { eventTitleHeaderEl.textContent = "Dettaglio Evento"; }
+                
+                galleryItemsData = []; // Reset gallery data
+                
                 if (event) {
-                    if(event.FotoCopertina && eventCoverImageEl){ eventCoverImageEl.src = event.FotoCopertina; eventCoverImageEl.alt = "Copertina " + (event.Titolo || "evento"); eventCoverImageEl.style.display = 'block'; }
-                    if(eventMetaInfoEl){
-                        let metaHTML = '';
-                        if (event.Data) { try { const dateObj = new Date(event.Data.replace(/-/g, '/')); if (!isNaN(dateObj.getTime())) metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${dateObj.toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric', timeZone: 'Europe/Rome'})}</span>`; else metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${sanitizeTextForHTML(event.Data)}</span>`; } catch (e) { metaHTML += `<span><i class="fas fa-calendar-alt"></i> ${sanitizeTextForHTML(event.Data)}</span>`; } }
-                        if (event.Durata) metaHTML += `<span><i class="fas fa-clock"></i> ${sanitizeTextForHTML(event.Durata)}</span>`;
-                        if (event.Relatore) metaHTML += `<span><i class="fas fa-user"></i> ${sanitizeTextForHTML(event.PrefissoRelatore || 'Relatore')}: ${sanitizeTextForHTML(event.Relatore)}</span>`;
-                        if (event.Associazione) metaHTML += `<span><i class="fas fa-users"></i> ${sanitizeTextForHTML(event.Associazione)}</span>`;
-                        eventMetaInfoEl.innerHTML = metaHTML; if (metaHTML) eventMetaInfoEl.style.display = 'flex';
+                    if(event.FotoCopertina && eventCoverImageContainerEl && eventCoverImageEl){ 
+                        eventCoverImageEl.src = event.FotoCopertina; 
+                        eventCoverImageEl.alt = "Copertina " + (event.Titolo || "evento"); 
+                        eventCoverImageContainerEl.style.display = 'block'; 
+                        // Add cover image as the first item in the gallery
+                        galleryItemsData.push({ href: encodeURI(event.FotoCopertina), title: "Immagine di Copertina", type: 'image' });
                     }
                     if(eventDescriptionFullEl && (event.DescrizioneEstesa || event.Descrizione)){ eventDescriptionFullEl.innerHTML = sanitizeTextForHTML(event.DescrizioneEstesa || event.Descrizione); eventDescriptionFullEl.style.display = 'block'; }
-                    if(eventVolantinoContainerEl && event.VolantinoUrl){ eventVolantinoContainerEl.innerHTML = `<h4>Volantino</h4><a href="${encodeURI(event.VolantinoUrl)}" target="_blank" title="Visualizza volantino per ${sanitizeTextForHTML(event.Titolo || '')}" class="btn-volantino"><i class="fas fa-file-pdf"></i> Visualizza Volantino</a>`; eventVolantinoContainerEl.style.display = 'block'; }
                 } else { displayErrorMessageOnPage("Dettagli evento non disponibili."); }
-                galleryItemsData = []; if (galleryGridEl) galleryGridEl.innerHTML = '';
+
+                if (galleryGridEl) galleryGridEl.innerHTML = '';
                 if (mediaItems.length > 0 && galleryGridEl) {
                     if (gallerySectionEl) gallerySectionEl.style.display = 'block'; if (noMediaMessageEl) noMediaMessageEl.style.display = 'none';
-                    mediaItems.forEach((item, index) => {
-                        const rawPath = item.Percorso || ''; const desc = item.Descrizione || ''; const title = sanitizeTextForHTML(desc || `Media ${index + 1}`);
+                    mediaItems.forEach((item) => {
+                        const rawPath = item.Percorso || ''; const desc = item.Descrizione || ''; 
                         let type = 'image', thumb = rawPath, href = rawPath;
                         if (rawPath.match(/\.(mp4|webm|ogv)$/i)) { type = 'video'; thumb = 'images/video_placeholder.png';}
                         else if (rawPath.match(/\.(pdf)$/i)) { type = 'document'; thumb = 'images/pdf_placeholder.png'; }
                         else if (!rawPath.match(/\.(jpeg|jpg|gif|png|webp)$/i)) { type = 'document'; thumb = 'images/file_placeholder.png';}
-                        galleryItemsData.push({ href: encodeURI(href), title, type }); const div = document.createElement('div'); div.className = 'gallery-item';
-                        let itemHTML = `<a href="${type === 'document' ? encodeURI(href) : '#'}" ${type !== 'document' ? `data-index="${index}"` : 'target="_blank" rel="noopener noreferrer"'} title="${title}">`;
+                        
+                        const galleryItemData = { href: encodeURI(href), title: sanitizeTextForHTML(desc || `Media`), type };
+                        galleryItemsData.push(galleryItemData);
+                        
+                        const currentIndex = galleryItemsData.length - 1;
+                        const title = galleryItemData.title;
+
+                        const div = document.createElement('div'); div.className = 'gallery-item';
+                        let itemHTML = `<a href="${type === 'document' ? encodeURI(href) : '#'}" ${type !== 'document' ? `data-index="${currentIndex}"` : 'target="_blank" rel="noopener noreferrer"'} title="${title}">`;
                         itemHTML += `<img src="${thumb}" alt="${title}" loading="lazy" onerror="this.onerror=null; this.src='images/file_placeholder.png';">`;
                         if (type === 'video') itemHTML += '<div class="media-overlay"><i class="fas fa-play media-play-icon"></i></div>';
                         itemHTML += '</a>'; div.innerHTML = itemHTML; galleryGridEl.appendChild(div);
                     });
                     document.querySelectorAll('#galleryGrid .gallery-item a[data-index]').forEach(a => a.addEventListener('click', function(e) { e.preventDefault(); openLightbox(parseInt(this.dataset.index)); }));
                 } else { if (gallerySectionEl) gallerySectionEl.style.display = 'block'; if (noMediaMessageEl) noMediaMessageEl.style.display = 'block'; }
+
+                if (eventCoverImageContainerEl) {
+                    eventCoverImageContainerEl.addEventListener('click', () => {
+                        if (galleryItemsData.length > 0) {
+                            openLightbox(0); // Apre la galleria partendo dall'immagine di copertina (indice 0)
+                        }
+                    });
+                }
+                
                 const commentFormCont = document.getElementById('commentFormContainer'); const loginMsg = document.getElementById('login-to-comment-message');
                 if (commentsSectionEl) commentsSectionEl.style.display = 'block';
                 if (currentUser?.email) { if(commentFormCont) commentFormCont.style.display = 'block'; if(loginMsg) loginMsg.style.display = 'none'; }
