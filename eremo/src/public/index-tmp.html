@@ -165,20 +165,27 @@
     .image-loading-spinner .spinner .bounce2 { animation-delay: -0.16s; }
     .image-load-error-display { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-color: var(--gray-light); border-radius: var(--border-radius-large); color: var(--gray-dark); text-align: center; padding: 1rem; z-index: 1; }
     .image-load-error-display p { margin: 0.2rem 0; font-size: 0.9em;}
-    /* Liquid Glass Effect Styles */
+    /* Stili per centrare e definire l'area dell'eroe */
+    .hero-section {
+      display: flex;
+      align-items: center; /* Allinea verticalmente al centro */
+      justify-content: center; /* Allinea orizzontalmente al centro */
+      min-height: 100vh; /* Assicura che la sezione occupi l'intera altezza della finestra */
+      padding: 20px; /* Aggiunge un po' di spazio dai bordi su schermi piccoli */
+      box-sizing: border-box;
+      /* L'immagine di sfondo è già impostata da JS, non serve qui */
+    }
+
+    /* Rimuove il posizionamento assoluto e lo sfondo biancastro */
     .hero-liquid-container {
-      position: absolute;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%);
+      /* Rimosso: position absolute, bottom, left, transform */
+      position: relative;
       width: 90%;
       max-width: 800px;
       padding: 30px 40px;
       border-radius: 25px;
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: transparent; /* Rimosso il colore biancastro, ora è trasparente */
+      /* I filtri (blur, saturate) e il bordo verranno gestiti dalla libreria LiquidWeb */
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
       z-index: 2;
       overflow: hidden;
@@ -194,10 +201,21 @@
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .hero-liquid-container {
-        width: 85%;
-        padding: 20px 25px;
-        bottom: 60px;
+        width: 90%;
+        padding: 25px;
         border-radius: 20px;
+      }
+
+      /* NUOVE REGOLE: Riduci la dimensione del testo su mobile */
+      .hero-title {
+        font-size: 1.8rem; /* Valore ridotto per il titolo */
+        line-height: 1.2;
+        margin-bottom: 0.75rem; /* Aggiunge un po' di spazio sotto il titolo */
+      }
+
+      .hero-subtitle {
+        font-size: 1rem; /* Valore ridotto per il sottotitolo */
+        line-height: 1.5;
       }
     }
 
@@ -210,6 +228,7 @@
       border: none;
       box-shadow: none;
     }
+    /* === FINE CODICE AGGIORNATO === */
   </style>
 </head>
 
@@ -1061,32 +1080,32 @@
 <script>
   // Inizializza Liquid Glass Effect
   document.addEventListener('DOMContentLoaded', function() {
-    // Attendi che la libreria sia caricata
     if (typeof LiquidWeb !== 'undefined') {
+      // Un piccolo ritardo per assicurare che tutto sia renderizzato
       setTimeout(() => {
-        const liquidElement = document.querySelector('[data-liquid]');
+        const liquidElement = document.querySelector('.hero-liquid-container');
         if (liquidElement) {
-          new LiquidWeb('[data-liquid]', {
-            scale: 22,
-            blur: 2,
-            saturation: 170,
-            aberration: 50,
-            mode: 'prominent',
+          new LiquidWeb(liquidElement, { // Passa l'elemento direttamente per chiarezza
+            // Valori aggiornati per replicare l'effetto desiderato
+            scale: 15,          // Scala di distorsione, valore più contenuto
+            blur: 3,            // Sfocatura dello sfondo a 3px
+            saturation: 130,    // Saturazione al 130%
+            aberration: 35,     // Aberrazione cromatica ridotta per un effetto più pulito
+            mode: 'prominent',  // Mantiene un effetto reattivo
             on: {
               init: (instance) => {
                 console.log('Liquid glass effect initialized');
               },
+              // Effetto hover più delicato
               mouseEnter: (instance) => {
-                // Aumenta l'effetto al hover
                 instance.updateEffects({
-                  scale: 25,
-                  aberration: 45
+                  scale: 18,
+                  aberration: 40
                 });
               },
               mouseLeave: (instance) => {
-                // Ripristina l'effetto normale
                 instance.updateEffects({
-                  scale: 18,
+                  scale: 15,
                   aberration: 35
                 });
               }
