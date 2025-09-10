@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Liquid Web Library -->
+  <script src="https://cdn.jsdelivr.net/npm/liquid-web/liquid-core.min.js"></script>
   <style>
     /* Stili popup login/registrazione */
     .login-popup input.form-control { transition: border-color 0.3s ease; border: 1px solid #ced4da; background-color: white !important; box-shadow: none !important; outline: none !important; }
@@ -83,7 +85,7 @@
       z-index: 5;
       align-items: center;
       justify-content: center;
-      
+
       /* Stato iniziale (nascosto) */
       opacity: 0;
       transform: scale(0.5);
@@ -95,18 +97,18 @@
     body.edit-mode-on .edit-icon-text,
     body.edit-mode-on .edit-icon-image,
     body.edit-mode-on .edit-icon-banner-bg {
-        opacity: 1;
-        transform: scale(1);
-        visibility: visible;
-        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), visibility 0s 0s;
+      opacity: 1;
+      transform: scale(1);
+      visibility: visible;
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), visibility 0s 0s;
     }
 
     /* Effetto hover solo quando le icone sono già visibili */
     .edit-icon-text:hover, .edit-icon-image:hover, .edit-icon-banner-bg:hover {
-        transform: scale(1.1); /* Mantiene lo scale(1) base e lo aumenta */
-        background-color: #c07b50;
+      transform: scale(1.1); /* Mantiene lo scale(1) base e lo aumenta */
+      background-color: #c07b50;
     }
-    
+
     .edit-icon-text { top: -12px; right: -12px; }
     .edit-icon-image { top: -12px; right: -12px; }
     .edit-icon-banner-bg { bottom: 20px; right: 20px; }
@@ -163,7 +165,51 @@
     .image-loading-spinner .spinner .bounce2 { animation-delay: -0.16s; }
     .image-load-error-display { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-color: var(--gray-light); border-radius: var(--border-radius-large); color: var(--gray-dark); text-align: center; padding: 1rem; z-index: 1; }
     .image-load-error-display p { margin: 0.2rem 0; font-size: 0.9em;}
-    
+    /* Liquid Glass Effect Styles */
+    .hero-liquid-container {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 800px;
+      padding: 30px 40px;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    /* Assicura che il contenuto sia sopra l'effetto */
+    .hero-liquid-container .hero-content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hero-liquid-container {
+        width: 85%;
+        padding: 20px 25px;
+        bottom: 60px;
+        border-radius: 20px;
+      }
+    }
+
+    /* Rimuovi il padding dal hero-content originale quando è dentro il container liquid */
+    .hero-liquid-container .hero-content {
+      padding: 0;
+      background: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 
@@ -215,14 +261,16 @@
 
 <main>
   <section class="hero-section" id="heroSection">
-    <div class="hero-content">
-      <div class="editable-text-wrapper">
-        <h1 class="hero-title" id="content-heroTitle" data-content-key="heroTitle"></h1>
-        <span class="edit-icon-text" data-key="heroTitle" data-type="text" title="Modifica titolo"><i class="fas fa-pencil-alt"></i></span>
-      </div>
-      <div class="editable-text-wrapper">
-        <p class="hero-subtitle" id="content-heroSubtitle" data-content-key="heroSubtitle"></p>
-        <span class="edit-icon-text" data-key="heroSubtitle" data-type="textarea" title="Modifica sottotitolo"><i class="fas fa-pencil-alt"></i></span>
+    <div class="hero-liquid-container" data-liquid>
+      <div class="hero-content">
+        <div class="editable-text-wrapper">
+          <h1 class="hero-title" id="content-heroTitle" data-content-key="heroTitle"></h1>
+          <span class="edit-icon-text" data-key="heroTitle" data-type="text" title="Modifica titolo"><i class="fas fa-pencil-alt"></i></span>
+        </div>
+        <div class="editable-text-wrapper">
+          <p class="hero-subtitle" id="content-heroSubtitle" data-content-key="heroSubtitle"></p>
+          <span class="edit-icon-text" data-key="heroSubtitle" data-type="textarea" title="Modifica sottotitolo"><i class="fas fa-pencil-alt"></i></span>
+        </div>
       </div>
     </div>
     <span class="edit-icon-banner-bg" data-key="heroBackgroundImage" data-type="backgroundImage" title="Modifica immagine di sfondo banner"><i class="fas fa-pencil-alt"></i></span>
@@ -396,8 +444,8 @@
   let isEditModeActive = false;
   let originalPageContentsForCancel = {};
   let currentPageDbContents = {};
-  let currentUserData = null; 
-  const defaultUserIconPath = 'uploads/icons/default_user.png'; 
+  let currentUserData = null;
+  const defaultUserIconPath = 'uploads/icons/default_user.png';
 
   const defaultPageContents = {
     heroTitle: "Eremo Frate Francesco",
@@ -437,9 +485,9 @@
           errorData = { message: rawErrorText || `Errore HTTP ${response.status} (${response.statusText}) per ${url}` };
         }
         if (!errorData.status) errorData.status = response.status;
-        throw errorData; 
+        throw errorData;
       }
-      if (response.status === 204) return {}; 
+      if (response.status === 204) return {};
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.indexOf("application/json") !== -1) {
         return await response.json();
@@ -453,7 +501,7 @@
         const match = error.message.match(/HTTP (\d+)/);
         if (match && match[1]) error.status = parseInt(match[1]);
       }
-      throw error; 
+      throw error;
     }
   }
 
@@ -461,14 +509,14 @@
   async function checkUserSessionActive() {
     try {
       await callApi('api/api_check_session.php'); // Assicurati che esista e usi require_login()
-      return true; 
+      return true;
     } catch (error) {
       if (error && (error.status === 401 || error.status === 403)) {
         console.warn("Session check: Sessione server non attiva (401/403).");
-        return false; 
+        return false;
       }
       console.warn("Errore durante il check della sessione (non 401/403):", error.message || error);
-      return true; 
+      return true;
     }
   }
 
@@ -497,8 +545,8 @@
     if(el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'none';
     if(el.loginBtnMobile) el.loginBtnMobile.style.display = 'none';
     if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'none';
-    if(el.navProfilo) el.navProfilo.style.display = 'none'; 
-    if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none'; 
+    if(el.navProfilo) el.navProfilo.style.display = 'none';
+    if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
     if(el.navDashboard) el.navDashboard.style.display = 'none';
     if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
     if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
@@ -508,10 +556,10 @@
     if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
     if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
 
-    if (currentUserData) { 
-      if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block'; 
-      if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block'; 
-      if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block'; 
+    if (currentUserData) {
+      if(el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block';
+      if(el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
+      if(el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
 
       if (el.navbarUsername) el.navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
       if(el.navbarAvatarImg){
@@ -520,25 +568,25 @@
         el.navbarAvatarImg.onerror=function(){this.src=defaultUserIconPath;};
       }
 
-      if(currentUserData.isAdmin){ 
-        if(el.navProfilo) el.navProfilo.style.display = 'block'; 
-        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block'; 
-        if(el.navDashboard) el.navDashboard.style.display = 'block'; 
-        if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block'; 
+      if(currentUserData.isAdmin){
+        if(el.navProfilo) el.navProfilo.style.display = 'block';
+        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
+        if(el.navDashboard) el.navDashboard.style.display = 'block';
+        if(el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
         if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
         if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
         if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
         if(el.mobileNavGestioneEventiAdminLink) el.mobileNavGestioneEventiAdminLink.style.display = 'none';
         if(el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
-      } else { 
-        if(el.navProfilo) el.navProfilo.style.display = 'block'; 
-        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block'; 
-        if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block'; 
-        if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block'; 
+      } else {
+        if(el.navProfilo) el.navProfilo.style.display = 'block';
+        if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
+        if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block';
+        if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
         if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
         if(el.editPageBtnContainer && el.editPageBtnContainer.classList) el.editPageBtnContainer.classList.remove('active');
       }
-    } else { 
+    } else {
       if(el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'inline-block';
       if(el.loginBtnMobile) el.loginBtnMobile.style.display = 'block';
       if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
@@ -587,12 +635,12 @@
         currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath||defaultUserIconPath,isAdmin:j.is_admin===true||j.is_admin===1};
         localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));
 
-        updateNavbarUI(); 
-        closeLoginPopup(); 
-        await loadPageContentsFromServer(); 
+        updateNavbarUI();
+        closeLoginPopup();
+        await loadPageContentsFromServer();
 
         if (currentUserData.isAdmin) {
-          toggleEditMode(false); 
+          toggleEditMode(false);
         }
         showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");
 
@@ -615,31 +663,31 @@
     const wasLoggedIn = !!localStorage.getItem('userDataEFF');
     localStorage.removeItem('userDataEFF');
     currentUserData = null;
-    
+
     // Disattiva la modalità modifica se era attiva
     if (isEditModeActive) {
       toggleEditMode(false);
     }
 
     fetch('api/api_logout.php', { method: 'POST', credentials: 'same-origin' })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          if (showAlert && wasLoggedIn) showPageStatus('Logout effettuato con successo.', 'info');
-        } else {
-          if (showAlert && wasLoggedIn) showPageStatus('Logout dal server fallito, ma i dati locali sono stati rimossi.', 'warning');
-        }
-      })
-      .catch(error => {
-        console.error("Errore API logout:", error);
-        if (showAlert && wasLoggedIn) showPageStatus('Errore durante il logout dal server.', 'error');
-      })
-      .finally(() => {
-        updateNavbarUI();
-        loadPageContentsFromServer(); // Ricarica i contenuti per la vista da ospite
-        const editContainer = document.getElementById('editPageBtnContainer');
-        if (editContainer) editContainer.classList.remove('active');
-      });
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                if (showAlert && wasLoggedIn) showPageStatus('Logout effettuato con successo.', 'info');
+              } else {
+                if (showAlert && wasLoggedIn) showPageStatus('Logout dal server fallito, ma i dati locali sono stati rimossi.', 'warning');
+              }
+            })
+            .catch(error => {
+              console.error("Errore API logout:", error);
+              if (showAlert && wasLoggedIn) showPageStatus('Errore durante il logout dal server.', 'error');
+            })
+            .finally(() => {
+              updateNavbarUI();
+              loadPageContentsFromServer(); // Ricarica i contenuti per la vista da ospite
+              const editContainer = document.getElementById('editPageBtnContainer');
+              if (editContainer) editContainer.classList.remove('active');
+            });
   }
   document.getElementById('logout-link-desktop')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();});
   document.getElementById('mobile-logout-link')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenuOnLinkClick();});
@@ -663,7 +711,7 @@
   function showPageStatus(message, type = 'info', duration = 3000) {
     if (!pageOverallStatus) return;
     pageOverallStatus.textContent = message;
-    pageOverallStatus.className = 'form-message'; 
+    pageOverallStatus.className = 'form-message';
     pageOverallStatus.classList.remove('success', 'error', 'active');
 
     if (type === 'success') {
@@ -674,7 +722,7 @@
     if (pageOverallStatus.hideTimeout) {
       clearTimeout(pageOverallStatus.hideTimeout);
     }
-    void pageOverallStatus.offsetHeight; 
+    void pageOverallStatus.offsetHeight;
     pageOverallStatus.classList.add('active');
 
     pageOverallStatus.hideTimeout = setTimeout(() => {
@@ -689,35 +737,35 @@
     let appliedFromCache = false;
 
     try {
-        const cachedData = localStorage.getItem(cacheKey);
-        if (cachedData) {
-            cachedContents = JSON.parse(cachedData);
-            applyContentsToPage(cachedContents);
-            console.log("Contenuti caricati dalla cache.");
-            originalPageContentsForCancel = { ...cachedContents };
-            currentPageDbContents = { ...cachedContents };
-            appliedFromCache = true;
-        } else {
-            applyContentsToPage(defaultPageContents);
-        }
-    } catch (e) {
-        console.error("Errore caricamento cache:", e);
-        localStorage.removeItem(cacheKey);
+      const cachedData = localStorage.getItem(cacheKey);
+      if (cachedData) {
+        cachedContents = JSON.parse(cachedData);
+        applyContentsToPage(cachedContents);
+        console.log("Contenuti caricati dalla cache.");
+        originalPageContentsForCancel = { ...cachedContents };
+        currentPageDbContents = { ...cachedContents };
+        appliedFromCache = true;
+      } else {
         applyContentsToPage(defaultPageContents);
+      }
+    } catch (e) {
+      console.error("Errore caricamento cache:", e);
+      localStorage.removeItem(cacheKey);
+      applyContentsToPage(defaultPageContents);
     }
 
     try {
       const r = await fetch(`api_get_page_content.php?page=${PAGE_NAME_FOR_CONTENT}`);
       if (r.status === 401 || r.status === 403) {
         console.warn("Sessione scaduta o non valida durante il caricamento dei contenuti.");
-        if (currentUserData) { 
+        if (currentUserData) {
           handleLogout(false);
-          showPageStatus("Sessione scaduta. Effettua login.", "error", 5000); 
+          showPageStatus("Sessione scaduta. Effettua login.", "error", 5000);
         }
         if (cachedContents) {
-            applyContentsToPage(defaultPageContents);
-            currentPageDbContents = {...defaultPageContents};
-            originalPageContentsForCancel = {...defaultPageContents};
+          applyContentsToPage(defaultPageContents);
+          currentPageDbContents = {...defaultPageContents};
+          originalPageContentsForCancel = {...defaultPageContents};
         }
         updateNavbarUI();
         return;
@@ -727,7 +775,7 @@
       let serverContents = (d.success && d.contents && Object.keys(d.contents).length > 0) ? d.contents : { ...defaultPageContents };
 
       if (!cachedContents || JSON.stringify(cachedContents) !== JSON.stringify(serverContents)) {
-        currentPageDbContents = serverContents; 
+        currentPageDbContents = serverContents;
         applyContentsToPage(currentPageDbContents);
         localStorage.setItem(cacheKey, JSON.stringify(currentPageDbContents));
         console.log("Contenuti aggiornati dal server e cache salvata.");
@@ -739,10 +787,10 @@
       originalPageContentsForCancel = { ...currentPageDbContents };
     } catch (err) {
       console.error("Errore caricamento contenuti dal server:", err);
-      if (!appliedFromCache) { 
-          currentPageDbContents = { ...defaultPageContents }; 
-          applyContentsToPage(currentPageDbContents); 
-          originalPageContentsForCancel = { ...currentPageDbContents };
+      if (!appliedFromCache) {
+        currentPageDbContents = { ...defaultPageContents };
+        applyContentsToPage(currentPageDbContents);
+        originalPageContentsForCancel = { ...currentPageDbContents };
       }
       showPageStatus("Errore caricamento server. Mostrati dati locali/predefiniti.", "error");
     }
@@ -765,7 +813,7 @@
         if (finalSrc) {
           if (spinnerContainer) spinnerContainer.style.display = 'flex';
           imageElement.style.display = 'none'; // Nascondi prima del caricamento
-          imageElement.src = finalSrc; 
+          imageElement.src = finalSrc;
           imageElement.alt = (defaultPageContents[key]?.alt || `Immagine per ${key}`);
           imageElement.onload = function() {
             if (spinnerContainer) spinnerContainer.style.display = 'none';
@@ -783,7 +831,7 @@
 
   function toggleEditMode(enable){
     isEditModeActive = enable;
-    
+
     document.body.classList.toggle('edit-mode-on', enable && currentUserData?.isAdmin);
 
     const editContainer = document.getElementById('editPageBtnContainer');
@@ -793,7 +841,7 @@
 
     if(editContainer) {
       if (currentUserData?.isAdmin) {
-        editContainer.classList.add('active'); 
+        editContainer.classList.add('active');
         if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block';
         if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none';
         if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none';
@@ -848,7 +896,7 @@
       editModalInputFile.style.display = 'block';
       editModalFileLabel.style.display = 'block';
       editModalFileNote.style.display = 'block';
-    } else { 
+    } else {
       editModalTitle.textContent = `Modifica Testo Breve (ID: ${key})`;
       editModalFieldLabelText.textContent = "Testo (titolo/corto):";
       editModalInputText.value = valForInput;
@@ -885,35 +933,35 @@
   }
 
   if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
-  
+
   if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=> {
-      const contentsToSave = { ...currentPageDbContents };
+    const contentsToSave = { ...currentPageDbContents };
 
-      const btn = savePageChangesBtn;
-      const oldHtml = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
-      try {
-          const r = await fetch('api_save_page_content.php', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ page_name: PAGE_NAME_FOR_CONTENT, contents: contentsToSave })
-          });
-          const j = await r.json();
-          if (!r.ok || !j.success) throw new Error(j.message || "Errore salvataggio.");
+    const btn = savePageChangesBtn;
+    const oldHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
+    try {
+      const r = await fetch('api_save_page_content.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page_name: PAGE_NAME_FOR_CONTENT, contents: contentsToSave })
+      });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.message || "Errore salvataggio.");
 
-          originalPageContentsForCancel = { ...currentPageDbContents };
-          
-          localStorage.setItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`, JSON.stringify(currentPageDbContents));
-          showPageStatus(j.message || 'Modifiche salvate!', 'success');
-          toggleEditMode(false);
-      } catch (err) {
-          console.error("Errore salvataggio:", err);
-          showPageStatus(`Errore: ${err.message}`, 'error');
-      } finally {
-          btn.disabled = false;
-          btn.innerHTML = oldHtml;
-      }
+      originalPageContentsForCancel = { ...currentPageDbContents };
+
+      localStorage.setItem(`pageContent_${PAGE_NAME_FOR_CONTENT}`, JSON.stringify(currentPageDbContents));
+      showPageStatus(j.message || 'Modifiche salvate!', 'success');
+      toggleEditMode(false);
+    } catch (err) {
+      console.error("Errore salvataggio:", err);
+      showPageStatus(`Errore: ${err.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = oldHtml;
+    }
   });
 
   if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{ applyContentsToPage(originalPageContentsForCancel); currentPageDbContents = {...originalPageContentsForCancel}; toggleEditMode(false); showPageStatus('Modifiche annullate.','info');});
@@ -987,27 +1035,68 @@
     loadUserData(); // Carica da localStorage
 
     if (currentUserData) { // Se c'erano dati in localStorage
-        const sessionIsValidOnServer = await checkUserSessionActive();
-        if (!sessionIsValidOnServer) {
-            console.warn("Sessione server non valida rilevata all'avvio.");
-            handleLogout(false);
-        }
+      const sessionIsValidOnServer = await checkUserSessionActive();
+      if (!sessionIsValidOnServer) {
+        console.warn("Sessione server non valida rilevata all'avvio.");
+        handleLogout(false);
+      }
     }
-    
+
     updateNavbarUI();
-    await loadPageContentsFromServer(); 
+    await loadPageContentsFromServer();
 
     if (currentUserData && currentUserData.isAdmin) {
-      toggleEditMode(false); 
+      toggleEditMode(false);
     } else {
-      toggleEditMode(false); 
+      toggleEditMode(false);
       const editContainer=document.getElementById('editPageBtnContainer');
       if(editContainer && editContainer.classList) editContainer.classList.remove('active');
     }
-    document.removeEventListener('keydown', handleGlobalKeyDown); 
+    document.removeEventListener('keydown', handleGlobalKeyDown);
     document.addEventListener('keydown', handleGlobalKeyDown);
   });
 </script>
 <script src="assistenteAI.js" defer></script>
 </body>
+<script>
+  // Inizializza Liquid Glass Effect
+  document.addEventListener('DOMContentLoaded', function() {
+    // Attendi che la libreria sia caricata
+    if (typeof LiquidWeb !== 'undefined') {
+      setTimeout(() => {
+        const liquidElement = document.querySelector('[data-liquid]');
+        if (liquidElement) {
+          new LiquidWeb('[data-liquid]', {
+            scale: 22,
+            blur: 2,
+            saturation: 170,
+            aberration: 50,
+            mode: 'prominent',
+            on: {
+              init: (instance) => {
+                console.log('Liquid glass effect initialized');
+              },
+              mouseEnter: (instance) => {
+                // Aumenta l'effetto al hover
+                instance.updateEffects({
+                  scale: 25,
+                  aberration: 45
+                });
+              },
+              mouseLeave: (instance) => {
+                // Ripristina l'effetto normale
+                instance.updateEffects({
+                  scale: 18,
+                  aberration: 35
+                });
+              }
+            }
+          });
+        }
+      }, 100);
+    } else {
+      console.warn('LiquidWeb library not loaded');
+    }
+  });
+</script>
 </html>
