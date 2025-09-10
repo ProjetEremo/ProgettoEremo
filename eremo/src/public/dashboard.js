@@ -289,7 +289,7 @@ async function generateShortDescriptionAI(longDescription) {
             { "role": "system", "content": promptSystem },
             { "role": "user", "content": `Descrizione estesa da riassumere:\n\n${longDescription}` }
         ],
-        "model": "llama3-8b-8192",
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
         "temperature": 0.7,
         "max_tokens": 70,
         "top_p": 1,

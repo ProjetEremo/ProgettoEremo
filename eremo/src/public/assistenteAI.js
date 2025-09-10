@@ -475,8 +475,14 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
     async function toggleAiChat() {
         checkUserLoginStatus(); // Aggiorna stato login
         const isActive = aiChatPopupEl.classList.toggle('active');
-        aiAssistantFabEl.innerHTML = isActive ? '<i class="fas fa-times"></i>' : '<i class="fas fa-headset"></i>'; // Cambia icona FAB
-
+// Cerca l'icona esistente all'interno del bottone
+const iconElement = aiAssistantFabEl.querySelector('i');
+if (iconElement) {
+    // Usa classList.toggle per cambiare l'icona in modo pulito,
+    // senza distruggere gli altri elementi del bottone.
+    iconElement.classList.toggle('fa-headset', !isActive);
+    iconElement.classList.toggle('fa-times', isActive);
+}
         if (isActive) {
             // Se la cronologia è vuota o non ci sono messaggi dell'assistente, genera il saluto
             if (chatHistoryForAssistant.length === 0 || !chatHistoryForAssistant.some(m => m.role === 'assistant')) {
