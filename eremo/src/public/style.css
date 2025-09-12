@@ -315,23 +315,40 @@ img {
 
 /* In style.css */
 .page-index .hero-section {
-  min-height: calc(70vh - var(--navbar-height));
+  min-height: 100vh; /* OCCUPA SEMPRE L'INTERA ALTEZZA DELLA FINESTRA */
   margin: 0;
   border-radius: 0;
   overflow: hidden;
-  position: relative;
-  /* === MODIFICA QUESTA PARTE === */
-  background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('images/eremo.jpg'); /* Assumendo che style.css sia nella root. Se è in una cartella css/, usa url('../images/eremo.jpg') */
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-attachment: fixed; /* Mantenuto dal tuo CSS originale */
-  /* === FINE MODIFICA === */
+  position: relative; /* NECESSARIO PER POSIZIONARE IL CONTENUTO */
+  /* RIMOSSE TUTTE LE PROPRIETA' background-* DA QUI */
   box-shadow: var(--shadow-medium);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--white);
+  background-color: transparent; /* Assicura che la sezione sia trasparente */
+}
+/* NUOVO BLOCCO PER LA SOLUZIONE COMPATIBILE CON IOS (CON FIX ALTEZZA) */
+.page-index .hero-section::before {
+  content: '';
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* CHIAVE DELLA SOLUZIONE: Assicura che l'altezza copra sempre tutto lo spazio visibile su iOS */
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* Proprietà specifica per Safari/iOS */
+  height: 100vh;
+  z-index: -2; /* Assicura sia sempre lo strato più basso */
+
+  background-image: var(--hero-bg-image, linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('images/eremo.jpg'));
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+  
+  /* Assicura che il padding superiore non venga rimosso */
+  padding-top: clamp(1.2rem, 3vw, 2rem);
 }
 
 main section:first-of-type.hero-section {
@@ -5473,4 +5490,50 @@ li.top-level-comment-item:last-child { border-bottom: none; margin-bottom: 0; }
   max-width: 90%;
   background-color: var(--gray-light, #e9e9e9);
   border-radius: 10px;
+}
+
+/* =================================================================== */
+/* SOLUZIONE DEFINITIVA PER SFONDO FISSO E PATINA SUL CONTENUTO */
+/* =================================================================== */
+
+/* 1. Spinge l'immagine di sfondo dell'Eremo ancora più indietro (z-index: -2) 
+      per essere sicuri che sia sempre lo strato più basso. */
+.page-index .hero-section::before {
+  z-index: -2;
+}
+
+/* 2. Imposta ogni sezione di contenuto per creare un contesto di posizionamento.
+      Questo è FONDAMENTALE per far funzionare la patina. */
+main > section.section-padding {
+  position: relative;
+  z-index: 1; /* Assicura che la sezione di contenuto sia sopra lo sfondo fisso */
+}
+
+/* 3. Aggiunge la "patina" bianca semi-trasparente DENTRO ogni sezione di contenuto,
+      ma la posiziona DIETRO al testo e alle immagini di quella sezione. */
+main > section.section-padding::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  /* Ecco la patina biancastra richiesta. È il colore di sfondo della pagina
+     ma con una trasparenza del 5%, così si intravede appena l'Eremo dietro. */
+  background-color: rgba(248, 245, 239, 0.95); /* var(--light) con 95% di opacità */
+
+  z-index: -1; /* Posiziona la patina dietro al contenuto (h2, p, img) della sua sezione */
+}
+
+/* =================================================================== */
+/* FIX: Ripristina l'altezza della hero section su desktop */
+/* =================================================================== */
+
+@media (min-width: 992px) {
+  .page-index .hero-section {
+    /* Imposta un'altezza più contenuta per gli schermi grandi, 
+       lasciando 100vh per i dispositivi mobili e tablet. */
+    min-height: 80vh; 
+  }
 }

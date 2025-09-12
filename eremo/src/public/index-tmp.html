@@ -814,11 +814,14 @@
     }
   }
 
-  function applyContentsToPage(contents) {
+ function applyContentsToPage(contents) {
     const heroSection = document.getElementById('heroSection');
     if (heroSection) {
       const heroBgUrl = contents.heroBackgroundImage || defaultPageContents.heroBackgroundImage || 'images/eremo.jpg';
-      heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.1)),url('${heroBgUrl.replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29")}')`;
+      // MODIFICA: Invece di impostare lo stile direttamente, imposta una variabile CSS (--hero-bg-image)
+      // che viene usata dallo pseudo-elemento ::before nel file CSS. Questo risolve il bug di iOS.
+      const finalUrl = `linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.1)),url('${heroBgUrl.replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29")}')`;
+      heroSection.style.setProperty('--hero-bg-image', finalUrl);
     }
     document.querySelectorAll('[data-content-key]').forEach(el => {
       const key = el.dataset.contentKey; if (key === 'heroBackgroundImage') return;
