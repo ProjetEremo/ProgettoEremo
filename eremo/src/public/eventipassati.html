@@ -62,8 +62,7 @@
     .event-filters button:hover {
       background-color: var(--primary);
     }
-
-    /* === NUOVI STILI PER FILTRI MOBILE === */
+    /* === NUOVI STILI PER FILTRI MOBILE E BUTTONS === */
     #mobile-filter-trigger {
       display: none; /* Nascosto di default, mostrato solo su mobile */
       width: 100%;
@@ -87,11 +86,13 @@
       transform: translateY(-2px);
       box-shadow: var(--shadow-medium);
     }
-
+    /* Overlay che copre lo schermo quando il drawer è aperto */
     #filter-drawer-overlay {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background-color: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(8px) saturate(150%);
       -webkit-backdrop-filter: blur(8px) saturate(150%);
@@ -104,14 +105,12 @@
       opacity: 1;
       visibility: visible;
     }
-
     .filter-drawer-header {
       padding: 0.5rem 1.5rem 1rem 1.5rem;
       text-align: center;
       position: relative;
       border-bottom: 1px solid var(--gray-lighter);
     }
-
     .filter-drawer-handle {
       width: 40px;
       height: 5px;
@@ -119,14 +118,13 @@
       border-radius: 2.5px;
       margin: 0 auto 1rem auto;
     }
-
     .filter-drawer-header h3 {
       margin: 0;
       font-size: 1.2rem;
       color: var(--primary-dark);
       font-weight: 600;
     }
-
+    /* La 'X' del pulsante di chiusura */
     .filter-drawer-close-btn {
       position: absolute;
       top: 0.75rem;
@@ -141,12 +139,14 @@
       border: none;
       border-radius: 50%;
       cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
+      transition: background-color 0.2s, color 0.2s, transform 0.2s ease-in-out;
     }
     .filter-drawer-close-btn:hover {
-      background-color: var(--gray-light);
+      background-color: var(--gray-medium);
       color: var(--dark);
+      transform: rotate(90deg) scale(1.1);
     }
+    /* Il pulsante "Applica filtri" del drawer mobile */
     .filter-drawer-apply-btn {
       display: block;
       width: calc(100% - 3rem);
@@ -166,14 +166,42 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 20px -5px rgba(var(--secondary-rgb), 0.7);
     }
-
-
+    /* Nasconde la 'X' e il pulsante 'Applica' su schermi più grandi */
+    @media (min-width: 768px) {
+      .filter-drawer-header,
+      .filter-drawer-apply-btn,
+      .filter-drawer-overlay,
+      .event-filters.active {
+        display: none !important;
+        visibility: hidden !important;
+        transform: translateY(100%);
+      }
+      #mobile-filter-trigger {
+        display: none !important;
+      }
+      .event-filters {
+        position: static;
+        width: auto;
+        border-radius: var(--border-radius-medium);
+        box-shadow: var(--shadow-light);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        background-color: var(--white);
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+      .event-filters.active {
+        transform: translateY(0);
+      }
+    }
     /* Media query per mobile */
     @media (max-width: 768px) {
       #mobile-filter-trigger {
         display: block; /* Mostra il pulsante su mobile */
       }
-
       .event-filters {
         position: fixed;
         bottom: 0;
@@ -181,45 +209,37 @@
         right: 0;
         width: 100%;
         z-index: 1600;
-
         background-color: #f8f8fa; /* Colore più "morbido", stile Apple */
         border-top-left-radius: 20px;
         border-top-right-radius: 20px;
         box-shadow: 0 -10px 40px -10px rgba(0, 0, 0, 0.2);
         padding: 0;
         margin-bottom: 0;
-
         /* Animazione */
         transform: translateY(100%);
         transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-
         /* Layout interno per il drawer */
         display: flex;
         flex-direction: column;
         gap: 0;
         max-height: 80vh;
       }
-
       .event-filters.active {
         transform: translateY(0);
       }
-
       .event-filters .form-group {
         flex: 1 1 100%; /* Occupa tutta la larghezza */
         padding: 0 1.5rem;
         margin-bottom: 1rem;
       }
-
       .event-filters .form-group:first-of-type {
         margin-top: 1.5rem;
       }
-
       .event-filters label {
         font-size: 0.95rem;
         font-weight: 500;
         color: var(--primary-dark);
       }
-
       .event-filters input, .event-filters select {
         padding: 0.8rem 1.1rem;
         font-size: 1rem;
@@ -231,8 +251,6 @@
       }
     }
     /* === FINE NUOVI STILI === */
-
-
     .loading-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -262,7 +280,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .no-events { text-align: center; padding: 2rem; color: var(--gray-dark); }
-
     /* Stili per popup login, messaggi errore, etc. (Stili unificati da eventiincorso) */
     .login-popup input.form-control.error-border { border-color: var(--danger, red) !important; }
     .login-popup input:-webkit-autofill,
@@ -290,14 +307,12 @@
     #current-event-image-preview { max-width:100px; max-height:100px; display:none; margin-top:5px; border-radius: 4px; border: 1px solid var(--gray-light); }
     #current-event-flyer-preview a { color: var(--primary); text-decoration: underline; }
     #current-event-flyer-preview a:hover { color: var(--accent); }
-
     /* === STILI NUOVO POPUP VOLANTINO (Design Ispirato Apple) === */
     :root {
       --flyer-text-primary: #1d1d1f;
       --flyer-modal-bg: #f8f8fa;
       --flyer-overlay-bg: rgba(0, 0, 0, 0.65);
     }
-
     .flyer-overlay-eff {
       position: fixed;
       top: 0;
@@ -315,13 +330,11 @@
       visibility: hidden;
       transition: opacity 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95), visibility 0s linear 0.4s;
     }
-
     .flyer-overlay-eff.active {
       opacity: 1;
       visibility: visible;
       transition-delay: 0s;
     }
-
     .flyer-modal-eff {
       background-color: var(--flyer-modal-bg);
       border-radius: 22px;
@@ -337,12 +350,10 @@
       transition: opacity 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.05s, transform 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) 0.05s;
       overflow: hidden;
     }
-
     .flyer-overlay-eff.active .flyer-modal-eff {
       opacity: 1;
       transform: scale(1) translateY(0px);
     }
-
     .flyer-close-btn-eff {
       position: absolute;
       top: 8px;
@@ -357,14 +368,12 @@
       z-index: 10;
       transition: color 0.2s ease, transform 0.25s ease-out;
     }
-
     .flyer-close-btn-eff:hover,
     .flyer-close-btn-eff:focus-visible {
       color: var(--dark, #333);
       transform: rotate(90deg);
       background: none;
     }
-
     .flyer-content-area-eff {
       flex-grow: 1;
       width: 100%;
@@ -375,7 +384,6 @@
       justify-content: center;
       border-radius: inherit;
     }
-
     .flyer-media-container-eff {
       width: 100%;
       height: 100%;
@@ -386,7 +394,6 @@
       padding: 5px;
       box-sizing: border-box;
     }
-
     .flyer-media-container-eff img,
     .flyer-media-container-eff iframe {
       display: block;
@@ -398,13 +405,11 @@
       border: none;
       border-radius: 8px;
     }
-
     .flyer-media-container-eff iframe {
       width: 100%;
       height: 100%;
       min-height: 400px;
     }
-
     .flyer-message-display-eff {
       text-align: center;
       padding: 3rem 1rem;
@@ -424,12 +429,10 @@
       padding: 0.6rem 1.2rem; background-color: rgba(0,0,0,0.05); border-radius: 8px;
     }
     .flyer-message-display-eff a:hover { background-color: rgba(0,0,0,0.08); }
-
     body.flyer-popup-active-eff {
       overflow: hidden;
     }
     /* === FINE STILI NUOVO POPUP VOLANTINO === */
-
     /* Stile per il Custom Confirm Modal */
     .custom-confirm-overlay {
       position: fixed;
@@ -490,7 +493,6 @@
     .custom-confirm-actions .btn-confirm-no:hover {
       background-color: var(--gray-medium);
     }
-
     /* === NUOVI STILI PER INFO A "PILLOLE" (CON SPAZIATURA AGGIORNATA) === */
     .card-info-pills {
       display: flex;
@@ -518,7 +520,6 @@
       font-size: 0.9em;
     }
     /* === FINE NUOVI STILI === */
-
     /* === NUOVI STILI PER POPUP ADMIN (stile Dashboard) === */
     .dash-admin-event-popup-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -526,7 +527,6 @@
       display: none; opacity: 0; transition: opacity 0.3s ease;
     }
     .dash-admin-event-popup-overlay.active { display: block; opacity: 1; }
-
     .dash-admin-event-popup {
       position: fixed; top: 50%; left: 50%;
       background-color: var(--white, #fff);
@@ -545,7 +545,6 @@
       opacity: 1; transform: translate(-50%, -50%) scale(1);
       display: flex; flex-direction: column;
     }
-
     .dash-admin-event-popup-header {
       padding: 1rem 1.5rem;
       border-bottom: 1px solid var(--gray-light, #eee);
@@ -646,12 +645,10 @@
     #dashAdmin-current-event-flyer-preview a { color: var(--primary); text-decoration: underline; }
     #dashAdmin-current-event-flyer-preview span { color: var(--gray-dark); }
     #dashAdminEventFormMessage.form-message { margin-top: 1rem; }
-
     /* Stile body quando il drawer dei filtri è aperto */
     body.filter-drawer-open {
       overflow: hidden;
     }
-
   </style>
 </head>
 <body>
@@ -711,21 +708,19 @@
 <main>
   <div class="container section-padding">
     <h1 id="mainPageTitle">Archivio Attività</h1>
-
-    <!-- NUOVO: Pulsante per triggerare i filtri su mobile -->
+    <!-- Pulsante per triggerare i filtri su mobile -->
     <button id="mobile-filter-trigger">
       <i class="fas fa-sliders-h"></i> Filtra Risultati
     </button>
-
-    <!-- I filtri ora verranno trasformati in un drawer su mobile via CSS -->
+    <!-- I filtri verranno trasformati in un drawer su mobile via CSS -->
     <div class="event-filters" id="eventFilters">
-      <!-- NUOVO: Header del drawer per mobile -->
+      <!-- Header del drawer per mobile -->
       <div class="filter-drawer-header">
         <div class="filter-drawer-handle"></div>
         <h3>Filtri</h3>
+        <!-- Pulsante di chiusura del drawer mobile -->
         <button class="filter-drawer-close-btn" aria-label="Chiudi Filtri">&times;</button>
       </div>
-
       <!-- Contenuto originale dei filtri -->
       <div class="form-group">
         <label for="searchTitle">Titolo Evento</label>
@@ -758,11 +753,9 @@
         <label for="searchSpeaker">Relatore</label>
         <input type="text" id="searchSpeaker" class="form-control" placeholder="Nome relatore..."/>
       </div>
-
-      <!-- NUOVO: Pulsante Applica per mobile -->
+      <!-- Pulsante Applica per mobile -->
       <button class="filter-drawer-apply-btn">Applica Filtri</button>
     </div>
-
     <div id="eventiGridContainer" style="position: relative"> <div id="loadingIndicator" class="loading-overlay"> <div class="spinner"></div>
       <p>Caricamento eventi...</p>
     </div>
@@ -771,13 +764,10 @@
     </div>
   </div>
 </main>
-
-<!-- NUOVO: Overlay per il drawer dei filtri -->
+<!-- Overlay per il drawer dei filtri -->
 <div id="filter-drawer-overlay"></div>
-
 <div id="ai-assistant-fab" title="Assistente Virtuale Eremo" data-liquid> <i class="fas fa-headset"></i>
 </div>
-
 <div id="ai-chat-popup">
   <div id="ai-chat-header">
     <h3>Assistente Eremo <i class="fas fa-robot"></i></h3>
@@ -791,11 +781,9 @@
     <button id="ai-chat-send-btn" aria-label="Invia Messaggio"><i class="fas fa-paper-plane"></i></button>
   </div>
 </div>
-
 <footer>
   <p>© <span id="currentYear"></span> Eremo Frate Francesco. OdV Via San Vito 2, Nembro. C.F.:90004060167. Sviluppato da 5AII 2024-2025 Majorana Seriate.</p>
 </footer>
-
 <div class="login-popup-overlay" id="loginOverlay"></div>
 <div class="login-popup" id="loginPopup">
   <button class="close-popup" id="closeLoginPopupBtn" aria-label="Chiudi popup">&times;</button>
@@ -822,7 +810,6 @@
     <div class="form-actions"><button type="submit" class="btn-popup">Registrati</button></div>
   </form>
 </div>
-
 <div class="login-popup-overlay" id="forgotPasswordOverlay"></div>
 <div class="login-popup" id="forgotPasswordPopup">
   <button class="close-popup" id="closeForgotPasswordPopupBtn" aria-label="Chiudi popup">&times;</button>
@@ -839,7 +826,6 @@
     </div>
   </form>
 </div>
-
 <div class="login-popup-overlay" id="loginRequiredOverlay"></div>
 <div class="login-popup" id="loginRequiredPopup">
   <button class="close-popup" id="closeLoginRequiredPopupBtn" aria-label="Chiudi popup">&times;</button>
@@ -849,7 +835,6 @@
     <button type="button" class="btn-popup" id="loginRequiredLoginBtn">Accedi / Registrati</button>
   </div>
 </div>
-
 <!-- NUOVO POPUP MODALE AGGIORNATO (stili da eventiincorso) -->
 <div class="dash-admin-event-popup-overlay" id="dashAdminEventPopupOverlay"></div>
 <div class="dash-admin-event-popup" id="dashAdminEventPopup">
@@ -936,7 +921,6 @@
           <button type="submit" class="btn-popup">Salva Modifiche</button>
         </div>
       </form>
-
       <div id="dashAdminEventCardPreviewContainer">
         <h4>Anteprima Card Evento</h4>
         <div class="dash-admin-preview-card">
@@ -958,7 +942,6 @@
     </div>
   </div>
 </div>
-
 <div class="custom-confirm-overlay" id="customConfirmOverlay">
   <div class="custom-confirm-modal" id="customConfirmModal">
     <h3 id="customConfirmTitle">Conferma Uscita</h3>
@@ -969,11 +952,8 @@
     </div>
   </div>
 </div>
-
-
 <script src="assistenteAI.js" defer></script>
 <script src="liquidglass.js" defer></script>
-
 <script>
   // Percorso dell'icona utente di default
   const defaultUserIconPath = 'uploads/icons/default_user.png';
@@ -981,7 +961,6 @@
   let currentUserData = null;
   // Array per memorizzare tutti gli eventi passati caricati
   let allPastEventsData = [];
-
   // Elementi del DOM per i filtri
   const searchTitleEl = document.getElementById("searchTitle");
   const searchMonthEl = document.getElementById("searchMonth");
@@ -991,15 +970,12 @@
   const eventiPassatiGridEl = document.getElementById("eventiPassatiGrid");
   // Elemento del DOM per l'indicatore di caricamento
   const loadingIndicatorEl = document.getElementById("loadingIndicator");
-
   // NUOVI Elementi del DOM per il drawer dei filtri mobile
   const mobileFilterTriggerEl = document.getElementById('mobile-filter-trigger');
   const eventFiltersEl = document.getElementById('eventFilters');
   const filterDrawerOverlayEl = document.getElementById('filter-drawer-overlay');
   const filterDrawerCloseBtnEl = document.querySelector('.filter-drawer-close-btn');
   const filterDrawerApplyBtnEl = document.querySelector('.filter-drawer-apply-btn');
-
-
   // Elementi del DOM per il nuovo popup di modifica admin (stile dashboard)
   let dashAdminEventPopupOverlayEl, dashAdminEventPopupEl, closeDashAdminEventPopupBtnEl,
           dashAdminEventFormEl, dashAdminEventPopupTitleEl, dashAdminEventIdInputEl,
@@ -1013,34 +989,27 @@
           dashAdminPreviewDateFullEl, dashAdminPreviewTimeFullEl, dashAdminPreviewTimeValueEl,
           dashAdminPreviewSpeakerFullEl, dashAdminPreviewSpeakerPrefixEl, dashAdminPreviewSpeakerNameEl,
           dashAdminPreviewShortDescEl, dashAdminPreviewSeatsFullEl, dashAdminPreviewPriceFullEl;
-
   let initialAdminEventFormData = {};
   let isEventFormDirty = false;
   let customConfirmOverlayEl, customConfirmModalEl, customConfirmTitleEl, customConfirmMessageEl,
           customConfirmYesBtn, customConfirmNoBtn;
   let confirmResolve = null;
-
   // Variabili globali per popup volantino
   let globalFlyerOverlayEff = null;
   let currentFlyerModalEff = null;
-
   // Funzione abbreviata per getElementById
   function gebi(id) { return document.getElementById(id); }
-
   // NUOVE Funzioni per gestire il drawer dei filtri mobile
   function openFilterDrawer() {
     if (filterDrawerOverlayEl) filterDrawerOverlayEl.classList.add('active');
     if (eventFiltersEl) eventFiltersEl.classList.add('active');
     document.body.classList.add('filter-drawer-open');
   }
-
   function closeFilterDrawer() {
     if (filterDrawerOverlayEl) filterDrawerOverlayEl.classList.remove('active');
     if (eventFiltersEl) eventFiltersEl.classList.remove('active');
     document.body.classList.remove('filter-drawer-open');
   }
-
-
   function showCustomConfirm(title, message, confirmBtnText = "Sì", cancelBtnText = "Annulla") {
     return new Promise((resolve) => {
       if(customConfirmTitleEl) customConfirmTitleEl.textContent = title || "Conferma";
@@ -1051,7 +1020,6 @@
       confirmResolve = resolve;
     });
   }
-
   function handleConfirm(confirmed) {
     if(customConfirmOverlayEl) customConfirmOverlayEl.classList.remove('active');
     if (confirmResolve) {
@@ -1059,7 +1027,6 @@
       confirmResolve = null;
     }
   }
-
   // Carica i dati dell'utente dal localStorage
   function loadUserData() {
     const uds = localStorage.getItem('userDataEFF');
@@ -1073,7 +1040,6 @@
       } catch (e) { currentUserData = null; localStorage.removeItem('userDataEFF'); }
     } else { currentUserData = null; }
   }
-
   // Aggiorna i dati dell'utente (nome, icona) dalla API se necessario e aggiorna la UI della navbar
   async function fetchAndUpdateUserDisplayData() {
     if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
@@ -1096,7 +1062,6 @@
     }
     updateNavbarUI();
   }
-
   // Aggiorna l'interfaccia utente della navbar in base allo stato di login e al ruolo dell'utente
   function updateNavbarUI() {
     const logoLink = gebi('logoLink');
@@ -1168,7 +1133,6 @@
       if(mainPageTitle) mainPageTitle.textContent = "Archivio Attività ";
     }
   }
-
   // Gestisce il logout dell'utente
   function handleLogout() {
     localStorage.removeItem('userDataEFF');
@@ -1177,7 +1141,6 @@
     loadPastEvents();
     alert('Logout effettuato.');
   }
-
   // Gestione navbar che scompare allo scroll
   let lastScrollNav = 0; const navbarContainerEl = gebi("navbarContainer"); if (navbarContainerEl) { window.addEventListener("scroll", function () { const cS = window.pageYOffset || document.documentElement.scrollTop; if (cS <= 50) { navbarContainerEl.classList.remove("hidden"); lastScrollNav = 0; return; } if (cS > lastScrollNav && !navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.add("hidden"); else if (cS < lastScrollNav && navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.remove("hidden"); lastScrollNav = cS <= 0 ? 0 : cS; }, false); }
   // Gestione menu mobile (hamburger)
@@ -1187,11 +1150,9 @@
   document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) closeMobileMenu(); });
   // Gestione dropdown utente
   const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iS = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iS ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iS)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl && userDropdownMenuEl.style.display === 'block' && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
-
   // Elementi del DOM per il popup di login/registrazione
   const loginOverlayEl = gebi("loginOverlay"); const loginPopupEl = gebi("loginPopup"); const closePopupBtnEl = gebi("closeLoginPopupBtn"); const loginTabsEls = document.querySelectorAll(".login-tab"); const loginFormsEls = document.querySelectorAll("#loginPopup .login-form");
   const loginErrorMessagePopupEl = gebi('login-error-message-popup'); const registerErrorMessagePopupEl = gebi('register-error-message-popup');
-
   function isAnyPopupActive() {
     const isActive = (el) => el && (el.classList.contains('active') || window.getComputedStyle(el).display !== 'none');
     return isActive(loginPopupEl) ||
@@ -1202,7 +1163,6 @@
             (customConfirmOverlayEl && customConfirmOverlayEl.classList.contains('active')) ||
             (eventFiltersEl && eventFiltersEl.classList.contains('active')); // Aggiunto controllo per drawer filtri
   }
-
   function openLoginPopup() {
     if(gebi('loginRequiredPopup')?.classList.contains('active')) closeLoginRequiredPopup();
     if (loginOverlayEl) loginOverlayEl.classList.add("active");
@@ -1231,7 +1191,6 @@
   gebi("login-btn-mobile")?.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); closeMobileMenu(); });
   if (closePopupBtnEl) closePopupBtnEl.addEventListener("click", closeLoginPopup);
   if (loginOverlayEl) loginOverlayEl.addEventListener("click", (e) => { if (e.target === loginOverlayEl) closeLoginPopup(); });
-
   loginTabsEls.forEach((tab) => {
     tab.addEventListener("click", () => {
       const tabId = tab.getAttribute("data-tab");
@@ -1247,17 +1206,14 @@
       resetFormErrors();
     });
   });
-
   gebi("loginFormPopup")?.addEventListener("submit", async (e) => { e.preventDefault(); const loginButton = e.target.querySelector('button[type="submit"]'); const originalButtonText = loginButton.textContent; loginButton.disabled = true; loginButton.innerHTML = 'Accesso... <div class="spinner-mini-light"></div>'; const emailInput = gebi('login-email-popup'); const passwordInput = gebi('login-password-popup'); emailInput.classList.remove('error-border'); passwordInput.classList.remove('error-border'); if(loginErrorMessagePopupEl) loginErrorMessagePopupEl.style.display = 'none'; try { const response = await fetch('login.php', { method: 'POST', body: new FormData(e.target) }); if (!response.ok) { let errorData = { message: `Errore HTTP: ${response.status}` }; try { errorData = await response.json(); } catch (parseError) {} throw new Error(errorData.message || `Errore HTTP: ${response.status}`); } const result = await response.json(); if (result.success) { currentUserData = { nome: result.nome, email: result.email, iconPath: result.iconPath, isAdmin: result.is_admin === true || result.is_admin === 1 }; localStorage.setItem('userDataEFF', JSON.stringify(currentUserData)); await fetchAndUpdateUserDisplayData(); closeLoginPopup(); loadPastEvents(); } else { emailInput.classList.add('error-border'); passwordInput.classList.add('error-border'); if(loginErrorMessagePopupEl) { loginErrorMessagePopupEl.textContent = result.message || "Credenziali non valide."; loginErrorMessagePopupEl.style.display = 'block'; } } } catch (error) { emailInput.classList.add('error-border'); passwordInput.classList.add('error-border'); if(loginErrorMessagePopupEl) { loginErrorMessagePopupEl.textContent = "Errore di connessione o risposta non valida."; loginErrorMessagePopupEl.style.display = 'block'; } } finally { loginButton.disabled = false; loginButton.innerHTML = originalButtonText; } });
   gebi("registerFormPopup")?.addEventListener("submit", async (e) => { e.preventDefault(); const registerButton = e.target.querySelector('button[type="submit"]'); const originalButtonText = registerButton.textContent; registerButton.disabled = true; registerButton.innerHTML = 'Registrazione... <div class="spinner-mini-light"></div>'; if(registerErrorMessagePopupEl) registerErrorMessagePopupEl.style.display = 'none'; e.target.querySelectorAll('.form-control.error-border').forEach(input => input.classList.remove('error-border')); try { const response = await fetch('registrati.php', { method: 'POST', body: new FormData(e.target) }); if (!response.ok) { let errorMsg = `Errore HTTP: ${response.status} ${response.statusText}`; try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; } catch(err) {} throw new Error(errorMsg); } const result = await response.json(); if (result.success) { alert(result.message || "Registrazione completata! Ora puoi effettuare il login."); const loginTabButton = document.querySelector('#loginPopup .login-tab[data-tab="login"]'); if (loginTabButton) loginTabButton.click(); const loginEmailPopup = gebi('login-email-popup'); const registerEmailPopup = gebi('register-email-popup'); if (loginEmailPopup && registerEmailPopup) loginEmailPopup.value = registerEmailPopup.value; e.target.reset(); } else { if(registerErrorMessagePopupEl) { registerErrorMessagePopupEl.textContent = result.message || "Errore durante la registrazione."; registerErrorMessagePopupEl.style.display = 'block'; } if (result.errors) { for (const fieldNameFromError in result.errors) { const inputElement = e.target.elements[fieldNameFromError] || gebi(`register-${fieldNameFromError}-popup`); if (inputElement) inputElement.classList.add('error-border'); } } } } catch (error) { if(registerErrorMessagePopupEl) { registerErrorMessagePopupEl.textContent = "Errore: " + error.message; registerErrorMessagePopupEl.style.display = 'block'; } } finally { registerButton.disabled = false; registerButton.innerHTML = originalButtonText; } });
-
   const forgotPasswordLink = document.getElementById('forgotPasswordLink');
   const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
   const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
   const closeForgotPasswordPopupBtn = document.getElementById('closeForgotPasswordPopupBtn');
   const forgotPasswordForm = document.getElementById('forgotPasswordForm');
   const forgotPasswordMessage = document.getElementById('forgot-password-message');
-
   function openForgotPasswordPopup() {
     if (typeof closeLoginPopup === 'function' && loginPopupEl?.classList.contains('active')) {
       closeLoginPopup();
@@ -1269,7 +1225,6 @@
     const forgotEmailInput = document.getElementById('forgot-email');
     if(forgotEmailInput) forgotEmailInput.focus();
   }
-
   function closeForgotPasswordPopup() {
     if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active');
     if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active');
@@ -1279,7 +1234,6 @@
     if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
     if(forgotPasswordForm) forgotPasswordForm.reset();
   }
-
   if (forgotPasswordLink) {
     forgotPasswordLink.addEventListener('click', (e) => {
       e.preventDefault();
@@ -1288,7 +1242,6 @@
   }
   if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
   if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
-
   if (forgotPasswordForm) {
     forgotPasswordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1301,7 +1254,6 @@
       const originalBtnText = submitBtn.innerHTML;
       submitBtn.disabled = true;
       submitBtn.innerHTML = 'Invio...<div class="spinner-mini-light"></div>';
-
       try {
         const formData = new FormData(forgotPasswordForm);
         const response = await fetch('richiesta_recupero_password.php', {
@@ -1309,7 +1261,6 @@
           body: formData
         });
         const result = await response.json();
-
         if (result.success) {
           forgotPasswordMessage.textContent = result.message;
           forgotPasswordMessage.classList.add('success');
@@ -1335,7 +1286,6 @@
   if (closeLoginRequiredPopupBtnEl) closeLoginRequiredPopupBtnEl.addEventListener("click", closeLoginRequiredPopup);
   if (loginRequiredOverlayEl) loginRequiredOverlayEl.addEventListener("click", (e) => { if (e.target === loginRequiredOverlayEl) closeLoginRequiredPopup(); });
   if (loginRequiredLoginBtnEl) { loginRequiredLoginBtnEl.addEventListener("click", () => { closeLoginRequiredPopup(); openLoginPopup(); }); }
-
   // NUOVE FUNZIONI PER POPUP MODALE ADMIN
   function initializeDashAdminEventPopupHandlers() {
     dashAdminEventPopupOverlayEl = gebi('dashAdminEventPopupOverlay');
@@ -1363,7 +1313,6 @@
     dashAdminEventFormMessageEl = gebi('dashAdminEventFormMessage');
     dashAdminCurrentImagePreviewEl = gebi('dashAdmin-current-event-image-preview');
     dashAdminCurrentFlyerPreviewEl = gebi('dashAdmin-current-event-flyer-preview');
-
     dashAdminPreviewImageEl = gebi('dashAdmin_previewImage');
     dashAdminPreviewNoImagePlaceholderEl = document.querySelector('#dashAdminEventCardPreviewContainer .dash-admin-no-image-placeholder');
     dashAdminPreviewTitleEl = gebi('dashAdmin_previewTitle');
@@ -1376,18 +1325,15 @@
     dashAdminPreviewShortDescEl = gebi('dashAdmin_previewShortDesc');
     dashAdminPreviewSeatsFullEl = gebi('dashAdmin_previewSeatsFull').querySelector('.value');
     dashAdminPreviewPriceFullEl = gebi('dashAdmin_previewPriceFull').querySelector('.value');
-
     customConfirmOverlayEl = gebi('customConfirmOverlay');
     customConfirmModalEl = gebi('customConfirmModal');
     customConfirmTitleEl = gebi('customConfirmTitle');
     customConfirmMessageEl = gebi('customConfirmMessage');
     customConfirmYesBtn = gebi('customConfirmYes');
     customConfirmNoBtn = gebi('customConfirmNo');
-
     if (closeDashAdminEventPopupBtnEl) closeDashAdminEventPopupBtnEl.addEventListener('click', () => tryCloseDashAdminEventPopup());
     if (dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.addEventListener('click', (e) => { if (e.target === dashAdminEventPopupOverlayEl) tryCloseDashAdminEventPopup(); });
     if (dashAdminEventVoluntaryCheckbox) dashAdminEventVoluntaryCheckbox.addEventListener('change', updateDashAdminPriceFieldVisibility);
-
     attachDashAdminPreviewListeners();
     dashAdminEventFormEl?.addEventListener('submit', handleAdminEventFormSubmit);
     if (customConfirmYesBtn) customConfirmYesBtn.addEventListener('click', () => handleConfirm(true));
@@ -1396,7 +1342,6 @@
       if (e.target === customConfirmOverlayEl) handleConfirm(false);
     });
   }
-
   function getAdminEventFormData(form) {
     const formData = new FormData(form);
     const data = {};
@@ -1408,7 +1353,6 @@
     }
     return data;
   }
-
   function compareAdminEventFormData(data1, data2) {
     const keys1 = Object.keys(data1);
     const keys2 = Object.keys(data2);
@@ -1420,7 +1364,6 @@
     }
     return true;
   }
-
   function updateDashAdminPriceFieldVisibility() {
     if (dashAdminEventVoluntaryCheckbox && dashAdminEventPriceContainerEl && dashAdminEventPriceInputEl) {
       const isVoluntary = dashAdminEventVoluntaryCheckbox.checked;
@@ -1430,7 +1373,6 @@
       updateDashAdminEventPreview();
     }
   }
-
   function sanitizeForAttribute(str) {
     if (typeof str !== 'string' || str === null) return '';
     return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
@@ -1439,12 +1381,10 @@
     if (text === null || typeof text === 'undefined') return '';
     const element = document.createElement('div'); element.innerText = String(text); return element.innerHTML;
   }
-
   function openEditPastEventPopup(eventData = null) {
     if (!dashAdminEventFormEl) return;
     if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Modifica Evento Passato';
     if (!eventData) return;
-
     if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = eventData.idevento;
     dashAdminEventTitleEl.value = eventData.titolo || '';
     dashAdminEventDateEl.value = eventData.datainizio ? eventData.datainizio.substring(0,10) : '';
@@ -1488,27 +1428,22 @@
     }
     updateDashAdminEventPreview();
     storeInitialFormData();
-
     if(dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.classList.add('active');
     if(dashAdminEventPopupEl) dashAdminEventPopupEl.classList.add('active');
     document.body.style.overflow = 'hidden';
     if(dashAdminEventTitleEl) dashAdminEventTitleEl.focus();
   }
-
   function storeInitialFormData() {
     if (dashAdminEventFormEl) {
       initialAdminEventFormData = getAdminEventFormData(dashAdminEventFormEl);
       isEventFormDirty = false;
     }
   }
-
   async function tryCloseDashAdminEventPopup() {
     const currentFormData = getAdminEventFormData(dashAdminEventFormEl);
     const imageFileChanged = dashAdminEventImageEl.files.length > 0 && initialAdminEventFormData['event-image'] !== dashAdminEventImageEl.files[0].name;
     const flyerFileChanged = dashAdminEventFlyerEl.files.length > 0 && initialAdminEventFormData['event-flyer'] !== dashAdminEventFlyerEl.files[0].name;
-
     isEventFormDirty = !compareAdminEventFormData(initialAdminEventFormData, currentFormData) || imageFileChanged || flyerFileChanged;
-
     if (isEventFormDirty) {
       const confirmed = await showCustomConfirm(
               "Conferma Uscita",
@@ -1523,7 +1458,6 @@
     }
     closeDashAdminEventPopup_actual();
   }
-
   function closeDashAdminEventPopup_actual() {
     if(dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.classList.remove('active');
     if(dashAdminEventPopupEl) dashAdminEventPopupEl.classList.remove('active');
@@ -1531,7 +1465,6 @@
     isEventFormDirty = false;
     dashAdminEventFormEl.reset();
   }
-
   function updateDashAdminEventPreview() {
     if (!dashAdminPreviewTitleEl) return;
     dashAdminPreviewTitleEl.textContent = dashAdminEventTitleEl.value || 'Titolo Evento';
@@ -1578,7 +1511,6 @@
       if(dashAdminPreviewNoImagePlaceholderEl) dashAdminPreviewNoImagePlaceholderEl.style.display = 'none';
     }
   }
-
   function attachDashAdminPreviewListeners() {
     const formElementsToWatch = [
       'dashAdmin-event-title', 'dashAdmin-event-date', 'dashAdmin-event-start-time', 'dashAdmin-event-end-time',
@@ -1604,7 +1536,6 @@
       });
     }
   }
-
   async function handleAdminEventFormSubmit(e) {
     e.preventDefault();
     const submitBtn = this.querySelector('button[type="submit"]');
@@ -1622,7 +1553,6 @@
       formData.delete('event-start-time'); formData.delete('event-end-time');
       if (dashAdminEventVoluntaryCheckbox.checked) formData.set('event-price', '0.00');
       else if (!formData.get('event-price')) formData.set('event-price', '0.00');
-
       const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
       const responseText = await response.text();
       let result; try { result = JSON.parse(responseText); }
@@ -1649,18 +1579,15 @@
       submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText;
     }
   }
-
   async function handleDeleteEvent(eventId) {
     const eventToDelete = allPastEventsData.find(e => e.idevento == eventId);
     const eventTitle = eventToDelete ? eventToDelete.titolo : "questo evento";
-
     const userConfirmed = await showCustomConfirm(
             "Conferma eliminazione",
             `Sei sicuro di voler eliminare l'evento "${sanitizeForAttribute(eventTitle)}"? L'azione è irreversibile.`,
             "Elimina",
             "Annulla"
     );
-
     if (userConfirmed) {
       const deleteButton = document.querySelector(`.btn-delete[data-event-id="${eventId}"]`);
       let originalButtonHTML = '';
@@ -1686,8 +1613,6 @@
       }
     }
   }
-
-
   function formatDate(dateString) {
     if (!dateString) return "Data non disponibile";
     try {
@@ -1714,8 +1639,6 @@
       return dateString;
     } catch (e) { return dateString; }
   }
-
-
   function populateYearFilter() {
     const currentYr = new Date().getFullYear();
     let minYear = currentYr;
@@ -1742,7 +1665,6 @@
       searchYearEl.value = currentYr.toString();
     }
   }
-
   // === NUOVE FUNZIONI PER POPUP VOLANTINO E SANITIZZAZIONE ===
   function initGlobalFlyerOverlay() {
     if (!document.getElementById('globalFlyerOverlayEff')) {
@@ -1758,7 +1680,6 @@
       globalFlyerOverlayEff = document.getElementById('globalFlyerOverlayEff');
     }
   }
-
   function showFlyerPopupEff(volantinoUrl) {
     if (!globalFlyerOverlayEff) return;
     if (currentFlyerModalEff) currentFlyerModalEff.remove();
@@ -1788,7 +1709,6 @@
     const closeBtn = currentFlyerModalEff.querySelector('.flyer-close-btn-eff');
     if (closeBtn) { closeBtn.onclick = hideFlyerPopupEff; closeBtn.focus(); }
   }
-
   function hideFlyerPopupEff() {
     if (globalFlyerOverlayEff) globalFlyerOverlayEff.classList.remove("active");
     if (currentFlyerModalEff) {
@@ -1809,8 +1729,6 @@
     document.body.classList.remove("flyer-popup-active-eff");
   }
   // === FINE NUOVE FUNZIONI ===
-
-
   function createPastEventCard(event) {
     const card = document.createElement("article");
     card.className = "card";
@@ -1818,9 +1736,7 @@
     card.dataset.title = event.titolo?.toLowerCase() || '';
     card.dataset.date = event.datainizio || '';
     card.dataset.speaker = event.relatore?.toLowerCase() || '';
-
     let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event-past.jpg";
-
     // --- NUOVA LOGICA PER LE "PILLOLE" INFORMATIVE ---
     let infoPillsHTML = '<div class="card-info-pills">';
     if (event.datainizio) {
@@ -1849,7 +1765,6 @@
     }
     infoPillsHTML += '</div>';
     // --- FINE NUOVA LOGICA ---
-
     if (currentUserData && currentUserData.isAdmin) {
       let volantinoAdminLinkHTML = '';
       if (event.volantino_url && event.volantino_url.trim() !== "") { volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em;"><b>Volantino:</b> <a href="${sanitizeForAttribute(event.volantino_url)}" target="_blank">Visualizza volantino</a></p>`; }
@@ -1874,22 +1789,18 @@
     } else {
       let volantinoBtnHTML = '';
       const sanitizedUrl = sanitizeForAttribute(event.volantino_url);
-
       if (event.volantino_url && event.volantino_url.trim() !== "") {
         volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="${sanitizedUrl}">Volantino</button>`;
       } else {
         volantinoBtnHTML = `<button class="card-btn card-btn-secondary" disabled title="Volantino non disponibile">Volantino</button>`;
       }
-
       let risorseBtnHTML = '';
       if (currentUserData) {
         risorseBtnHTML = `<a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Risorse</a>`;
       } else {
         risorseBtnHTML = `<a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Risorse</a>`;
       }
-
       const actionsHTML = `${volantinoBtnHTML}${risorseBtnHTML}`;
-
       card.innerHTML = `
         <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
         <div class="card-content">
@@ -1898,7 +1809,6 @@
           <p class="card-description">${sanitizeText(event.descrizione) || "Nessuna descrizione breve disponibile."}</p>
           <div class="card-actions">${actionsHTML}</div>
         </div>`;
-
       const viewFlyerBtn = card.querySelector(".btn-visualizza-volantino");
       if (viewFlyerBtn && !viewFlyerBtn.disabled) {
         viewFlyerBtn.addEventListener("click", function() {
@@ -1910,7 +1820,6 @@
     }
     return card;
   }
-
   async function loadPastEvents() {
     if (!eventiPassatiGridEl || !loadingIndicatorEl) return;
     loadingIndicatorEl.classList.add("visible");
@@ -1930,27 +1839,22 @@
       if(loadingIndicatorEl) loadingIndicatorEl.classList.remove("visible");
     }
   }
-
   function filterEvents() {
     if (!eventiPassatiGridEl) return;
     const titleFilter = searchTitleEl ? searchTitleEl.value.toLowerCase().trim() : "";
     const monthFilter = searchMonthEl ? searchMonthEl.value : "";
     const yearFilterStr = searchYearEl ? searchYearEl.value : "";
     const speakerFilter = searchSpeakerEl ? searchSpeakerEl.value.toLowerCase().trim() : "";
-
     eventiPassatiGridEl.innerHTML = '';
     let visibleCardsCount = 0;
-
     const filteredEvents = allPastEventsData.filter(event => {
       const eventTitle = event.titolo?.toLowerCase() || "";
       const eventDateStr = event.datainizio || "";
       let eventMatchesYear = (yearFilterStr === "");
       let eventMatchesMonth = (monthFilter === "");
-
       if (eventDateStr) {
         const eventYear = parseInt(eventDateStr.substring(0, 4));
         const eventMonthNum = eventDateStr.substring(5, 7);
-
         if (yearFilterStr !== "" && !isNaN(eventYear) && eventYear === parseInt(yearFilterStr)) {
           eventMatchesYear = true;
         }
@@ -1958,21 +1862,16 @@
           eventMatchesMonth = true;
         }
       }
-
       const titleMatch = !titleFilter || eventTitle.includes(titleFilter);
       const speakerMatch = !speakerFilter || (event.relatore?.toLowerCase() || "").includes(speakerFilter);
-
       return titleMatch && speakerMatch && eventMatchesYear && eventMatchesMonth;
     });
-
     if (filteredEvents.length > 0) {
       filteredEvents.forEach(event => eventiPassatiGridEl.appendChild(createPastEventCard(event)));
       visibleCardsCount = filteredEvents.length;
     }
-
     const existingNoResultsMessage = gebi("noResultsMessage");
     if (existingNoResultsMessage) existingNoResultsMessage.remove();
-
     if (visibleCardsCount === 0) {
       const p = document.createElement("p");
       p.id = "noResultsMessage";
@@ -2009,37 +1908,27 @@
       logoImgTag.src = defaultLogoPath;
     }
   }
-
-
   document.addEventListener("DOMContentLoaded", async () => {
     const currentYearEl = gebi("currentYear");
     if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
-
     initGlobalFlyerOverlay(); // Inizializza il popup del volantino
     loadUserData();
     await fetchAndUpdateUserDisplayData();
     await loadNavbarLogo();
-
     // Listeners per i filtri desktop
     searchTitleEl?.addEventListener("input", filterEvents);
     searchMonthEl?.addEventListener("change", filterEvents);
     searchYearEl?.addEventListener("change", filterEvents);
     searchSpeakerEl?.addEventListener("input", filterEvents);
-
     // NUOVI Listeners per il drawer mobile
     mobileFilterTriggerEl?.addEventListener('click', openFilterDrawer);
     filterDrawerOverlayEl?.addEventListener('click', closeFilterDrawer);
     filterDrawerCloseBtnEl?.addEventListener('click', closeFilterDrawer);
     filterDrawerApplyBtnEl?.addEventListener('click', closeFilterDrawer);
-
-
     initializeDashAdminEventPopupHandlers();
-
     await loadPastEvents();
-
     gebi('dropdownLogout')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
     gebi('mobileLogoutLink')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenu(); });
-
     document.addEventListener("keydown", async (event) => {
       if (event.key === "Escape") {
         if (eventFiltersEl?.classList.contains('active')) closeFilterDrawer(); // Chiude il drawer filtri
@@ -2051,7 +1940,6 @@
         if (customConfirmOverlayEl?.classList.contains('active')) handleConfirm(false);
       }
     });
-
     if (currentUserData && currentUserData.isAdmin && typeof updateDashAdminPriceFieldVisibility === 'function') {
       updateDashAdminPriceFieldVisibility();
     }
