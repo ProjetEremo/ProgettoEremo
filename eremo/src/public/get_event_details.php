@@ -91,7 +91,7 @@ try {
          FROM commenti c
          LEFT JOIN utentiregistrati u ON c.Contatto = u.Contatto
          WHERE c.IDEvento = :idEvento
-         ORDER BY c.DataPubb ASC";
+         ORDER BY c.DataPubb DESC"; // MODIFICA: cambiato da ASC a DESC per ordine LIFO
 
     $stmtComments = $conn->prepare($sqlComments);
     $stmtComments->bindParam(':idEvento', $idEvento, PDO::PARAM_INT);

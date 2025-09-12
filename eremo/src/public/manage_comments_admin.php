@@ -50,7 +50,7 @@ if ($action === 'get_comments') {
              FROM commenti c
              LEFT JOIN utentiregistrati ur ON c.Contatto = ur.Contatto
              WHERE c.IDEvento = :idEvento
-             ORDER BY c.DataPubb ASC"
+             ORDER BY c.DataPubb DESC"
         );
         $stmtComments->bindParam(':idEvento', $eventId, PDO::PARAM_INT);
         $stmtComments->execute();
