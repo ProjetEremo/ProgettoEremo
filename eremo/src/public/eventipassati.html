@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
+    /* Stili per filtri e card */
     .event-filters {
       background-color: var(--white);
       padding: 1.5rem;
@@ -72,7 +73,7 @@
       z-index: 10;
       visibility: hidden; opacity: 0;
       transition: opacity 0.3s, visibility 0.3s;
-      border-radius: inherit; /* Inherit border radius from parent if any */
+      border-radius: inherit;
     }
     .loading-overlay.visible { visibility: visible; opacity: 1; }
     .loading-overlay .spinner {
@@ -90,7 +91,8 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .no-events { text-align: center; padding: 2rem; color: var(--gray-dark); }
-    /* Stili per popup login, messaggi errore, etc. */
+
+    /* Stili per popup login, messaggi errore, etc. (Stili unificati da eventiincorso) */
     .login-popup input.form-control.error-border { border-color: var(--danger, red) !important; }
     .login-popup input:-webkit-autofill,
     .login-popup input:-webkit-autofill:hover,
@@ -107,18 +109,13 @@
     .terms-checkbox a { color: var(--primary); text-decoration: underline; }
     .spinner-mini-light { display: inline-block; width: 1em; height: 1em; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; vertical-align: middle; margin-left: 5px; }
     .spinner-mini { display: inline-block; width: 1em; height: 1em; border: 2px solid rgba(0,0,0,0.2); border-radius: 50%; border-top-color: var(--primary); animation: spin .6s linear infinite; vertical-align: middle; margin-right: 5px; }
-    .user-avatar img {
-      width: 30px; height: 30px; border-radius: 50%;
-      object-fit: cover; vertical-align: middle;
-    }
+    .user-avatar img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
     .card-actions.admin-actions {
       margin-top: 1rem; border-top: 1px solid var(--gray-light); padding-top: 1rem;
     }
     .card-actions.admin-actions .card-btn { flex-grow: 1; }
     .card-actions .btn-delete { background-color: var(--danger) !important; color: white !important; }
     .card-actions .btn-delete:hover { background-color: darkred !important; }
-    .event-popup .form-message.success { color: var(--dark); } /* Specific for event popup messages */
-    .event-popup .form-message.error { color: var(--dark); } /* Specific for event popup messages */
     #current-event-image-preview { max-width:100px; max-height:100px; display:none; margin-top:5px; border-radius: 4px; border: 1px solid var(--gray-light); }
     #current-event-flyer-preview a { color: var(--primary); text-decoration: underline; }
     #current-event-flyer-preview a:hover { color: var(--accent); }
@@ -262,33 +259,223 @@
     }
     /* === FINE STILI NUOVO POPUP VOLANTINO === */
 
-        /* === NUOVI STILI PER INFO A "PILLOLE" (CON SPAZIATURA AGGIORNATA) === */
+    /* Stile per il Custom Confirm Modal */
+    .custom-confirm-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease-out;
+    }
+    .custom-confirm-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+    .custom-confirm-modal {
+      background-color: var(--white);
+      padding: 2rem;
+      border-radius: var(--border-radius-medium);
+      box-shadow: var(--shadow-strong);
+      width: 90%;
+      max-width: 450px;
+      text-align: center;
+      transform: scale(0.95);
+      opacity: 0;
+      transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+    }
+    .custom-confirm-overlay.active .custom-confirm-modal {
+      transform: scale(1);
+      opacity: 1;
+    }
+    .custom-confirm-modal h3 {
+      font-size: 1.3rem;
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    .custom-confirm-modal p {
+      font-size: 1rem;
+      color: var(--gray-dark);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    .custom-confirm-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .custom-confirm-actions .btn-popup {
+      min-width: 100px;
+    }
+    .custom-confirm-actions .btn-confirm-no {
+      background-color: var(--gray-light);
+      color: var(--dark);
+      border: 1px solid var(--gray-medium);
+    }
+    .custom-confirm-actions .btn-confirm-no:hover {
+      background-color: var(--gray-medium);
+    }
+
+    /* === NUOVI STILI PER INFO A "PILLOLE" (CON SPAZIATURA AGGIORNATA) === */
     .card-info-pills {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin: 1rem 0 1.2rem 0; /* Aumentato lo spazio sopra e sotto */
-        padding-bottom: 1rem; /* Aumentato il padding inferiore */
-        border-bottom: 1px solid var(--gray-lighter);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0 1.2rem 0;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--gray-lighter);
     }
     .info-pill {
-        display: inline-flex;
-        align-items: center;
-        background-color: var(--background-light, #f8f9fa);
-        color: var(--primary-dark, #333);
-        padding: 0.4rem 0.8rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        border: 1px solid var(--gray-light, #eee);
-        transition: all 0.2s ease-in-out;
+      display: inline-flex;
+      align-items: center;
+      background-color: var(--background-light, #f8f9fa);
+      color: var(--primary-dark, #333);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid var(--gray-light, #eee);
+      transition: all 0.2s ease-in-out;
     }
     .info-pill i {
-        margin-right: 0.5rem;
-        color: var(--primary);
-        font-size: 0.9em;
+      margin-right: 0.5rem;
+      color: var(--primary);
+      font-size: 0.9em;
     }
     /* === FINE NUOVI STILI === */
+
+    /* === NUOVI STILI PER POPUP ADMIN (stile Dashboard) === */
+    .dash-admin-event-popup-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.65); z-index: 1050;
+      display: none; opacity: 0; transition: opacity 0.3s ease;
+    }
+    .dash-admin-event-popup-overlay.active { display: block; opacity: 1; }
+
+    .dash-admin-event-popup {
+      position: fixed; top: 50%; left: 50%;
+      background-color: var(--white, #fff);
+      padding: 0;
+      border-radius: var(--border-radius-large, 12px);
+      box-shadow: var(--shadow-strong, 0 10px 30px rgba(0,0,0,0.2));
+      z-index: 1051;
+      width: 95%; max-width: 900px;
+      max-height: 90vh;
+      display: none; opacity: 0;
+      transform: translate(-50%, -50%) scale(0.95);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      overflow: hidden;
+    }
+    .dash-admin-event-popup.active {
+      opacity: 1; transform: translate(-50%, -50%) scale(1);
+      display: flex; flex-direction: column;
+    }
+
+    .dash-admin-event-popup-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--gray-light, #eee);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .dash-admin-event-popup-header h2 { margin: 0; color: var(--primary); font-size: 1.5rem; }
+    .dash-admin-event-popup .close-popup {
+      font-size: 1.8rem; color: var(--gray-dark, #777); background: none;
+      border: none; cursor: pointer; padding: 0.5rem; line-height: 1;
+    }
+    .dash-admin-event-popup .close-popup:hover { color: var(--dark, #333); }
+    .dash-admin-event-popup-content {
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .dash-admin-event-form-and-preview-container {
+      display: flex;
+      flex-wrap: wrap; gap: 2rem;
+      width: 100%;
+    }
+    #dashAdminEventForm { flex: 2; min-width: 320px; }
+    #dashAdminEventCardPreviewContainer {
+      flex: 1; min-width: 280px; padding: 1rem; border: 1px dashed var(--gray-medium, #ccc);
+      border-radius: var(--border-radius-medium, 8px); background-color: var(--background-light, #f8f9fa);
+      height: fit-content; position: sticky; top: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .dash-admin-event-form-and-preview-container { flex-direction: column-reverse; }
+      #dashAdminEventCardPreviewContainer { position: static; margin-bottom: 2rem;}
+    }
+    #dashAdminEventCardPreviewContainer h4 {
+      text-align: center; color: var(--primary); margin-top: 0; margin-bottom: 1rem;
+      font-size: 1.1rem; border-bottom: 1px solid var(--gray-light, #eee); padding-bottom: 0.5rem;
+    }
+    .dash-admin-preview-card {
+      background: var(--white); border-radius: var(--border-radius-medium);
+      box-shadow: var(--shadow-light); overflow: hidden; border: 1px solid var(--gray-light);
+    }
+    .dash-admin-preview-card-image-container {
+      height: 160px; background-color: var(--gray-lighter, #f0f0f0); display: flex;
+      align-items: center; justify-content: center; overflow: hidden;
+    }
+    .dash-admin-preview-card-image-container img { width: 100%; height: 100%; object-fit: cover; }
+    .dash-admin-preview-card-image-container .dash-admin-no-image-placeholder { font-size: 0.9rem; color: var(--gray-dark); }
+    .dash-admin-preview-card-content { padding: 0.8rem 1rem; }
+    .dash-admin-preview-card-content h5 {
+      font-size: 1.15rem; color: var(--primary); margin: 0 0 0.4rem 0;
+      font-weight: 600; min-height: 1.2em; word-break: break-word;
+    }
+    .dash-admin-preview-card-content p {
+      font-size: 0.85rem; color: var(--gray-dark); line-height: 1.4;
+      margin-bottom: 0.4rem; min-height: 1em; word-break: break-word;
+    }
+    .dash-admin-preview-card-content .dash-admin-preview-relatore { font-style: italic; }
+    .dash-admin-preview-card-content .dash-admin-preview-posti,
+    .dash-admin-preview-card-content .dash-admin-preview-costo { font-weight: bold; }
+    #dashAdminEventForm .form-group { margin-bottom: 1rem; position: relative; }
+    #dashAdminEventForm .form-group label {
+      display: block; margin-bottom: 0.3rem; color: var(--primary-dark, #333);
+      font-weight: 500; font-size: 0.9rem;
+    }
+    #dashAdminEventForm .form-control, #dashAdminEventForm select.form-control {
+      width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--gray-medium, #ccc);
+      border-radius: 6px; font-size: 0.95rem; background-color: var(--white, #fff);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    #dashAdminEventForm .form-control:focus {
+      border-color: var(--secondary, #8db187);
+      box-shadow: 0 0 0 2px rgba(var(--secondary-rgb, 141, 177, 135), 0.2);
+      outline: none;
+    }
+    #dashAdminEventForm textarea.form-control { min-height: 70px; resize: vertical; }
+    #dashAdminEventForm .form-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;
+    }
+    #dashAdminEventForm .form-check-group {
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;
+    }
+    #dashAdminEventForm .form-check-group input[type="checkbox"] {
+      width: auto; margin-right: 0.2rem; transform: scale(1.05);
+    }
+    #dashAdminEventForm .form-check-group label {
+      font-weight: normal; font-size: 0.9rem; margin-bottom: 0; color: var(--dark);
+    }
+    #dashAdminEventForm .form-actions { margin-top: 1.5rem; text-align: right; }
+    #dashAdminEventForm small {
+      font-size: 0.8rem; color: var(--gray-dark); display: block; margin-top: 0.2rem;
+    }
+    #dashAdmin-current-event-image-preview {
+      margin-top: 0.5rem; max-width: 120px; border: 1px solid var(--gray-light, #eee);
+      padding: 4px; border-radius: 4px; display:none;
+    }
+    #dashAdmin-current-event-flyer-preview {
+      margin-top: 0.5rem; padding: 4px; font-size: 0.85rem;
+    }
+    #dashAdmin-current-event-flyer-preview a { color: var(--primary); text-decoration: underline; }
+    #dashAdmin-current-event-flyer-preview span { color: var(--gray-dark); }
+    #dashAdminEventFormMessage.form-message { margin-top: 1rem; }
+
   </style>
 </head>
 <body>
@@ -395,7 +582,6 @@
 <div id="ai-assistant-fab" title="Assistente Virtuale Eremo" data-liquid> <i class="fas fa-headset"></i>
 </div>
 
-
 <div id="ai-chat-popup">
   <div id="ai-chat-header">
     <h3>Assistente Eremo <i class="fas fa-robot"></i></h3>
@@ -457,6 +643,7 @@
     </div>
   </form>
 </div>
+
 <div class="login-popup-overlay" id="loginRequiredOverlay"></div>
 <div class="login-popup" id="loginRequiredPopup">
   <button class="close-popup" id="closeLoginRequiredPopupBtn" aria-label="Chiudi popup">&times;</button>
@@ -467,44 +654,126 @@
   </div>
 </div>
 
-<div class="event-popup-overlay" id="eventPopupOverlayAdmin" style="display:none;"></div>
-<div class="event-popup" id="eventPopupAdmin" style="display:none;">
-  <button class="close-popup" id="closeEventPopupBtnAdmin" aria-label="Chiudi popup">&times;</button>
-  <h2 id="eventPopupTitleAdmin">Modifica Evento Passato</h2>
-  <form id="editPastEventFormAdmin" method="POST" enctype="multipart/form-data">
-    <input type="hidden" id="admin-event-id" name="event-id">
-    <div class="form-group"> <label for="admin-event-title">Titolo Evento*</label> <input type="text" id="admin-event-title" name="event-title" class="form-control" required> </div>
-    <div class="form-grid">
-      <div class="form-group"> <label for="admin-event-date">Data Inizio*</label> <input type="date" id="admin-event-date" name="event-date" class="form-control" required> </div>
-      <div class="form-group"> <label for="admin-event-time">Orario/Durata</label> <input type="text" id="admin-event-time" name="event-time" class="form-control" placeholder="es. 18:00-19:30 o 2 giorni"> </div>
+<!-- NUOVO POPUP MODALE AGGIORNATO (stili da eventiincorso) -->
+<div class="dash-admin-event-popup-overlay" id="dashAdminEventPopupOverlay"></div>
+<div class="dash-admin-event-popup" id="dashAdminEventPopup">
+  <div class="dash-admin-event-popup-header">
+    <h2 id="dashAdminEventPopupTitle">Modifica Evento Passato</h2>
+    <button class="close-popup" id="closeDashAdminEventPopupBtn" aria-label="Chiudi popup">&times;</button>
+  </div>
+  <div class="dash-admin-event-popup-content">
+    <div class="dash-admin-event-form-and-preview-container">
+      <form id="dashAdminEventForm" method="POST" enctype="multipart/form-data">
+        <input type="hidden" id="dashAdmin-event-id" name="event-id">
+        <div class="form-group">
+          <label for="dashAdmin-event-title">Titolo Evento*</label>
+          <input type="text" id="dashAdmin-event-title" name="event-title" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="dashAdmin-event-date">Data Evento*</label>
+          <input type="date" id="dashAdmin-event-date" name="event-date" class="form-control" required>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="dashAdmin-event-start-time">Orario Inizio (HH:MM)</label>
+            <input type="time" id="dashAdmin-event-start-time" name="event-start-time" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="dashAdmin-event-end-time">Orario Fine (HH:MM)</label>
+            <input type="time" id="dashAdmin-event-end-time" name="event-end-time" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="dashAdmin-event-short-desc">Descrizione Breve*</label>
+          <textarea id="dashAdmin-event-short-desc" name="event-short-desc" class="form-control" rows="3" required maxlength="200"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="dashAdmin-event-long-desc">Descrizione Estesa</label>
+          <textarea id="dashAdmin-event-long-desc" name="event-long-desc" class="form-control" rows="5"></textarea>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="dashAdmin-event-prefix">Prefisso Relatore</label>
+            <input type="text" id="dashAdmin-event-prefix" name="event-prefix" class="form-control" placeholder="Default: Relatore">
+          </div>
+          <div class="form-group">
+            <label for="dashAdmin-event-speaker">Nome Relatore*</label>
+            <input type="text" id="dashAdmin-event-speaker" name="event-speaker" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="dashAdmin-event-association">Associazione</label>
+            <input type="text" id="dashAdmin-event-association" name="event-association" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="dashAdmin-event-seats">Posti Totali*</label>
+            <input type="number" id="dashAdmin-event-seats" name="event-seats" class="form-control" required min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="dashAdmin-event-image">Immagine Copertina</label>
+          <input type="file" id="dashAdmin-event-image" name="event-image" class="form-control" accept="image/*">
+          <small>Lascia vuoto se non vuoi modificare l'immagine corrente.</small>
+          <img id="dashAdmin-current-event-image-preview" src="#" alt="Anteprima copertina">
+        </div>
+        <div class="form-group">
+          <label for="dashAdmin-event-flyer">Volantino (PDF/Immagine)</label>
+          <input type="file" id="dashAdmin-event-flyer" name="event-flyer" class="form-control" accept="image/*,application/pdf">
+          <small>Lascia vuoto se non vuoi modificare il volantino corrente.</small>
+          <div id="dashAdmin-current-event-flyer-preview" style="margin-top:5px;"></div>
+        </div>
+        <div class="form-check-group">
+          <input type="checkbox" id="dashAdmin-event-booking" name="event-booking">
+          <label for="dashAdmin-event-booking">Evento prenotabile?</label>
+        </div>
+        <div class="form-check-group">
+          <input type="checkbox" id="dashAdmin-event-voluntary" name="event-voluntary">
+          <label for="dashAdmin-event-voluntary">Costo su base volontaria (offerta libera)</label>
+        </div>
+        <div class="form-group" id="dashAdmin-event-price-container">
+          <label for="dashAdmin-event-price">Prezzo (€)</label>
+          <input type="number" id="dashAdmin-event-price" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00">
+        </div>
+        <div id="dashAdminEventFormMessage" class="form-message" style="display:none;"></div>
+        <div class="form-actions">
+          <button type="submit" class="btn-popup">Salva Modifiche</button>
+        </div>
+      </form>
+
+      <div id="dashAdminEventCardPreviewContainer">
+        <h4>Anteprima Card Evento</h4>
+        <div class="dash-admin-preview-card">
+          <div class="dash-admin-preview-card-image-container">
+            <img id="dashAdmin_previewImage" src="images/default-event.jpg" alt="Anteprima copertina evento">
+            <span class="dash-admin-no-image-placeholder" style="display:none;">Nessuna immagine</span>
+          </div>
+          <div class="dash-admin-preview-card-content">
+            <h5 id="dashAdmin_previewTitle">Titolo Evento</h5>
+            <p id="dashAdmin_previewDateFull"><b>Data:</b> <span class="value">Seleziona data</span></p>
+            <p id="dashAdmin_previewTimeFull" style="display:none;"><b>Orario:</b> <span class="value"></span></p>
+            <p id="dashAdmin_previewSpeakerFull" class="dash-admin-preview-relatore"><b><span id="dashAdmin_previewSpeakerPrefix">Relatore</span>:</b> <span id="dashAdmin_previewSpeakerName" class="value">Nome Relatore</span></p>
+            <p id="dashAdmin_previewShortDesc">Descrizione breve dell'evento qui...</p>
+            <p id="dashAdmin_previewSeatsFull" class="dash-admin-preview-posti"><b>Posti:</b> <span class="value">0</span></p>
+            <p id="dashAdmin_previewPriceFull" class="dash-admin-preview-costo"><b>Costo:</b> <span class="value">€ 0.00</span></p>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="form-group"> <label for="admin-event-short-desc">Descrizione Breve*</label> <textarea id="admin-event-short-desc" name="event-short-desc" class="form-control" rows="3" required maxlength="200"></textarea> </div>
-    <div class="form-group"> <label for="admin-event-long-desc">Descrizione Estesa</label> <textarea id="admin-event-long-desc" name="event-long-desc" class="form-control" rows="5"></textarea> </div>
-    <div class="form-grid">
-      <div class="form-group"> <label for="admin-event-prefix">Prefisso Relatore</label> <input type="text" id="admin-event-prefix" name="event-prefix" class="form-control" placeholder="Default: Relatore"> </div>
-      <div class="form-group"> <label for="admin-event-speaker">Nome Relatore*</label> <input type="text" id="admin-event-speaker" name="event-speaker" class="form-control" required> </div>
-    </div>
-    <div class="form-grid">
-      <div class="form-group"> <label for="admin-event-association">Associazione</label> <input type="text" id="admin-event-association" name="event-association" class="form-control"> </div>
-      <div class="form-group"> <label for="admin-event-seats">Posti Totali*</label> <input type="number" id="admin-event-seats" name="event-seats" class="form-control" required min="0"> </div>
-    </div>
-    <div class="form-group">
-      <label for="admin-event-image">Immagine Copertina</label> <input type="file" id="admin-event-image" name="event-image" class="form-control" accept="image/*">
-      <small>Lascia vuoto se non vuoi modificare l'immagine corrente.</small>
-      <img id="current-event-image-preview" src="#" alt="Anteprima copertina">
-    </div>
-    <div class="form-group">
-      <label for="admin-event-flyer">Volantino (PDF/Immagine)</label> <input type="file" id="admin-event-flyer" name="event-flyer" class="form-control" accept="image/*,application/pdf">
-      <small>Lascia vuoto se non vuoi modificare il volantino corrente.</small>
-      <div id="current-event-flyer-preview" style="margin-top:5px;"></div>
-    </div>
-    <div class="form-check-group"> <input type="checkbox" id="admin-event-booking" name="event-booking"> <label for="admin-event-booking">Era prenotabile?</label> </div>
-    <div class="form-check-group"> <input type="checkbox" id="admin-event-voluntary" name="event-voluntary"> <label for="admin-event-voluntary">Costo su base volontaria (offerta libera)</label> </div>
-    <div class="form-group" id="admin-event-price-container"> <label for="admin-event-price">Prezzo (€) (Record)</label> <input type="number" id="admin-event-price" name="event-price" class="form-control" min="0" step="0.01" placeholder="Es. 10.00"> </div>
-    <div id="editPastEventFormMessageAdmin" class="form-message" style="display:none;"></div>
-    <div class="form-actions"> <button type="submit" class="btn-popup">Salva Modifiche</button> </div>
-  </form>
+  </div>
 </div>
+
+<div class="custom-confirm-overlay" id="customConfirmOverlay">
+  <div class="custom-confirm-modal" id="customConfirmModal">
+    <h3 id="customConfirmTitle">Conferma Uscita</h3>
+    <p id="customConfirmMessage">Hai modifiche non salvate. Sei sicuro di voler uscire senza salvare?</p>
+    <div class="custom-confirm-actions">
+      <button type="button" class="btn-popup btn-confirm-no" id="customConfirmNo">Annulla</button>
+      <button type="button" class="btn-popup btn-confirm-yes" id="customConfirmYes">Esci</button>
+    </div>
+  </div>
+</div>
+
 
 <script src="assistenteAI.js" defer></script>
 <script src="liquidglass.js" defer></script>
@@ -527,8 +796,51 @@
   // Elemento del DOM per l'indicatore di caricamento
   const loadingIndicatorEl = document.getElementById("loadingIndicator");
 
+  // Elementi del DOM per il nuovo popup di modifica admin (stile dashboard)
+  let dashAdminEventPopupOverlayEl, dashAdminEventPopupEl, closeDashAdminEventPopupBtnEl,
+          dashAdminEventFormEl, dashAdminEventPopupTitleEl, dashAdminEventIdInputEl,
+          dashAdminEventTitleEl, dashAdminEventDateEl, dashAdminEventStartTimeEl, dashAdminEventEndTimeEl,
+          dashAdminEventShortDescEl, dashAdminEventLongDescEl, dashAdminEventPrefixEl,
+          dashAdminEventSpeakerEl, dashAdminEventAssociationEl, dashAdminEventSeatsEl,
+          dashAdminEventImageEl, dashAdminEventFlyerEl, dashAdminEventBookingCheckbox,
+          dashAdminEventVoluntaryCheckbox, dashAdminEventPriceContainerEl, dashAdminEventPriceInputEl,
+          dashAdminEventFormMessageEl, dashAdminCurrentImagePreviewEl, dashAdminCurrentFlyerPreviewEl,
+          dashAdminPreviewImageEl, dashAdminPreviewNoImagePlaceholderEl, dashAdminPreviewTitleEl,
+          dashAdminPreviewDateFullEl, dashAdminPreviewTimeFullEl, dashAdminPreviewTimeValueEl,
+          dashAdminPreviewSpeakerFullEl, dashAdminPreviewSpeakerPrefixEl, dashAdminPreviewSpeakerNameEl,
+          dashAdminPreviewShortDescEl, dashAdminPreviewSeatsFullEl, dashAdminPreviewPriceFullEl;
+
+  let initialAdminEventFormData = {};
+  let isEventFormDirty = false;
+  let customConfirmOverlayEl, customConfirmModalEl, customConfirmTitleEl, customConfirmMessageEl,
+          customConfirmYesBtn, customConfirmNoBtn;
+  let confirmResolve = null;
+
+  // Variabili globali per popup volantino
+  let globalFlyerOverlayEff = null;
+  let currentFlyerModalEff = null;
+
   // Funzione abbreviata per getElementById
   function gebi(id) { return document.getElementById(id); }
+
+  function showCustomConfirm(title, message, confirmBtnText = "Sì", cancelBtnText = "Annulla") {
+    return new Promise((resolve) => {
+      if(customConfirmTitleEl) customConfirmTitleEl.textContent = title || "Conferma";
+      if(customConfirmMessageEl) customConfirmMessageEl.textContent = message || "Sei sicuro di voler procedere?";
+      if(customConfirmYesBtn) customConfirmYesBtn.textContent = confirmBtnText;
+      if(customConfirmNoBtn) customConfirmNoBtn.textContent = cancelBtnText;
+      if(customConfirmOverlayEl) customConfirmOverlayEl.classList.add('active');
+      confirmResolve = resolve;
+    });
+  }
+
+  function handleConfirm(confirmed) {
+    if(customConfirmOverlayEl) customConfirmOverlayEl.classList.remove('active');
+    if (confirmResolve) {
+      confirmResolve(confirmed);
+      confirmResolve = null;
+    }
+  }
 
   // Carica i dati dell'utente dal localStorage
   function loadUserData() {
@@ -644,7 +956,7 @@
     localStorage.removeItem('userDataEFF');
     currentUserData = null;
     updateNavbarUI();
-    loadPastEvents(); 
+    loadPastEvents();
     alert('Logout effettuato.');
   }
 
@@ -653,29 +965,31 @@
   // Gestione menu mobile (hamburger)
   const mobileMenuEl = gebi("mobileMenu"); const hamburgerButton = gebi("hamburgerBtn"); function toggleMobileMenu() { if (mobileMenuEl && hamburgerButton) { const iO = mobileMenuEl.classList.toggle("open"); hamburgerButton.classList.toggle("open"); hamburgerButton.setAttribute("aria-expanded", String(iO)); document.body.style.overflow = iO ? "hidden" : ""; } } function closeMobileMenu() { if (mobileMenuEl && hamburgerButton && mobileMenuEl.classList.contains("open")) { mobileMenuEl.classList.remove("open"); hamburgerButton.classList.remove("open"); hamburgerButton.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; } }
   if (hamburgerButton) hamburgerButton.addEventListener("click", toggleMobileMenu);
-  document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobileLogoutLink') { l.addEventListener("click", closeMobileMenu); }}); 
-  document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) closeMobileMenu(); }); 
+  document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobileLogoutLink') { l.addEventListener("click", closeMobileMenu); }});
+  document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) closeMobileMenu(); });
   // Gestione dropdown utente
   const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iS = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iS ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iS)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl && userDropdownMenuEl.style.display === 'block' && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
-  
+
   // Elementi del DOM per il popup di login/registrazione
-  const loginOverlayEl = gebi("loginOverlay"); const loginPopupEl = gebi("loginPopup"); const closePopupBtnEl = gebi("closeLoginPopupBtn"); const loginTabsEls = document.querySelectorAll(".login-tab"); const loginFormsEls = document.querySelectorAll("#loginPopup .login-form"); 
+  const loginOverlayEl = gebi("loginOverlay"); const loginPopupEl = gebi("loginPopup"); const closePopupBtnEl = gebi("closeLoginPopupBtn"); const loginTabsEls = document.querySelectorAll(".login-tab"); const loginFormsEls = document.querySelectorAll("#loginPopup .login-form");
   const loginErrorMessagePopupEl = gebi('login-error-message-popup'); const registerErrorMessagePopupEl = gebi('register-error-message-popup');
 
   function isAnyPopupActive() {
     const isActive = (el) => el && (el.classList.contains('active') || window.getComputedStyle(el).display !== 'none');
-    return isActive(loginPopupEl) || 
-           isActive(gebi('forgotPasswordPopup')) || 
-           isActive(gebi('loginRequiredPopup')) || 
-           isActive(gebi('eventPopupAdmin')) ||
-           (globalFlyerOverlayEff && globalFlyerOverlayEff.classList.contains('active'));
+    return isActive(loginPopupEl) ||
+            isActive(gebi('forgotPasswordPopup')) ||
+            isActive(gebi('loginRequiredPopup')) ||
+            isActive(gebi('dashAdminEventPopup')) ||
+            (globalFlyerOverlayEff && globalFlyerOverlayEff.classList.contains('active')) ||
+            (customConfirmOverlayEl && customConfirmOverlayEl.classList.contains('active'));
   }
+
   function openLoginPopup() {
-    if(gebi('loginRequiredPopup')?.classList.contains('active')) closeLoginRequiredPopup(); 
+    if(gebi('loginRequiredPopup')?.classList.contains('active')) closeLoginRequiredPopup();
     if (loginOverlayEl) loginOverlayEl.classList.add("active");
     if (loginPopupEl) loginPopupEl.classList.add("active");
-    document.body.style.overflow = "hidden"; 
-    resetFormErrors(); 
+    document.body.style.overflow = "hidden";
+    resetFormErrors();
     const loginTabToActivate = loginPopupEl.querySelector('.login-tab[data-tab="login"]');
     if (loginTabToActivate) loginTabToActivate.click();
     const firstInput = loginPopupEl.querySelector('#login-email-popup');
@@ -697,7 +1011,7 @@
   gebi("login-btn-desktop")?.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); });
   gebi("login-btn-mobile")?.addEventListener("click", (e) => { e.preventDefault(); openLoginPopup(); closeMobileMenu(); });
   if (closePopupBtnEl) closePopupBtnEl.addEventListener("click", closeLoginPopup);
-  if (loginOverlayEl) loginOverlayEl.addEventListener("click", (e) => { if (e.target === loginOverlayEl) closeLoginPopup(); }); 
+  if (loginOverlayEl) loginOverlayEl.addEventListener("click", (e) => { if (e.target === loginOverlayEl) closeLoginPopup(); });
 
   loginTabsEls.forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -708,10 +1022,10 @@
         form.classList.remove("active");
         if (form.id === `${tabId}FormPopup`) {
           form.classList.add("active");
-          form.querySelector('input:not([type="hidden"])')?.focus(); 
+          form.querySelector('input:not([type="hidden"])')?.focus();
         }
       });
-      resetFormErrors(); 
+      resetFormErrors();
     });
   });
 
@@ -727,14 +1041,14 @@
 
   function openForgotPasswordPopup() {
     if (typeof closeLoginPopup === 'function' && loginPopupEl?.classList.contains('active')) {
-      closeLoginPopup(); 
+      closeLoginPopup();
     }
     if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active');
     if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active');
     document.body.style.overflow = 'hidden';
-    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; 
+    if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
     const forgotEmailInput = document.getElementById('forgot-email');
-    if(forgotEmailInput) forgotEmailInput.focus(); 
+    if(forgotEmailInput) forgotEmailInput.focus();
   }
 
   function closeForgotPasswordPopup() {
@@ -744,7 +1058,7 @@
       document.body.style.overflow = '';
     }
     if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none';
-    if(forgotPasswordForm) forgotPasswordForm.reset(); 
+    if(forgotPasswordForm) forgotPasswordForm.reset();
   }
 
   if (forgotPasswordLink) {
@@ -761,7 +1075,7 @@
       e.preventDefault();
       if (forgotPasswordMessage) {
         forgotPasswordMessage.style.display = 'none';
-        forgotPasswordMessage.className = 'form-message'; 
+        forgotPasswordMessage.className = 'form-message';
       }
       const emailInput = document.getElementById('forgot-email');
       const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]');
@@ -780,7 +1094,7 @@
         if (result.success) {
           forgotPasswordMessage.textContent = result.message;
           forgotPasswordMessage.classList.add('success');
-          if(emailInput) emailInput.value = ''; 
+          if(emailInput) emailInput.value = '';
         } else {
           forgotPasswordMessage.textContent = result.message || "Si è verificato un errore.";
           forgotPasswordMessage.classList.add('error');
@@ -801,37 +1115,391 @@
   function closeLoginRequiredPopup() { if (loginRequiredOverlayEl) loginRequiredOverlayEl.classList.remove("active"); if (loginRequiredPopupEl) loginRequiredPopupEl.classList.remove("active"); if (!isAnyPopupActive()) { document.body.style.overflow = ""; } }
   if (closeLoginRequiredPopupBtnEl) closeLoginRequiredPopupBtnEl.addEventListener("click", closeLoginRequiredPopup);
   if (loginRequiredOverlayEl) loginRequiredOverlayEl.addEventListener("click", (e) => { if (e.target === loginRequiredOverlayEl) closeLoginRequiredPopup(); });
-  if (loginRequiredLoginBtnEl) { loginRequiredLoginBtnEl.addEventListener("click", () => { closeLoginRequiredPopup(); openLoginPopup(); }); } 
+  if (loginRequiredLoginBtnEl) { loginRequiredLoginBtnEl.addEventListener("click", () => { closeLoginRequiredPopup(); openLoginPopup(); }); }
 
-  const eventPopupOverlayAdminEl = gebi('eventPopupOverlayAdmin'); const eventPopupAdminEl = gebi('eventPopupAdmin'); const closeEventPopupBtnAdminEl = gebi('closeEventPopupBtnAdmin'); const editPastEventFormAdminEl = gebi('editPastEventFormAdmin'); const eventPopupTitleAdminEl = gebi('eventPopupTitleAdmin'); const adminEventIdInput = gebi('admin-event-id'); const adminVoluntaryCheckbox = gebi('admin-event-voluntary'); const adminPriceContainer = gebi('admin-event-price-container'); const adminEventPriceInput = gebi('admin-event-price'); const editPastEventFormMessageAdminEl = gebi('editPastEventFormMessageAdmin'); const adminCurrentImagePreview = gebi('current-event-image-preview'); const adminCurrentFlyerPreview = gebi('current-event-flyer-preview');
-  function updateAdminPriceFieldVisibility() { if (adminVoluntaryCheckbox && adminPriceContainer && adminEventPriceInput) { const isVoluntary = adminVoluntaryCheckbox.checked; adminPriceContainer.style.display = isVoluntary ? 'none' : 'block'; adminEventPriceInput.required = !isVoluntary; if (isVoluntary) adminEventPriceInput.value = ''; } } if (adminVoluntaryCheckbox) adminVoluntaryCheckbox.addEventListener('change', updateAdminPriceFieldVisibility);
-  function openEditPastEventPopup(eventData) { if (!currentUserData || !currentUserData.isAdmin) return; if (!editPastEventFormAdminEl || !eventPopupAdminEl || !eventPopupOverlayAdminEl) return; editPastEventFormAdminEl.reset(); if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.style.display = 'none'; editPastEventFormMessageAdminEl.className = 'form-message'; } if(adminCurrentImagePreview) { adminCurrentImagePreview.style.display = 'none'; adminCurrentImagePreview.src = '#';} if(adminCurrentFlyerPreview) adminCurrentFlyerPreview.innerHTML = ''; if(eventPopupTitleAdminEl) eventPopupTitleAdminEl.textContent = 'Modifica Evento Passato'; if(adminEventIdInput) adminEventIdInput.value = eventData.idevento; gebi('admin-event-title').value = eventData.titolo || ''; gebi('admin-event-date').value = eventData.datainizio ? eventData.datainizio.substring(0,10) : ''; gebi('admin-event-time').value = eventData.durata || ''; gebi('admin-event-short-desc').value = eventData.descrizione || ''; gebi('admin-event-long-desc').value = eventData.descrizione_estesa || ''; gebi('admin-event-prefix').value = eventData.prefisso_relatore || ''; gebi('admin-event-speaker').value = eventData.relatore || ''; gebi('admin-event-association').value = eventData.associazione || ''; gebi('admin-event-seats').value = eventData.posti_disponibili !== null ? eventData.posti_disponibili : ''; gebi('admin-event-booking').checked = !!eventData.flagprenotabile; if(adminVoluntaryCheckbox) adminVoluntaryCheckbox.checked = parseFloat(eventData.costo) === 0.00; updateAdminPriceFieldVisibility(); if (adminEventPriceInput && !adminVoluntaryCheckbox.checked && eventData.costo && parseFloat(eventData.costo) > 0) { adminEventPriceInput.value = parseFloat(eventData.costo).toFixed(2); } else if (adminEventPriceInput) { adminEventPriceInput.value = ''; } if (adminCurrentImagePreview && eventData.immagine_url) { adminCurrentImagePreview.src = eventData.immagine_url; adminCurrentImagePreview.style.display = 'block'; } if (adminCurrentFlyerPreview && eventData.volantino_url) { const fileName = eventData.volantino_url.split('/').pop(); adminCurrentFlyerPreview.innerHTML = `<p>Volantino attuale: <a href="${eventData.volantino_url}" target="_blank">${fileName}</a></p>`; } eventPopupOverlayAdminEl.style.display = 'block'; eventPopupAdminEl.style.display = 'block'; setTimeout(() => { eventPopupOverlayAdminEl.classList.add('active'); eventPopupAdminEl.classList.add('active'); }, 10); document.body.style.overflow = 'hidden'; gebi('admin-event-title').focus(); }
-  function closeEditPastEventPopup() { if (!eventPopupAdminEl || !eventPopupOverlayAdminEl) return; eventPopupOverlayAdminEl.classList.remove('active'); eventPopupAdminEl.classList.remove('active'); setTimeout(() => { eventPopupOverlayAdminEl.style.display = 'none'; eventPopupAdminEl.style.display = 'none'; if (!isAnyPopupActive()) { document.body.style.overflow = ''; } }, 300); }
-  if (closeEventPopupBtnAdminEl) closeEventPopupBtnAdminEl.addEventListener('click', closeEditPastEventPopup); if (eventPopupOverlayAdminEl) eventPopupOverlayAdminEl.addEventListener('click', (e) => { if (e.target === eventPopupOverlayAdminEl) closeEditPastEventPopup(); });
-  editPastEventFormAdminEl?.addEventListener('submit', async function(e) { e.preventDefault(); if (!currentUserData || !currentUserData.isAdmin) return; const submitBtn = this.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML; submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...'; if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.style.display = 'none'; editPastEventFormMessageAdminEl.className = 'form-message'; } try { const formData = new FormData(this); formData.append('action', 'update_event'); const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData }); const responseText = await response.text(); let result; try { result = JSON.parse(responseText); } catch (jsonError) { throw new Error(`Risposta non JSON: ${responseText.substring(0,200)}`); } if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`); if (result.success) { if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.textContent = result.message || 'Evento aggiornato!'; editPastEventFormMessageAdminEl.classList.add('success'); } loadPastEvents(); setTimeout(closeEditPastEventPopup, 1500); } else { throw new Error(result.message || 'Errore aggiornamento.'); } } catch (error) { if(editPastEventFormMessageAdminEl) { editPastEventFormMessageAdminEl.textContent = `Errore: ${error.message}`; editPastEventFormMessageAdminEl.classList.add('error'); } } finally { if(editPastEventFormMessageAdminEl) editPastEventFormMessageAdminEl.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } });
+  // NUOVE FUNZIONI PER POPUP MODALE ADMIN
+  function initializeDashAdminEventPopupHandlers() {
+    dashAdminEventPopupOverlayEl = gebi('dashAdminEventPopupOverlay');
+    dashAdminEventPopupEl = gebi('dashAdminEventPopup');
+    closeDashAdminEventPopupBtnEl = gebi('closeDashAdminEventPopupBtn');
+    dashAdminEventFormEl = gebi('dashAdminEventForm');
+    dashAdminEventPopupTitleEl = gebi('dashAdminEventPopupTitle');
+    dashAdminEventIdInputEl = gebi('dashAdmin-event-id');
+    dashAdminEventTitleEl = gebi('dashAdmin-event-title');
+    dashAdminEventDateEl = gebi('dashAdmin-event-date');
+    dashAdminEventStartTimeEl = gebi('dashAdmin-event-start-time');
+    dashAdminEventEndTimeEl = gebi('dashAdmin-event-end-time');
+    dashAdminEventShortDescEl = gebi('dashAdmin-event-short-desc');
+    dashAdminEventLongDescEl = gebi('dashAdmin-event-long-desc');
+    dashAdminEventPrefixEl = gebi('dashAdmin-event-prefix');
+    dashAdminEventSpeakerEl = gebi('dashAdmin-event-speaker');
+    dashAdminEventAssociationEl = gebi('dashAdmin-event-association');
+    dashAdminEventSeatsEl = gebi('dashAdmin-event-seats');
+    dashAdminEventImageEl = gebi('dashAdmin-event-image');
+    dashAdminEventFlyerEl = gebi('dashAdmin-event-flyer');
+    dashAdminEventBookingCheckbox = gebi('dashAdmin-event-booking');
+    dashAdminEventVoluntaryCheckbox = gebi('dashAdmin-event-voluntary');
+    dashAdminEventPriceContainerEl = gebi('dashAdmin-event-price-container');
+    dashAdminEventPriceInputEl = gebi('dashAdmin-event-price');
+    dashAdminEventFormMessageEl = gebi('dashAdminEventFormMessage');
+    dashAdminCurrentImagePreviewEl = gebi('dashAdmin-current-event-image-preview');
+    dashAdminCurrentFlyerPreviewEl = gebi('dashAdmin-current-event-flyer-preview');
+
+    dashAdminPreviewImageEl = gebi('dashAdmin_previewImage');
+    dashAdminPreviewNoImagePlaceholderEl = document.querySelector('#dashAdminEventCardPreviewContainer .dash-admin-no-image-placeholder');
+    dashAdminPreviewTitleEl = gebi('dashAdmin_previewTitle');
+    dashAdminPreviewDateFullEl = gebi('dashAdmin_previewDateFull').querySelector('.value');
+    dashAdminPreviewTimeFullEl = gebi('dashAdmin_previewTimeFull');
+    dashAdminPreviewTimeValueEl = gebi('dashAdmin_previewTimeFull').querySelector('.value');
+    dashAdminPreviewSpeakerFullEl = gebi('dashAdmin_previewSpeakerFull');
+    dashAdminPreviewSpeakerPrefixEl = gebi('dashAdmin_previewSpeakerPrefix');
+    dashAdminPreviewSpeakerNameEl = gebi('dashAdmin_previewSpeakerName');
+    dashAdminPreviewShortDescEl = gebi('dashAdmin_previewShortDesc');
+    dashAdminPreviewSeatsFullEl = gebi('dashAdmin_previewSeatsFull').querySelector('.value');
+    dashAdminPreviewPriceFullEl = gebi('dashAdmin_previewPriceFull').querySelector('.value');
+
+    customConfirmOverlayEl = gebi('customConfirmOverlay');
+    customConfirmModalEl = gebi('customConfirmModal');
+    customConfirmTitleEl = gebi('customConfirmTitle');
+    customConfirmMessageEl = gebi('customConfirmMessage');
+    customConfirmYesBtn = gebi('customConfirmYes');
+    customConfirmNoBtn = gebi('customConfirmNo');
+
+    if (closeDashAdminEventPopupBtnEl) closeDashAdminEventPopupBtnEl.addEventListener('click', () => tryCloseDashAdminEventPopup());
+    if (dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.addEventListener('click', (e) => { if (e.target === dashAdminEventPopupOverlayEl) tryCloseDashAdminEventPopup(); });
+    if (dashAdminEventVoluntaryCheckbox) dashAdminEventVoluntaryCheckbox.addEventListener('change', updateDashAdminPriceFieldVisibility);
+
+    attachDashAdminPreviewListeners();
+    dashAdminEventFormEl?.addEventListener('submit', handleAdminEventFormSubmit);
+    if (customConfirmYesBtn) customConfirmYesBtn.addEventListener('click', () => handleConfirm(true));
+    if (customConfirmNoBtn) customConfirmNoBtn.addEventListener('click', () => handleConfirm(false));
+    if (customConfirmOverlayEl) customConfirmOverlayEl.addEventListener('click', (e) => {
+      if (e.target === customConfirmOverlayEl) handleConfirm(false);
+    });
+  }
+
+  function getAdminEventFormData(form) {
+    const formData = new FormData(form);
+    const data = {};
+    for (const [key, value] of formData.entries()) {
+      const element = form.elements[key];
+      if (element.type === 'checkbox') data[key] = element.checked;
+      else if (element.type === 'file') data[key] = element.files.length > 0 ? element.files[0].name : '';
+      else data[key] = value;
+    }
+    return data;
+  }
+
+  function compareAdminEventFormData(data1, data2) {
+    const keys1 = Object.keys(data1);
+    const keys2 = Object.keys(data2);
+    if (keys1.length !== keys2.length) return false;
+    for (let key of keys1) {
+      if (data1[key] !== data2[key]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function updateDashAdminPriceFieldVisibility() {
+    if (dashAdminEventVoluntaryCheckbox && dashAdminEventPriceContainerEl && dashAdminEventPriceInputEl) {
+      const isVoluntary = dashAdminEventVoluntaryCheckbox.checked;
+      dashAdminEventPriceContainerEl.style.display = isVoluntary ? 'none' : 'block';
+      dashAdminEventPriceInputEl.required = !isVoluntary;
+      if (isVoluntary) dashAdminEventPriceInputEl.value = '';
+      updateDashAdminEventPreview();
+    }
+  }
+
+  function sanitizeForAttribute(str) {
+    if (typeof str !== 'string' || str === null) return '';
+    return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+  }
+  function sanitizeText(text) {
+    if (text === null || typeof text === 'undefined') return '';
+    const element = document.createElement('div'); element.innerText = String(text); return element.innerHTML;
+  }
+
+  function openEditPastEventPopup(eventData = null) {
+    if (!dashAdminEventFormEl) return;
+    if(dashAdminEventPopupTitleEl) dashAdminEventPopupTitleEl.textContent = 'Modifica Evento Passato';
+    if (!eventData) return;
+
+    if(dashAdminEventIdInputEl) dashAdminEventIdInputEl.value = eventData.idevento;
+    dashAdminEventTitleEl.value = eventData.titolo || '';
+    dashAdminEventDateEl.value = eventData.datainizio ? eventData.datainizio.substring(0,10) : '';
+    let startTime = '', endTime = '';
+    const durata = eventData.durata || '';
+    if (durata.includes('-')) {
+      const parts = durata.split('-');
+      startTime = parts[0].trim().match(/^\d{2}:\d{2}/) ? parts[0].trim().substring(0,5) : '';
+      endTime = parts[1].trim().match(/^\d{2}:\d{2}/) ? parts[1].trim().substring(0,5) : '';
+    } else if (durata.match(/^\d{2}:\d{2}/)) {
+      startTime = durata.substring(0,5);
+    }
+    dashAdminEventStartTimeEl.value = startTime;
+    dashAdminEventEndTimeEl.value = endTime;
+    dashAdminEventShortDescEl.value = eventData.descrizione || '';
+    dashAdminEventLongDescEl.value = eventData.descrizione_estesa || '';
+    dashAdminEventPrefixEl.value = eventData.prefisso_relatore || 'Relatore';
+    dashAdminEventSpeakerEl.value = eventData.relatore || '';
+    dashAdminEventAssociationEl.value = eventData.associazione || '';
+    dashAdminEventSeatsEl.value = eventData.posti_disponibili !== null ? eventData.posti_disponibili : '0';
+    dashAdminEventBookingCheckbox.checked = parseInt(eventData.flagprenotabile) === 1;
+    dashAdminEventVoluntaryCheckbox.checked = parseFloat(eventData.costo) === 0.00;
+    updateDashAdminPriceFieldVisibility();
+    if (!dashAdminEventVoluntaryCheckbox.checked && eventData.costo && parseFloat(eventData.costo) > 0) {
+      dashAdminEventPriceInputEl.value = parseFloat(eventData.costo).toFixed(2);
+    } else {
+      dashAdminEventPriceInputEl.value = '';
+    }
+    if (dashAdminCurrentImagePreviewEl && eventData.immagine_url) {
+      dashAdminCurrentImagePreviewEl.src = eventData.immagine_url;
+      dashAdminCurrentImagePreviewEl.style.display = 'block';
+    } else if (dashAdminCurrentImagePreviewEl) {
+      dashAdminCurrentImagePreviewEl.style.display = 'none';
+      dashAdminCurrentImagePreviewEl.src = '#';
+    }
+    if(dashAdminEventFlyerEl) dashAdminEventFlyerEl.value = '';
+    if (dashAdminCurrentFlyerPreviewEl && eventData.volantino_url) {
+      dashAdminCurrentFlyerPreviewEl.innerHTML = `<a href="${sanitizeForAttribute(eventData.volantino_url)}" target="_blank" title="Visualizza il volantino attuale">${sanitizeText(eventData.volantino_url.split('/').pop())}</a>`;
+    } else if (dashAdminCurrentFlyerPreviewEl) {
+      dashAdminCurrentFlyerPreviewEl.innerHTML = `<span>Nessun volantino caricato.</span>`;
+    }
+    updateDashAdminEventPreview();
+    storeInitialFormData();
+
+    if(dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.classList.add('active');
+    if(dashAdminEventPopupEl) dashAdminEventPopupEl.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    if(dashAdminEventTitleEl) dashAdminEventTitleEl.focus();
+  }
+
+  function storeInitialFormData() {
+    if (dashAdminEventFormEl) {
+      initialAdminEventFormData = getAdminEventFormData(dashAdminEventFormEl);
+      isEventFormDirty = false;
+    }
+  }
+
+  async function tryCloseDashAdminEventPopup() {
+    const currentFormData = getAdminEventFormData(dashAdminEventFormEl);
+    const imageFileChanged = dashAdminEventImageEl.files.length > 0 && initialAdminEventFormData['event-image'] !== dashAdminEventImageEl.files[0].name;
+    const flyerFileChanged = dashAdminEventFlyerEl.files.length > 0 && initialAdminEventFormData['event-flyer'] !== dashAdminEventFlyerEl.files[0].name;
+
+    isEventFormDirty = !compareAdminEventFormData(initialAdminEventFormData, currentFormData) || imageFileChanged || flyerFileChanged;
+
+    if (isEventFormDirty) {
+      const confirmed = await showCustomConfirm(
+              "Conferma Uscita",
+              "Hai modifiche non salvate. Sei sicuro di voler uscire senza salvare?",
+              "Esci",
+              "Annulla"
+      );
+      if (confirmed) {
+        closeDashAdminEventPopup_actual();
+      }
+      return;
+    }
+    closeDashAdminEventPopup_actual();
+  }
+
+  function closeDashAdminEventPopup_actual() {
+    if(dashAdminEventPopupOverlayEl) dashAdminEventPopupOverlayEl.classList.remove('active');
+    if(dashAdminEventPopupEl) dashAdminEventPopupEl.classList.remove('active');
+    if (!isAnyPopupActive()) document.body.style.overflow = '';
+    isEventFormDirty = false;
+    dashAdminEventFormEl.reset();
+  }
+
+  function updateDashAdminEventPreview() {
+    if (!dashAdminPreviewTitleEl) return;
+    dashAdminPreviewTitleEl.textContent = dashAdminEventTitleEl.value || 'Titolo Evento';
+    const dateValue = dashAdminEventDateEl.value;
+    dashAdminPreviewDateFullEl.textContent = dateValue ? formatSimpleDateForPreview(dateValue) : 'Seleziona data';
+    const startTimeValue = dashAdminEventStartTimeEl.value;
+    const endTimeValue = dashAdminEventEndTimeEl.value;
+    let timeString = '';
+    if (startTimeValue && endTimeValue) timeString = `${startTimeValue}-${endTimeValue}`;
+    else if (startTimeValue) timeString = startTimeValue;
+    if (timeString && dashAdminPreviewTimeFullEl && dashAdminPreviewTimeValueEl) {
+      dashAdminPreviewTimeFullEl.style.display = 'block';
+      dashAdminPreviewTimeValueEl.textContent = timeString;
+    } else if (dashAdminPreviewTimeFullEl && dashAdminPreviewTimeValueEl) {
+      dashAdminPreviewTimeFullEl.style.display = 'none';
+      dashAdminPreviewTimeValueEl.textContent = '';
+    }
+    dashAdminPreviewSpeakerPrefixEl.textContent = dashAdminEventPrefixEl.value || 'Relatore';
+    dashAdminPreviewSpeakerNameEl.textContent = dashAdminEventSpeakerEl.value || 'Nome Relatore';
+    dashAdminPreviewShortDescEl.textContent = dashAdminEventShortDescEl.value || 'Descrizione breve dell\'evento qui...';
+    dashAdminPreviewSeatsFullEl.textContent = dashAdminEventSeatsEl.value || '0';
+    const isVoluntary = dashAdminEventVoluntaryCheckbox.checked;
+    if (isVoluntary) dashAdminPreviewPriceFullEl.textContent = 'Offerta libera';
+    else {
+      const priceValue = parseFloat(dashAdminEventPriceInputEl.value);
+      dashAdminPreviewPriceFullEl.textContent = !isNaN(priceValue) && priceValue > 0 ? `€ ${priceValue.toFixed(2)}` : '€ 0.00';
+    }
+    const imageInput = dashAdminEventImageEl;
+    if (imageInput.files && imageInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        dashAdminPreviewImageEl.src = e.target.result;
+        dashAdminPreviewImageEl.style.display = 'block';
+        if(dashAdminPreviewNoImagePlaceholderEl) dashAdminPreviewNoImagePlaceholderEl.style.display = 'none';
+      }
+      reader.readAsDataURL(imageInput.files[0]);
+    } else if (dashAdminCurrentImagePreviewEl && dashAdminCurrentImagePreviewEl.src !== '#' && dashAdminCurrentImagePreviewEl.style.display !== 'none') {
+      dashAdminPreviewImageEl.src = dashAdminCurrentImagePreviewEl.src;
+      dashAdminPreviewImageEl.style.display = 'block';
+      if(dashAdminPreviewNoImagePlaceholderEl) dashAdminPreviewNoImagePlaceholderEl.style.display = 'none';
+    } else {
+      dashAdminPreviewImageEl.src = 'images/default-event.jpg';
+      dashAdminPreviewImageEl.style.display = 'block';
+      if(dashAdminPreviewNoImagePlaceholderEl) dashAdminPreviewNoImagePlaceholderEl.style.display = 'none';
+    }
+  }
+
+  function attachDashAdminPreviewListeners() {
+    const formElementsToWatch = [
+      'dashAdmin-event-title', 'dashAdmin-event-date', 'dashAdmin-event-start-time', 'dashAdmin-event-end-time',
+      'dashAdmin-event-short-desc', 'dashAdmin-event-prefix', 'dashAdmin-event-speaker', 'dashAdmin-event-seats',
+      'dashAdmin-event-price', 'dashAdmin-event-voluntary', 'dashAdmin-event-image', 'dashAdmin-event-long-desc'
+    ];
+    formElementsToWatch.forEach(id => {
+      const element = gebi(id);
+      if (element) {
+        element.addEventListener('input', updateDashAdminEventPreview);
+        if (element.type === 'checkbox' || element.type === 'file' || element.type === 'date' || element.type === 'time') {
+          element.addEventListener('change', updateDashAdminEventPreview);
+        }
+      }
+    });
+    if (dashAdminEventFlyerEl && dashAdminCurrentFlyerPreviewEl) {
+      dashAdminEventFlyerEl.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          dashAdminCurrentFlyerPreviewEl.innerHTML = `<a href="${URL.createObjectURL(this.files[0])}" target="_blank" title="Visualizza il volantino selezionato">${sanitizeText(this.files[0].name)}</a>`;
+        } else if (!dashAdminEventIdInputEl.value) {
+          dashAdminCurrentFlyerPreviewEl.innerHTML = '<span>Nessun volantino caricato.</span>';
+        }
+      });
+    }
+  }
+
+  async function handleAdminEventFormSubmit(e) {
+    e.preventDefault();
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true; submitBtn.innerHTML = '<div class="spinner-mini"></div>Salvataggio...';
+    if(dashAdminEventFormMessageEl) { dashAdminEventFormMessageEl.style.display = 'none'; dashAdminEventFormMessageEl.className = 'form-message';}
+    try {
+      const formData = new FormData(this);
+      formData.append('action', formData.get('event-id') ? 'update_event' : 'add_event');
+      const startTime = formData.get('event-start-time'); const endTime = formData.get('event-end-time');
+      let durataString = '';
+      if (startTime && endTime) durataString = `${startTime}-${endTime}`;
+      else if (startTime) durataString = startTime;
+      formData.append('event-time', durataString);
+      formData.delete('event-start-time'); formData.delete('event-end-time');
+      if (dashAdminEventVoluntaryCheckbox.checked) formData.set('event-price', '0.00');
+      else if (!formData.get('event-price')) formData.set('event-price', '0.00');
+
+      const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+      const responseText = await response.text();
+      let result; try { result = JSON.parse(responseText); }
+      catch (jsonError) { throw new Error(`Risposta non JSON dal server: ${responseText.substring(0,200)}`); }
+      if (!response.ok) throw new Error(result.message || `Errore server: ${response.status}`);
+      if (result.success) {
+        if(dashAdminEventFormMessageEl) {
+          dashAdminEventFormMessageEl.textContent = result.message || 'Operazione completata!';
+          dashAdminEventFormMessageEl.classList.add('success');
+          dashAdminEventFormMessageEl.style.display = 'block';
+        }
+        loadPastEvents();
+        isEventFormDirty = false;
+        setTimeout(closeDashAdminEventPopup_actual, 1500);
+      } else { throw new Error(result.message || 'Errore durante il salvataggio dell\'evento.'); }
+    } catch (error) {
+      console.error('Errore invio form evento admin (stile dashboard):', error);
+      if(dashAdminEventFormMessageEl) {
+        dashAdminEventFormMessageEl.textContent = `Errore: ${error.message}`;
+        dashAdminEventFormMessageEl.classList.add('error');
+        dashAdminEventFormMessageEl.style.display = 'block';
+      }
+    } finally {
+      submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText;
+    }
+  }
+
+  async function handleDeleteEvent(eventId) {
+    const eventToDelete = allPastEventsData.find(e => e.idevento == eventId);
+    const eventTitle = eventToDelete ? eventToDelete.titolo : "questo evento";
+
+    const userConfirmed = await showCustomConfirm(
+            "Conferma eliminazione",
+            `Sei sicuro di voler eliminare l'evento "${sanitizeForAttribute(eventTitle)}"? L'azione è irreversibile.`,
+            "Elimina",
+            "Annulla"
+    );
+
+    if (userConfirmed) {
+      const deleteButton = document.querySelector(`.btn-delete[data-event-id="${eventId}"]`);
+      let originalButtonHTML = '';
+      if(deleteButton) {
+        originalButtonHTML = deleteButton.innerHTML;
+        deleteButton.disabled = true;
+        deleteButton.innerHTML = '<div class="spinner-mini" style="border-top-color:white;"></div>';
+      }
+      try {
+        const formData = new FormData(); formData.append('action', 'delete_event'); formData.append('event_id', eventId);
+        const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+        const resText = await response.text();
+        let result; try { result = JSON.parse(resText); }
+        catch(e) { throw new Error("Risposta non JSON dal server (delete): "+resText.substring(0,100));}
+        if (!response.ok) throw new Error(result.message || `Errore HTTP ${response.status}`);
+        if (result.success) { console.log(result.message || 'Evento eliminato con successo.'); loadPastEvents(); }
+        else { throw new Error(result.message || 'Eliminazione fallita.'); }
+      } catch (error) {
+        console.error('Errore eliminazione evento:', error);
+        alert(`Errore durante l'eliminazione: ${error.message}`);
+      } finally {
+        if(deleteButton) { deleteButton.disabled = false; deleteButton.innerHTML = originalButtonHTML; }
+      }
+    }
+  }
+
 
   function formatDate(dateString) {
     if (!dateString) return "Data non disponibile";
     try {
       const normalizedDateString = dateString.length === 10 ? dateString + "T00:00:00Z" : dateString.replace(" ", "T") + (dateString.endsWith("Z") ? "" : "Z");
       const date = new Date(normalizedDateString);
-      if (isNaN(date.getTime())) { 
+      if (isNaN(date.getTime())) {
         if (/^\d{4}-\d{2}-\d{2}$/.test(dateString.substring(0,10))) {
           const parts = dateString.substring(0,10).split('-');
           const utcDate = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
           if (!isNaN(utcDate.getTime())) return utcDate.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
         }
-        return dateString; 
+        return dateString;
       }
-      return date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' }); 
+      return date.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: 'UTC' });
     } catch (e) {
-      return dateString; 
+      return dateString;
     }
   }
+  function formatSimpleDateForPreview(dateString) {
+    if (!dateString) return 'Seleziona data';
+    try {
+      const parts = dateString.split('-');
+      if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      return dateString;
+    } catch (e) { return dateString; }
+  }
+
 
   function populateYearFilter() {
     const currentYr = new Date().getFullYear();
-    let minYear = currentYr; 
+    let minYear = currentYr;
     if (allPastEventsData && allPastEventsData.length > 0) {
       allPastEventsData.forEach(event => {
         if (event.datainizio) {
@@ -842,10 +1510,10 @@
         }
       });
     } else {
-      minYear = currentYr - 4; 
+      minYear = currentYr - 4;
     }
     if (searchYearEl) {
-      searchYearEl.innerHTML = '<option value="">Tutti gli anni</option>'; 
+      searchYearEl.innerHTML = '<option value="">Tutti gli anni</option>';
       for (let y = currentYr; y >= minYear; y--) {
         const option = document.createElement('option');
         option.value = y;
@@ -857,21 +1525,6 @@
   }
 
   // === NUOVE FUNZIONI PER POPUP VOLANTINO E SANITIZZAZIONE ===
-  let globalFlyerOverlayEff = null;
-  let currentFlyerModalEff = null;
-
-  function sanitizeForAttribute(str) {
-    if (typeof str !== 'string' || str === null) return '';
-    return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-  }
-
-  function sanitizeText(text) {
-    if (text === null || typeof text === 'undefined') return '';
-    const element = document.createElement('div');
-    element.innerText = String(text);
-    return element.innerHTML;
-  }
-
   function initGlobalFlyerOverlay() {
     if (!document.getElementById('globalFlyerOverlayEff')) {
       const overlay = document.createElement('div');
@@ -942,31 +1595,43 @@
   function createPastEventCard(event) {
     const card = document.createElement("article");
     card.className = "card";
-    if (currentUserData && currentUserData.isAdmin) card.classList.add('admin-card'); 
+    if (currentUserData && currentUserData.isAdmin) card.classList.add('admin-card');
     card.dataset.title = event.titolo?.toLowerCase() || '';
     card.dataset.date = event.datainizio || '';
     card.dataset.speaker = event.relatore?.toLowerCase() || '';
 
-    let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event-past.jpg"; 
+    let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event-past.jpg";
 
     // --- NUOVA LOGICA PER LE "PILLOLE" INFORMATIVE ---
     let infoPillsHTML = '<div class="card-info-pills">';
     if (event.datainizio) {
-        infoPillsHTML += `<span class="info-pill"><i class="fas fa-calendar-alt"></i> ${formatDate(event.datainizio)}</span>`;
+      infoPillsHTML += `<span class="info-pill"><i class="fas fa-calendar-alt"></i> ${formatDate(event.datainizio)}</span>`;
     }
-    if (event.durata) {
-        infoPillsHTML += `<span class="info-pill"><i class="fas fa-clock"></i> ${sanitizeText(event.durata)}</span>`;
+    const durata = event.durata || '';
+    if (durata) {
+      const parts = durata.split('-');
+      let formattedDurata = '';
+      if (parts.length === 2 && parts[0].trim().match(/^\d{2}:\d{2}/) && parts[1].trim().match(/^\d{2}:\d{2}/)) {
+        formattedDurata = `${parts[0].trim()} - ${parts[1].trim()}`;
+      } else if (durata.trim().match(/^\d{2}:\d{2}/)) {
+        formattedDurata = durata.trim();
+      } else {
+        formattedDurata = sanitizeText(durata);
+      }
+      if (formattedDurata) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-clock"></i> ${formattedDurata}</span>`;
+      }
     }
     if (event.relatore) {
-        infoPillsHTML += `<span class="info-pill"><i class="fas fa-user"></i> ${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>`;
+      infoPillsHTML += `<span class="info-pill"><i class="fas fa-user"></i> ${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>`;
     }
     if (event.associazione) {
-        infoPillsHTML += `<span class="info-pill"><i class="fas fa-users"></i> ${sanitizeText(event.associazione)}</span>`;
+      infoPillsHTML += `<span class="info-pill"><i class="fas fa-users"></i> ${sanitizeText(event.associazione)}</span>`;
     }
     infoPillsHTML += '</div>';
     // --- FINE NUOVA LOGICA ---
 
-    if (currentUserData && currentUserData.isAdmin) { 
+    if (currentUserData && currentUserData.isAdmin) {
       let volantinoAdminLinkHTML = '';
       if (event.volantino_url && event.volantino_url.trim() !== "") { volantinoAdminLinkHTML = `<p class="card-info" style="font-size:0.9em;"><b>Volantino:</b> <a href="${sanitizeForAttribute(event.volantino_url)}" target="_blank">Visualizza volantino</a></p>`; }
       card.innerHTML = `
@@ -981,31 +1646,35 @@
             <button class="card-btn btn-delete card-btn-primary" data-event-id="${event.idevento}">Elimina</button>
           </div>
         </div>`;
-      card.querySelector('.btn-edit').addEventListener('click', function() { const eventToEdit = allPastEventsData.find(e => e.idevento == this.dataset.eventId); if (eventToEdit) openEditPastEventPopup(eventToEdit); else alert("Dettagli evento non trovati per la modifica."); });
-      card.querySelector('.btn-delete').addEventListener('click', async function() { const eventId = this.dataset.eventId; const eventToDelete = allPastEventsData.find(e => e.idevento == eventId); if (confirm(`Sei sicuro di voler eliminare l'evento "${eventToDelete?.titolo || "questo evento"}"? L'azione è irreversibile.`)) { const btn = this; const oldTxt = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<div class="spinner-mini" style="border-top-color:white;"></div>'; try { const fd = new FormData(); fd.append('action', 'delete_event'); fd.append('event_id', eventId); const r = await fetch('gestione_eventi.php', { method: 'POST', body: fd }); const rt = await r.text(); let res; try { res = JSON.parse(rt); } catch { throw new Error("Risposta non JSON dal server durante l'eliminazione."); } if (!r.ok || !res.success) throw new Error(res.message || "Eliminazione fallita."); alert(res.message || 'Evento eliminato con successo.'); loadPastEvents(); } catch (err) { alert(`Errore durante l'eliminazione: ${err.message}`); } finally { btn.disabled = false; btn.innerHTML = oldTxt; } } });
-    } else { 
+      card.querySelector('.btn-edit').addEventListener('click', function() {
+        const eventToEdit = allPastEventsData.find(e => e.idevento == this.dataset.eventId);
+        if (eventToEdit) openEditPastEventPopup(eventToEdit);
+        else alert("Dettagli evento non trovati per la modifica.");
+      });
+      card.querySelector('.btn-delete').addEventListener('click', async function() { handleDeleteEvent(this.dataset.eventId); });
+    } else {
       let volantinoBtnHTML = '';
       const sanitizedUrl = sanitizeForAttribute(event.volantino_url);
 
       if (event.volantino_url && event.volantino_url.trim() !== "") {
-          volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="${sanitizedUrl}">Volantino</button>`;
+        volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="${sanitizedUrl}">Volantino</button>`;
       } else {
-          volantinoBtnHTML = `<button class="card-btn card-btn-secondary" disabled title="Volantino non disponibile">Volantino</button>`;
+        volantinoBtnHTML = `<button class="card-btn card-btn-secondary" disabled title="Volantino non disponibile">Volantino</button>`;
       }
 
       let risorseBtnHTML = '';
       if (currentUserData) {
-          risorseBtnHTML = `<a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Risorse</a>`;
+        risorseBtnHTML = `<a href="evento_dettaglio_accesso.html?id=${event.idevento}" class="card-btn card-btn-primary">Risorse</a>`;
       } else {
-          risorseBtnHTML = `<a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Risorse</a>`;
+        risorseBtnHTML = `<a href="#" onclick="showLoginRequiredPopup(event); return false;" class="card-btn card-btn-primary">Risorse</a>`;
       }
 
       const actionsHTML = `${volantinoBtnHTML}${risorseBtnHTML}`;
-      
+
       card.innerHTML = `
         <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeText(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
         <div class="card-content">
-          <h3>${sanitizeText(event.titolo) || "Titolo N/D"}</h3>
+          <h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3>
           ${infoPillsHTML}
           <p class="card-description">${sanitizeText(event.descrizione) || "Nessuna descrizione breve disponibile."}</p>
           <div class="card-actions">${actionsHTML}</div>
@@ -1013,11 +1682,11 @@
 
       const viewFlyerBtn = card.querySelector(".btn-visualizza-volantino");
       if (viewFlyerBtn && !viewFlyerBtn.disabled) {
-          viewFlyerBtn.addEventListener("click", function() {
-              if (typeof showFlyerPopupEff === 'function') {
-                  showFlyerPopupEff(this.dataset.volantinoUrl);
-              }
-          });
+        viewFlyerBtn.addEventListener("click", function() {
+          if (typeof showFlyerPopupEff === 'function') {
+            showFlyerPopupEff(this.dataset.volantinoUrl);
+          }
+        });
       }
     }
     return card;
@@ -1025,21 +1694,21 @@
 
   async function loadPastEvents() {
     if (!eventiPassatiGridEl || !loadingIndicatorEl) return;
-    loadingIndicatorEl.classList.add("visible"); 
-    eventiPassatiGridEl.innerHTML = ""; 
+    loadingIndicatorEl.classList.add("visible");
+    eventiPassatiGridEl.innerHTML = "";
     try {
-      const response = await fetch("get_past_events.php"); 
+      const response = await fetch("get_past_events.php");
       if (!response.ok) throw new Error( `Errore HTTP: ${response.status} ${response.statusText}` );
       const result = await response.json();
       if (result.success && result.data) {
-        allPastEventsData = result.data; 
-        populateYearFilter(); 
-        filterEvents(); 
+        allPastEventsData = result.data;
+        populateYearFilter();
+        filterEvents();
       } else { throw new Error( result.message || "Errore nel caricamento degli eventi passati." ); }
     } catch (error) {
       if(eventiPassatiGridEl) eventiPassatiGridEl.innerHTML = `<p class="no-events error-message" style="text-align:center; padding:20px;">Errore durante il caricamento degli eventi. (${error.message}) <button onclick="loadPastEvents()" class="btn-popup" style="margin-top:10px;">Riprova</button></p>`;
     } finally {
-      if(loadingIndicatorEl) loadingIndicatorEl.classList.remove("visible"); 
+      if(loadingIndicatorEl) loadingIndicatorEl.classList.remove("visible");
     }
   }
 
@@ -1047,21 +1716,21 @@
     if (!eventiPassatiGridEl) return;
     const titleFilter = searchTitleEl ? searchTitleEl.value.toLowerCase().trim() : "";
     const monthFilter = searchMonthEl ? searchMonthEl.value : "";
-    const yearFilterStr = searchYearEl ? searchYearEl.value : ""; 
+    const yearFilterStr = searchYearEl ? searchYearEl.value : "";
     const speakerFilter = searchSpeakerEl ? searchSpeakerEl.value.toLowerCase().trim() : "";
 
-    eventiPassatiGridEl.innerHTML = ''; 
+    eventiPassatiGridEl.innerHTML = '';
     let visibleCardsCount = 0;
 
     const filteredEvents = allPastEventsData.filter(event => {
       const eventTitle = event.titolo?.toLowerCase() || "";
       const eventDateStr = event.datainizio || "";
-      let eventMatchesYear = (yearFilterStr === ""); 
-      let eventMatchesMonth = (monthFilter === ""); 
+      let eventMatchesYear = (yearFilterStr === "");
+      let eventMatchesMonth = (monthFilter === "");
 
       if (eventDateStr) {
         const eventYear = parseInt(eventDateStr.substring(0, 4));
-        const eventMonthNum = eventDateStr.substring(5, 7); 
+        const eventMonthNum = eventDateStr.substring(5, 7);
 
         if (yearFilterStr !== "" && !isNaN(eventYear) && eventYear === parseInt(yearFilterStr)) {
           eventMatchesYear = true;
@@ -1091,7 +1760,7 @@
       p.className = "no-events";
       if (allPastEventsData.length === 0 && !titleFilter && !monthFilter && !yearFilterStr && !speakerFilter) {
         p.textContent = "Nessun evento passato trovato in archivio.";
-      } else if (titleFilter || monthFilter || yearFilterStr || speakerFilter) { 
+      } else if (titleFilter || monthFilter || yearFilterStr || speakerFilter) {
         p.textContent = "Nessun evento passato corrisponde ai criteri di ricerca.";
       }
       if (p.textContent) eventiPassatiGridEl.appendChild(p);
@@ -1103,16 +1772,13 @@
       console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in eventipassati.html.");
       return;
     }
-
-    const defaultLogoPath = 'images/Logo_eremo.png'; 
-
+    const defaultLogoPath = 'images/Logo_eremo.png';
     try {
-      const response = await fetch('api_get_page_content.php?page=index'); 
+      const response = await fetch('api_get_page_content.php?page=index');
       if (!response.ok) {
         throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
       }
       const data = await response.json();
-
       if (data.success && data.contents && data.contents.navbarLogo) {
         logoImgTag.src = data.contents.navbarLogo;
       } else {
@@ -1121,41 +1787,43 @@
       }
     } catch (error) {
       console.error("Errore nel caricare dinamicamente il logo navbar:", error);
-      logoImgTag.src = defaultLogoPath; 
+      logoImgTag.src = defaultLogoPath;
     }
   }
 
 
   document.addEventListener("DOMContentLoaded", async () => {
-    const currentYearEl = gebi("currentYear"); 
+    const currentYearEl = gebi("currentYear");
     if(currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 
     initGlobalFlyerOverlay(); // Inizializza il popup del volantino
-    loadUserData(); 
-    await fetchAndUpdateUserDisplayData(); 
-    await loadNavbarLogo(); 
+    loadUserData();
+    await fetchAndUpdateUserDisplayData();
+    await loadNavbarLogo();
     searchTitleEl?.addEventListener("input", filterEvents);
     searchMonthEl?.addEventListener("change", filterEvents);
     searchYearEl?.addEventListener("change", filterEvents);
     searchSpeakerEl?.addEventListener("input", filterEvents);
+    initializeDashAdminEventPopupHandlers();
 
-    await loadPastEvents(); 
+    await loadPastEvents();
 
     gebi('dropdownLogout')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
     gebi('mobileLogoutLink')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenu(); });
 
-    document.addEventListener("keydown", (event) => {
+    document.addEventListener("keydown", async (event) => {
       if (event.key === "Escape") {
         if (loginPopupEl?.classList.contains("active")) closeLoginPopup();
         if (gebi('forgotPasswordPopup')?.classList.contains("active")) closeForgotPasswordPopup();
-        if (loginRequiredPopupEl?.classList.contains("active")) closeLoginRequiredPopup();
-        if (eventPopupAdminEl?.classList.contains("active")) closeEditPastEventPopup();
-        if (globalFlyerOverlayEff?.classList.contains("active")) hideFlyerPopupEff(); // Gestisce ESC per il popup volantino
+        if (gebi('loginRequiredPopup')?.classList.contains("active")) closeLoginRequiredPopup();
+        if (globalFlyerOverlayEff?.classList.contains("active")) hideFlyerPopupEff();
+        if (gebi('dashAdminEventPopup')?.classList.contains("active")) await tryCloseDashAdminEventPopup();
+        if (customConfirmOverlayEl?.classList.contains('active')) handleConfirm(false);
       }
     });
 
-    if (currentUserData && currentUserData.isAdmin && typeof updateAdminPriceFieldVisibility === 'function') {
-      updateAdminPriceFieldVisibility();
+    if (currentUserData && currentUserData.isAdmin && typeof updateDashAdminPriceFieldVisibility === 'function') {
+      updateDashAdminPriceFieldVisibility();
     }
   });
 </script>
