@@ -1475,7 +1475,8 @@ function renderEventsSection(events, gridContainerId, isUpcoming, groupBy, sortD
 }
 
 function createAdminEventCard(event) {
-    const eventCard = document.createElement('article'); eventCard.className = 'admin-event-card';
+    const eventCard = document.createElement('article');
+    eventCard.className = 'admin-event-card';
     const eventId = event.IDEvento || event.idevento;
     eventCard.id = `admin-event-${eventId}`;
 
@@ -1486,11 +1487,24 @@ function createAdminEventCard(event) {
     const mediaCount = event.media_count || 0;
 
     let imageSrc = (event.immagine_url && event.immagine_url.trim() !== '') ? event.immagine_url : 'images/default-event-admin.jpg';
-    const relatoreDisplay = event.relatore ? `<span class="admin-event-date" style="display:block; margin-top:2px; font-style:italic;">${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>` : '';
     const eventTitle = event.Titolo || event.titolo || "Titolo sconosciuto";
     const eventDate = event.Data || event.datainizio;
     const eventDurata = event.Durata || event.durata || '';
 
+    // --- NUOVA SEZIONE PER LE PILLOLE INFORMATIVE ---
+    let infoPillsHTML = '<div class="card-info-pills">';
+    if (eventDate) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-calendar-alt"></i> ${formatDbDate(eventDate)}</span>`;
+    }
+    if (eventDurata) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-clock"></i> ${sanitizeText(eventDurata)}</span>`;
+    }
+    if (event.relatore) {
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-user"></i> ${sanitizeText(event.prefisso_relatore) || 'Relatore'}: ${sanitizeText(event.relatore)}</span>`;
+    }
+    infoPillsHTML += '</div>';
+
+    // --- HTML DELLA CARD AGGIORNATO ---
     eventCard.innerHTML = `
         <div class="admin-event-card-image-container">
             <img src="${imageSrc}" alt="Copertina: ${sanitizeText(eventTitle)}" class="admin-event-card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';">
@@ -1498,14 +1512,13 @@ function createAdminEventCard(event) {
         <div class="admin-event-card-content">
             <div class="admin-event-card-header">
                 <h3 class="admin-event-title">${sanitizeText(eventTitle)} <small>(ID: ${eventId})</small></h3>
-                <span class="admin-event-date">Data: ${formatDbDate(eventDate)} ${sanitizeText(eventDurata)}</span>
-                ${relatoreDisplay}
             </div>
+            ${infoPillsHTML}
             <div class="admin-event-card-quick-stats">
-                <div class="stat-item" title="Prenotazioni"><i class="fas fa-ticket-alt"></i> ${numPrenotazioni} Pren.</div>
+                <div class="stat-item" title="Prenotazioni"><i class="fas fa-ticket-alt"></i> ${numPrenotazioni} Prenotazioni</div>
                 <div class="stat-item" title="Partecipanti / Posti Config."><i class="fas fa-users"></i> ${partecipanti}/${postiConfigurati}</div>
                 <div class="stat-item" title="Media"><i class="fas fa-photo-video"></i> ${mediaCount} Media</div>
-                <div class="stat-item" title="Commenti"><i class="fas fa-comments"></i> ${commentCount} Comm.</div>
+                <div class="stat-item" title="Commenti"><i class="fas fa-comments"></i> ${commentCount} Commenti</div>
             </div>
             <div class="admin-event-card-actions top-actions">
                 <button class="btn-admin btn-admin-warning btn-manage-media" data-event-id="${eventId}" data-event-title="${sanitizeForAttribute(eventTitle)}" title="Media"><i class="fas fa-photo-video"></i> Media</button>
@@ -1519,6 +1532,7 @@ function createAdminEventCard(event) {
             </div>
         </div>`;
 
+    // Aggiunta degli event listener (invariata)
     const editButton = eventCard.querySelector('.btn-edit');
     if (editButton) editButton.addEventListener('click', function () {
         const eventToEdit = [...allUpcomingEventsData, ...allPastEventsData].find(e => String(e.IDEvento || e.idevento) === this.dataset.eventId);
@@ -1553,7 +1567,6 @@ function createAdminEventCard(event) {
     if(pdfButton) pdfButton.addEventListener('click', function() {
         window.open(`generate_event_pdf.php?event_id=${this.dataset.eventId}`, '_blank');
     });
-
 
     return eventCard;
 }

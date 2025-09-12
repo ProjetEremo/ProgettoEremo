@@ -29,10 +29,11 @@ if (!$participantId) {
 $conn->begin_transaction();
 try {
     // 1. Trova la prenotazione e l'evento, e VERIFICA che l'utente sia il proprietario
+    // CORREZIONE: Utilizzato par.ProgressivoPart al posto del non esistente par.ID
     $sql_check = "SELECT p.Progressivo, p.Contatto, p.IDEvento, p.NumeroPosti 
                   FROM Partecipanti par 
                   JOIN prenotazioni p ON par.Progressivo = p.Progressivo 
-                  WHERE par.ID = ?";
+                  WHERE par.ProgressivoPart = ?";
     $stmt_check = $conn->prepare($sql_check);
     $stmt_check->bind_param("i", $participantId);
     $stmt_check->execute();
@@ -54,7 +55,8 @@ try {
     $idEvento = $booking_info['IDEvento'];
 
     // 2. Elimina il partecipante
-    $sql_delete = "DELETE FROM Partecipanti WHERE ID = ?";
+    // CORREZIONE: Utilizzato ProgressivoPart al posto del non esistente ID
+    $sql_delete = "DELETE FROM Partecipanti WHERE ProgressivoPart = ?";
     $stmt_delete = $conn->prepare($sql_delete);
     $stmt_delete->bind_param("i", $participantId);
     $stmt_delete->execute();
