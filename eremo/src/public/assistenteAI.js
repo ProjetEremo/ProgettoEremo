@@ -1,4 +1,4 @@
-// File: assistenteAI.js (Versione Rivoluzionata e Corretta v14 - Pulsante TTS Integrato)
+// File: assistenteAI.js (Versione Rivoluzionata e Corretta v18 - TTS Ibrido con Fallback)
 document.addEventListener('DOMContentLoaded', () => {
     const aiAssistantFabEl = document.getElementById('ai-assistant-fab');
     const aiChatPopupEl = document.getElementById('ai-chat-popup');
@@ -27,13 +27,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAX_SEATS_PER_SINGLE_BOOKING_REQUEST = 5; // Massimo posti prenotabili per singola richiesta
     const MAX_TOTAL_SEATS_PER_USER_PER_EVENT = 5; // Massimo posti totali prenotabili da un utente per un evento
 
-    // let isTTSEnabled = true; // Rimosso, useremo isTTSEnabledByUser
-    let speechSynthesisVoices = []; // Array per memorizzare le voci disponibili per TTS
-
-    // --- INIZIO MODIFICHE PER PULSANTE TTS ---
+    // --- INIZIO GESTIONE TTS IBRIDO (Google con Fallback su Browser) ---
     let isTTSEnabledByUser = true; // Default: TTS abilitato dall'utente, gestito da localStorage
     const TTS_USER_PREFERENCE_KEY = 'aiChatTTSEnabledByUser'; // Chiave per localStorage
     let ttsToggleButton = null; // Riferimento al pulsante TTS che creeremo
+    let audioQueue = []; // Coda per i segmenti di testo da riprodurre
+    let isPlayingAudio = false; // Flag per controllare se la coda è in esecuzione
+    let currentAudioElement = null; // Riferimento all'elemento audio corrente
+    let speechSynthesisVoices = []; // Voci per il TTS del browser (fallback)
+    // --- FINE GESTIONE TTS ---
+
 
     // Carica la preferenza TTS dell'utente da localStorage
     function loadTTSUserPreference() {
@@ -41,8 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (storedPreference !== null) {
             isTTSEnabledByUser = storedPreference === 'true';
         }
-        // Altrimenti, usa il default (true) impostato all'inizio
-        updateTTSButtonUI(); // Aggiorna l'UI del pulsante dopo aver caricato la preferenza
+        updateTTSButtonUI();
     }
 
     // Salva la preferenza TTS dell'utente in localStorage
@@ -52,10 +54,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Aggiorna l'aspetto del pulsante TTS (icona e tooltip)
     function updateTTSButtonUI() {
-        if (ttsToggleButton) { // Assicurati che il pulsante esista
+        if (ttsToggleButton) {
             ttsToggleButton.innerHTML = isTTSEnabledByUser ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
             ttsToggleButton.setAttribute('aria-label', isTTSEnabledByUser ? 'Disabilita sintesi vocale' : 'Abilita sintesi vocale');
             ttsToggleButton.title = isTTSEnabledByUser ? 'Disabilita sintesi vocale' : 'Abilita sintesi vocale';
+        }
+    }
+
+    // Interrompe la riproduzione audio corrente (sia Google che Browser)
+    function stopCurrentAudio() {
+        audioQueue = []; // Svuota la coda di Google TTS
+        isPlayingAudio = false;
+        if (currentAudioElement) {
+            currentAudioElement.pause();
+            currentAudioElement.src = '';
+            currentAudioElement = null;
+        }
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
         }
     }
 
@@ -64,99 +80,120 @@ document.addEventListener('DOMContentLoaded', () => {
         isTTSEnabledByUser = !isTTSEnabledByUser;
         saveTTSUserPreference();
         updateTTSButtonUI();
-        if (!isTTSEnabledByUser && 'speechSynthesis' in window) {
-            window.speechSynthesis.cancel(); // Ferma la lettura se TTS viene disabilitato durante la riproduzione
+        if (!isTTSEnabledByUser) {
+            stopCurrentAudio();
         }
         console.log(`AssistenteAI: Sintesi vocale ${isTTSEnabledByUser ? 'abilitata' : 'disabilitata'} dall'utente.`);
     }
 
     // Crea e aggiunge il pulsante TTS all'header della chat
     function createAndInjectTTSButton() {
-        // Evita di aggiungere duplicati se la funzione viene chiamata più volte accidentalmente
         if (document.getElementById('ai-chat-tts-toggle-btn')) return;
 
         ttsToggleButton = document.createElement('button');
         ttsToggleButton.id = 'ai-chat-tts-toggle-btn';
-        ttsToggleButton.className = 'ai-chat-header-btn'; // Usa una classe simile a close-btn per lo stile base
-        // updateTTSButtonUI() sarà chiamato da loadTTSUserPreference dopo che il pulsante è stato creato
+        ttsToggleButton.className = 'ai-chat-header-btn';
         ttsToggleButton.addEventListener('click', toggleUserTTSPreference);
 
-        // Inserisce il pulsante TTS prima del pulsante di chiusura, se esistono
         if (aiChatHeaderEl && aiChatCloseBtnEl) {
             aiChatHeaderEl.insertBefore(ttsToggleButton, aiChatCloseBtnEl);
         } else {
             console.error("AssistenteAI: Impossibile inserire il pulsante TTS. Elemento header o bottone chiusura mancanti.");
         }
     }
-    // --- FINE MODIFICHE PER PULSANTE TTS ---
-
-
-    // Carica le voci disponibili per la sintesi vocale
+    
+    // Carica le voci per il fallback TTS del browser
     function loadVoices() {
         if ('speechSynthesis' in window) {
             speechSynthesisVoices = window.speechSynthesis.getVoices();
         }
     }
+    
+    // Funzione di fallback che usa la sintesi vocale del browser
+    function speakTextWithBrowserTTS(plainText) {
+        if (!isTTSEnabledByUser || !('speechSynthesis' in window)) return;
+        
+        console.log("AssistenteAI: Eseguo fallback su sintesi vocale del browser.");
 
-    loadVoices(); // Carica le voci al primo avvio
-    // Listener per quando le voci cambiano (es. caricate dinamicamente dal browser)
-    if ('speechSynthesis' in window && window.speechSynthesis.onvoiceschanged !== undefined) {
-        window.speechSynthesis.onvoiceschanged = loadVoices;
+        const utterance = new SpeechSynthesisUtterance(plainText);
+        utterance.lang = 'it-IT';
+        const italianVoice = speechSynthesisVoices.find(voice => voice.lang === 'it-IT' || voice.lang.startsWith('it-'));
+        if (italianVoice) {
+            utterance.voice = italianVoice;
+        }
+        utterance.onerror = (event) => console.error('AssistenteAI: Errore SpeechSynthesisUtterance (fallback):', event.error);
+        
+        window.speechSynthesis.speak(utterance);
     }
 
-    // Funzione per la sintesi vocale del testo
+    // Funzione principale per la sintesi vocale (tenta Google, poi fallback)
     function speakText(text) {
-        // MODIFICA: Controllo basato sulla preferenza dell'utente
-        if (!isTTSEnabledByUser || !('speechSynthesis' in window)) {
-            return; // Non fare nulla se TTS disabilitato dall'utente o non supportato
-        }
-        if (!aiChatPopupEl.classList.contains('active')) {
-            window.speechSynthesis.cancel(); // Interrompe la lettura se la chat non è attiva
-            return;
-        }
+        if (!isTTSEnabledByUser) return;
+        
+        stopCurrentAudio();
 
-        window.speechSynthesis.cancel(); // Interrompe qualsiasi lettura precedente
-
+        if (!aiChatPopupEl.classList.contains('active')) return;
+        
         let plainText = text;
-
-        // Rimuove tag HTML per ottenere testo puro
         if (/<[a-z][\s\S]*>/i.test(text)) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = text;
             plainText = tempDiv.textContent || tempDiv.innerText || "";
         }
 
-        // Pulizia ulteriore del testo da caratteri speciali e Markdown per una migliore resa vocale
-        plainText = plainText.replace(/\*\*(.*?)\*\*/g, '$1'); // Rimuove grassetto Markdown
-        plainText = plainText.replace(/\*(.*?)\*/g, '$1');   // Rimuove corsivo Markdown
-        plainText = plainText.replace(/ID:\s*\w+/gi, '');     // Rimuove diciture "ID: xxx"
-        plainText = plainText.replace(/\[(.*?)\]\(.*?\)/g, '$1'); // Gestisce link Markdown, leggendo solo il testo
-        plainText = plainText.replace(/```[\s\S]*?```/g, ' '); // Rimuove blocchi di codice
-        plainText = plainText.replace(/`([^`]+)`/g, '$1');    // Rimuove codice inline
-        plainText = plainText.replace(/&nbsp;/g, ' ');      // Sostituisce &nbsp; con spazio
-        plainText = plainText.replace(/#/g, '');            // Rimuove # (es. da titoli Markdown)
-        plainText = plainText.replace(/\s+/g, ' ').trim();   // Normalizza spazi multipli
+        plainText = plainText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/ID:\s*\w+/gi, '').replace(/\[(.*?)\]\(.*?\)/g, '$1').replace(/```[\s\S]*?```/g, ' ').replace(/`([^`]+)`/g, '$1').replace(/&nbsp;/g, ' ').replace(/#/g, '').replace(/\s+/g, ' ').trim();
 
-        if (plainText.trim() === "") return; // Non leggere se il testo risultante è vuoto
+        if (plainText.trim() === "") return;
 
-        const utterance = new SpeechSynthesisUtterance(plainText);
-        utterance.lang = 'it-IT'; // Imposta la lingua italiana
+        console.log("AssistenteAI: Tentativo di sintesi vocale (Google Translate) per:", plainText.substring(0, 100) + "...");
+        
+        const maxLength = 180;
+        const sentences = plainText.match(/[^.!?]+[.!?]*|[^,]+[,]*|[^ ]+/g) || [];
+        let currentChunk = "";
+        
+        sentences.forEach(sentence => {
+            if ((currentChunk + sentence).length > maxLength) {
+                if (currentChunk.length > 0) audioQueue.push(currentChunk.trim());
+                currentChunk = sentence;
+            } else {
+                currentChunk += " " + sentence;
+            }
+        });
+        if (currentChunk.length > 0) audioQueue.push(currentChunk.trim());
 
-        // Cerca una voce italiana specifica
-        const italianVoice = speechSynthesisVoices.find(voice => voice.lang === 'it-IT' || voice.lang.startsWith('it-'));
-        if (italianVoice) {
-            utterance.voice = italianVoice;
-        } else {
-            console.warn("AssistenteAI: Nessuna voce italiana trovata per TTS, verrà usata la voce di default.");
+        playNextInQueue(plainText); // Passa il testo completo per il fallback
+    }
+    
+    // Funzione ricorsiva per riprodurre i segmenti audio di Google
+    function playNextInQueue(originalTextForFallback) {
+        if (audioQueue.length === 0) {
+            isPlayingAudio = false;
+            currentAudioElement = null;
+            return;
         }
 
-        // Gestione errori durante la sintesi vocale
-        utterance.onerror = function(event) {
-            console.error('AssistenteAI: Errore SpeechSynthesisUtterance:', event.error, "Testo problematico:", plainText);
+        if (!isTTSEnabledByUser || !aiChatPopupEl.classList.contains('active')) {
+             stopCurrentAudio();
+             return;
+        }
+
+        isPlayingAudio = true;
+        const textChunk = audioQueue.shift();
+        const url = `https://translate.google.com/translate_tts?tl=it&q=${encodeURIComponent(textChunk)}&client=tw-ob&ie=UTF-8`;
+        
+        currentAudioElement = new Audio(url);
+        
+        const errorHandler = (e) => {
+            console.error("AssistenteAI: Google TTS non riuscito. Attivazione fallback.", e);
+            stopCurrentAudio();
+            speakTextWithBrowserTTS(originalTextForFallback); 
         };
 
-        window.speechSynthesis.speak(utterance); // Avvia la lettura
+        currentAudioElement.addEventListener('ended', () => playNextInQueue(originalTextForFallback));
+        currentAudioElement.addEventListener('error', errorHandler);
+        currentAudioElement.play().catch(errorHandler);
     }
+
 
     // Controlla lo stato di login dell'utente leggendo localStorage
     function checkUserLoginStatus() {
@@ -475,14 +512,14 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
     async function toggleAiChat() {
         checkUserLoginStatus(); // Aggiorna stato login
         const isActive = aiChatPopupEl.classList.toggle('active');
-// Cerca l'icona esistente all'interno del bottone
-const iconElement = aiAssistantFabEl.querySelector('i');
-if (iconElement) {
-    // Usa classList.toggle per cambiare l'icona in modo pulito,
-    // senza distruggere gli altri elementi del bottone.
-    iconElement.classList.toggle('fa-headset', !isActive);
-    iconElement.classList.toggle('fa-times', isActive);
-}
+        // Cerca l'icona esistente all'interno del bottone
+        const iconElement = aiAssistantFabEl.querySelector('i');
+        if (iconElement) {
+            // Usa classList.toggle per cambiare l'icona in modo pulito,
+            // senza distruggere gli altri elementi del bottone.
+            iconElement.classList.toggle('fa-headset', !isActive);
+            iconElement.classList.toggle('fa-times', isActive);
+        }
         if (isActive) {
             // Se la cronologia è vuota o non ci sono messaggi dell'assistente, genera il saluto
             if (chatHistoryForAssistant.length === 0 || !chatHistoryForAssistant.some(m => m.role === 'assistant')) {
@@ -499,7 +536,8 @@ if (iconElement) {
             }
             if (aiChatInputEl) aiChatInputEl.focus(); // Focus sull'input quando la chat si apre
         } else {
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel(); // Interrompe TTS alla chiusura
+            // Interrompe TTS alla chiusura
+            stopCurrentAudio();
         }
         document.body.style.overflow = isActive ? 'hidden' : ''; // Blocca scroll pagina quando chat aperta
     }
@@ -532,7 +570,6 @@ if (iconElement) {
         }
 
         // Gestione TTS per la risposta reale dell'assistente
-        // MODIFICA: Controllo isTTSEnabledByUser
         if (isTTSEnabledByUser && aiChatPopupEl.classList.contains('active') && !isThinkingMessage) {
             let textToSpeak = chatResponseText;
 
@@ -1089,10 +1126,9 @@ if (iconElement) {
     fetchAndPrepareAssistantApiKey().then(keyReady => {
         if (keyReady) {
             console.log("AssistenteAI: Pronto.");
-            // --- INIZIO MODIFICHE PER PULSANTE TTS ---
-            createAndInjectTTSButton(); // Crea e inserisce il pulsante TTS
-            loadTTSUserPreference();    // Carica la preferenza TTS dell'utente e aggiorna l'UI del pulsante
-            // --- FINE MODIFICHE PER PULSANTE TTS ---
+            createAndInjectTTSButton();
+            loadTTSUserPreference();
+            // Niente da caricare per Google Translate TTS, funziona on-demand
         } else {
             console.warn("AssistenteAI: Chiave API non caricata o non valida. L'assistente potrebbe non funzionare.");
         }
@@ -1100,3 +1136,4 @@ if (iconElement) {
 
 }); // Chiusura del listener per DOMContentLoaded
 ; // Assicura che l'istruzione addEventListener termini con un punto e virgola.
+

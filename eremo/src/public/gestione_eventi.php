@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 error_log("Errore prepare SELECT SUM(NumeroPosti): " . $conn->error);
                 die(json_encode(['success' => false, 'message' => 'Errore server nel verificare le prenotazioni esistenti.']));
             }
-
+            
             $nuova_capacita_totale = intval($_POST['event-seats']);
 
             if ($nuova_capacita_totale < $posti_gia_prenotati) {
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $prefisso_relatore = trim($_POST['event-prefix'] ?? 'Relatore');
         $relatore = trim($_POST['event-speaker']);
         $associazione = trim($_POST['event-association'] ?? '');
-
+        
         $posti_disponibili = intval($_POST['event-seats']);
         $prenotabile = isset($_POST['event-booking']) && $_POST['event-booking'] === 'on' ? 1 : 0;
         // MODIFICA: Gestione del costo come float
