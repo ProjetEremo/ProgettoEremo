@@ -1,4 +1,4 @@
-// File: assistenteAI.js (Versione Rivoluzionata e Corretta v18 - TTS Ibrido con Fallback)
+// File: assistenteAI.js (Versione 19 - Senza TTS e con Verifica Prenotazione)
 document.addEventListener('DOMContentLoaded', () => {
     const aiAssistantFabEl = document.getElementById('ai-assistant-fab');
     const aiChatPopupEl = document.getElementById('ai-chat-popup');
@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let GROQ_API_KEY_FOR_ASSISTANT = null; // Chiave API Groq per l'assistente principale
     const GROQ_MODEL_NAME_ASSISTANT = "meta-llama/llama-4-scout-17b-16e-instruct"; // Modello Groq per l'assistente principale (aggiornato)
-    const GROQ_MODEL_NAME_TTS_OPTIMIZER = "gemma2-9b-it"; // Modello Groq per l'ottimizzazione TTS (aggiornato, più piccolo)
 
     let IS_USER_LOGGED_IN = false; // Stato login utente
     let CURRENT_USER_EMAIL = null; // Email utente loggato
@@ -26,174 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Costanti per la logica di prenotazione
     const MAX_SEATS_PER_SINGLE_BOOKING_REQUEST = 5; // Massimo posti prenotabili per singola richiesta
     const MAX_TOTAL_SEATS_PER_USER_PER_EVENT = 5; // Massimo posti totali prenotabili da un utente per un evento
-
-    // --- INIZIO GESTIONE TTS IBRIDO (Google con Fallback su Browser) ---
-    let isTTSEnabledByUser = true; // Default: TTS abilitato dall'utente, gestito da localStorage
-    const TTS_USER_PREFERENCE_KEY = 'aiChatTTSEnabledByUser'; // Chiave per localStorage
-    let ttsToggleButton = null; // Riferimento al pulsante TTS che creeremo
-    let audioQueue = []; // Coda per i segmenti di testo da riprodurre
-    let isPlayingAudio = false; // Flag per controllare se la coda è in esecuzione
-    let currentAudioElement = null; // Riferimento all'elemento audio corrente
-    let speechSynthesisVoices = []; // Voci per il TTS del browser (fallback)
-    // --- FINE GESTIONE TTS ---
-
-
-    // Carica la preferenza TTS dell'utente da localStorage
-    function loadTTSUserPreference() {
-        const storedPreference = localStorage.getItem(TTS_USER_PREFERENCE_KEY);
-        if (storedPreference !== null) {
-            isTTSEnabledByUser = storedPreference === 'true';
-        }
-        updateTTSButtonUI();
-    }
-
-    // Salva la preferenza TTS dell'utente in localStorage
-    function saveTTSUserPreference() {
-        localStorage.setItem(TTS_USER_PREFERENCE_KEY, isTTSEnabledByUser);
-    }
-
-    // Aggiorna l'aspetto del pulsante TTS (icona e tooltip)
-    function updateTTSButtonUI() {
-        if (ttsToggleButton) {
-            ttsToggleButton.innerHTML = isTTSEnabledByUser ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
-            ttsToggleButton.setAttribute('aria-label', isTTSEnabledByUser ? 'Disabilita sintesi vocale' : 'Abilita sintesi vocale');
-            ttsToggleButton.title = isTTSEnabledByUser ? 'Disabilita sintesi vocale' : 'Abilita sintesi vocale';
-        }
-    }
-
-    // Interrompe la riproduzione audio corrente (sia Google che Browser)
-    function stopCurrentAudio() {
-        audioQueue = []; // Svuota la coda di Google TTS
-        isPlayingAudio = false;
-        if (currentAudioElement) {
-            currentAudioElement.pause();
-            currentAudioElement.src = '';
-            currentAudioElement = null;
-        }
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-        }
-    }
-
-    // Funzione per attivare/disattivare il TTS da parte dell'utente
-    function toggleUserTTSPreference() {
-        isTTSEnabledByUser = !isTTSEnabledByUser;
-        saveTTSUserPreference();
-        updateTTSButtonUI();
-        if (!isTTSEnabledByUser) {
-            stopCurrentAudio();
-        }
-        console.log(`AssistenteAI: Sintesi vocale ${isTTSEnabledByUser ? 'abilitata' : 'disabilitata'} dall'utente.`);
-    }
-
-    // Crea e aggiunge il pulsante TTS all'header della chat
-    function createAndInjectTTSButton() {
-        if (document.getElementById('ai-chat-tts-toggle-btn')) return;
-
-        ttsToggleButton = document.createElement('button');
-        ttsToggleButton.id = 'ai-chat-tts-toggle-btn';
-        ttsToggleButton.className = 'ai-chat-header-btn';
-        ttsToggleButton.addEventListener('click', toggleUserTTSPreference);
-
-        if (aiChatHeaderEl && aiChatCloseBtnEl) {
-            aiChatHeaderEl.insertBefore(ttsToggleButton, aiChatCloseBtnEl);
-        } else {
-            console.error("AssistenteAI: Impossibile inserire il pulsante TTS. Elemento header o bottone chiusura mancanti.");
-        }
-    }
-    
-    // Carica le voci per il fallback TTS del browser
-    function loadVoices() {
-        if ('speechSynthesis' in window) {
-            speechSynthesisVoices = window.speechSynthesis.getVoices();
-        }
-    }
-    
-    // Funzione di fallback che usa la sintesi vocale del browser
-    function speakTextWithBrowserTTS(plainText) {
-        if (!isTTSEnabledByUser || !('speechSynthesis' in window)) return;
-        
-        console.log("AssistenteAI: Eseguo fallback su sintesi vocale del browser.");
-
-        const utterance = new SpeechSynthesisUtterance(plainText);
-        utterance.lang = 'it-IT';
-        const italianVoice = speechSynthesisVoices.find(voice => voice.lang === 'it-IT' || voice.lang.startsWith('it-'));
-        if (italianVoice) {
-            utterance.voice = italianVoice;
-        }
-        utterance.onerror = (event) => console.error('AssistenteAI: Errore SpeechSynthesisUtterance (fallback):', event.error);
-        
-        window.speechSynthesis.speak(utterance);
-    }
-
-    // Funzione principale per la sintesi vocale (tenta Google, poi fallback)
-    function speakText(text) {
-        if (!isTTSEnabledByUser) return;
-        
-        stopCurrentAudio();
-
-        if (!aiChatPopupEl.classList.contains('active')) return;
-        
-        let plainText = text;
-        if (/<[a-z][\s\S]*>/i.test(text)) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = text;
-            plainText = tempDiv.textContent || tempDiv.innerText || "";
-        }
-
-        plainText = plainText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/ID:\s*\w+/gi, '').replace(/\[(.*?)\]\(.*?\)/g, '$1').replace(/```[\s\S]*?```/g, ' ').replace(/`([^`]+)`/g, '$1').replace(/&nbsp;/g, ' ').replace(/#/g, '').replace(/\s+/g, ' ').trim();
-
-        if (plainText.trim() === "") return;
-
-        console.log("AssistenteAI: Tentativo di sintesi vocale (Google Translate) per:", plainText.substring(0, 100) + "...");
-        
-        const maxLength = 180;
-        const sentences = plainText.match(/[^.!?]+[.!?]*|[^,]+[,]*|[^ ]+/g) || [];
-        let currentChunk = "";
-        
-        sentences.forEach(sentence => {
-            if ((currentChunk + sentence).length > maxLength) {
-                if (currentChunk.length > 0) audioQueue.push(currentChunk.trim());
-                currentChunk = sentence;
-            } else {
-                currentChunk += " " + sentence;
-            }
-        });
-        if (currentChunk.length > 0) audioQueue.push(currentChunk.trim());
-
-        playNextInQueue(plainText); // Passa il testo completo per il fallback
-    }
-    
-    // Funzione ricorsiva per riprodurre i segmenti audio di Google
-    function playNextInQueue(originalTextForFallback) {
-        if (audioQueue.length === 0) {
-            isPlayingAudio = false;
-            currentAudioElement = null;
-            return;
-        }
-
-        if (!isTTSEnabledByUser || !aiChatPopupEl.classList.contains('active')) {
-             stopCurrentAudio();
-             return;
-        }
-
-        isPlayingAudio = true;
-        const textChunk = audioQueue.shift();
-        const url = `https://translate.google.com/translate_tts?tl=it&q=${encodeURIComponent(textChunk)}&client=tw-ob&ie=UTF-8`;
-        
-        currentAudioElement = new Audio(url);
-        
-        const errorHandler = (e) => {
-            console.error("AssistenteAI: Google TTS non riuscito. Attivazione fallback.", e);
-            stopCurrentAudio();
-            speakTextWithBrowserTTS(originalTextForFallback); 
-        };
-
-        currentAudioElement.addEventListener('ended', () => playNextInQueue(originalTextForFallback));
-        currentAudioElement.addEventListener('error', errorHandler);
-        currentAudioElement.play().catch(errorHandler);
-    }
-
 
     // Controlla lo stato di login dell'utente leggendo localStorage
     function checkUserLoginStatus() {
@@ -299,14 +130,12 @@ Sei un assistente virtuale avanzato per "Eremo Frate Francesco". Data e ora corr
 Il tuo scopo è ESEGUIRE AZIONI e fornire informazioni in modo amichevole e utile. Il sistema JavaScript (JS) aggiorna currentBookingState. Tu guidi l'utente e fai domande basate su currentBookingState e sulle informazioni mancanti identificate dal JS.
 
 INTERAZIONE CON DATI PHP (RUOLO "system"):
-- Se ricevi una lista di eventi (risultato di GET_EVENTS), presentala in modo chiaro e leggibile usando Markdown. Utilizza una lista numerata o puntata. Ogni evento deve essere su una nuova riga.
-  Formato suggerito per ogni evento:
-  \`- **Nome Evento** (ID: xxx) - Data: YYYY-MM-DD\`
-  Oppure:
-  \`1. **Nome Evento**
-     - ID: xxx
-     - Data: YYYY-MM-DD\`
-  Se ci sono molti eventi, puoi presentarne un numero limitato (es. i primi 5) e chiedere all'utente se desidera vederne altri o filtrare la ricerca.
+- Se ricevi una lista di eventi (risultato di GET_EVENTS):
+    - **Se la lista è vuota (es. il messaggio system contiene \`"data":[]\`), DEVI informare l'utente che non hai trovato eventi che corrispondono alla sua ricerca.** Esempio: "Mi dispiace, non ho trovato eventi per la data richiesta. Vuoi che cerchi in un altro periodo?" **NON DEVI inventare eventi usando il formato di esempio.**
+    - Se la lista non è vuota, presentala in modo chiaro e leggibile usando Markdown. Utilizza una lista numerata o puntata. Ogni evento deve essere su una nuova riga.
+        Formato suggerito per ogni evento:
+        \`- **Nome Evento** (ID: xxx) - Data: YYYY-MM-DD\`
+        Se ci sono molti eventi, puoi presentarne un numero limitato (es. i primi 5) e chiedere all'utente se desidera vederne altri o filtrare la ricerca.
 - Se l'utente chiede di un evento per nome e il JS ti passa una lista di corrispondenze, presenta la lista (usando la formattazione chiara sopra) e chiedi di specificare l'ID.
 - **Se ricevi contenuti da una pagina (risultato di GET_PAGE_CONTENT)**:
     - Il messaggio "system" conterrà un JSON simile a \`{"success":true,"contents":{"heroTitle":"Titolo Esempio","heroSubtitle":"Sottotitolo...", "section1Heading":"Testata Sezione", "section1Text":"Testo della sezione..."}}\` oppure \`{"success":true,"contents":[]}\` se non ci sono contenuti specifici, o \`{"success":false,"message":"Errore..."}\`.
@@ -347,15 +176,13 @@ PROCESSO DI PRENOTAZIONE (Requires_login: true):
       È tutto corretto? Posso procedere con la prenotazione?\`
     - Solo DOPO che l'utente conferma, l'intent analysis dovrebbe dare CONFIRM_BOOKING_DETAILS. Il JS chiamerà 'prenota_evento.php'.
     - **GESTIONE RISULTATO PRENOTAZIONE (da prenota_evento.php):**
-        - Se il messaggio "system" contiene un JSON da \`prenota_evento.php\` che indica SUCCESSO (es. \`{"success":true,"message":"...","idPrenotazione":"..."}\`):
+        - Se il messaggio "system" contiene un JSON da \`prenota_evento.php\` che indica SUCCESSO (es. \`{"success":true,"message":"...","idPrenotazione":"..."}\`) E la verifica successiva ha avuto esito positivo:
             - **NON MOSTRARE MAI IL JSON ALL'UTENTE.**
             - Estrai il \`message\` dal JSON e presentalo in modo amichevole. Se c'è un \`idPrenotazione\`, puoi includerlo nel messaggio, ad esempio: "Fantastico! \`[messaggio da JSON]\` La tua prenotazione è stata confermata con l'ID \`[idPrenotazione]\`. Grazie!"
-            - Esempio di output per l'utente, basato sul JSON \`{"success":true,"message":"Prenotazione per l'evento 'Laboratorio di Pane e Preghiera' effettuata con successo per 3 partecipante/i!","idPrenotazione":"193"}\`:
-              "Fantastico! Prenotazione per l'evento 'Laboratorio di Pane e Preghiera' effettuata con successo per 3 partecipante/i! La tua prenotazione è stata confermata con l'ID 193. Grazie per aver scelto l'Eremo Frate Francesco!"
             - Se nel JSON c'è anche \`event_title\` e \`num_participants\`, puoi riformulare in modo più naturale: "Ottimo! La tua prenotazione per **[event_title]** per **[num_participants]** persone (ID Prenotazione: **[idPrenotazione]**) è stata confermata con successo! Riceverai presto una email di conferma. Grazie!"
-        - Se il JSON indica un FALLIMENTO (es. \`{"success":false,"message":"Errore..."}\`):
+        - Se il JSON indica un FALLIMENTO (es. \`{"success":false,"message":"Errore..."}\`) O se la verifica post-prenotazione fallisce:
             - **NON MOSTRARE MAI IL JSON ALL'UTENTE.**
-            - Estrai il \`message\` di errore e presentalo chiaramente: "Oh no, sembra esserci stato un problema con la prenotazione: \`[messaggio di errore da JSON]\`. Potresti voler controllare i dettagli o riprovare."
+            - Estrai il \`message\` di errore e presentalo chiaramente: "Oh no, sembra esserci stato un problema con la prenotazione: \`[messaggio di errore da JSON o dalla verifica]\`. Potresti voler controllare i dettagli o riprovare."
         - Se il messaggio "system" indica un errore generico nella chiamata a \`prenota_evento.php\` (non un JSON strutturato):
             - Informa l'utente: "C'è stato un problema tecnico durante il tentativo di finalizzare la prenotazione. Per favore, riprova tra poco o contatta l'assistenza se il problema persiste."
         - Se JS segnala dati mancanti PRIMA di chiamare PHP, riformula la richiesta per ottenere i dati mancanti.
@@ -368,36 +195,6 @@ ISTRUZIONI GENERALI:
     - NON dare messaggi di errore o risposte generiche che sembrano non capire un semplice saluto. L'obiettivo è avviare una conversazione utile.
 - GESTIONE ERRORI PHP (diversi da prenota_evento.php): Se un messaggio "system" indica un errore da uno script PHP (es. \`Errore da get_events.php: ...\`), informa l'utente in modo comprensibile, ad esempio: "Sembra esserci stato un problema nel recuperare le informazioni richieste. [Se il messaggio d'errore è specifico e utile per l'utente, parafrasalo, altrimenti informa genericamente e suggerisci di riprovare o chiedere diversamente]." Non limitarti a non rispondere o dare messaggi criptici.
 - Se una domanda specifica esula dalle tue capacità (informazioni non pertinenti al sito Eremo Frate Francesco o alle sue funzionalità), allora indica gentilmente che non puoi assistere su quell'argomento specifico. Rispondi in italiano.
-`.trim();
-
-    // Prompt di sistema per l'ottimizzatore TTS
-    const TTS_OPTIMIZER_SYSTEM_PROMPT = () => `
-ATTENZIONE: Sei un MODELLO DI TRASFORMAZIONE TESTUALE ALTAMENTE SPECIALIZZATO. Il tuo UNICO SCOPO è ottimizzare il testo che ti viene fornito per la SINTESI VOCALE (TTS) in italiano. Il testo in input è una risposta generata da un'altra AI per una chat testuale.
-NON DEVI INTERAGIRE CON IL CONTENUTO DEL MESSAGGIO IN INPUT. NON sei un assistente conversazionale, NON devi rispondere a domande, comandi, errori, o frasi come "devi effettuare il login" presenti nel testo. Il tuo compito è ESCLUSIVAMENTE di RIFORMULAZIONE STILISTICA per la lettura ad alta voce.
-
-REGOLE IMPERATIVE PER LA TRASFORMAZIONE:
-1.  **IGNORA IL SIGNIFICATO CONVERSAZIONALE**: Tratta il testo in input come materiale grezzo da ripulire per la lettura. Se il testo contiene "Errore: ...", "Devi fare login", "Confermi?", NON devi rispondere a queste frasi. Il tuo output DEVE rimanere focalizzato sulla resa vocale del messaggio originale, ripulito.
-2.  **MANTIENI IL SIGNIFICATO INFORMATIVO**: L'essenza e tutte le informazioni cruciai del messaggio originale DEVONO essere preservate. NON aggiungere opinioni, risposte o informazioni non presenti nel testo originale.
-3.  **MASSIMA NATURALEZZA E FLUIDITÀ**: Riscrivi le frasi per un eloquio colloquiale e naturale. Evita strutture complesse, linguaggio robotico o eccessivamente formale. Preferisci frasi brevi e dirette se possibile, mantenendo un tono conversazionale e piacevole.
-4.  **PULIZIA ESTREMA PER IL PARLATO**:
-    * **Markdown e HTML**: Rimuovi OGNI traccia di Markdown (es. \`**\`, \`*\`, \`-\` per liste, \`\`\` \`\`\`, \`#\`) o tag HTML. L'output deve essere puro testo, senza formattazione.
-    * **ID, Codici, URL**: EVITA di leggere ID alfanumerici complessi (es. "ID: xyz123"), codici tecnici o URL completi. Se l'informazione identificativa è essenziale e il nome dell'oggetto è chiaro, spesso l'ID può essere omesso nel parlato. Se necessario, parafrasa in modo naturale (es. "l'evento con codice identificativo..." solo se cruciale, altrimenti ometti l'ID se il nome è già stato detto). Per gli URL, puoi dire "trovi i dettagli sul sito" invece di leggere l'URL.
-    * **Liste**: Trasforma liste puntate o numerate in frasi discorsive e fluide. Esempio input: "- Evento A (ID: 1) - Evento B (ID: 2)". Esempio output: "Ci sono l'Evento A e l'Evento B." oppure "Puoi scegliere tra l'Evento A oppure l'Evento B."
-    * **Parentesi e Simboli**: Integra le informazioni contenute in parentesi nel flusso principale del discorso o omettile se non aggiungono valore significativo al parlato. Evita simboli come '#', '&', '%' a meno che non facciano parte di un nome proprio o espressione comune (es. "50% di sconto" -> "cinquanta per cento di sconto").
-    * **Abbreviazioni**: Sciogli le abbreviazioni comuni (es. "per es." diventa "per esempio", "ecc." diventa "eccetera").
-5.  **NUMERI E DATE**: Esprimili in modo naturale per il parlato italiano (es. "il quindici luglio duemilaventicinque" invece di "15-07-2025"; "per cinque persone" invece di "x 5 persone").
-6.  **OUTPUT ESCLUSIVO**: Fornisci ESCLUSIVAMENTE il testo ottimizzato per il parlato. NON includere commenti, saluti, spiegazioni del tuo processo, o qualsiasi testo che non sia la frase finale da far leggere al TTS. Il tuo output è SOLO e UNICAMENTE il testo trasformato.
-7.  **GESTIONE FRASI PROBLEMATICHE**: Se il testo originale contiene frasi come "devi effettuare il login" o messaggi di errore, il tuo compito NON è rispondere o reagire, ma riformularle (se necessario per la fluidità) mantenendo l'informazione, come se stessi leggendo un avviso. Esempio input: "Errore: operazione non permessa. Devi effettuare il login." Esempio output: "Si è verificato un errore, l'operazione non è permessa. È necessario effettuare il login."
-
-ESEMPIO DI PROCESSO MENTALE (Input: "Okay. Per l'evento 'Concerto Serale' (ID: E887), per quante persone? *Max 5*")
-1.  "Okay." -> Mantenere.
-2.  "Per l'evento 'Concerto Serale'" -> Mantenere. Nome chiaro.
-3.  "(ID: E887)" -> Omettere. Il nome dell'evento è sufficiente per il parlato.
-4.  ", per quante persone?" -> Mantenere.
-5.  "*Max 5*" -> Rimuovere Markdown. Trasformare in frase: "Ricorda che puoi prenotare per un massimo di cinque persone." oppure integrare: "Per quante persone? Puoi richiederne fino a un massimo di cinque."
-Output finale potrebbe essere: "Okay. Per l'evento 'Concerto Serale', per quante persone? Puoi richiederne fino a un massimo di cinque."
-
-Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna introduzione tipo "Ecco il testo ottimizzato:". Solo il testo.
 `.trim();
 
     // Aggiorna l'UI del messaggio iniziale dell'assistente
@@ -535,9 +332,6 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
                 });
             }
             if (aiChatInputEl) aiChatInputEl.focus(); // Focus sull'input quando la chat si apre
-        } else {
-            // Interrompe TTS alla chiusura
-            stopCurrentAudio();
         }
         document.body.style.overflow = isActive ? 'hidden' : ''; // Blocca scroll pagina quando chat aperta
     }
@@ -554,11 +348,10 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
         aiChatMessagesContainerEl.appendChild(messageDiv);
         aiChatMessagesContainerEl.scrollTop = aiChatMessagesContainerEl.scrollHeight; // Scroll automatico all'ultimo messaggio
 
-        // La logica TTS per i messaggi AI (non iniziali) è gestita da processAndDisplayAiResponse
         return messageDiv;
     }
 
-    // Processa la risposta dell'AI e la mostra nell'UI, gestendo anche TTS
+    // Processa la risposta dell'AI e la mostra nell'UI
     async function processAndDisplayAiResponse(chatResponseText, isThinkingMessage = false) {
         const messageDiv = addMessageToChatUI(isThinkingMessage ? 'ai' : 'assistant', chatResponseText, 'html');
 
@@ -568,34 +361,7 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
                 chatHistoryForAssistant.push({ role: "assistant", content: chatResponseText });
             }
         }
-
-        // Gestione TTS per la risposta reale dell'assistente
-        if (isTTSEnabledByUser && aiChatPopupEl.classList.contains('active') && !isThinkingMessage) {
-            let textToSpeak = chatResponseText;
-
-            try {
-                const ttsOptimizerMessages = [{ role: "user", content: `MESSAGGIO DA ANALIZZARE: ${chatResponseText}` }];
-                console.log("AssistenteAI: Richiesta ottimizzazione TTS per:", chatResponseText.substring(0,100)+"...");
-
-                const spokenResponseCandidate = await getGroqCompletion(
-                    ttsOptimizerMessages,
-                    TTS_OPTIMIZER_SYSTEM_PROMPT(),
-                    GROQ_MODEL_NAME_TTS_OPTIMIZER,
-                    0.2, // Temperatura bassa per output più deterministico
-                    Math.max(300, Math.floor(chatResponseText.length * 1.5)) // Max tokens in base alla lunghezza
-                );
-
-                if (spokenResponseCandidate && spokenResponseCandidate.trim() !== "") {
-                    textToSpeak = spokenResponseCandidate.trim();
-                    console.log("AssistenteAI: Testo ottimizzato per TTS:", textToSpeak.substring(0,100)+"...");
-                } else {
-                    console.warn("AssistenteAI: Ottimizzazione TTS non ha prodotto output valido, uso testo originale (dopo pulizia di speakText).");
-                }
-            } catch (error) {
-                console.error("AssistenteAI: Errore durante l'ottimizzazione TTS:", error);
-            }
-            speakText(textToSpeak); // Chiama speakText con testo ottimizzato o originale
-        }
+        // La logica TTS è stata rimossa.
         return messageDiv;
     }
 
@@ -747,39 +513,51 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
         // userEmail è necessario per recuperare posti_gia_prenotati_utente
         if (!userEmail && currentBookingState.isActive) { // Se siamo in un flusso di prenotazione attivo
             console.warn("AssistenteAI: fetchEventDetailsAndUserBookingStatus: userEmail mancante per un flusso di prenotazione attivo.");
-            // Non è strettamente un errore fatale qui, ma posti_gia_prenotati_utente sarà 0
         }
+
         try {
-            const scriptParams = { id: eventId }; // 'id' è il parametro atteso da get_event_details.php
-            // user_email_for_script sarà aggiunto da callPhpScript se CURRENT_USER_EMAIL è impostato
-            const eventDetailsResult = await callPhpScript("get_event_details.php", scriptParams);
+            // PRIMA PARTE: Recupera i posti già prenotati dall'utente per l'evento specifico.
+            if (userEmail) { // Solo se l'utente è loggato possiamo verificare le sue prenotazioni
+                const userBookingsResult = await callPhpScript("api/api_get_user_bookings.php", {});
+                if (userBookingsResult.success && Array.isArray(userBookingsResult.bookings)) {
+                    const seatsForThisEvent = userBookingsResult.bookings
+                        .filter(booking => booking.idEvento == eventId)
+                        .reduce((total, booking) => total + (parseInt(booking.numeroPostiPrenotati, 10) || 0), 0);
+
+                    currentBookingState.postiGiaPrenotatiUtente = seatsForThisEvent;
+                    console.log(`AssistenteAI: L'utente ha già ${seatsForThisEvent} posti prenotati per l'evento ID ${eventId}.`);
+                } else {
+                    console.warn("AssistenteAI: Impossibile recuperare le prenotazioni dell'utente. Assumo 0 posti prenotati.", userBookingsResult);
+                    currentBookingState.postiGiaPrenotatiUtente = 0; // Fallback
+                }
+            } else {
+                currentBookingState.postiGiaPrenotatiUtente = 0; // Se non è loggato, non ha prenotazioni
+            }
+
+            // SECONDA PARTE: Recupera i dettagli generali dell'evento (titolo, posti disponibili totali)
+            const eventDetailsResult = await callPhpScript("get_event_details.php", { id: eventId });
 
             if (eventDetailsResult.success && eventDetailsResult.data && eventDetailsResult.data.details) {
                 currentBookingState.eventTitle = eventDetailsResult.data.details.Titolo;
-                // Assicurati che questi campi esistano nel tuo script PHP
-                currentBookingState.postiGiaPrenotatiUtente = parseInt(eventDetailsResult.data.details.posti_gia_prenotati_utente, 10) || 0;
-                currentBookingState.postiDisponibiliEvento = parseInt(eventDetailsResult.data.details.PostiDisponibili, 10); // O come si chiama nel tuo PHP
-                console.log("AssistenteAI: Dettagli evento e stato prenotazione utente recuperati:", currentBookingState);
+                currentBookingState.postiDisponibiliEvento = parseInt(eventDetailsResult.data.details.PostiDisponibili, 10);
+                console.log("AssistenteAI: Dettagli evento (titolo, disp.) recuperati:", currentBookingState);
                 return true;
             } else {
-                console.warn("AssistenteAI: Dettagli evento non trovati o formato risposta inatteso da get_event_details.php per eventId:", eventId, eventDetailsResult);
-                // Fallback: prova a ottenere info base da get_events.php se get_event_details fallisce
-                const fallbackParams = { event_id_specific: eventId }; // Un parametro per filtrare per ID specifico in get_events.php
+                console.warn("AssistenteAI: Dettagli evento non trovati da get_event_details.php, tento fallback...", eventDetailsResult);
+                const fallbackParams = { event_id_specific: eventId };
                 const eventsResult = await callPhpScript("get_events.php", fallbackParams);
                 if (eventsResult.success && eventsResult.data && eventsResult.data.length > 0) {
-                    const eventInfo = eventsResult.data.find(e => e.idevento == eventId); // Trova l'evento specifico
+                    const eventInfo = eventsResult.data.find(e => e.idevento == eventId);
                     if (eventInfo) {
                         currentBookingState.eventTitle = eventInfo.titolo;
-                        currentBookingState.postiGiaPrenotatiUtente = parseInt(eventInfo.posti_gia_prenotati_utente, 10) || 0; // Se get_events.php lo fornisce
-                        currentBookingState.postiDisponibiliEvento = parseInt(eventInfo.posti_disponibili, 10); // Se get_events.php lo fornisce
+                        currentBookingState.postiDisponibiliEvento = parseInt(eventInfo.posti_disponibili, 10);
                         console.log("AssistenteAI: Dettagli evento recuperati (fallback get_events):", currentBookingState);
                         return true;
                     }
                 }
-                // Se anche il fallback fallisce, imposta valori di default/errore
+                // Se tutto fallisce
                 currentBookingState.eventTitle = currentBookingState.eventTitle || `Evento ID ${eventId} (Dettagli non reperibili)`;
-                currentBookingState.postiGiaPrenotatiUtente = currentBookingState.postiGiaPrenotatiUtente === undefined ? 0 : currentBookingState.postiGiaPrenotatiUtente;
-                currentBookingState.postiDisponibiliEvento = currentBookingState.postiDisponibiliEvento === undefined ? 0 : currentBookingState.postiDisponibiliEvento; // Assumiamo 0 se non caricabili
+                currentBookingState.postiDisponibiliEvento = currentBookingState.postiDisponibiliEvento === undefined ? 0 : currentBookingState.postiDisponibiliEvento;
                 return false;
             }
         } catch (e) {
@@ -997,7 +775,6 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
 
                     case "CONFIRM_BOOKING_DETAILS":
                         if (!IS_USER_LOGGED_IN) {
-                            // Già gestito sopra.
                             resetBookingState();
                             break;
                         }
@@ -1006,31 +783,61 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
                             break;
                         }
                         const validation = validateBookingStateForConfirmation(currentBookingState);
-                        if (validation.isValid) { // Ricontrolla validità prima di chiamare PHP
+                        if (validation.isValid) {
                             try {
                                 const nomiPartecipanti = [];
                                 const cognomiPartecipanti = [];
                                 currentBookingState.partecipanti.forEach(partecipante => {
                                     const parts = partecipante.trim().split(' ');
-                                    nomiPartecipanti.push(parts.shift()); // Primo elemento è nome
-                                    cognomiPartecipanti.push(parts.join(' ')); // Resto è cognome
+                                    nomiPartecipanti.push(parts.shift());
+                                    cognomiPartecipanti.push(parts.join(' '));
                                 });
 
-                                const bookingParams = new FormData(); // Usa FormData per prenota_evento.php
+                                const bookingParams = new FormData();
                                 bookingParams.append('eventId', currentBookingState.eventId);
                                 bookingParams.append('numeroPosti', currentBookingState.numeroPosti);
-                                bookingParams.append('contatto', CURRENT_USER_EMAIL); // Email dell'utente loggato
+                                bookingParams.append('contatto', CURRENT_USER_EMAIL);
                                 nomiPartecipanti.forEach(nome => bookingParams.append('partecipanti_nomi[]', nome));
                                 cognomiPartecipanti.forEach(cognome => bookingParams.append('partecipanti_cognomi[]', cognome));
-                                // Aggiungi anche il titolo evento e il numero di partecipanti per un messaggio di successo più ricco, se il PHP lo gestisce
-                                bookingParams.append('event_title_for_confirmation', currentBookingState.eventTitle); // Opzionale
-                                bookingParams.append('num_participants_for_confirmation', currentBookingState.numeroPosti); // Opzionale
+                                bookingParams.append('event_title_for_confirmation', currentBookingState.eventTitle);
+                                bookingParams.append('num_participants_for_confirmation', currentBookingState.numeroPosti);
 
-                                console.log("AssistenteAI: Invio parametri a prenota_evento.php:", Object.fromEntries(bookingParams.entries()));
                                 const bookingResult = await callPhpScript("prenota_evento.php", bookingParams, 'POST');
-                                systemMessageForMainAI = `Risultato prenotazione da prenota_evento.php: ${JSON.stringify(bookingResult)}`;
+
                                 if (bookingResult.success) {
-                                    resetBookingState(); // Resetta stato dopo prenotazione success
+                                    try {
+                                        const postiPrima = currentBookingState.postiGiaPrenotatiUtente || 0;
+                                        const postiAggiunti = currentBookingState.numeroPosti;
+                                        const postiAttesi = postiPrima + postiAggiunti;
+
+                                        await new Promise(resolve => setTimeout(resolve, 500)); // Attendi per la propagazione nel DB
+
+                                        const verificationBookings = await callPhpScript("api/api_get_user_bookings.php", {});
+
+                                        if (verificationBookings.success && Array.isArray(verificationBookings.bookings)) {
+                                            const postiDopo = verificationBookings.bookings
+                                                .filter(booking => booking.idEvento == currentBookingState.eventId)
+                                                .reduce((total, booking) => total + (parseInt(booking.numeroPostiPrenotati, 10) || 0), 0);
+
+                                            if (postiDopo >= postiAttesi) {
+                                                console.log(`AssistenteAI: Verifica prenotazione RIUSCITA. Posti attesi >= ${postiAttesi}, Posti trovati: ${postiDopo}.`);
+                                                systemMessageForMainAI = `Risultato prenotazione da prenota_evento.php: ${JSON.stringify(bookingResult)}. La verifica successiva ha CONFERMATO il successo. Comunica la conferma definitiva.`;
+                                            } else {
+                                                console.warn(`AssistenteAI: Verifica prenotazione FALLITA. Posti attesi >= ${postiAttesi}, ma trovati solo: ${postiDopo}.`);
+                                                systemMessageForMainAI = `ATTENZIONE: La prenotazione sembrava riuscita, ma la verifica automatica ha fallito (Posti attesi: ${postiAttesi}, Posti trovati: ${postiDopo}). Comunica all'utente che potrebbe esserci stato un problema e di controllare manualmente nella sua area personale. Messaggio originale di successo: ${bookingResult.message}`;
+                                            }
+                                        } else {
+                                            console.warn("AssistenteAI: Impossibile VERIFICARE la prenotazione, api_get_user_bookings.php ha fallito dopo la prenotazione.");
+                                            systemMessageForMainAI = `Risultato prenotazione da prenota_evento.php: ${JSON.stringify(bookingResult)}. La verifica automatica non è riuscita. Comunica il successo ma consiglia di controllare l'area personale.`;
+                                        }
+                                    } catch (verificationError) {
+                                        console.error("AssistenteAI: Errore critico durante la verifica della prenotazione:", verificationError);
+                                        systemMessageForMainAI = `Risultato prenotazione da prenota_evento.php: ${JSON.stringify(bookingResult)}. Errore durante la verifica automatica. Comunica il successo ma consiglia di controllare l'area personale.`;
+                                    } finally {
+                                        resetBookingState();
+                                    }
+                                } else {
+                                    systemMessageForMainAI = `Risultato prenotazione da prenota_evento.php: ${JSON.stringify(bookingResult)}`;
                                 }
                             } catch (error) {
                                 systemMessageForMainAI = `Errore durante la chiamata a prenota_evento.php: ${error.message}. Informa l'utente del problema tecnico.`;
@@ -1043,7 +850,6 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
                     case "GET_USER_PROFILE":
                     case "GET_USER_BOOKINGS":
                         if (!IS_USER_LOGGED_IN) {
-                            // Già gestito.
                             break;
                         }
                         try {
@@ -1063,45 +869,41 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
                         } else if (intentAnalysisParsed.intent === "UNKNOWN") {
                             systemMessageForMainAI = "Non ho compreso chiaramente la tua richiesta. Potresti provare a formulare diversamente o chiedere aiuto sulle mie capacità?";
                         }
-                        // Se è un semplice saluto, MAIN_ASSISTANT_SYSTEM_PROMPT lo gestirà senza systemMessageForMainAI.
                         break;
                 }
-            } else { // Se intentAnalysisParsed è null/undefined (errore parsing JSON dell'intento)
-                // Il messaggio di sistema sull'errore di parsing è già stato aggiunto alla cronologia.
-                // L'AI principale dovrebbe vederlo e chiedere di riformulare.
-                // Non serve aggiungere altro qui.
+            } else {
+                // Gestione errore parsing JSON
             }
 
             // 4. Chiamata all'AI principale per generare la risposta all'utente
             const messagesForMainAI = [...chatHistoryForAssistant];
-            if (systemMessageForMainAI) { // Se c'è un messaggio di sistema specifico da questa logica
+            if (systemMessageForMainAI) {
                 messagesForMainAI.push({ role: "system", content: systemMessageForMainAI });
             }
 
             mainAiResponseContent = await getGroqCompletion(
-                messagesForMainAI.slice(-10), // Invia gli ultimi 10 messaggi (inclusi user, assistant, system)
+                messagesForMainAI.slice(-10),
                 MAIN_ASSISTANT_SYSTEM_PROMPT(),
                 GROQ_MODEL_NAME_ASSISTANT
             );
 
-            if (thinkingMessageDiv) thinkingMessageDiv.remove(); // Rimuove "Sto pensando..."
+            if (thinkingMessageDiv) thinkingMessageDiv.remove();
 
             if (mainAiResponseContent) {
-                await processAndDisplayAiResponse(mainAiResponseContent); // Mostra risposta AI e TTS
+                await processAndDisplayAiResponse(mainAiResponseContent);
             } else {
                 await processAndDisplayAiResponse("Mi dispiace, non sono riuscito a elaborare una risposta in questo momento. Riprova.");
             }
 
-        } catch (error) { // Errore generico in handleSendMessageToAI
+        } catch (error) {
             console.error("AssistenteAI: Errore grave in handleSendMessageToAI:", error);
             if (thinkingMessageDiv) thinkingMessageDiv.remove();
-
             let displayErrorMessage = `Si è verificato un errore imprevisto: ${error.message}. Riprova più tardi o contatta l'assistenza.`;
             await processAndDisplayAiResponse(displayErrorMessage);
         } finally {
-            aiChatInputEl.disabled = false; // Riabilita input
-            aiChatSendBtnEl.disabled = false; // Riabilita bottone
-            if (aiChatPopupEl.classList.contains('active')) aiChatInputEl.focus(); // Metti a fuoco l'input se la chat è attiva
+            aiChatInputEl.disabled = false;
+            aiChatSendBtnEl.disabled = false;
+            if (aiChatPopupEl.classList.contains('active')) aiChatInputEl.focus();
         }
     }
 
@@ -1109,16 +911,15 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
     aiAssistantFabEl.addEventListener('click', toggleAiChat);
     aiChatCloseBtnEl.addEventListener('click', toggleAiChat);
     aiChatSendBtnEl.addEventListener('click', handleSendMessageToAI);
-    aiChatInputEl.addEventListener('keypress', (e) => { // Invia con Enter (non Shift+Enter)
+    aiChatInputEl.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault(); // Previene nuova riga
+            e.preventDefault();
             handleSendMessageToAI();
         }
     });
-    // Gestisce l'altezza dinamica del campo di input (textarea)
     aiChatInputEl.addEventListener('input', () => {
-        aiChatInputEl.style.height = 'auto'; // Resetta altezza
-        aiChatInputEl.style.height = (aiChatInputEl.scrollHeight) + 'px'; // Imposta altezza in base al contenuto
+        aiChatInputEl.style.height = 'auto';
+        aiChatInputEl.style.height = (aiChatInputEl.scrollHeight) + 'px';
     });
 
 
@@ -1126,14 +927,11 @@ Il tuo output deve essere PRONTO PER LA LETTURA IMMEDIATA. Non aggiungere alcuna
     fetchAndPrepareAssistantApiKey().then(keyReady => {
         if (keyReady) {
             console.log("AssistenteAI: Pronto.");
-            createAndInjectTTSButton();
-            loadTTSUserPreference();
-            // Niente da caricare per Google Translate TTS, funziona on-demand
         } else {
             console.warn("AssistenteAI: Chiave API non caricata o non valida. L'assistente potrebbe non funzionare.");
         }
     });
 
-}); // Chiusura del listener per DOMContentLoaded
-; // Assicura che l'istruzione addEventListener termini con un punto e virgola.
+});
+
 
