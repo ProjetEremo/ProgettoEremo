@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
   <style>
-    /* Stili popup login/registrazione */
+    /* Stili popup login/registrazione (per coerenza, anche se gestiti da auth.js) */
     .login-popup input.form-control { transition: border-color 0.3s ease; border: 1px solid #ced4da; background-color: white !important; box-shadow: none !important; outline: none !important; }
     .login-popup input.error-border { border-color: var(--danger, red) !important; }
     .login-popup input:-webkit-autofill,
@@ -107,7 +107,7 @@
      .contatto-card .editable-text-wrapper .edit-icon-text {
         top: 0;
         right: 0;
-        transform: translate(calc(100% + 0px), -50%) scale(0.8); /* Adjusted for tighter fit */
+        transform: translate(calc(100% + 0px), -50%) scale(0.8);
     }
 
     .editable-text-wrapper:hover .edit-icon-text {
@@ -119,8 +119,6 @@
         transform: translate(var(--custom-translate-x, 50%), var(--custom-translate-y, -50%)) scale(1);
     }
 
-
-    /* Generic Edit Modal Styles */
     .edit-content-modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(var(--dark-rgb, 30, 59, 47), 0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center;}
     .edit-content-modal-content { background-color: var(--white); padding: 25px; border-radius: var(--border-radius-medium); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;}
     .edit-content-modal-content h3 { margin-top: 0; color: var(--primary); }
@@ -132,7 +130,6 @@
     .close-modal-btn { position: absolute; top: 10px; right: 15px; font-size: 1.8rem; color: var(--gray-medium); background: none; border: none; cursor: pointer; line-height: 1;}
     .close-modal-btn:hover { color: var(--dark); }
 
-    /* Phone Numbers Modal Specific Styles */
     #editPhoneNumbersModal .phone-entry { display: flex; align-items: center; margin-bottom: 10px; padding: 10px; border: 1px solid #eee; border-radius: 8px; background-color: #f9f9f9; }
     #editPhoneNumbersModal .phone-entry-details { flex-grow: 1; display: flex; gap: 10px; }
     #editPhoneNumbersModal .phone-entry-details span { font-size: 0.9em; }
@@ -141,16 +138,14 @@
     #editPhoneNumbersModal .add-phone-form { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;}
     #editPhoneNumbersModal .add-phone-form .form-group { flex: 1 1 150px; margin-bottom: 0;}
     #editPhoneNumbersModal .add-phone-form button { flex-basis: 100%; margin-top:10px; background-color: var(--success); }
-     @media (min-width: 768px) { /* Desktop view for add phone form */
+     @media (min-width: 768px) {
         #editPhoneNumbersModal .add-phone-form button { flex-basis: auto; margin-top:0px;}
     }
     #editPhoneNumbersModal #phoneNumbersListContainer { max-height: 250px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px;}
 
-
-    /* Stili per #pageOverallStatus - Standardizzati */
     #pageOverallStatus {
       position: fixed;
-      bottom: 80px; /* Adjusted to be above admin buttons */
+      bottom: 80px;
       left: 50%;
       z-index: 1000;
       padding: 10px 20px;
@@ -158,42 +153,33 @@
       font-size: 0.9em;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
-      background-color: var(--primary); /* Default color */
+      background-color: var(--primary);
       color: white;
-      display: block; /* Initially block but invisible */
+      display: block;
       opacity: 0;
-      transform: translateX(-50%) translateY(30px); /* Start off-screen */
+      transform: translateX(-50%) translateY(30px);
       transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275), transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275);
-      pointer-events: none; /* Prevent interaction when hidden */
+      pointer-events: none;
       max-width: 90%;
       box-sizing: border-box;
     }
-
     #pageOverallStatus.active {
       opacity: 1;
-      transform: translateX(-50%) translateY(0); /* Slide in */
-      pointer-events: auto; /* Allow interaction when visible */
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
     }
-
-    #pageOverallStatus.success {
-      background-color: var(--success, green);
-    }
-
-    #pageOverallStatus.error {
-      background-color: var(--danger, red);
-    }
+    #pageOverallStatus.success { background-color: var(--success, green); }
+    #pageOverallStatus.error { background-color: var(--danger, red); }
     
-    /* NUOVI STILI PER LA PAGINA CONTATTI */
     .contatti-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 2rem;
-        align-items: stretch; /* Allinea le card sulla stessa altezza */
+        align-items: stretch;
     }
-
     .contatto-card {
         background-color: #ffffff;
-        border-radius: 1rem; /* Angoli più arrotondati */
+        border-radius: 1rem;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
         padding: 2.5rem;
         text-align: center;
@@ -201,42 +187,27 @@
         flex-direction: column;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
     .contatto-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
     }
-    
-    .contatto-card .card-content {
-        flex-grow: 1; /* Fa espandere l'area del contenuto per riempire lo spazio */
-    }
-
-    .contatto-card .contatto-icon {
-        margin-bottom: 1.5rem;
-    }
-
-    .contatto-card h3 {
-        margin-bottom: 1.5rem; /* Aumentato il margine inferiore per più spazio */
-    }
-    
+    .contatto-card .card-content { flex-grow: 1; }
+    .contatto-card .contatto-icon { margin-bottom: 1.5rem; }
+    .contatto-card h3 { margin-bottom: 1.5rem; }
     .contatto-card .contatto-valore {
         font-weight: 600;
         font-size: 1.2rem;
         color: var(--primary);
         word-break: break-all;
-        margin-bottom: 0; /* Rimuove lo spazio sotto l'email */
+        margin-bottom: 0;
     }
-
     .phone-display-entry {
         margin-bottom: 1rem;
         font-size: 1.2rem;
         font-weight: 600;
         color: var(--primary);
     }
-
-    .contatto-card .btn-contatto, .contatto-card .btn-secondary {
-        width: 100%; /* Bottone a larghezza piena */
-    }
+    .contatto-card .btn-contatto, .contatto-card .btn-secondary { width: 100%; }
   </style>
 </head>
 <body>
@@ -249,13 +220,13 @@
       </a>
     </div>
     <div class="menu" id="mainMenu">
-      <a href="eventiincorso.html" id="navCalendarioAttivita">Calendario attività</a>
-      <a href="eventipassati.html" id="navArchivioAttivita">Archivio attività</a>
+      <a href="eventiincorso.html">Calendario attività</a>
+      <a href="eventipassati.html">Archivio attività</a>
       <span class="separator">|</span>
-      <a href="incontrisullaparola.html" id="navIncontriParola">Incontri sulla parola</a>
+      <a href="incontrisullaparola.html">Incontri sulla parola</a>
       <span class="separator">|</span>
-      <a href="dovesiamo.html" id="navDoveSiamo">Dove siamo</a>
-      <a href="contatti.html" class="active" id="navContatti">Contatti</a>
+      <a href="dovesiamo.html">Dove siamo</a>
+      <a href="contatti.html" class="active">Contatti</a>
     </div>
     <div class="right-menu">
       <button id="login-btn-desktop" class="login-btn" style="display: none;">Accedi</button>
@@ -266,29 +237,27 @@
           <span class="dropdown-arrow">▼</span>
         </button>
         <div class="dropdown-menu" id="userDropdownMenu">
-          <a href="areapersonale.html" id="dropdownProfilo" style="display: none;">Il mio profilo</a>
-          <a href="areapersonale.html#prenotazioni" id="dropdownPrenotazioni" style="display: none;">Le mie prenotazioni</a>
-          <a href="dashboard.html" id="dropdownDashboard" style="display: none;">Dashboard Admin</a>
-          <a href="eventiincorsoAdmin.html" id="dropdownGestioneEventi" style="display: none;">Gestione Eventi</a>
-          <a href="#" id="dropdownLogout">Esci</a>
+          <a href="areapersonale.html" id="nav-profilo">Il mio profilo</a>
+          <a href="areapersonale.html#prenotazioni" id="nav-mie-prenotazioni">Le mie prenotazioni</a>
+          <a href="dashboard.html" id="nav-dashboard">Dashboard Admin</a>
+          <a href="#" id="logout-link-desktop">Esci</a>
         </div>
       </div>
       <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">☰</button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="eventiincorso.html" id="mobileNavCalendarioAttivita">Calendario attività</a>
-    <a href="eventipassati.html" id="mobileNavArchivioAttivita">Archivio attività</a>
-    <a href="incontrisullaparola.html" id="mobileNavIncontriParola">Incontri sulla parola</a>
-    <a href="dovesiamo.html" id="mobileNavDoveSiamo">Dove siamo</a>
-    <a href="contatti.html" id="mobileNavContatti">Contatti</a>
-    <hr id="mobileMenuSeparator" style="border-color: rgba(255,255,255,0.1); display:none;">
+    <a href="eventiincorso.html">Calendario attività</a>
+    <a href="eventipassati.html">Archivio attività</a>
+    <a href="incontrisullaparola.html">Incontri sulla parola</a>
+    <a href="dovesiamo.html">Dove siamo</a>
+    <a href="contatti.html">Contatti</a>
+    <hr id="mobile-menu-separator" style="display:none;">
     <a href="#" id="login-btn-mobile" style="display: none;">Accedi</a>
-    <a href="areapersonale.html" id="mobileNavProfilo" style="display: none;">Il mio profilo</a>
-    <a href="areapersonale.html#prenotazioni" id="mobileNavPrenotazioni" style="display: none;">Le mie prenotazioni</a>
-    <a href="dashboard.html" id="mobileNavDashboard" style="display: none;">Dashboard Admin</a>
-    <a href="eventiincorsoAdmin.html" id="mobileNavGestioneEventiAdmin" style="display: none;">Gestione Eventi</a>
-    <a href="#" id="mobileLogoutLink" style="display: none;">Esci</a>
+    <a href="areapersonale.html" id="mobile-nav-profilo" style="display: none;">Il mio profilo</a>
+    <a href="areapersonale.html#prenotazioni" id="mobile-nav-mie-prenotazioni" style="display: none;">Le mie prenotazioni</a>
+    <a href="dashboard.html" id="mobile-nav-dashboard" style="display: none;">Dashboard Admin</a>
+    <a href="#" id="mobile-logout-link" style="display: none;">Esci</a>
   </div>
 </header>
 
@@ -347,48 +316,10 @@
   </div>
 </main>
 
-<!-- Login Popup -->
-<div class="login-popup-overlay" id="loginOverlay"></div>
-<div class="login-popup" id="loginPopup">
-  <button class="close-popup" id="closeLoginPopupBtn" aria-label="Chiudi popup"> × </button>
-  <div class="login-tabs"> <div class="login-tab active" data-tab="login">Accedi</div> <div class="login-tab" data-tab="register">Registrati</div></div>
-  <form class="login-form active" id="loginForm" method="POST">
-    <div class="form-group mb-3"><label for="login-email">Email</label><input type="email" id="login-email" name="login-email" class="form-control" required autocomplete="email"/></div>
-    <div class="form-group mb-3"><label for="login-password">Password</label><input type="password" id="login-password" name="login-password" class="form-control" required autocomplete="current-password"/></div>
-    <div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
-      <a href="#" id="forgotPasswordLink" style="font-size: 0.9em; color: var(--primary);">Password dimenticata?</a>
-    </div>
-    <div id="login-error-message" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
-    <div class="form-actions"><button type="submit" class="btn-popup">Accedi</button></div>
-  </form>
-  <form class="login-form" id="registerForm" method="POST">
-    <div class="form-group mb-3"><label for="register-name">Nome</label><input type="text" id="register-name" name="register-name" class="form-control" required autocomplete="given-name"/></div>
-    <div class="form-group mb-3"><label for="register-surname">Cognome</label><input type="text" id="register-surname" name="register-surname" class="form-control" required autocomplete="family-name"/></div>
-    <div class="form-group mb-3"><label for="register-email">Email</label><input type="email" id="register-email" name="register-email" class="form-control" required autocomplete="email"/></div>
-    <div class="form-group mb-3"><label for="register-password">Password</label><input type="password" id="register-password" name="register-password" class="form-control" required minlength="8" autocomplete="new-password"/><small>Minimo 8 caratteri.</small></div>
-    <div class="terms-checkbox mb-3"><input type="checkbox" id="register-terms" name="register-terms" required/><label for="register-terms">Accetto i <a href="termini.html" target="_blank">termini e condizioni</a></label></div>
-    <div id="register-error-message" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
-    <div class="form-actions"><button type="submit" class="btn-popup">Registrati</button></div>
-  </form>
-</div>
-
-<!-- Forgot Password Popup -->
-<div class="login-popup-overlay" id="forgotPasswordOverlay"></div>
-<div class="login-popup" id="forgotPasswordPopup">
-  <button class="close-popup" id="closeForgotPasswordPopupBtn" aria-label="Chiudi popup">×</button>
-  <h3 style="text-align:center; margin-bottom: 1rem; color: var(--primary);">Recupera Password</h3>
-  <p style="font-size:0.95em; color:var(--gray-dark); margin-bottom:1.5rem; text-align:left;">Inserisci l'indirizzo email associato al tuo account. Se presente nel nostro sistema, ti invieremo un link per reimpostare la password.</p>
-  <form id="forgotPasswordForm" method="POST">
-    <div class="form-group mb-3">
-      <label for="forgot-email">Email</label>
-      <input type="email" id="forgot-email" name="forgot-email" class="form-control" required autocomplete="email">
-    </div>
-    <div id="forgot-password-message" class="form-message" style="text-align:left;"></div>
-    <div class="form-actions">
-      <button type="submit" class="btn-popup">Invia link di recupero</button>
-    </div>
-  </form>
-</div>
+<!--
+  [RIMOSSO] I popup di login/registrazione/recupero password sono stati rimossi da qui.
+  Vengono ora creati e gestiti dinamicamente dallo script 'auth.js'.
+-->
 
 <!-- Admin Edit Buttons Container -->
 <div id="editPageBtnContainer">
@@ -478,21 +409,20 @@
 
 <script src="assistenteAI.js" defer></script>
 <script src="liquidglass.js" defer></script>
+<script src="auth.js" defer></script>
 
 <script>
   const PAGE_NAME_FOR_CONTENT = 'contatti';
-  const defaultUserIconPath = 'uploads/icons/default_user.png';
-  let currentUserData = null;
   let isEditModeActive = false;
   let originalPageContentsForCancel = {};
-  let currentPageDbContents = {}; // Questo conterrà i dati caricati dal server o i default
-  let tempPhoneNumbers = []; // Array temporaneo per modifiche nel modal dei telefoni
+  let currentPageDbContents = {};
+  let tempPhoneNumbers = [];
 
   const defaultPageContents = {
     pageTitle: "Contattaci",
     pageIntroText: "Siamo a disposizione per informazioni sulle nostre attività, sull'ospitalità o per qualsiasi altra domanda. Non esitare a contattarci!",
     card1Title: "Referenti Ospitalità",
-    card1PhoneNumbers: [ // NUOVA STRUTTURA PER I NUMERI
+    card1PhoneNumbers: [
       { id: 'default-pn1', prefix: "+39", number: "3471900434", name: "Antonella" },
       { id: 'default-pn2', prefix: "+39", number: "3292142414", name: "Marina" }
     ],
@@ -508,160 +438,64 @@
     card2Email: "Indirizzo Email"
   };
 
-
   function gebi(id) { return document.getElementById(id); }
   function formatHTMLContent(str) { if (typeof str !== 'string') str = String(str || ''); return str.replace(/\r\n|\r|\n/g, '<br>'); }
-  function loadUserData() { const uds = localStorage.getItem('userDataEFF'); if (uds) { try { currentUserData = JSON.parse(uds); if (!currentUserData || typeof currentUserData.email === 'undefined') {currentUserData = null; localStorage.removeItem('userDataEFF');}} catch (e) { console.error("Err parsing userDataEFF:", e); currentUserData = null; localStorage.removeItem('userDataEFF');}} else { currentUserData = null; }}
 
-  async function fetchAndUpdateUserDisplayDataFromApi() {
-    if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
-      updateNavbarUI();
-      return;
-    }
-    try {
-      const response = await fetch(`api/api_get_user_profile.php?email=${encodeURIComponent(currentUserData.email)}`);
-      if (!response.ok) throw new Error('Errore fetch profilo utente');
-      const apiResult = await response.json();
-      if (apiResult.success && apiResult.data) {
-        const freshData = apiResult.data;
-        currentUserData.nome = freshData.nome || currentUserData.nome;
-        currentUserData.iconPath = freshData.icon || defaultUserIconPath;
-        currentUserData.cognome = freshData.cognome || (currentUserData.cognome || '');
-        localStorage.setItem('userDataEFF', JSON.stringify(currentUserData));
+  function setupPageNavigation() {
+      const hamburgerBtn = gebi("hamburgerBtn");
+      const mobileMenu = gebi("mobileMenu");
+      function toggleMobileMenu() {
+          if (mobileMenu && hamburgerBtn) {
+              const isOpen = mobileMenu.classList.toggle("open");
+              hamburgerBtn.classList.toggle("open");
+              hamburgerBtn.setAttribute("aria-expanded", String(isOpen));
+              document.body.style.overflow = isOpen ? "hidden" : "";
+          }
       }
-    } catch (error) {
-      console.warn(`${PAGE_NAME_FOR_CONTENT}: Errore fetch profilo aggiornato per navbar:`, error.message);
-    }
-    updateNavbarUI();
-  }
-
- function updateNavbarUI() {
-    const logoLink = gebi('logoLink'); if (logoLink) logoLink.href = "index.html";
-    const navbarTitle = gebi('navbarTitle'); const loginBtnDesktop = gebi('login-btn-desktop'); const userDropdownContainer = gebi('userDropdownContainer'); const navbarAvatarSpan = gebi('navbar-avatar'); const navbarUsername = gebi('navbar-username');
-    const dropdownProfilo = gebi('dropdownProfilo');
-    const dropdownPrenotazioni = gebi('dropdownPrenotazioni');
-    const dropdownDashboard = gebi('dropdownDashboard');
-    const dropdownGestioneEventi = gebi('dropdownGestioneEventi'); 
-    const dropdownLogout = gebi('dropdownLogout'); 
-    const loginBtnMobile = gebi('login-btn-mobile');
-    const mobileNavProfilo = gebi('mobileNavProfilo');
-    const mobileNavPrenotazioni = gebi('mobileNavPrenotazioni');
-    const mobileNavDashboard = gebi('mobileNavDashboard');
-    const mobileNavGestioneEventiAdmin = gebi('mobileNavGestioneEventiAdmin'); 
-    const mobileLogoutLink = gebi('mobileLogoutLink');
-    const mobileMenuSeparator = gebi('mobileMenuSeparator');
-    const editPageBtnContainer = gebi('editPageBtnContainer');
-
-    [loginBtnDesktop, userDropdownContainer, dropdownProfilo, dropdownPrenotazioni, dropdownDashboard, dropdownGestioneEventi, loginBtnMobile, mobileNavProfilo, mobileNavPrenotazioni, mobileNavDashboard, mobileNavGestioneEventiAdmin, mobileLogoutLink, mobileMenuSeparator].forEach(el => { if (el) el.style.display = 'none'; });
-    if(dropdownLogout) dropdownLogout.style.display = 'none'; 
-
-    if (currentUserData) { 
-      if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
-      if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
-      const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
-      if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; };}
-      if (dropdownLogout) dropdownLogout.style.display = 'block'; 
-      if (mobileLogoutLink) mobileLogoutLink.style.display = 'block';
-      if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
-
-      if (currentUserData.isAdmin) { 
-        if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
-        if (dropdownProfilo) dropdownProfilo.style.display = 'block';
-        if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
-        if (dropdownDashboard) dropdownDashboard.style.display = 'block';
-        if (mobileNavDashboard) mobileNavDashboard.style.display = 'block';
-        if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'none';
-        if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'none';
-        if (dropdownGestioneEventi) dropdownGestioneEventi.style.display = 'none';
-        if (mobileNavGestioneEventiAdmin) mobileNavGestioneEventiAdmin.style.display = 'none';
-
-      } else { 
-        if (navbarTitle) navbarTitle.textContent = "Eremo frate Francesco";
-        if (dropdownProfilo) dropdownProfilo.style.display = 'block';
-        if (mobileNavProfilo) mobileNavProfilo.style.display = 'block';
-        if (dropdownPrenotazioni) dropdownPrenotazioni.style.display = 'block';
-        if (mobileNavPrenotazioni) mobileNavPrenotazioni.style.display = 'block';
-        if(editPageBtnContainer) editPageBtnContainer.classList.remove('active');
+      function closeMobileMenu() {
+          if (mobileMenu && hamburgerBtn && mobileMenu.classList.contains("open")) {
+              mobileMenu.classList.remove("open");
+              hamburgerBtn.classList.remove("open");
+              hamburgerBtn.setAttribute("aria-expanded", "false");
+              document.body.style.overflow = "";
+          }
       }
-    } else { 
-      if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
-      if (loginBtnMobile) loginBtnMobile.style.display = 'block';
-      if (navbarTitle) navbarTitle.textContent = "Eremo frate Francesco";
-      if(editPageBtnContainer) editPageBtnContainer.classList.remove('active');
-    }
+      if (hamburgerBtn) hamburgerBtn.addEventListener("click", toggleMobileMenu);
+      document.querySelectorAll("#mobileMenu a").forEach(link => {
+          if (!link.id.includes('login') && !link.id.includes('logout')) {
+              link.addEventListener("click", closeMobileMenu);
+          }
+      });
+      document.addEventListener("click", function(e) {
+          if (mobileMenu && mobileMenu.classList.contains("open") && hamburgerBtn && !mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+              closeMobileMenu();
+          }
+      });
+
+      const userBtnTrigger = gebi('userBtnTrigger');
+      const userDropdownMenu = gebi('userDropdownMenu');
+      if (userBtnTrigger && userDropdownMenu) {
+          userBtnTrigger.addEventListener('click', function(e) {
+              e.stopPropagation();
+              const isShown = userDropdownMenu.style.display === 'block';
+              userDropdownMenu.style.display = isShown ? 'none' : 'block';
+              this.setAttribute('aria-expanded', String(!isShown));
+          });
+          document.addEventListener('click', function(e) {
+              if (userDropdownMenu && userDropdownMenu.style.display === 'block' && !userBtnTrigger.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+                  userDropdownMenu.style.display = 'none';
+                  userBtnTrigger.setAttribute('aria-expanded', 'false');
+              }
+          });
+      }
   }
-
-
-  function handleLogout(){localStorage.removeItem('userDataEFF');currentUserData=null;isEditModeActive=false;updateNavbarUI();loadPageContentsFromServer();showPageStatus('Logout effettuato.','info');}
+  
   let lastScroll = 0; const navbarContainer = gebi("navbarContainer"); if (navbarContainer) { window.addEventListener("scroll", function () { const cS = window.pageYOffset||document.documentElement.scrollTop; if(cS<=50){navbarContainer.classList.remove("hidden");lastScroll=0;return;} if(cS>lastScroll&&!navbarContainer.classList.contains("hidden"))navbarContainer.classList.add("hidden"); else if(cS<lastScroll&&navbarContainer.classList.contains("hidden"))navbarContainer.classList.remove("hidden"); lastScroll=cS<=0?0:cS;}, false);}
-  const mobileMenu = gebi("mobileMenu"); const hamburgerBtn = gebi("hamburgerBtn"); function toggleMobileMenu(){if(mobileMenu&&hamburgerBtn){const iO=mobileMenu.classList.toggle("open");hamburgerBtn.classList.toggle("open"); hamburgerBtn.setAttribute("aria-expanded",String(iO));document.body.style.overflow=iO?"hidden":"";}} function closeMobileMenu(){if(mobileMenu&&hamburgerBtn&&mobileMenu.classList.contains("open")){mobileMenu.classList.remove("open");hamburgerBtn.classList.remove("open");hamburgerBtn.setAttribute("aria-expanded","false");document.body.style.overflow="";}} if(hamburgerBtn)hamburgerBtn.addEventListener("click",toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l=>{if(l.id!=='login-btn-mobile'&&l.id!=='mobileLogoutLink')l.addEventListener("click",closeMobileMenu);}); document.addEventListener("click",function(e){if(mobileMenu&&mobileMenu.classList.contains("open")&&hamburgerBtn&&!mobileMenu.contains(e.target)&&!hamburgerBtn.contains(e.target))closeMobileMenu();});
-  const userBtnTrigger = gebi('userBtnTrigger'); const userDropdownMenu = gebi('userDropdownMenu'); if(userBtnTrigger&&userDropdownMenu){userBtnTrigger.addEventListener('click',function(e){e.stopPropagation();const iS=userDropdownMenu.style.display==='block';userDropdownMenu.style.display=iS?'none':'block';this.setAttribute('aria-expanded',String(!iS));}); document.addEventListener('click',function(e){if(userDropdownMenu&&userDropdownMenu.style.display==='block'&&!userBtnTrigger.contains(e.target)&&!userDropdownMenu.contains(e.target)){userDropdownMenu.style.display='none';userBtnTrigger.setAttribute('aria-expanded','false');}});}
-  const loginOverlay = gebi('loginOverlay'); const loginPopup = gebi('loginPopup'); const closeLoginPopupBtn = gebi('closeLoginPopupBtn'); const loginTabs = document.querySelectorAll('#loginPopup .login-tab'); const loginForms = document.querySelectorAll('#loginPopup .login-form'); const loginFormEl = gebi('loginForm'); const registerFormEl = gebi('registerForm'); const loginErrorMessageEl = gebi('login-error-message'); const registerErrorMessageEl = gebi('register-error-message');
-  function openLoginPopup(){if(loginOverlay)loginOverlay.classList.add('active');if(loginPopup)loginPopup.classList.add('active');document.body.style.overflow='hidden';resetFormErrorsAndMessages();const loginTabToActivate = loginPopup.querySelector('.login-tab[data-tab="login"]'); if(loginTabToActivate) loginTabToActivate.click(); gebi('login-email')?.focus();}
-  function closeLoginPopup(){if(loginOverlay)loginOverlay.classList.remove('active');if(loginPopup)loginPopup.classList.remove('active');document.body.style.overflow='';resetFormErrorsAndMessages();}
-  function resetFormErrorsAndMessages(){loginForms.forEach(f=>f.querySelectorAll('.form-control.error-border').forEach(i=>i.classList.remove('error-border')));if(loginErrorMessageEl)loginErrorMessageEl.style.display='none';if(registerErrorMessageEl)registerErrorMessageEl.style.display='none';}
-  gebi('login-btn-desktop')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();}); gebi('login-btn-mobile')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();closeMobileMenu();});
-  if(closeLoginPopupBtn)closeLoginPopupBtn.addEventListener('click',closeLoginPopup); if(loginOverlay)loginOverlay.addEventListener('click',(e)=>{if(e.target===loginOverlay)closeLoginPopup();});
-  loginTabs.forEach(t=>t.addEventListener('click',()=>{const id=t.dataset.tab;loginTabs.forEach(tb=>tb.classList.remove('active'));t.classList.add('active');loginForms.forEach(f=>{f.classList.remove('active');if(f.id===`${id}Form`){f.classList.add('active');f.querySelector('input:not([type="hidden"])')?.focus();}});resetFormErrorsAndMessages();}));
-
-  loginFormEl?.addEventListener('submit',async(e)=>{
-    e.preventDefault();
-    resetFormErrorsAndMessages();
-    const b=loginFormEl.querySelector('button[type="submit"]');
-    const o=b.innerHTML;
-    b.disabled=true;
-    b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';
-    try{
-      const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});
-      const j=await r.json();
-      if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);
-      if(j.success){
-        currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath,isAdmin:j.is_admin===true||j.is_admin===1};
-        localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));
-
-        updateNavbarUI();
-        closeLoginPopup();
-        await loadPageContentsFromServer();
-
-        if (currentUserData.isAdmin) {
-          toggleEditMode(false); // Inizializza la modalità modifica (ma non la attiva)
-        }
-        showPageStatus(`Benvenuto/a ${currentUserData.nome}!`, "success");
-
-      }else{
-        loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));
-        if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}
-      }
-    }catch(err){
-      console.error("Errore login:",err);
-      if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}
-    }finally{
-      b.disabled=false;
-      b.innerHTML=o;
-    }
-  });
-
-  registerFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=registerFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Registrazione...<div class="spinner-mini-light"></div>';try{const r=await fetch('registrati.php',{method:'POST',body:new FormData(registerFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){alert(j.message||"Registrazione completata! Ora puoi accedere.");const loginTabButton=document.querySelector('.login-tab[data-tab="login"]');if(loginTabButton)loginTabButton.click();const loginEmailInput=gebi('login-email');const registerEmailInput=gebi('register-email');if(loginEmailInput&&registerEmailInput)loginEmailInput.value=registerEmailInput.value;e.target.reset();}else{if(registerErrorMessageEl){registerErrorMessageEl.textContent=j.message||"Errore registrazione.";registerErrorMessageEl.style.display='block';}if(j.errors){for(const f in j.errors)gebi(`register-${f}`)?.classList.add('error-border');}}}catch(err){console.error("Errore registrazione:",err);if(registerErrorMessageEl){registerErrorMessageEl.textContent="Errore connessione o server.";registerErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
-  gebi('dropdownLogout')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();}); gebi('mobileLogoutLink')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenu();});
-
-  const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-  const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
-  const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
-  const closeForgotPasswordPopupBtn = document.getElementById('closeForgotPasswordPopupBtn');
-  const forgotPasswordForm = document.getElementById('forgotPasswordForm');
-  const forgotPasswordMessage = document.getElementById('forgot-password-message');
-  function openForgotPasswordPopup() { if (typeof closeLoginPopup === 'function' && loginPopup?.classList.contains('active')) { closeLoginPopup(); } if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active'); document.body.style.overflow = 'hidden'; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; const forgotEmailInput = document.getElementById('forgot-email'); if(forgotEmailInput) forgotEmailInput.focus(); }
-  function closeForgotPasswordPopup() { if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active'); let anyOtherPagePopupActive = document.querySelector('#loginPopup.active, #editContentModal.active, #editPhoneNumbersModal.active'); if (!anyOtherPagePopupActive) { document.body.style.overflow = ''; } if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; if(forgotPasswordForm) forgotPasswordForm.reset(); }
-  if (forgotPasswordLink) { forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); openForgotPasswordPopup(); }); }
-  if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
-  if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
-  if (forgotPasswordForm) { forgotPasswordForm.addEventListener('submit', async (e) => { e.preventDefault(); if (forgotPasswordMessage) { forgotPasswordMessage.style.display = 'none'; forgotPasswordMessage.className = 'form-message'; } const emailInput = document.getElementById('forgot-email'); const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML; submitBtn.disabled = true; submitBtn.innerHTML = 'Invio...<div class="spinner-mini-light"></div>'; try { const formData = new FormData(forgotPasswordForm); const response = await fetch('richiesta_recupero_password.php', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { forgotPasswordMessage.textContent = result.message; forgotPasswordMessage.classList.add('success'); if(emailInput) emailInput.value = ''; } else { forgotPasswordMessage.textContent = result.message || "Si è verificato un errore."; forgotPasswordMessage.classList.add('error'); } } catch (error) { console.error('Errore richiesta recupero password:', error); forgotPasswordMessage.textContent = "Errore di connessione o del server."; forgotPasswordMessage.classList.add('error'); } finally { if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } }); }
-
+  
   const editPageBtn=gebi('editPageBtn');const savePageChangesBtn=gebi('savePageChangesBtn'); const cancelPageChangesBtn=gebi('cancelPageChangesBtn');
   const editContentModal=gebi('editContentModal'); const closeEditContentModalBtn=gebi('closeEditContentModalBtn');const editModalTitle=gebi('editModalTitle'); const editModalTextarea=gebi('editModalTextarea');const editModalInputText=gebi('editModalInputText'); const editModalInputUrl = gebi('editModalInputUrl'); const editModalInputEmail = gebi('editModalInputEmail'); const editModalInputTel = gebi('editModalInputTel'); const editModalFieldLabelText=gebi('editModalFieldLabelText'); const saveEditModalBtn=gebi('saveEditModalBtn');const cancelEditModalBtn=gebi('cancelEditModalBtn'); const editModalMessage=gebi('editModalMessage');const pageOverallStatus=gebi('pageOverallStatus');
   let currentEditingKey=null;let currentEditingType='text';
 
-  // NUOVI elementi per il modal dei telefoni
   const editPhoneNumbersModal = gebi('editPhoneNumbersModal');
   const closeEditPhoneNumbersModalBtn = gebi('closeEditPhoneNumbersModalBtn');
   const cancelEditPhoneNumbersModalBtn = gebi('cancelEditPhoneNumbersModalBtn');
@@ -671,29 +505,15 @@
   const manageCard1PhonesBtn = gebi('manageCard1PhonesBtn');
   const editPhoneModalMessage = gebi('editPhoneModalMessage');
 
-
   function showPageStatus(message, type = 'info', duration = 3000) {
     if (!pageOverallStatus) return;
     pageOverallStatus.textContent = message;
-    pageOverallStatus.className = ''; // Reset classes
-    pageOverallStatus.classList.add('active'); // Always add active to trigger transition
-
-    if (type === 'success') {
-      pageOverallStatus.classList.add('success');
-    } else if (type === 'error') {
-      pageOverallStatus.classList.add('error');
-    } else {
-        pageOverallStatus.classList.add('info'); // Default or 'info' type
-    }
+    pageOverallStatus.className = '';
+    pageOverallStatus.classList.add('active');
+    if (type === 'success') pageOverallStatus.classList.add('success');
+    else if (type === 'error') pageOverallStatus.classList.add('error');
     
-    if (pageOverallStatus.hideTimeout) {
-      clearTimeout(pageOverallStatus.hideTimeout);
-    }
-    
-    // Force reflow to restart animation if class was already there
-    void pageOverallStatus.offsetHeight; 
-
-    pageOverallStatus.hideTimeout = setTimeout(() => {
+    setTimeout(() => {
       pageOverallStatus.classList.remove('active');
     }, duration);
   }
@@ -706,7 +526,6 @@
       const d=await r.json();
       if(d.success&&d.contents&&Object.keys(d.contents).length>0){ 
           currentPageDbContents=d.contents; 
-          // Assicura che card1PhoneNumbers sia un array
           if (!Array.isArray(currentPageDbContents.card1PhoneNumbers)) {
               currentPageDbContents.card1PhoneNumbers = defaultPageContents.card1PhoneNumbers.map(p => ({...p}));
           }
@@ -720,13 +539,13 @@
       showPageStatus("Errore caricamento. Usati valori predefiniti.","error");
     }
     applyContentsToPage(currentPageDbContents);
-    originalPageContentsForCancel=JSON.parse(JSON.stringify(currentPageDbContents)); // Salva una copia profonda
+    originalPageContentsForCancel=JSON.parse(JSON.stringify(currentPageDbContents));
   }
 
   function applyContentsToPage(contents) {
     document.querySelectorAll('[data-content-key]').forEach(el => {
       const key = el.dataset.contentKey;
-      if (key === 'card1PhoneNumbers') return; // Gestito da renderCard1PhoneNumbers
+      if (key === 'card1PhoneNumbers') return;
 
       let contentValue = contents[key] !== undefined ? contents[key] : defaultPageContents[key];
       if (typeof contentValue !== 'string' && key !== 'card1PhoneNumbers') contentValue = String(contentValue || '');
@@ -746,14 +565,11 @@
   function renderCard1PhoneNumbers(phoneNumbersArray) {
     const numbersContainer = gebi('card1PhoneNumbersContainer');
     if (!numbersContainer) return;
-
-    numbersContainer.innerHTML = ''; // Pulisci i numeri esistenti
-
+    numbersContainer.innerHTML = '';
     if (!phoneNumbersArray || phoneNumbersArray.length === 0) {
-        numbersContainer.innerHTML = '<p class="text-center" style="font-style: italic;">Nessun numero di telefono configurato.</p>';
+        numbersContainer.innerHTML = '<p class="text-center" style="font-style: italic;">Nessun numero configurato.</p>';
         return;
     }
-    
     phoneNumbersArray.forEach((phone) => {
       const numberDiv = document.createElement('div');
       numberDiv.classList.add('phone-display-entry');
@@ -762,50 +578,25 @@
     });
   }
 
-
   function toggleEditMode(enable){
     isEditModeActive=enable;
     document.querySelectorAll('.edit-icon-text, .edit-icon-iframe, .edit-icon-href').forEach(icon => {
-      if (currentUserData?.isAdmin && enable) {
-        icon.style.display = 'flex';
-        const parentWrapper = icon.closest('.editable-text-wrapper');
-        if (parentWrapper) {
-          let translateX = '50%'; let translateY = '-50%';
-          if (parentWrapper.classList.contains('main-title-editable-wrapper')) {translateX = '50%'; translateY = '-50%';}
-          else if (parentWrapper.closest('.contatto-card')) {translateX = 'calc(100% + 0px)'; translateY = '-50%';}
-          else if (parentWrapper.closest('.text-center')) {translateX = 'calc(100% + 5px)'; translateY = '-50%';}
-          icon.style.setProperty('--custom-translate-x', translateX);
-          icon.style.setProperty('--custom-translate-y', translateY);
-        }
-        setTimeout(() => {
-          icon.style.opacity = '1';
-          icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(1)`;
-        }, 10);
-      } else {
-        icon.style.opacity = '0';
-        icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(0.8)`;
-        setTimeout(() => { icon.style.display = 'none'; }, 300);
-      }
+        icon.style.display = (typeof currentUserData !== 'undefined' && currentUserData?.isAdmin && enable) ? 'flex' : 'none';
     });
-
-    if(manageCard1PhonesBtn) manageCard1PhonesBtn.style.display = (currentUserData?.isAdmin && enable) ? 'block' : 'none';
+    if(manageCard1PhonesBtn) manageCard1PhonesBtn.style.display = (typeof currentUserData !== 'undefined' && currentUserData?.isAdmin && enable) ? 'block' : 'none';
 
     const editContainer=gebi('editPageBtnContainer');
     const editBtn=gebi('editPageBtn');
     const saveBtn=gebi('savePageChangesBtn');
     const cancelBtn=gebi('cancelPageChangesBtn');
-
     if(editContainer) {
-      if (currentUserData?.isAdmin) {
+      if (typeof currentUserData !== 'undefined' && currentUserData?.isAdmin) {
         editContainer.classList.add('active');
         if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block';
         if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none';
         if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none';
       } else {
         editContainer.classList.remove('active');
-        if(editBtn) editBtn.style.display = 'none';
-        if(saveBtn) saveBtn.style.display = 'none';
-        if(cancelBtn) cancelBtn.style.display = 'none';
       }
     }
     if(enable){originalPageContentsForCancel= JSON.parse(JSON.stringify(currentPageDbContents));}
@@ -818,90 +609,54 @@
     editModalTitle.textContent=`Modifica: ${keyDisplayNameMap[key] || key}`;
     editModalTextarea.style.display='none';editModalInputText.style.display='none';
     editModalInputUrl.style.display='none'; editModalInputEmail.style.display='none'; editModalInputTel.style.display='none';
-
     let valForInput = currentValue;
     const tmp = document.createElement('div'); tmp.innerHTML = currentValue;
     const plainTextValue = (tmp.textContent || "").replace(/<br\s*\/?>/gi, "\n");
 
-    if (type === 'iframe_src' || type === 'href') { editModalFieldLabelText.textContent = (type === 'iframe_src' ? "URL Mappa (src iframe):" : "URL Link:"); editModalInputUrl.value = valForInput; editModalInputUrl.style.display='block'; editModalInputUrl.focus(); }
+    if (type === 'iframe_src' || type === 'href') { editModalFieldLabelText.textContent = (type === 'iframe_src' ? "URL Mappa:" : "URL Link:"); editModalInputUrl.value = valForInput; editModalInputUrl.style.display='block'; editModalInputUrl.focus(); }
     else if (type === 'email') { editModalFieldLabelText.textContent = "Indirizzo Email:"; editModalInputEmail.value = plainTextValue; editModalInputEmail.style.display='block'; editModalInputEmail.focus(); }
     else if (type === 'tel') { editModalFieldLabelText.textContent = "Numero Telefono:"; editModalInputTel.value = plainTextValue; editModalInputTel.style.display='block'; editModalInputTel.focus(); }
     else if (type === 'textarea') { editModalFieldLabelText.textContent="Testo (paragrafo):"; editModalTextarea.value= plainTextValue; editModalTextarea.style.display='block';editModalTextarea.focus(); }
-    else { editModalFieldLabelText.textContent="Testo (titolo/corto):"; editModalInputText.value= plainTextValue; editModalInputText.style.display='block';editModalInputText.focus(); }
+    else { editModalFieldLabelText.textContent="Testo (corto):"; editModalInputText.value= plainTextValue; editModalInputText.style.display='block';editModalInputText.focus(); }
     editContentModal.style.display='flex';
   }
 
   function closeEditContentModal(){if(editContentModal)editContentModal.style.display='none';currentEditingKey=null;}
   
   if(editPageBtn)editPageBtn.addEventListener('click',()=>toggleEditMode(true));
-  
   if(savePageChangesBtn)savePageChangesBtn.addEventListener('click',async()=>{
     const contentsToSave = JSON.parse(JSON.stringify(currentPageDbContents)); 
-    document.querySelectorAll('[data-content-key]').forEach(el => {
-      const key = el.dataset.contentKey;
-      if (key === 'card1PhoneNumbers') { 
-          if (!Array.isArray(contentsToSave[key])) {
-              contentsToSave[key] = []; 
-          }
-      } else if (el.tagName === 'IFRAME' && key === 'mapIframeSrc') { contentsToSave[key] = el.src; }
-      else if (el.tagName === 'A' && key === 'locationDirectionsButtonHref') { contentsToSave[key] = el.href; }
-      else { contentsToSave[key] = currentPageDbContents[key]; } 
-    });
-
     const btn=savePageChangesBtn; const oldHtml=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
-    
     try {
       const response = await fetch('api_save_page_content.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ page_name: PAGE_NAME_FOR_CONTENT, contents: contentsToSave })
       });
-
-      const responseText = await response.text(); 
-
+      const responseText = await response.text();
       if (!response.ok) {
         let errorMessage = `Errore server: ${response.status}`;
         try {
             if (response.headers.get("content-type")?.includes("application/json")) {
                 const errorJson = JSON.parse(responseText);
                 errorMessage = errorJson.message || responseText;
-            } else {
-                errorMessage = responseText.substring(0, 300) + (responseText.length > 300 ? "..." : "");
-            }
-        } catch (e) {
-             errorMessage = responseText.substring(0, 300) + (responseText.length > 300 ? "..." : "");
-        }
+            } else { errorMessage = responseText.substring(0, 300); }
+        } catch (e) { errorMessage = responseText.substring(0, 300); }
         throw new Error(errorMessage);
       }
-
       let jsonData;
-      try {
-        jsonData = JSON.parse(responseText);
-      } catch (e) {
-        console.error("Errore parsing JSON dalla risposta del server:", e);
-        console.error("Testo della risposta ricevuto dal server:", responseText);
-        throw new Error("Risposta non valida dal server. Controllare la console per i dettagli.");
-      }
-
-      if (!jsonData.success) {
-        throw new Error(jsonData.message || "Errore sconosciuto durante il salvataggio dei contenuti.");
-      }
+      try { jsonData = JSON.parse(responseText); }
+      catch (e) { throw new Error("Risposta non valida dal server."); }
+      if (!jsonData.success) { throw new Error(jsonData.message || "Errore sconosciuto."); }
 
       currentPageDbContents = JSON.parse(JSON.stringify(contentsToSave));
       originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents));
       showPageStatus(jsonData.message || 'Modifiche salvate!', 'success');
       toggleEditMode(false);
-
     } catch (err) {
-      console.error("Errore durante il salvataggio (catch generale):", err);
-      let displayMessage = `Errore: ${err.message}`;
-      if (err.message.includes("Risposta non valida dal server") || err.message.includes("Errore server:")) {
-          displayMessage = err.message;
-      }
-      showPageStatus(displayMessage, 'error');
+      showPageStatus(`Errore: ${err.message}`, 'error');
     } finally {
-      btn.disabled = false;
-      btn.innerHTML = oldHtml;
+      btn.disabled = false; btn.innerHTML = oldHtml;
     }
   });
 
@@ -914,16 +669,14 @@
 
   document.addEventListener('click',function(e){
     if(!isEditModeActive||!currentUserData?.isAdmin)return;
-    const editIcon=e.target.closest('.edit-icon-text,.edit-icon-iframe,.edit-icon-href');
-    let elToEdit,key,type,currentVal;
+    const editIcon=e.target.closest('.edit-icon-text');
     if(editIcon){
       e.stopPropagation();
-      key=editIcon.dataset.key; type=editIcon.dataset.type;
-      elToEdit=gebi(`content-${key}`);
-      if(!elToEdit){console.error(`Elemento con id content-${key} non trovato`);return;}
-      if (type === 'iframe_src') { currentVal = elToEdit.src; }
-      else if (type === 'href') { currentVal = elToEdit.href; }
-      else { currentVal = currentPageDbContents[key] !== undefined ? currentPageDbContents[key] : defaultPageContents[key]; }
+      const key=editIcon.dataset.key; 
+      const type=editIcon.dataset.type;
+      const elToEdit=gebi(`content-${key}`);
+      if(!elToEdit){return;}
+      const currentVal = currentPageDbContents[key] !== undefined ? currentPageDbContents[key] : defaultPageContents[key];
       openEditModal(key, type, currentVal);
     }
   });
@@ -934,26 +687,23 @@
   if(saveEditModalBtn)saveEditModalBtn.addEventListener('click',async()=>{
     if(!currentEditingKey)return;
     let targetElement = gebi(`content-${currentEditingKey}`);
-    if(!targetElement){if(editModalMessage){editModalMessage.textContent="Err: Elem. non trovato.";editModalMessage.className='form-message error';editModalMessage.style.display='block';}return;}
+    if(!targetElement)return;
 
     let newValueRaw=''; let formattedNewValue = '';
-    if(currentEditingType === 'iframe_src' || currentEditingType === 'href'){ newValueRaw = editModalInputUrl.value.trim(); formattedNewValue = newValueRaw; }
-    else if(currentEditingType === 'email'){ newValueRaw = editModalInputEmail.value.trim(); formattedNewValue = formatHTMLContent(newValueRaw); }
-    else if(currentEditingType === 'tel'){ newValueRaw = editModalInputTel.value.trim(); formattedNewValue = formatHTMLContent(newValueRaw); }
-    else { newValueRaw = currentEditingType === 'textarea' ? editModalTextarea.value : editModalInputText.value; formattedNewValue = formatHTMLContent(newValueRaw); }
-
-    if(currentEditingType === 'iframe_src') { targetElement.src = formattedNewValue; }
-    else if (currentEditingType === 'href') { targetElement.href = formattedNewValue; }
-    else { targetElement.innerHTML = formattedNewValue; }
+    if(currentEditingType === 'email'){ newValueRaw = editModalInputEmail.value.trim(); }
+    else if(currentEditingType === 'tel'){ newValueRaw = editModalInputTel.value.trim(); }
+    else { newValueRaw = currentEditingType === 'textarea' ? editModalTextarea.value : editModalInputText.value; }
+    
+    formattedNewValue = formatHTMLContent(newValueRaw);
+    targetElement.innerHTML = formattedNewValue;
     currentPageDbContents[currentEditingKey] = newValueRaw;
+
     if (currentEditingKey === 'card2Email') { const mailLink = gebi('mailtoLinkCard2'); if (mailLink) mailLink.href = `mailto:${newValueRaw.trim()}`; }
     closeEditContentModal();
   });
   
-  // ----- LOGICA MODAL GESTIONE NUMERI TELEFONO -----
   function openEditPhoneNumbersModal() {
     if (!editPhoneNumbersModal) return;
-    // Clona profondamente i numeri attuali in tempPhoneNumbers per modifiche isolate
     tempPhoneNumbers = JSON.parse(JSON.stringify(currentPageDbContents.card1PhoneNumbers || []));
     renderPhoneNumbersInModal();
     editPhoneModalMessage.style.display = 'none';
@@ -963,19 +713,17 @@
 
   function closeEditPhoneNumbersModal() {
     if (editPhoneNumbersModal) editPhoneNumbersModal.style.display = 'none';
-    addPhoneForm.reset(); // Pulisci il form di aggiunta
-    gebi('phonePrefixInput').value = "+39"; // Reimposta il prefisso
+    addPhoneForm.reset();
+    gebi('phonePrefixInput').value = "+39";
   }
 
   function renderPhoneNumbersInModal() {
     if (!phoneNumbersListContainer) return;
-    phoneNumbersListContainer.innerHTML = ''; // Pulisci lista
-
+    phoneNumbersListContainer.innerHTML = '';
     if (tempPhoneNumbers.length === 0) {
-        phoneNumbersListContainer.innerHTML = '<p style="text-align:center; font-style:italic;">Nessun numero aggiunto. Usa il form sotto.</p>';
+        phoneNumbersListContainer.innerHTML = '<p style="text-align:center; font-style:italic;">Nessun numero. Usa il form sotto.</p>';
         return;
     }
-
     tempPhoneNumbers.forEach((phone, index) => {
       const entryDiv = document.createElement('div');
       entryDiv.classList.add('phone-entry');
@@ -986,18 +734,15 @@
           <span><strong>Nome:</strong> ${phone.name}</span>
         </div>
         <div class="phone-entry-actions">
-          <button data-index="${index}" class="remove-phone-btn"><i class="fas fa-trash-alt"></i> Rimuovi</button>
+          <button data-index="${index}" class="remove-phone-btn"><i class="fas fa-trash-alt"></i></button>
         </div>
       `;
       phoneNumbersListContainer.appendChild(entryDiv);
     });
-
-    // Aggiungi event listener ai nuovi bottoni "Rimuovi"
     document.querySelectorAll('#editPhoneNumbersModal .remove-phone-btn').forEach(btn => {
       btn.addEventListener('click', function() {
-        const indexToRemove = parseInt(this.dataset.index, 10);
-        tempPhoneNumbers.splice(indexToRemove, 1);
-        renderPhoneNumbersInModal(); // Ri-renderizza la lista nel modal
+        tempPhoneNumbers.splice(parseInt(this.dataset.index, 10), 1);
+        renderPhoneNumbersInModal();
       });
     });
   }
@@ -1008,94 +753,62 @@
       const prefix = gebi('phonePrefixInput').value.trim();
       const number = gebi('phoneNumberInput').value.trim();
       const name = gebi('phoneNameInput').value.trim();
-
-      if (!number || !name) {
-        editPhoneModalMessage.textContent = "Numero e Nome sono obbligatori.";
-        editPhoneModalMessage.className = 'form-message error';
-        editPhoneModalMessage.style.display = 'block';
-        return;
-      }
-       if (!/^\d+$/.test(number)) {
-        editPhoneModalMessage.textContent = "Il numero di telefono può contenere solo cifre.";
-        editPhoneModalMessage.className = 'form-message error';
-        editPhoneModalMessage.style.display = 'block';
-        return;
-      }
-      if (prefix && !/^\+\d+$/.test(prefix)) {
-        editPhoneModalMessage.textContent = "Il prefisso deve iniziare con '+' seguito da cifre (es. +39).";
-        editPhoneModalMessage.className = 'form-message error';
-        editPhoneModalMessage.style.display = 'block';
-        return;
-      }
-
+      if (!number || !name) { editPhoneModalMessage.textContent = "Numero e Nome sono obbligatori."; editPhoneModalMessage.className = 'form-message error'; editPhoneModalMessage.style.display = 'block'; return; }
+      if (!/^\d+$/.test(number)) { editPhoneModalMessage.textContent = "Il numero può contenere solo cifre."; editPhoneModalMessage.className = 'form-message error'; editPhoneModalMessage.style.display = 'block'; return; }
+      if (prefix && !/^\+\d+$/.test(prefix)) { editPhoneModalMessage.textContent = "Il prefisso deve iniziare con '+' (es. +39)."; editPhoneModalMessage.className = 'form-message error'; editPhoneModalMessage.style.display = 'block'; return; }
 
       editPhoneModalMessage.style.display = 'none';
       tempPhoneNumbers.push({ id: `temp-${Date.now()}`, prefix, number, name });
       renderPhoneNumbersInModal();
-      this.reset(); // Pulisci il form
-      gebi('phonePrefixInput').value = "+39"; // Reimposta il prefisso
+      this.reset();
+      gebi('phonePrefixInput').value = "+39";
       gebi('phoneNumberInput').focus();
     });
   }
   
-  if (manageCard1PhonesBtn) {
-      manageCard1PhonesBtn.addEventListener('click', openEditPhoneNumbersModal);
-  }
-
+  if (manageCard1PhonesBtn) manageCard1PhonesBtn.addEventListener('click', openEditPhoneNumbersModal);
   if (savePhoneNumbersModalBtn) {
     savePhoneNumbersModalBtn.addEventListener('click', function() {
-      // Salva i numeri da tempPhoneNumbers a currentPageDbContents
       currentPageDbContents.card1PhoneNumbers = JSON.parse(JSON.stringify(tempPhoneNumbers));
-      renderCard1PhoneNumbers(currentPageDbContents.card1PhoneNumbers); // Aggiorna la visualizzazione principale
+      renderCard1PhoneNumbers(currentPageDbContents.card1PhoneNumbers);
       closeEditPhoneNumbersModal();
-      showPageStatus('Numeri di telefono aggiornati. Ricorda di salvare le modifiche generali della pagina.', 'info', 4000);
+      showPageStatus('Numeri aggiornati. Ricorda di salvare le modifiche alla pagina.', 'info', 4000);
     });
   }
-  
-  if (cancelEditPhoneNumbersModalBtn) {
-    cancelEditPhoneNumbersModalBtn.addEventListener('click', closeEditPhoneNumbersModal);
-  }
-  if (closeEditPhoneNumbersModalBtn) {
-    closeEditPhoneNumbersModalBtn.addEventListener('click', closeEditPhoneNumbersModal);
-  }
-  // ----- FINE LOGICA MODAL GESTIONE NUMERI TELEFONO -----
-
+  if (cancelEditPhoneNumbersModalBtn) cancelEditPhoneNumbersModalBtn.addEventListener('click', closeEditPhoneNumbersModal);
+  if (closeEditPhoneNumbersModalBtn) closeEditPhoneNumbersModalBtn.addEventListener('click', closeEditPhoneNumbersModal);
 
   async function loadNavbarLogo() {
     const logoImgTag = document.getElementById('navbarLogoImgTag');
-    if (!logoImgTag) { console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in contatti.html."); return; }
+    if (!logoImgTag) { return; }
     const defaultLogoPath = 'images/Logo_eremo.png';
     try {
       const response = await fetch('api_get_page_content.php?page=index');
-      if (!response.ok) { throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`); }
+      if (!response.ok) throw new Error(`Errore HTTP ${response.status}`);
       const data = await response.json();
-      if (data.success && data.contents && data.contents.navbarLogo) { logoImgTag.src = data.contents.navbarLogo; }
-      else { console.warn("URL del logo navbar non trovato o errore API. Uso il logo di default."); logoImgTag.src = defaultLogoPath; }
-    } catch (error) { console.error("Errore nel caricare dinamicamente il logo navbar:", error); logoImgTag.src = defaultLogoPath; }
+      logoImgTag.src = (data.success && data.contents && data.contents.navbarLogo) ? data.contents.navbarLogo : defaultLogoPath;
+    } catch (error) {
+      logoImgTag.src = defaultLogoPath;
+    }
   }
 
   document.addEventListener('DOMContentLoaded',async()=>{
     const c=gebi('currentYear');if(c)c.textContent=new Date().getFullYear();
-    loadUserData();
-    updateNavbarUI();
+    setupPageNavigation();
     await loadNavbarLogo();
     await loadPageContentsFromServer();
-    await fetchAndUpdateUserDisplayDataFromApi();
-
-    const editContainer = gebi('editPageBtnContainer');
-    if (currentUserData && currentUserData.isAdmin) {
-      toggleEditMode(false); // Inizializza ma non attiva la modalità modifica
-    } else {
-      toggleEditMode(false); // Assicura che sia disattivata per non admin
-      if(editContainer) editContainer.classList.remove('active');
-    }
+    
+    document.addEventListener('loginSuccess', () => {
+        toggleEditMode(false);
+    });
+    document.addEventListener('logoutSuccess', () => {
+        toggleEditMode(false);
+    });
 
     document.addEventListener('keydown',(e)=>{
       if(e.key==='Escape'){
-        if(loginPopup?.classList.contains('active')) closeLoginPopup();
-        if(gebi('forgotPasswordPopup')?.classList.contains('active')) closeForgotPasswordPopup();
         if(editContentModal?.style.display==='flex') closeEditContentModal();
-        if(editPhoneNumbersModal?.style.display==='flex') closeEditPhoneNumbersModal(); // Chiudi anche il modal dei telefoni
+        if(editPhoneNumbersModal?.style.display==='flex') closeEditPhoneNumbersModal();
       }
     });
   });

@@ -10,11 +10,7 @@
     <link rel="stylesheet" href="liquidai.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Add this for red logout link */
-        #logout-link-desktop, #mobileLogoutLink {
-            /* color: red !important; */ /* Rimosso stile rosso per coerenza con altre pagine */
-        }
-        /* Stili popup login/registrazione */
+        /* Stili popup login/registrazione (da auth.js) */
         .login-popup input.form-control { transition: border-color 0.3s ease; border: 1px solid #ced4da; background-color: white !important; box-shadow: none !important; outline: none !important; }
         .login-popup input.error-border { border-color: var(--danger, red) !important; }
         .login-popup input:-webkit-autofill,
@@ -236,8 +232,7 @@
                 <div class="dropdown-menu" id="userDropdownMenu">
                     <a href="areapersonale.html" id="nav-profilo">Il mio profilo</a>
                     <a href="areapersonale.html#prenotazioni" id="nav-mie-prenotazioni">Le mie prenotazioni</a>
-                    <a href="dashboard.html" id="nav-dashboard" style="display: none;">Dashboard Admin</a>
-                    <a href="eventiincorsoAdmin.html" id="nav-gestione-eventi-admin" style="display: none;">Gestione Eventi</a>
+                    <a href="dashboard.html" id="nav-dashboard">Dashboard Admin</a>
                     <a href="#" id="logout-link-desktop">Esci</a>
                 </div>
             </div>
@@ -245,18 +240,17 @@
         </div>
     </nav>
     <div class="mobile-menu" id="mobileMenu">
-        <a href="eventiincorso.html" id="mobileNavCalendarioAttivita">Calendario attività</a>
-        <a href="eventipassati.html" id="mobileNavArchivioAttivita">Archivio attività</a>
-        <a href="incontrisullaparola.html" id="mobileNavIncontriParola">Incontri sulla parola</a>
-        <a href="dovesiamo.html" id="mobileNavDoveSiamo">Dove siamo</a>
-        <a href="contatti.html" id="mobileNavContatti">Contatti</a>
-        <hr id="mobileMenuSeparator" style="border-color: rgba(255,255,255,0.1); display:none;">
+        <a href="eventiincorso.html">Calendario attività</a>
+        <a href="eventipassati.html">Archivio attività</a>
+        <a href="incontrisullaparola.html">Incontri sulla parola</a>
+        <a href="dovesiamo.html">Dove siamo</a>
+        <a href="contatti.html">Contatti</a>
+        <hr id="mobile-menu-separator" style="display:none;">
         <a href="#" id="login-btn-mobile" style="display: none;">Accedi</a>
-        <a href="areapersonale.html" id="mobileNavProfilo" style="display: none;">Il mio profilo</a>
-        <a href="areapersonale.html#prenotazioni" id="mobileNavPrenotazioni" style="display: none;">Le mie prenotazioni</a>
-        <a href="dashboard.html" id="mobileNavDashboard" style="display: none;">Dashboard Admin</a>
-        <a href="eventiincorsoAdmin.html" id="mobileNavGestioneEventiAdmin" style="display: none;">Gestione Eventi</a>
-        <a href="#" id="mobileLogoutLink" style="display: none;">Esci</a>
+        <a href="areapersonale.html" id="mobile-nav-profilo" style="display: none;">Il mio profilo</a>
+        <a href="areapersonale.html#prenotazioni" id="mobile-nav-mie-prenotazioni" style="display: none;">Le mie prenotazioni</a>
+        <a href="dashboard.html" id="mobile-nav-dashboard" style="display: none;">Dashboard Admin</a>
+        <a href="#" id="mobile-logout-link" style="display: none;">Esci</a>
     </div>
 </header>
 
@@ -289,8 +283,6 @@
                 </div>
             </div>
         </section>
-
-        
 
         <section class="chi-siamo-section reverse section-padding">
             <div class="chi-siamo-image-container editable-image-wrapper">
@@ -400,46 +392,11 @@
     </div>
 </main>
 
-<div class="login-popup-overlay" id="loginOverlay"></div>
-<div class="login-popup" id="loginPopup">
-    <button class="close-popup" id="closeLoginPopupBtn" aria-label="Chiudi popup">×</button>
-    <div class="login-tabs"> <div class="login-tab active" data-tab="login">Accedi</div> <div class="login-tab" data-tab="register">Registrati</div></div>
-    <form class="login-form active" id="loginForm" method="POST">
-        <div class="form-group mb-3"><label for="login-email">Email</label><input type="email" id="login-email" name="login-email" class="form-control" required autocomplete="email"></div>
-        <div class="form-group mb-3"><label for="login-password">Password</label><input type="password" id="login-password" name="login-password" class="form-control" required autocomplete="current-password"></div>
-        <div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
-            <a href="#" id="forgotPasswordLink" style="font-size: 0.9em; color: var(--primary);">Password dimenticata?</a>
-        </div>
-        <div id="login-error-message" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
-        <div class="form-actions"><button type="submit" class="btn-popup">Accedi</button></div>
-    </form>
-    <form class="login-form" id="registerForm" method="POST">
-        <div class="form-group mb-3"><label for="register-name">Nome</label><input type="text" id="register-name" name="register-name" class="form-control" required autocomplete="given-name"></div>
-        <div class="form-group mb-3"><label for="register-surname">Cognome</label><input type="text" id="register-surname" name="register-surname" class="form-control" required autocomplete="family-name"></div>
-        <div class="form-group mb-3"><label for="register-email">Email</label><input type="email" id="register-email" name="register-email" class="form-control" required autocomplete="email"></div>
-        <div class="form-group mb-3"><label for="register-password">Password</label><input type="password" id="register-password" name="register-password" class="form-control" required minlength="8" autocomplete="new-password"><small>Minimo 8 caratteri.</small></div>
-        <div class="terms-checkbox mb-3"><input type="checkbox" id="register-terms" name="register-terms" required><label for="register-terms">Accetto i <a href="termini.html" target="_blank">termini e condizioni</a></label></div>
-        <div id="register-error-message" class="form-message error" style="display: none; margin-bottom: 1rem;"></div>
-        <div class="form-actions"><button type="submit" class="btn-popup">Registrati</button></div>
-    </form>
-</div>
+<!--
+  [RIMOSSO] I popup di login/registrazione/recupero password sono stati rimossi da qui.
+  Vengono ora creati e gestiti dinamicamente dallo script 'auth.js'.
+-->
 
-<div class="login-popup-overlay" id="forgotPasswordOverlay"></div>
-<div class="login-popup" id="forgotPasswordPopup">
-    <button class="close-popup" id="closeForgotPasswordPopupBtn" aria-label="Chiudi popup">×</button>
-    <h3 style="text-align:center; margin-bottom: 1rem; color: var(--primary);">Recupera Password</h3>
-    <p style="font-size:0.95em; color:var(--gray-dark); margin-bottom:1.5rem; text-align:left;">Inserisci l'indirizzo email associato al tuo account. Se presente nel nostro sistema, ti invieremo un link per reimpostare la password.</p>
-    <form id="forgotPasswordForm" method="POST">
-        <div class="form-group mb-3">
-            <label for="forgot-email">Email</label>
-            <input type="email" id="forgot-email" name="forgot-email" class="form-control" required autocomplete="email">
-        </div>
-        <div id="forgot-password-message" class="form-message" style="text-align:left;"></div>
-        <div class="form-actions">
-            <button type="submit" class="btn-popup">Invia link di recupero</button>
-        </div>
-    </form>
-</div>
 <div id="editPageBtnContainer">
     <button id="editPageBtn"><i class="fas fa-pencil-alt"></i> Attiva Modifiche</button>
     <button id="savePageChangesBtn" style="display:none;"><i class="fas fa-save"></i> Salva Modifiche Pagina</button>
@@ -525,18 +482,17 @@
 
 <script src="assistenteAI.js" defer></script>
 <script src="liquidglass.js" defer></script>
+<script src="auth.js" defer></script>
 
 <script>
     const PAGE_NAME_FOR_CONTENT = 'incontrisullaparola';
-    const defaultUserIconPath = 'uploads/icons/default_user.png';
-    let currentUserData = null;
     let isEditModeActive = false;
     let originalPageContentsForCancel = {};
     let currentPageDbContents = {};
 
     const defaultPageContents = {
         pageHeaderTitle: "Incontri sulla Parola",
-        cosaSonoImage: "https://picsum.photos/600/400?random=group,reading,discussion",
+        cosaSonoImage: "images/default-image-1.jpg",
         cosaSonoHeading: "Cosa sono gli Incontri sulla Parola?",
         cosaSonoText1: "Gli Incontri sulla Parola sono un appuntamento settimanale dedicato all'ascolto, alla meditazione e alla condivisione della Parola di Dio, secondo il metodo della <strong>Lectio Divina</strong>. È un'opportunità per nutrire la propria fede, approfondire la comprensione delle Scritture e crescere insieme come comunità.",
         cosaSonoText2: "Non si tratta di uno studio accademico, ma di un'esperienza spirituale che cerca di far risuonare la Parola nella vita di ciascuno, in un clima di ascolto reciproco e di preghiera.",
@@ -544,7 +500,7 @@
         infoQuandoText: { dayOfWeek: 3, startTime: "20:30", endTime: "22:00" }, // Mercoledì per default
         infoDoveText: "Presso la sala incontri dell'Eremo Frate Francesco<br>Via San Vito, Nembro (BG)",
         infoRivoltoText: "L'invito è aperto a tutti: giovani, adulti, famiglie. Non è richiesta alcuna preparazione teologica specifica, solo il desiderio di mettersi in ascolto della Parola.",
-        approccioImage: "https://picsum.photos/600/400?random=community,prayer,circle",
+        approccioImage: "images/default-image-2.jpg",
         approccioHeading: "Un Approccio Comunitario alla Lectio Divina",
         approccioText1: "La Lectio Divina è un metodo antico di preghiera e lettura della Bibbia che si articola in quattro momenti: <strong>Lectio</strong> (lettura), <strong>Meditatio</strong> (meditazione), <strong>Oratio</strong> (preghiera) e <strong>Contemplatio</strong> (contemplazione).",
         approccioText2: "Durante i nostri incontri, applichiamo questo metodo in modo comunitario. Dopo la lettura attenta di un brano biblico, ognuno è invitato a meditare su ciò che lo ha colpito, a trasformarlo in preghiera personale e, infine, a condividere liberamente (senza obbligo) le proprie riflessioni con il gruppo, arricchendosi reciprocamente.",
@@ -558,6 +514,56 @@
     };
 
     function gebi(id) { return document.getElementById(id); }
+
+    // Gestione menu mobile e dropdown (specifico per questa pagina, per evitare conflitti con auth.js)
+    function setupPageNavigation() {
+        const hamburgerBtn = gebi("hamburgerBtn");
+        const mobileMenu = gebi("mobileMenu");
+        function toggleMobileMenu() {
+            if (mobileMenu && hamburgerBtn) {
+                const isOpen = mobileMenu.classList.toggle("open");
+                hamburgerBtn.classList.toggle("open");
+                hamburgerBtn.setAttribute("aria-expanded", String(isOpen));
+                document.body.style.overflow = isOpen ? "hidden" : "";
+            }
+        }
+        function closeMobileMenu() {
+            if (mobileMenu && hamburgerBtn && mobileMenu.classList.contains("open")) {
+                mobileMenu.classList.remove("open");
+                hamburgerBtn.classList.remove("open");
+                hamburgerBtn.setAttribute("aria-expanded", "false");
+                document.body.style.overflow = "";
+            }
+        }
+        if (hamburgerBtn) hamburgerBtn.addEventListener("click", toggleMobileMenu);
+        document.querySelectorAll("#mobileMenu a").forEach(link => {
+            if (!link.id.includes('login') && !link.id.includes('logout')) {
+                link.addEventListener("click", closeMobileMenu);
+            }
+        });
+        document.addEventListener("click", function(e) {
+            if (mobileMenu && mobileMenu.classList.contains("open") && hamburgerBtn && !mobileMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                closeMobileMenu();
+            }
+        });
+
+        const userBtnTrigger = gebi('userBtnTrigger');
+        const userDropdownMenu = gebi('userDropdownMenu');
+        if (userBtnTrigger && userDropdownMenu) {
+            userBtnTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isShown = userDropdownMenu.style.display === 'block';
+                userDropdownMenu.style.display = isShown ? 'none' : 'block';
+                this.setAttribute('aria-expanded', String(!isShown));
+            });
+            document.addEventListener('click', function(e) {
+                if (userDropdownMenu && userDropdownMenu.style.display === 'block' && !userBtnTrigger.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+                    userDropdownMenu.style.display = 'none';
+                    userBtnTrigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+    }
 
     function formatHTMLContent(str) {
         if (typeof str !== 'string') str = String(str || '');
@@ -580,174 +586,9 @@
         const dayName = days[dataToParse.dayOfWeek] || "Giorno non specificato";
         return `Ogni ${dayName} sera<br>Orario: ${dataToParse.startTime} - ${dataToParse.endTime}`;
     }
-
-    function loadUserData() { const uds = localStorage.getItem('userDataEFF'); if (uds) { try { currentUserData = JSON.parse(uds); if (!currentUserData || typeof currentUserData.email === 'undefined') {currentUserData = null; localStorage.removeItem('userDataEFF');}} catch (e) { console.error("Err parsing userDataEFF:", e); currentUserData = null; localStorage.removeItem('userDataEFF');}} else { currentUserData = null; }}
-
-    async function fetchAndUpdateUserDisplayDataFromApi() {
-        if (!currentUserData || !currentUserData.email || currentUserData.isAdmin) {
-            updateNavbarUI(); return;
-        }
-        try {
-            const response = await fetch(`api/api_get_user_profile.php?email=${encodeURIComponent(currentUserData.email)}`);
-            if (!response.ok) throw new Error('Errore fetch profilo utente');
-            const apiResult = await response.json();
-            if (apiResult.success && apiResult.data) {
-                const freshData = apiResult.data;
-                currentUserData.nome = freshData.nome || currentUserData.nome;
-                currentUserData.iconPath = freshData.icon || defaultUserIconPath;
-                currentUserData.cognome = freshData.cognome || (currentUserData.cognome || '');
-                localStorage.setItem('userDataEFF', JSON.stringify(currentUserData));
-            }
-        } catch (error) { console.warn("IncontriParola: Errore fetch profilo aggiornato:", error.message); }
-        updateNavbarUI();
-    }
-
-    function updateNavbarUI() {
-        const logoLink = gebi('logoLink'); if (logoLink) logoLink.href = "index.html";
-        const navbarTitle = gebi('navbarTitle');
-        const loginBtnDesktop = gebi('login-btn-desktop');
-        const userDropdownContainer = gebi('userDropdownContainer');
-        const navbarAvatarSpan = gebi('navbar-avatar');
-        const navbarUsername = gebi('navbar-username');
-        const mobileMenuSeparator = gebi('mobileMenuSeparator');
-        const editPageBtnContainer = gebi('editPageBtnContainer');
-        const navProfilo = gebi('nav-profilo');
-        const navMiePrenotazioni = gebi('nav-mie-prenotazioni');
-        const navDashboard = gebi('nav-dashboard');
-        const navGestioneEventiAdmin = gebi('nav-gestione-eventi-admin');
-        const logoutLinkDesktop = gebi('logout-link-desktop');
-        const loginBtnMobile = gebi('login-btn-mobile');
-        const mobileNavProfiloEl = gebi('mobileNavProfilo');
-        const mobileNavPrenotazioniEl = gebi('mobileNavPrenotazioni');
-        const mobileNavDashboardEl = gebi('mobileNavDashboard');
-        const mobileNavGestioneEventiAdminEl = gebi('mobileNavGestioneEventiAdmin');
-        const mobileLogoutLinkEl = gebi('mobileLogoutLink');
-
-        // Reset iniziale di tutti gli item specifici dell'utente/admin
-        if(loginBtnDesktop) loginBtnDesktop.style.display = 'none';
-        if(userDropdownContainer) userDropdownContainer.style.display = 'none';
-
-        if(navProfilo) navProfilo.style.display = 'none';
-        if(navMiePrenotazioni) navMiePrenotazioni.style.display = 'none';
-        if(navDashboard) navDashboard.style.display = 'none';
-        if(navGestioneEventiAdmin) navGestioneEventiAdmin.style.display = 'none';
-
-        if(loginBtnMobile) loginBtnMobile.style.display = 'none';
-        if(mobileNavProfiloEl) mobileNavProfiloEl.style.display = 'none';
-        if(mobileNavPrenotazioniEl) mobileNavPrenotazioniEl.style.display = 'none';
-        if(mobileNavDashboardEl) mobileNavDashboardEl.style.display = 'none';
-        if(mobileNavGestioneEventiAdminEl) mobileNavGestioneEventiAdminEl.style.display = 'none';
-
-        if(mobileLogoutLinkEl) mobileLogoutLinkEl.style.display = 'none';
-        if(mobileMenuSeparator) mobileMenuSeparator.style.display = 'none';
-        if(logoutLinkDesktop) logoutLinkDesktop.style.display = 'none';
-
-
-        if (currentUserData) { // Utente Loggato
-            if (userDropdownContainer) userDropdownContainer.style.display = 'inline-block';
-            if (navbarUsername) navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
-            const avatarImgEl = navbarAvatarSpan ? navbarAvatarSpan.querySelector('img') : null;
-            if (avatarImgEl) { avatarImgEl.src = currentUserData.iconPath || defaultUserIconPath; avatarImgEl.alt = `Avatar di ${currentUserData.nome || 'utente'}`; avatarImgEl.onerror = function() { this.src = defaultUserIconPath; }; }
-            if (logoutLinkDesktop) logoutLinkDesktop.style.display = 'block'; // Mostra Logout Desktop
-            if (mobileLogoutLinkEl) mobileLogoutLinkEl.style.display = 'block';
-            if (mobileMenuSeparator) mobileMenuSeparator.style.display = 'block';
-
-            if (currentUserData.isAdmin) { // ADMIN LOGGATO
-                if (navbarTitle) navbarTitle.textContent = "Eremo (Admin)";
-                if (navProfilo) navProfilo.style.display = 'block';
-                if (mobileNavProfiloEl) mobileNavProfiloEl.style.display = 'block';
-                if (navDashboard) navDashboard.style.display = 'block';
-                if (mobileNavDashboardEl) mobileNavDashboardEl.style.display = 'block';
-
-                // Nascondi "Le mie prenotazioni" e "Gestione Eventi" per admin
-                if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'none';
-                if (mobileNavPrenotazioniEl) mobileNavPrenotazioniEl.style.display = 'none';
-                if (navGestioneEventiAdmin) navGestioneEventiAdmin.style.display = 'none';
-                if (mobileNavGestioneEventiAdminEl) mobileNavGestioneEventiAdminEl.style.display = 'none';
-
-            } else { // UTENTE NORMALE LOGGATO
-                if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
-                if (navProfilo) navProfilo.style.display = 'block';
-                if (mobileNavProfiloEl) mobileNavProfiloEl.style.display = 'block';
-                if (navMiePrenotazioni) navMiePrenotazioni.style.display = 'block';
-                if (mobileNavPrenotazioniEl) mobileNavPrenotazioniEl.style.display = 'block';
-                // Dashboard e Gestione Eventi rimangono 'none' dal reset iniziale
-                if(editPageBtnContainer) editPageBtnContainer.classList.remove('active');
-            }
-        } else { // UTENTE NON LOGGATO
-            if (loginBtnDesktop) loginBtnDesktop.style.display = 'inline-block';
-            if (loginBtnMobile) loginBtnMobile.style.display = 'block';
-            if (navbarTitle) navbarTitle.textContent = "Eremo Frate Francesco";
-            if(editPageBtnContainer) editPageBtnContainer.classList.remove('active');
-        }
-    }
-
-
-    function handleLogout(){localStorage.removeItem('userDataEFF');currentUserData=null;isEditModeActive=false;updateNavbarUI();loadPageContentsFromServer();showPageStatus('Logout effettuato.','info');}
+    
     let lastScroll = 0; const navbarContainer = gebi("navbarContainer"); if (navbarContainer) { window.addEventListener("scroll", function () { const cS = window.pageYOffset||document.documentElement.scrollTop; if(cS<=50){navbarContainer.classList.remove("hidden");lastScroll=0;return;} if(cS>lastScroll&&!navbarContainer.classList.contains("hidden"))navbarContainer.classList.add("hidden"); else if(cS<lastScroll&&navbarContainer.classList.contains("hidden"))navbarContainer.classList.remove("hidden"); lastScroll=cS<=0?0:cS;}, false);}
-    const mobileMenu = gebi("mobileMenu"); const hamburgerBtn = gebi("hamburgerBtn"); function toggleMobileMenu(){if(mobileMenu&&hamburgerBtn){const iO=mobileMenu.classList.toggle("open");hamburgerBtn.classList.toggle("open"); hamburgerBtn.setAttribute("aria-expanded",String(iO));document.body.style.overflow=iO?"hidden":"";}} function closeMobileMenu(){if(mobileMenu&&hamburgerBtn&&mobileMenu.classList.contains("open")){mobileMenu.classList.remove("open");hamburgerBtn.classList.remove("open");hamburgerBtn.setAttribute("aria-expanded","false");document.body.style.overflow="";}} if(hamburgerBtn)hamburgerBtn.addEventListener("click",toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l=>{if(l.id!=='login-btn-mobile'&&l.id!=='mobileLogoutLink')l.addEventListener("click",closeMobileMenu);}); document.addEventListener("click",function(e){if(mobileMenu&&mobileMenu.classList.contains("open")&&hamburgerBtn&&!mobileMenu.contains(e.target)&&!hamburgerBtn.contains(e.target))closeMobileMenu();});
-    const userBtnTrigger = gebi('userBtnTrigger'); const userDropdownMenu = gebi('userDropdownMenu'); if(userBtnTrigger&&userDropdownMenu){userBtnTrigger.addEventListener('click',function(e){e.stopPropagation();const iS=userDropdownMenu.style.display==='block';userDropdownMenu.style.display=iS?'none':'block';this.setAttribute('aria-expanded',String(!iS));}); document.addEventListener('click',function(e){if(userDropdownMenu&&userDropdownMenu.style.display==='block'&&!userBtnTrigger.contains(e.target)&&!userDropdownMenu.contains(e.target)){userDropdownMenu.style.display='none';userBtnTrigger.setAttribute('aria-expanded','false');}});}
-    const loginOverlay = gebi('loginOverlay'); const loginPopup = gebi('loginPopup'); const closeLoginPopupBtn = gebi('closeLoginPopupBtn'); const loginTabs = document.querySelectorAll('.login-tab'); const loginForms = document.querySelectorAll('#loginPopup .login-form'); const loginFormEl = gebi('loginForm'); const registerFormEl = gebi('registerForm'); const loginErrorMessageEl = gebi('login-error-message'); const registerErrorMessageEl = gebi('register-error-message');
-    function openLoginPopup(){if(loginOverlay)loginOverlay.classList.add('active');if(loginPopup)loginPopup.classList.add('active');document.body.style.overflow='hidden';resetFormErrorsAndMessages();const loginTabToActivate = loginPopup.querySelector('.login-tab[data-tab="login"]'); if(loginTabToActivate) loginTabToActivate.click(); gebi('login-email')?.focus();}
-    function closeLoginPopup(){if(loginOverlay)loginOverlay.classList.remove('active');if(loginPopup)loginPopup.classList.remove('active');document.body.style.overflow='';resetFormErrorsAndMessages();}
-    function resetFormErrorsAndMessages(){loginForms.forEach(f=>f.querySelectorAll('.form-control.error-border').forEach(i=>i.classList.remove('error-border')));if(loginErrorMessageEl)loginErrorMessageEl.style.display='none';if(registerErrorMessageEl)registerErrorMessageEl.style.display='none';}
-    gebi('login-btn-desktop')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();}); gebi('login-btn-mobile')?.addEventListener('click',(e)=>{e.preventDefault();openLoginPopup();closeMobileMenu();});
-    if(closeLoginPopupBtn)closeLoginPopupBtn.addEventListener('click',closeLoginPopup); if(loginOverlay)loginOverlay.addEventListener('click',(e)=>{if(e.target===loginOverlay)closeLoginPopup();});
-    loginTabs.forEach(t=>t.addEventListener('click',()=>{const id=t.dataset.tab;loginTabs.forEach(tb=>tb.classList.remove('active'));t.classList.add('active');loginForms.forEach(f=>{f.classList.remove('active');if(f.id===`${id}Form`){f.classList.add('active');f.querySelector('input:not([type="hidden"])')?.focus();}});resetFormErrorsAndMessages();}));
-
-    loginFormEl?.addEventListener('submit',async(e)=>{
-        e.preventDefault();
-        resetFormErrorsAndMessages();
-        const b=loginFormEl.querySelector('button[type="submit"]');
-        const o=b.innerHTML;
-        b.disabled=true;
-        b.innerHTML='Accesso...<div class="spinner-mini-light"></div>';
-        try{
-            const r=await fetch('login.php',{method:'POST',body:new FormData(loginFormEl)});
-            const j=await r.json();
-            if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);
-            if(j.success){
-                currentUserData={email:j.email,nome:j.nome,iconPath:j.iconPath,isAdmin:j.is_admin===true||j.is_admin===1};
-                localStorage.setItem('userDataEFF',JSON.stringify(currentUserData));
-
-                updateNavbarUI(); 
-                closeLoginPopup(); 
-                await loadPageContentsFromServer(); 
-
-                if (currentUserData.isAdmin) {
-                    toggleEditMode(false); 
-                }
-                showPageStatus(`Benvenuto/a ${currentUserData.nome}!`,"success");
-
-            }else{
-                loginFormEl.querySelectorAll('#login-email,#login-password').forEach(el=>el.classList.add('error-border'));
-                if(loginErrorMessageEl){loginErrorMessageEl.textContent=j.message||"Credenziali errate.";loginErrorMessageEl.style.display='block';}
-            }
-        }catch(err){
-            console.error("Errore login:",err);
-            if(loginErrorMessageEl){loginErrorMessageEl.textContent="Errore connessione o server.";loginErrorMessageEl.style.display='block';}
-        }finally{
-            b.disabled=false;
-            b.innerHTML=o;
-        }
-    });
-
-    registerFormEl?.addEventListener('submit',async(e)=>{e.preventDefault();resetFormErrorsAndMessages();const b=registerFormEl.querySelector('button[type="submit"]');const o=b.innerHTML;b.disabled=true;b.innerHTML='Registrazione...<div class="spinner-mini-light"></div>';try{const r=await fetch('registrati.php',{method:'POST',body:new FormData(registerFormEl)});const j=await r.json();if(!r.ok)throw new Error(j.message||`Errore ${r.status}`);if(j.success){alert(j.message||"Registrazione completata! Ora puoi accedere.");const loginTabButton=document.querySelector('.login-tab[data-tab="login"]');if(loginTabButton)loginTabButton.click();const loginEmailInput=gebi('login-email');const registerEmailInput=gebi('register-email');if(loginEmailInput&&registerEmailInput)loginEmailInput.value=registerEmailInput.value;e.target.reset();}else{if(registerErrorMessageEl){registerErrorMessageEl.textContent=j.message||"Errore registrazione.";registerErrorMessageEl.style.display='block';}if(j.errors){for(const f in j.errors)gebi(`register-${f}`)?.classList.add('error-border');}}}catch(err){console.error("Errore registrazione:",err);if(registerErrorMessageEl){registerErrorMessageEl.textContent="Errore connessione o server.";registerErrorMessageEl.style.display='block';}}finally{b.disabled=false;b.innerHTML=o;}});
-    gebi('logout-link-desktop')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();}); gebi('mobileLogoutLink')?.addEventListener('click',(e)=>{e.preventDefault();handleLogout();closeMobileMenu();});
-
-    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-    const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
-    const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
-    const closeForgotPasswordPopupBtn = document.getElementById('closeForgotPasswordPopupBtn');
-    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
-    const forgotPasswordMessage = document.getElementById('forgot-password-message');
-    function openForgotPasswordPopup() { if (typeof closeLoginPopup === 'function' && loginPopup?.classList.contains('active')) { closeLoginPopup(); } if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active'); document.body.style.overflow = 'hidden'; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; const forgotEmailInput = document.getElementById('forgot-email'); if(forgotEmailInput) forgotEmailInput.focus(); }
-    function closeForgotPasswordPopup() { if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active'); let anyOtherPagePopupActive = document.querySelector('#loginPopup.active, #editContentModal.active, #editQuandoModal.active'); if (!anyOtherPagePopupActive) { document.body.style.overflow = ''; } if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; if(forgotPasswordForm) forgotPasswordForm.reset(); }
-    if (forgotPasswordLink) { forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); openForgotPasswordPopup(); }); }
-    if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
-    if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
-    if (forgotPasswordForm) { forgotPasswordForm.addEventListener('submit', async (e) => { e.preventDefault(); if (forgotPasswordMessage) { forgotPasswordMessage.style.display = 'none'; forgotPasswordMessage.className = 'form-message'; } const emailInput = document.getElementById('forgot-email'); const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]'); const originalBtnText = submitBtn.innerHTML; submitBtn.disabled = true; submitBtn.innerHTML = 'Invio...<div class="spinner-mini-light"></div>'; try { const formData = new FormData(forgotPasswordForm); const response = await fetch('richiesta_recupero_password.php', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { forgotPasswordMessage.textContent = result.message; forgotPasswordMessage.classList.add('success'); if(emailInput) emailInput.value = ''; } else { forgotPasswordMessage.textContent = result.message || "Si è verificato un errore."; forgotPasswordMessage.classList.add('error'); } } catch (error) { console.error('Errore richiesta recupero password:', error); forgotPasswordMessage.textContent = "Errore di connessione o del server."; forgotPasswordMessage.classList.add('error'); } finally { if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block'; submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } }); }
-
+    
     const editPageBtn=gebi('editPageBtn');const savePageChangesBtn=gebi('savePageChangesBtn'); const cancelPageChangesBtn=gebi('cancelPageChangesBtn');
     const editContentModal=gebi('editContentModal'); const closeEditContentModalBtn=gebi('closeEditContentModalBtn');const editModalTitle=gebi('editModalTitle'); const editModalTextarea=gebi('editModalTextarea');const editModalInputText=gebi('editModalInputText'); const editModalInputImage=gebi('editModalInputImage');const editModalFieldLabelText=gebi('editModalFieldLabelText'); const saveEditModalBtn=gebi('saveEditModalBtn');const cancelEditModalBtn=gebi('cancelEditModalBtn'); const editModalMessage=gebi('editModalMessage');const pageOverallStatus=gebi('pageOverallStatus'); const editModalInputFile=gebi('editModalInputFile'); const editModalFileLabel=gebi('editModalFileLabel'); const editModalFileNote = gebi('editModalFileNote');
     const editQuandoModal = gebi('editQuandoModal');
@@ -763,21 +604,12 @@
     function showPageStatus(message, type = 'info', duration = 3000) {
         if (!pageOverallStatus) return;
         pageOverallStatus.textContent = message;
-        pageOverallStatus.className = 'form-message'; 
-        pageOverallStatus.classList.remove('success', 'error', 'active');
-
-        if (type === 'success') {
-            pageOverallStatus.classList.add('success');
-        } else if (type === 'error') {
-            pageOverallStatus.classList.add('error');
-        }
-        if (pageOverallStatus.hideTimeout) {
-            clearTimeout(pageOverallStatus.hideTimeout);
-        }
-        void pageOverallStatus.offsetHeight; 
+        pageOverallStatus.className = '';
         pageOverallStatus.classList.add('active');
-
-        pageOverallStatus.hideTimeout = setTimeout(() => {
+        if (type === 'success') pageOverallStatus.classList.add('success');
+        else if (type === 'error') pageOverallStatus.classList.add('error');
+        
+        setTimeout(() => {
             pageOverallStatus.classList.remove('active');
         }, duration);
     }
@@ -806,6 +638,8 @@
         }
         applyContentsToPage(currentPageDbContents);
         originalPageContentsForCancel=JSON.parse(JSON.stringify(currentPageDbContents));
+        // Dopo aver caricato i contenuti, controlla lo stato utente e mostra/nascondi i pulsanti admin
+        toggleEditMode(false);
     }
 
     function applyContentsToPage(contents) {
@@ -836,46 +670,11 @@
     function toggleEditMode(enable){
         isEditModeActive=enable;
         document.querySelectorAll('.edit-icon-text, .edit-icon-image').forEach(icon => {
-            if (currentUserData?.isAdmin && enable) {
+            // currentUserData è una variabile globale definita in auth.js
+            if (typeof currentUserData !== 'undefined' && currentUserData && currentUserData.isAdmin && enable) {
                 icon.style.display = 'flex';
-                const parentWrapper = icon.closest('.editable-text-wrapper, .editable-image-wrapper');
-                if (parentWrapper) {
-                    let translateX = '50%';
-                    let translateY = '-50%';
-
-                    if (parentWrapper.classList.contains('main-title-editable-wrapper')) {
-                        translateX = '50%';
-                        translateY = '-50%';
-                    } else if (parentWrapper.closest('.chi-siamo-section')) {
-                        const tagName = parentWrapper.querySelector('[data-content-key]')?.tagName;
-                        if (tagName === 'H2') {
-                            translateX = 'calc(100% + 5px)';
-                            translateY = '-50%';
-                        } else if (tagName === 'P') {
-                            translateX = 'calc(100% + 5px)';
-                            translateY = '-50%';
-                        }
-                    } else if (parentWrapper.closest('.card-grid')) {
-                        translateX = '50%';
-                        translateY = '-50%';
-                    } else if (parentWrapper.classList.contains('editable-image-wrapper')) {
-                        translateX = '50%';
-                        translateY = '-50%';
-                    }
-
-                    icon.style.setProperty('--custom-translate-x', translateX);
-                    icon.style.setProperty('--custom-translate-y', translateY);
-                }
-                setTimeout(() => {
-                    icon.style.opacity = '1';
-                    icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(1)`;
-                }, 10);
             } else {
-                icon.style.opacity = '0';
-                icon.style.transform = `translate(var(--custom-translate-x), var(--custom-translate-y)) scale(0.8)`;
-                setTimeout(() => {
-                    icon.style.display = 'none';
-                }, 300);
+                icon.style.display = 'none';
             }
         });
 
@@ -884,16 +683,13 @@
         const saveBtn=gebi('savePageChangesBtn');
         const cancelBtn=gebi('cancelPageChangesBtn');
         if(editContainer) {
-            if (currentUserData?.isAdmin) {
+            if (typeof currentUserData !== 'undefined' && currentUserData && currentUserData.isAdmin) {
                 editContainer.classList.add('active');
                 if(editBtn) editBtn.style.display = enable ? 'none' : 'inline-block';
                 if(saveBtn) saveBtn.style.display = enable ? 'inline-block' : 'none';
                 if(cancelBtn) cancelBtn.style.display = enable ? 'inline-block' : 'none';
             } else {
                 editContainer.classList.remove('active');
-                if(editBtn) editBtn.style.display = 'none';
-                if(saveBtn) saveBtn.style.display = 'none';
-                if(cancelBtn) cancelBtn.style.display = 'none';
             }
         }
         if(enable){originalPageContentsForCancel= JSON.parse(JSON.stringify(currentPageDbContents));}
@@ -970,23 +766,20 @@
                 }
             }
         });
-        // Assicura che infoQuandoText sia stringhificato per il salvataggio
         if (typeof contentsToSave.infoQuandoText === 'object' && contentsToSave.infoQuandoText !== null) {
             contentsToSave.infoQuandoText = JSON.stringify(contentsToSave.infoQuandoText);
         } else if (contentsToSave.infoQuandoText === undefined || contentsToSave.infoQuandoText === null) {
             contentsToSave.infoQuandoText = JSON.stringify(defaultPageContents.infoQuandoText);
         }
 
-
         const btn=savePageChangesBtn;const oldHtml=btn.innerHTML;btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Salvataggio...';
         try{
             const r=await fetch('api_save_page_content.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page_name:PAGE_NAME_FOR_CONTENT,contents:contentsToSave})});
             const j=await r.json();if(!r.ok||!j.success)throw new Error(j.message||"Errore salvataggio.");
-            // Dopo il salvataggio, assicurati che currentPageDbContents.infoQuandoText sia un oggetto se era stato stringhificato
             if (typeof currentPageDbContents.infoQuandoText === 'string') {
                 try { currentPageDbContents.infoQuandoText = JSON.parse(currentPageDbContents.infoQuandoText); } catch(e){ currentPageDbContents.infoQuandoText = defaultPageContents.infoQuandoText; }
             }
-            originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents)); // Aggiorna il backup per l'annulla
+            originalPageContentsForCancel = JSON.parse(JSON.stringify(currentPageDbContents));
             showPageStatus(j.message||'Modifiche salvate!','success');toggleEditMode(false);
         }catch(err){console.error("Errore salvataggio:",err);showPageStatus(`Errore: ${err.message}`,'error');}
         finally{btn.disabled=false;btn.innerHTML=oldHtml;}
@@ -994,7 +787,7 @@
     if(cancelPageChangesBtn)cancelPageChangesBtn.addEventListener('click',()=>{applyContentsToPage(originalPageContentsForCancel); currentPageDbContents = JSON.parse(JSON.stringify(originalPageContentsForCancel)); toggleEditMode(false);showPageStatus('Modifiche annullate.','info');});
 
     document.addEventListener('click',function(e){
-        if(!isEditModeActive||!currentUserData?.isAdmin)return;
+        if(!isEditModeActive|| !currentUserData?.isAdmin)return;
         const editIcon=e.target.closest('.edit-icon-text,.edit-icon-image');
         const imageTarget=e.target.closest('img.editable-image-target');
         let elToEdit,key,type,currentVal;
@@ -1045,11 +838,11 @@
             newValue=editModalInputImage.value.trim(); targetElement.src=newValue;
             currentPageDbContents[currentEditingKey] = newValue;
         } else if(currentEditingType==='textarea'){
-            newValue = editModalTextarea.value; targetElement.innerHTML = formatHTMLContent(newValue); // Usa il valore grezzo per il DB
-            currentPageDbContents[currentEditingKey] = newValue; // Salva valore grezzo
+            newValue = editModalTextarea.value; targetElement.innerHTML = formatHTMLContent(newValue);
+            currentPageDbContents[currentEditingKey] = newValue;
         } else { // text
             newValue = editModalInputText.value; targetElement.innerHTML = formatHTMLContent(newValue);
-            currentPageDbContents[currentEditingKey] = newValue; // Salva valore grezzo
+            currentPageDbContents[currentEditingKey] = newValue;
         }
         if(closeTheModal)closeEditContentModal();
     });
@@ -1060,8 +853,8 @@
             startTime: editQuandoStartTimeEl.value,
             endTime: editQuandoEndTimeEl.value
         };
-        currentPageDbContents.infoQuandoText = newQuandoData; // Ora è un oggetto
-        applyContentsToPage(currentPageDbContents); // Aggiorna la UI
+        currentPageDbContents.infoQuandoText = newQuandoData;
+        applyContentsToPage(currentPageDbContents);
         closeEditQuandoModal();
         showPageStatus("Dettagli 'Quando' aggiornati localmente. Ricorda di salvare la pagina.", "info");
     });
@@ -1069,7 +862,6 @@
     function getNextMeetingDay(targetDay, triggerHour = 22, triggerMinute = 0) {
         const today = new Date(); const currentDay = today.getDay();
         let daysUntilTarget = (targetDay - currentDay + 7) % 7;
-        // Se oggi è il giorno dell'incontro e l'orario di fine è già passato, calcola per la settimana successiva
         if (daysUntilTarget === 0 && (today.getHours() > triggerHour || (today.getHours() === triggerHour && today.getMinutes() >= triggerMinute))) {
             daysUntilTarget = 7;
         }
@@ -1081,8 +873,8 @@
     function updateNextMeetingDateDisplay() {
         const nextMeetingDateElement = gebi('next-meeting-date');
         if (nextMeetingDateElement) {
-            let quandoData = currentPageDbContents.infoQuandoText; // Dovrebbe essere già un oggetto qui
-            if (typeof quandoData === 'string') { // Fallback nel caso improbabile sia ancora stringa
+            let quandoData = currentPageDbContents.infoQuandoText;
+            if (typeof quandoData === 'string') {
                 try { quandoData = JSON.parse(quandoData); }
                 catch(e) { quandoData = defaultPageContents.infoQuandoText; }
             }
@@ -1091,7 +883,7 @@
             }
 
             const targetDay = (quandoData && typeof quandoData.dayOfWeek === 'number') ? quandoData.dayOfWeek : 5; // Default Venerdì
-            let triggerHour = 22, triggerMinute = 0; // Orario di default per considerare l'incontro "finito" per oggi
+            let triggerHour = 22, triggerMinute = 0;
             if (quandoData && quandoData.endTime) {
                 const timeParts = quandoData.endTime.split(':');
                 if (timeParts.length === 2) {
@@ -1106,49 +898,47 @@
     async function loadNavbarLogo() {
         const logoImgTag = document.getElementById('navbarLogoImgTag');
         if (!logoImgTag) {
-            console.error("Elemento immagine logo navbar (<img id='navbarLogoImgTag'>) non trovato in incontrisullaparola.html.");
+            console.error("Elemento immagine logo navbar non trovato.");
             return;
         }
         const defaultLogoPath = 'images/Logo_eremo.png';
         try {
             const response = await fetch('api_get_page_content.php?page=index');
-            if (!response.ok) {
-                throw new Error(`Errore HTTP ${response.status} nel caricare i dati per il logo.`);
-            }
+            if (!response.ok) throw new Error(`Errore HTTP ${response.status}`);
             const data = await response.json();
             if (data.success && data.contents && data.contents.navbarLogo) {
                 logoImgTag.src = data.contents.navbarLogo;
             } else {
-                console.warn("URL del logo navbar non trovato o errore API. Uso il logo di default.");
                 logoImgTag.src = defaultLogoPath;
             }
         } catch (error) {
-            console.error("Errore nel caricare dinamicamente il logo navbar:", error);
+            console.error("Errore nel caricare il logo navbar:", error);
             logoImgTag.src = defaultLogoPath;
         }
     }
 
     document.addEventListener('DOMContentLoaded',async()=>{
         const c=gebi('currentYear');if(c)c.textContent=new Date().getFullYear();
-        loadUserData();
-        // updateNavbarUI(); // Chiamata spostata dopo fetchAndUpdateUserDisplayDataFromApi
+        
+        setupPageNavigation();
+        
+        // auth.js gestirà il caricamento dati utente e l'aggiornamento UI della navbar
+        // quindi qui ci concentriamo solo sulla logica della pagina
         await loadNavbarLogo();
-        await loadPageContentsFromServer(); // Carica i contenuti della pagina, inclusi quelli per 'infoQuandoText'
-        await fetchAndUpdateUserDisplayDataFromApi(); // Aggiorna UI Navbar dopo aver potenzialmente aggiornato currentUserData
+        await loadPageContentsFromServer();
+        
+        document.addEventListener('loginSuccess', async () => {
+            console.log('Login Rilevato. Aggiorno UI IncontriSullaParola.');
+            await loadPageContentsFromServer();
+        });
 
-        // Assicura che toggleEditMode sia chiamato dopo che i dati utente sono completamente caricati E la navbar UI è aggiornata
-        if (currentUserData && currentUserData.isAdmin) {
-            toggleEditMode(false);
-        } else {
-            toggleEditMode(false);
-            const editContainer = gebi('editPageBtnContainer');
-            if(editContainer) editContainer.classList.remove('active');
-        }
+        document.addEventListener('logoutSuccess', async () => {
+            console.log('Logout Rilevato. Aggiorno UI IncontriSullaParola.');
+            await loadPageContentsFromServer();
+        });
 
         document.addEventListener('keydown',(e)=>{
             if(e.key==='Escape'){
-                if(loginPopup?.classList.contains('active')) closeLoginPopup();
-                if(gebi('forgotPasswordPopup')?.classList.contains('active')) closeForgotPasswordPopup();
                 if(editContentModal?.style.display==='flex') closeEditContentModal();
                 if(editQuandoModal?.style.display==='flex') closeEditQuandoModal();
             }

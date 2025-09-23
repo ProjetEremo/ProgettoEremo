@@ -44,6 +44,12 @@ function createAuthPopupsHTML() {
                 <div class="form-group mb-3"><label for="register-email">Email</label><input type="email" id="register-email" name="register-email" class="form-control" required autocomplete="email"></div>
                 <div class="form-group mb-3"><label for="register-password">Password</label><input type="password" id="register-password" name="register-password" class="form-control" required minlength="8" autocomplete="new-password"><small>Minimo 8 caratteri.</small></div>
                 <div class="terms-checkbox mb-3"><input type="checkbox" id="register-terms" name="register-terms" required><label for="register-terms">Accetto i <a href="termini.html" target="_blank">termini e condizioni</a></label></div>
+                <!-- MODIFICA: Aggiunto checkbox per notifica eventi -->
+                <div class="terms-checkbox mb-3">
+                    <input type="checkbox" id="register-notify" name="register-notify" checked>
+                    <label for="register-notify">Avvisami quando vengono pubblicati nuovi eventi</label>
+                </div>
+                <!-- FINE MODIFICA -->
                 <div id="register-error-message" class="form-message error"></div>
                 <div class="form-actions"><button type="submit" class="btn-popup">Registrati</button></div>
             </form>
@@ -427,4 +433,3 @@ document.addEventListener('DOMContentLoaded', () => {
     loadUserData();
     updateNavbarUI();
 });
-

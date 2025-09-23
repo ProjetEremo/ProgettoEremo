@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/liquid-web/liquid-core.min.js"></script>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="liquidai.css"> <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script src="auth.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Roboto:wght@300;400;500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
@@ -1068,50 +1069,6 @@
   </div>
 </main>
 
-<div class="login-popup-overlay" id="loginOverlay"></div>
-<div class="login-popup" id="loginPopup">
-  <button class="close-popup" id="closeLoginPopupBtn" aria-label="Chiudi popup">&times;</button>
-  <div class="login-tabs">
-    <div class="login-tab active" data-tab="login">Accedi</div>
-    <div class="login-tab" data-tab="register">Registrati</div>
-  </div>
-  <form class="login-form active" id="loginForm" method="POST">
-    <div class="form-group mb-3"><label for="login-email">Email</label><input type="email" id="login-email" name="login-email" class="form-control" required autocomplete="email"></div>
-    <div class="form-group mb-3"><label for="login-password">Password</label><input type="password" id="login-password" name="login-password" class="form-control" required autocomplete="current-password"></div>
-    <div style="text-align: right; margin-top: -10px; margin-bottom: 10px;">
-      <a href="#" id="forgotPasswordLink" style="font-size: 0.9em; color: var(--primary);">Password dimenticata?</a>
-    </div>
-    <div id="login-error-message" class="form-message error"></div>
-    <div class="form-actions"><button type="submit" class="btn-popup">Accedi</button></div>
-  </form>
-  <form class="login-form" id="registerForm" method="POST">
-    <div class="form-group mb-3"><label for="register-name">Nome</label><input type="text" id="register-name" name="register-name" class="form-control" required autocomplete="given-name"></div>
-    <div class="form-group mb-3"><label for="register-surname">Cognome</label><input type="text" id="register-surname" name="register-surname" class="form-control" required autocomplete="family-name"></div>
-    <div class="form-group mb-3"><label for="register-email">Email</label><input type="email" id="register-email" name="register-email" class="form-control" required autocomplete="email"></div>
-    <div class="form-group mb-3"><label for="register-password">Password</label><input type="password" id="register-password" name="register-password" class="form-control" required minlength="8" autocomplete="new-password"><small>Minimo 8 caratteri.</small></div>
-    <div class="terms-checkbox mb-3"><input type="checkbox" id="register-terms" name="register-terms" required><label for="register-terms">Accetto i <a href="termini.html" target="_blank">termini e condizioni</a></label></div>
-    <div id="register-error-message" class="form-message error"></div>
-    <div class="form-actions"><button type="submit" class="btn-popup">Registrati</button></div>
-  </form>
-</div>
-
-<div class="login-popup-overlay" id="forgotPasswordOverlay"></div>
-<div class="login-popup" id="forgotPasswordPopup">
-  <button class="close-popup" id="closeForgotPasswordPopupBtn" aria-label="Chiudi popup">&times;</button>
-  <h3 style="text-align:center; margin-bottom: 1rem; color: var(--primary);">Recupera Password</h3>
-  <p style="font-size:0.95em; color:var(--gray-dark); margin-bottom:1.5rem; text-align:left;">Inserisci l'indirizzo email associato al tuo account. Se presente nel nostro sistema, ti invieremo un link per reimpostare la password.</p>
-  <form id="forgotPasswordForm" method="POST">
-    <div class="form-group mb-3">
-      <label for="forgot-email">Email</label>
-      <input type="email" id="forgot-email" name="forgot-email" class="form-control" required autocomplete="email">
-    </div>
-    <div id="forgot-password-message" class="form-message" style="text-align:left;"></div>
-    <div class="form-actions">
-      <button type="submit" class="btn-popup">Invia link di recupero</button>
-    </div>
-  </form>
-</div>
-
 <div class="booking-popup-overlay" id="bookingPopupOverlay"></div>
 <div class="booking-popup" id="bookingPopup">
   <button class="close-popup" id="closeBookingPopupBtn" aria-label="Chiudi popup">&times;</button>
@@ -1370,8 +1327,6 @@
 </html>
 <script>
   // === INIZIO SCRIPT UNIFICATO PER EVENTIINCORSO.HTML ===
-  const defaultUserIconPath = 'uploads/icons/default_user.png';
-  let currentUserData = null;
   let currentEventsData = [];
   let groqApiKey = null;
 
@@ -1646,115 +1601,9 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     }
   }
 
-  function loadUserData() {
-    const uds = localStorage.getItem('userDataEFF');
-    if (uds) {
-      try {
-        currentUserData = JSON.parse(uds);
-        if (!currentUserData || typeof currentUserData.email === 'undefined') {
-          currentUserData = null; localStorage.removeItem('userDataEFF');
-        }
-      } catch (e) {
-        console.error("Errore parsing userDataEFF:", e);
-        currentUserData = null; localStorage.removeItem('userDataEFF');
-      }
-    } else {
-      currentUserData = null;
-    }
-  }
-
-  function updateNavbarUI() {
-    const el = {
-      loginBtnDesktop: gebi('login-btn-desktop'), loginBtnMobile: gebi('login-btn-mobile'),
-      userDropdownContainer: gebi('userDropdownContainer'), navbarUsername: gebi('navbar-username'),
-      navbarAvatarImg: document.querySelector('#navbar-avatar img'), navProfilo: gebi('nav-profilo'),
-      navMiePrenotazioni: gebi('nav-mie-prenotazioni'), navDashboard: gebi('nav-dashboard'),
-      navGestioneEventiAdmin: gebi('nav-gestione-eventi-admin'), mobileNavProfilo: gebi('mobile-nav-profilo'),
-      mobileNavMiePrenotazioni: gebi('mobile-nav-mie-prenotazioni'), mobileNavDashboard: gebi('mobile-nav-dashboard'),
-      mobileNavGestioneEventiAdmin: gebi('mobile-nav-gestione-eventi-admin'), mobileLogoutLink: gebi('mobile-logout-link'),
-      mobileMenuSeparator: gebi('mobile-menu-separator'), navbarTitle: gebi('navbar-title'),
-      mainPageTitle: gebi('mainPageTitle'), addEventFabContainerWrapper: gebi('addEventFabContainerWrapper')
-    };
-    if(el.navGestioneEventiAdmin) el.navGestioneEventiAdmin.style.display = 'none';
-    if(el.mobileNavGestioneEventiAdmin) el.mobileNavGestioneEventiAdmin.style.display = 'none';
-    if (currentUserData) {
-      if (el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'none';
-      if (el.loginBtnMobile) el.loginBtnMobile.style.display = 'none';
-      if (el.userDropdownContainer) el.userDropdownContainer.style.display = 'inline-block';
-      if (el.navbarUsername) el.navbarUsername.textContent = currentUserData.nome || currentUserData.email.split('@')[0];
-      if (el.navbarAvatarImg) {
-        el.navbarAvatarImg.src = currentUserData.iconPath || defaultUserIconPath;
-        el.navbarAvatarImg.alt = `Avatar di ${currentUserData.nome || 'utente'}`;
-        el.navbarAvatarImg.onerror = function () { this.src = defaultUserIconPath; };
-      }
-      if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'block';
-      if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'block';
-      if (currentUserData.isAdmin) {
-        if (el.navProfilo) el.navProfilo.style.display = 'block';
-        if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
-        if (el.navDashboard) el.navDashboard.style.display = 'block';
-        if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'block';
-        if (el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
-        if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
-        if (el.navbarTitle) el.navbarTitle.textContent = "Eremo (Admin)";
-        if (el.mainPageTitle) el.mainPageTitle.textContent = "Gestione Calendario Attività";
-        if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'flex';
-      } else {
-        if (el.navProfilo) el.navProfilo.style.display = 'block';
-        if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
-        if (el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block';
-        if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
-        if (el.navDashboard) el.navDashboard.style.display = 'none';
-        if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
-        if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
-        if (el.mainPageTitle) el.mainPageTitle.textContent = "Calendario Attività";
-        if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none';
-      }
-    } else {
-      if (el.loginBtnDesktop) el.loginBtnDesktop.style.display = 'inline-block';
-      if (el.loginBtnMobile) el.loginBtnMobile.style.display = 'block';
-      if (el.userDropdownContainer) el.userDropdownContainer.style.display = 'none';
-      if (el.navProfilo) el.navProfilo.style.display = 'none';
-      if (el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'none';
-      if (el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'none';
-      if (el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'none';
-      if (el.navDashboard) el.navDashboard.style.display = 'none';
-      if (el.mobileNavDashboard) el.mobileNavDashboard.style.display = 'none';
-      if (el.mobileLogoutLink) el.mobileLogoutLink.style.display = 'none';
-      if (el.mobileMenuSeparator) el.mobileMenuSeparator.style.display = 'none';
-      if (el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
-      if (el.mainPageTitle) el.mainPageTitle.textContent = "Calendario Attività";
-      if (el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none';
-    }
-  }
-
   let lastScrollNav = 0; const navbarContainerEl = gebi("navbarContainer"); if (navbarContainerEl) { window.addEventListener("scroll", function () { const cS = window.pageYOffset || document.documentElement.scrollTop; if (cS <= 50) { navbarContainerEl.classList.remove("hidden"); lastScrollNav = 0; return; } if (cS > lastScrollNav && !navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.add("hidden"); else if (cS < lastScrollNav && navbarContainerEl.classList.contains("hidden")) navbarContainerEl.classList.remove("hidden"); lastScrollNav = cS <= 0 ? 0 : cS; }, false); }
   const mobileMenuEl = gebi("mobileMenu"); const hamburgerButton = gebi("hamburgerBtn"); function toggleMobileMenu() { if (mobileMenuEl && hamburgerButton) { const iO = mobileMenuEl.classList.toggle("open"); hamburgerButton.setAttribute("aria-expanded", String(iO)); document.body.style.overflow = iO ? "hidden" : ""; } } function closeMobileMenuOnLinkClick() { if (mobileMenuEl && hamburgerButton && mobileMenuEl.classList.contains("open")) { mobileMenuEl.classList.remove("open"); hamburgerButton.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; } } if (hamburgerButton) hamburgerButton.addEventListener("click", toggleMobileMenu); document.querySelectorAll("#mobileMenu a").forEach(l => { if (l.id !== 'login-btn-mobile' && l.id !== 'mobile-logout-link' && l.id !== 'mobile-nav-gestione-eventi-admin') l.addEventListener("click", closeMobileMenuOnLinkClick); }); document.addEventListener("click", function (e) { if (mobileMenuEl && mobileMenuEl.classList.contains("open") && hamburgerButton && !mobileMenuEl.contains(e.target) && !hamburgerButton.contains(e.target)) toggleMobileMenu(); });
   const userBtnTriggerEl = gebi('userBtnTrigger'); const userDropdownMenuEl = gebi('userDropdownMenu'); if (userBtnTriggerEl && userDropdownMenuEl) { userBtnTriggerEl.addEventListener('click', function (e) { e.stopPropagation(); const iO = userDropdownMenuEl.style.display === 'block'; userDropdownMenuEl.style.display = iO ? 'none' : 'block'; this.setAttribute('aria-expanded', String(!iO)); }); document.addEventListener('click', function (e) { if (userDropdownMenuEl.style.display === 'block' && !userBtnTriggerEl.contains(e.target) && !userDropdownMenuEl.contains(e.target)) { userDropdownMenuEl.style.display = 'none'; userBtnTriggerEl.setAttribute('aria-expanded', 'false'); } }); }
-  const loginOverlayEl = gebi('loginOverlay'); const loginPopupEl = gebi('loginPopup'); const closeLoginPopupBtnEl = gebi('closeLoginPopupBtn'); const loginTabsEl = document.querySelectorAll('.login-tab'); const loginFormsEl = document.querySelectorAll('.login-popup .login-form'); const loginFormElement = gebi('loginForm'); const registerFormElement = gebi('registerForm'); const loginErrorMessageElement = gebi('login-error-message'); const registerErrorMessageElement = gebi('register-error-message');
-  function openLoginPopup() { if (loginOverlayEl) loginOverlayEl.classList.add('active'); if (loginPopupEl) loginPopupEl.classList.add('active'); document.body.style.overflow = 'hidden'; resetFormErrorsAndMessages(); document.querySelector('.login-tab[data-tab="login"]')?.click(); gebi('login-email')?.focus(); }
-  function closeLoginPopup() { if (loginOverlayEl) loginOverlayEl.classList.remove('active'); if (loginPopupEl) loginPopupEl.classList.remove('active'); if (!isAnyPopupActive()) document.body.style.overflow = ''; resetFormErrorsAndMessages(); }
-  function resetFormErrorsAndMessages() { loginFormsEl.forEach(f => f.querySelectorAll('.form-control.error-border').forEach(i => i.classList.remove('error-border'))); if (loginErrorMessageElement) loginErrorMessageElement.style.display = 'none'; if (registerErrorMessageElement) registerErrorMessageElement.style.display = 'none'; }
-  gebi('login-btn-desktop')?.addEventListener('click', openLoginPopup); gebi('login-btn-mobile')?.addEventListener('click', (e) => { e.preventDefault(); openLoginPopup(); closeMobileMenuOnLinkClick(); });
-  if (closeLoginPopupBtnEl) closeLoginPopupBtnEl.addEventListener('click', closeLoginPopup); if (loginOverlayEl) loginOverlayEl.addEventListener('click', (e) => { if (e.target === loginOverlayEl) closeLoginPopup(); });
-  loginTabsEl.forEach(t => t.addEventListener('click', () => { const id = t.dataset.tab; loginTabsEl.forEach(tb => tb.classList.remove('active')); t.classList.add('active'); loginFormsEl.forEach(f => { f.classList.remove('active'); if (f.id === `${id}Form`) { f.classList.add('active'); f.querySelector('input:not([type="hidden"])')?.focus(); } }); resetFormErrorsAndMessages(); }));
-  loginFormElement?.addEventListener('submit', async (e) => { e.preventDefault(); resetFormErrorsAndMessages(); const b = loginFormElement.querySelector('button[type="submit"]'); const o = b.innerHTML; b.disabled = true; b.innerHTML = 'Accesso...<div class="spinner-mini-light"></div>'; try { const r = await fetch('login.php', { method: 'POST', body: new FormData(loginFormElement) }); const j = await r.json(); if (!r.ok) throw new Error(j.message || `Errore ${r.status}`); if (j.success) { currentUserData = { email: j.email, nome: j.nome, iconPath: j.iconPath || defaultUserIconPath, isAdmin: j.is_admin === true || j.is_admin === 1 }; localStorage.setItem('userDataEFF', JSON.stringify(currentUserData)); updateNavbarUI(); closeLoginPopup(); loadEvents(); const pAction = localStorage.getItem("pending_action_eff"); if (pAction) { localStorage.removeItem("pending_action_eff"); const aD = JSON.parse(pAction); if (aD.action === 'book' && typeof window.openBookingPopup === 'function') window.openBookingPopup(aD.eventId, aD.eventTitle, aD.postiDisp, aD.postiGiaPren); else if (aD.action === 'waitlist' && typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(aD.eventId, aD.eventTitle, aD.postiGiaPren); } } else { loginFormElement.querySelectorAll('#login-email,#login-password').forEach(el => el.classList.add('error-border')); if (loginErrorMessageElement) { loginErrorMessageElement.textContent = j.message || "Credenziali errate."; loginErrorMessageElement.style.display = 'block'; } } } catch (err) { console.error("Errore login:", err); if (loginErrorMessageElement) { loginErrorMessageElement.textContent = "Errore connessione o server."; loginErrorMessageElement.style.display = 'block'; } } finally { b.disabled = false; b.innerHTML = o; } });
-  registerFormElement?.addEventListener('submit', async (e) => { e.preventDefault(); resetFormErrorsAndMessages(); const b = registerFormElement.querySelector('button[type="submit"]'); const o = b.innerHTML; b.disabled = true; b.innerHTML = 'Registrazione...<div class="spinner-mini-light"></div>'; try { const r = await fetch('registrati.php', { method: 'POST', body: new FormData(registerFormElement) }); const j = await r.json(); if (!r.ok) throw new Error(j.message || `Errore ${r.status}`); if (j.success) { alert(j.message || "Registrazione completata! Ora puoi accedere."); document.querySelector('.login-tab[data-tab="login"]')?.click(); gebi('login-email').value = gebi('register-email').value; registerFormElement.reset(); } else { if (registerErrorMessageElement) { registerErrorMessageElement.textContent = j.message || "Errore registrazione."; registerErrorMessageElement.style.display = 'block'; } if (j.errors) { for (const f in j.errors) gebi(`register-${f}`)?.classList.add('error-border'); } } } catch (err) { console.error("Errore registrazione:", err); if (registerErrorMessageElement) { registerErrorMessageElement.textContent = "Errore connessione o server."; registerErrorMessageElement.style.display = 'block'; } } finally { b.disabled = false; b.innerHTML = o; } });
-  const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-  const forgotPasswordOverlay = document.getElementById('forgotPasswordOverlay');
-  const forgotPasswordPopup = document.getElementById('forgotPasswordPopup');
-  const closeForgotPasswordPopupBtn = document.getElementById('closeForgotPasswordPopupBtn');
-  const forgotPasswordForm = document.getElementById('forgotPasswordForm');
-  const forgotPasswordMessage = document.getElementById('forgot-password-message');
-  function openForgotPasswordPopup() { if (loginPopupEl?.classList.contains('active')) closeLoginPopup(); if (forgotPasswordOverlay) forgotPasswordOverlay.classList.add('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.add('active'); document.body.style.overflow = 'hidden'; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; gebi('forgot-email')?.focus(); }
-  function closeForgotPasswordPopup() { if (forgotPasswordOverlay) forgotPasswordOverlay.classList.remove('active'); if (forgotPasswordPopup) forgotPasswordPopup.classList.remove('active'); if (!isAnyPopupActive()) document.body.style.overflow = ''; if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'none'; if(forgotPasswordForm) forgotPasswordForm.reset(); }
-  if (forgotPasswordLink) forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); openForgotPasswordPopup(); });
-  if (closeForgotPasswordPopupBtn) closeForgotPasswordPopupBtn.addEventListener('click', closeForgotPasswordPopup);
-  if (forgotPasswordOverlay) forgotPasswordOverlay.addEventListener('click', (e) => { if (e.target === forgotPasswordOverlay) closeForgotPasswordPopup(); });
-  if (forgotPasswordForm) forgotPasswordForm.addEventListener('submit', async (e) => { e.preventDefault(); if (forgotPasswordMessage) { forgotPasswordMessage.style.display = 'none'; forgotPasswordMessage.className = 'form-message'; } const sB = forgotPasswordForm.querySelector('button[type="submit"]'); const oT = sB.innerHTML; sB.disabled = true; sB.innerHTML = 'Invio...<div class="spinner-mini-light"></div>'; try { const fD = new FormData(forgotPasswordForm); const rsp = await fetch('richiesta_recupero_password.php', { method: 'POST', body: fD }); const res = await rsp.json(); if (res.success) { forgotPasswordMessage.textContent = res.message; forgotPasswordMessage.classList.add('success'); gebi('forgot-email').value = ''; } else { forgotPasswordMessage.textContent = res.message || "Si è verificato un errore."; forgotPasswordMessage.classList.add('error'); } } catch (err) { console.error('Errore recupero password:', err); forgotPasswordMessage.textContent = "Errore di connessione o del server."; forgotPasswordMessage.classList.add('error'); } finally { if (forgotPasswordMessage) forgotPasswordMessage.style.display = 'block'; sB.disabled = false; sB.innerHTML = oT; } });
-  function handleLogout() { localStorage.removeItem('userDataEFF'); localStorage.removeItem('pending_action_eff'); currentUserData = null; updateNavbarUI(); loadEvents(); alert('Logout effettuato.'); }
-  gebi('logout-link-desktop')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
-  gebi('mobile-logout-link')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); closeMobileMenuOnLinkClick(); });
 
   function initGlobalFlyerOverlay() {
     if (!document.getElementById('globalFlyerOverlayEff')) {
@@ -2802,44 +2651,41 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
       }
     }
   }
-
-  function isAnyPopupActive() {
-    return gebi('loginPopup')?.classList.contains('active') ||
-            gebi('forgotPasswordPopup')?.classList.contains('active') ||
-            gebi('bookingPopup')?.classList.contains('active') ||
-            gebi('waitlistPopup')?.classList.contains('active') ||
-            gebi('dashAdminEventPopup')?.classList.contains('active') ||
-            (globalFlyerOverlayEff && globalFlyerOverlayEff.classList.contains('active')) ||
-            (customConfirmOverlayEl && customConfirmOverlayEl.classList.contains('active'));
-  }
-
-  document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const cY = gebi("currentYear"); if (cY) cY.textContent = new Date().getFullYear();
     initGlobalFlyerOverlay();
-    loadUserData();
-    updateNavbarUI(); // Aggiorna la UI generale della navbar
-    await loadNavbarLogo(); // Carica specificamente il logo dinamicamente
-    await loadEvents();     // Poi carica gli eventi
+
+    // NOTA: loadUserData() e updateNavbarUI() sono ora eseguiti automaticamente da auth.js
+    
+    await loadNavbarLogo();
+    await loadEvents();
     initializeBookingPopupHandlers();
     initializeWaitlistPopupHandlers();
     initializeDashAdminEventPopupHandlers();
+
+    // Questo controllo ora dipende dalla variabile currentUserData che viene popolata da auth.js
+    document.addEventListener('loginSuccess', () => { // Ascolta l'evento di login da auth.js
+        if (currentUserData && currentUserData.isAdmin) {
+            fetchAndPrepareGroqApiKey();
+        }
+    });
+    // Esegui anche al caricamento se l'utente è già loggato
     if (currentUserData && currentUserData.isAdmin) {
-      fetchAndPrepareGroqApiKey().then(ready => {
-        if (ready && generateShortDescBtnEl) console.log("Sistema AI per descrizione breve pronto.");
-        else if (generateShortDescBtnEl) console.warn("Sistema AI per descrizione breve non inizializzato correttamente.");
-      });
+      fetchAndPrepareGroqApiKey();
     }
+
     const pAction = localStorage.getItem("pending_action_eff");
     if (pAction && currentUserData) {
       const aD = JSON.parse(pAction); localStorage.removeItem("pending_action_eff");
       if (aD.action === 'book' && typeof window.openBookingPopup === 'function') window.openBookingPopup(aD.eventId, aD.eventTitle, aD.postiDisp, aD.postiGiaPren);
       else if (aD.action === 'waitlist' && typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(aD.eventId, aD.eventTitle, aD.postiGiaPren);
     }
+    
+    // Il listener per il tasto ESCAPE ora gestisce solo i popup specifici della pagina
     document.addEventListener("keydown", async (e) => {
       if (e.key === "Escape") {
-        if (gebi('loginPopup')?.classList.contains("active")) closeLoginPopup();
-        else if (gebi('forgotPasswordPopup')?.classList.contains("active")) closeForgotPasswordPopup();
-        else if (gebi('bookingPopup')?.classList.contains("active")) gebi('closeBookingPopupBtn')?.click();
+        // auth.js gestisce già i suoi popup (login, etc.)
+        if (gebi('bookingPopup')?.classList.contains("active")) gebi('closeBookingPopupBtn')?.click();
         else if (gebi('waitlistPopup')?.classList.contains("active")) gebi('closeWaitlistPopupBtn')?.click();
         else if (globalFlyerOverlayEff?.classList.contains("active")) hideFlyerPopupEff();
         else if (gebi('dashAdminEventPopup')?.classList.contains("active")) await tryCloseDashAdminEventPopup();
