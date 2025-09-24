@@ -179,14 +179,14 @@ function updateNavbarUI() {
             if(el.mobileNavProfilo) el.mobileNavProfilo.style.display = 'block';
             if(el.navMiePrenotazioni) el.navMiePrenotazioni.style.display = 'block';
             if(el.mobileNavMiePrenotazioni) el.mobileNavMiePrenotazioni.style.display = 'block';
-            if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
+            if(el.navbarTitle) el.navbarTitle.textContent = "Eremo frate Francesco";
             // UI specifiche per utente normale
             if(el.mainPageTitle && window.location.pathname.includes('eventiincorso')) el.mainPageTitle.textContent = "Calendario Attività";
             if(el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none';
             if(el.editPageBtnContainer) el.editPageBtnContainer.classList.remove('active');
         }
     } else { // Utente non loggato
-        if(el.navbarTitle) el.navbarTitle.textContent = "Eremo Frate Francesco";
+        if(el.navbarTitle) el.navbarTitle.textContent = "Eremo frate Francesco";
         if(el.mainPageTitle && window.location.pathname.includes('eventiincorso')) el.mainPageTitle.textContent = "Calendario Attività";
         if(el.addEventFabContainerWrapper) el.addEventFabContainerWrapper.style.display = 'none';
         if(el.editPageBtnContainer) el.editPageBtnContainer.classList.remove('active');
