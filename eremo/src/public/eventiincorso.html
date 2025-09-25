@@ -988,6 +988,53 @@
         background-color: rgba(0, 123, 255, 0.1);
         color: #004085;
     }
+    /* === NUOVI STILI PER BANNER EVENTO ANNULLATO === */
+    .card {
+        /* position: relative; è già implicito o gestito, ma assicuriamoci sia presente per il banner */
+        overflow: hidden;   /* Nasconde le parti del banner che escono dai bordi */
+    }
+    .cancelled-banner {
+        position: absolute;
+        top: 30px;
+        left: -60px;
+        width: 250px;
+        padding: 10px 0;
+        background-color: var(--danger, #e74c3c);
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        transform: rotate(-45deg);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        z-index: 5;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        animation: slideInBanner 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes slideInBanner {
+        from {
+            left: -250px;
+            top: 100px;
+            opacity: 0;
+        }
+        to {
+            left: -60px;
+            top: 30px;
+            opacity: 1;
+        }
+    }
+
+    /* Stile opzionale per rendere la card "spenta" quando annullata */
+    .card.is-cancelled .card-image {
+        filter: grayscale(80%);
+    }
+    .card.is-cancelled .card-content > h3,
+    .card.is-cancelled .card-content > .card-info-pills,
+    .card.is-cancelled .card-content > .card-description {
+        opacity: 0.6;
+    }
+    /* === FINE NUOVI STILI === */
   </style>
 </head>
 
@@ -1695,9 +1742,24 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
     finally { if (loadingIndicator) loadingIndicator.style.display = 'none'; }
   }
 
-   function createEventCard(event) {
-    const card = document.createElement("article"); card.className = "card"; card.dataset.eventId = event.idevento;
+function createEventCard(event) {
+    const card = document.createElement("article");
+    card.className = "card";
+    card.dataset.eventId = event.idevento;
     let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event.jpg";
+
+    // --- LOGICA BANNER ANNULLATO ---
+    let cancelledBannerHTML = '';
+    const isCancelled = event.Stato === 'cancellato';
+    if (isCancelled) {
+        const eventDate = new Date(event.datainizio);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Compara solo le date, ignorando l'ora
+        if (eventDate >= today) {
+            card.classList.add('is-cancelled'); // Aggiunge classe per styling opzionale (es. grayscale)
+            cancelledBannerHTML = '<div class="cancelled-banner">Annullato</div>';
+        }
+    }
 
     // --- LOGICA PER LE "PILLOLE" INFORMATIVE GENERALI ---
     let infoPillsHTML = '<div class="card-info-pills">';
@@ -1719,6 +1781,7 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
       card.classList.add('admin-card');
       let volantinoAdminLinkHTML = event.volantino_url?.trim() ? `<p class="card-info" style="font-size:0.9em; margin-bottom: 0.5rem;"><b>Volantino:</b> <a href="${sanitizeForAttribute(event.volantino_url)}" target="_blank" title="Visualizza il volantino dell'evento">Visualizza Volantino</a></p>` : '';
       card.innerHTML = `
+            ${cancelledBannerHTML}
             <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
             <div class="card-content">
                 <h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3>
@@ -1745,18 +1808,18 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
       const postiDispEv = parseInt(event.posti_disponibili) || 0; const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
       const inCodaPerP = parseInt(event.in_coda_per_posti) || 0; const flagPrenDB = parseInt(event.flagprenotabile) === 1;
       
-      // --- LOGICA PER LE "PILLOLE" DI STATO (POSTI E COSTO) ---
       let statusPillsHTML = '<div class="card-status-info">';
       let postiClass = 'posti';
       let postiText = '';
-      if (!flagPrenDB) {
+      if (isCancelled) {
+          postiText = 'Evento Annullato';
+          postiClass += ' sold-out';
+      } else if (!flagPrenDB) {
           postiText = 'Pren. Chiuse';
           postiClass += ' sold-out';
       } else if (postiDispEv > 0) {
           postiText = `${postiDispEv} Posti Disp.`;
-          if (postiDispEv <= 5) {
-              postiClass += ' low-seats';
-          }
+          if (postiDispEv <= 5) postiClass += ' low-seats';
       } else {
           postiText = 'Esaurito';
           postiClass += ' sold-out';
@@ -1768,9 +1831,7 @@ Non aggiungere commenti o spiegazioni al di fuori dell'oggetto JSON.`;
           statusPillsHTML += `<span class="status-pill costo"><i class="fas fa-euro-sign"></i> ${costoText}</span>`;
       }
       if (currentUserData) {
-          if (pGiaPrenUt > 0) {
-              statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-check"></i> ${pGiaPrenUt} Posti tuoi</span>`;
-          }
+          if (pGiaPrenUt > 0) statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-check"></i> ${pGiaPrenUt} Posti tuoi</span>`;
           if (inCodaPerP > 0) {
               statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-clock"></i> In coda per ${inCodaPerP}</span>`;
           }
