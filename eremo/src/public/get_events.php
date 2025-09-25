@@ -69,6 +69,7 @@ try {
             e.Associazione AS associazione,
             e.FotoCopertina AS immagine_url,
             e.VolantinoUrl AS volantino_url,
+            e.Stato AS stato,
             e.IDCategoria AS idcategoria,
             (SELECT COALESCE(SUM(p.NumeroPosti), 0)
              FROM prenotazioni p

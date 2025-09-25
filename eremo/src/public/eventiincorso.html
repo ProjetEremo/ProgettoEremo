@@ -988,53 +988,52 @@
         background-color: rgba(0, 123, 255, 0.1);
         color: #004085;
     }
-    /* === NUOVI STILI PER BANNER EVENTO ANNULLATO === */
-    .card {
-        /* position: relative; è già implicito o gestito, ma assicuriamoci sia presente per il banner */
-        overflow: hidden;   /* Nasconde le parti del banner che escono dai bordi */
-    }
-    .cancelled-banner {
-        position: absolute;
-        top: 30px;
-        left: -60px;
-        width: 250px;
-        padding: 10px 0;
-        background-color: var(--danger, #e74c3c);
-        color: white;
-        text-align: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-        transform: rotate(-45deg);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        z-index: 5;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        animation: slideInBanner 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
+    /* Stile per la card di un evento annullato */
+.card.event-cancelled {
+    position: relative; /* Necessario per posizionare il watermark */
+    overflow: hidden;   /* Nasconde le parti del banner che escono dalla card */
+}
 
-    @keyframes slideInBanner {
-        from {
-            left: -250px;
-            top: 100px;
-            opacity: 0;
-        }
-        to {
-            left: -60px;
-            top: 30px;
-            opacity: 1;
-        }
-    }
+.card.event-cancelled .card-image-container img {
+    filter: grayscale(80%) brightness(0.7);
+    transition: all 0.4s ease; /* Applica la transizione a tutto (filtro e zoom) */
+}
 
-    /* Stile opzionale per rendere la card "spenta" quando annullata */
-    .card.is-cancelled .card-image {
-        filter: grayscale(80%);
+/* Aggiungi questa nuova regola per l'effetto al passaggio del mouse */
+.card.event-cancelled:hover .card-image-container img {
+    transform: scale(1.1);
+    filter: grayscale(40%) brightness(0.85); /* Schiarisce leggermente l'effetto al passaggio */
+}
+
+.cancelled-watermark {
+    position: absolute;
+    top: 25px;
+    left: -45px;
+    transform: rotate(-35deg);
+    background-color: rgba(220, 53, 69, 0.85); /* Rosso semi-trasparente */
+    color: white;
+    padding: 8px 60px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-align: center;
+    z-index: 10;
+    pointer-events: none; /* Permette di cliccare gli elementi sotto il banner */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    animation: pulse-fade 2s infinite ease-in-out;
+}
+
+/* Animazione per il banner */
+@keyframes pulse-fade {
+    0%, 100% {
+        opacity: 0.85;
+        transform: rotate(-35deg) scale(1);
     }
-    .card.is-cancelled .card-content > h3,
-    .card.is-cancelled .card-content > .card-info-pills,
-    .card.is-cancelled .card-content > .card-description {
-        opacity: 0.6;
+    50% {
+        opacity: 1;
+        transform: rotate(-35deg) scale(1.05);
     }
-    /* === FINE NUOVI STILI === */
+}
   </style>
 </head>
 
@@ -1748,18 +1747,13 @@ function createEventCard(event) {
     card.dataset.eventId = event.idevento;
     let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event.jpg";
 
-    // --- LOGICA BANNER ANNULLATO ---
-    let cancelledBannerHTML = '';
-    const isCancelled = event.Stato === 'cancellato';
-    if (isCancelled) {
-        const eventDate = new Date(event.datainizio);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Compara solo le date, ignorando l'ora
-        if (eventDate >= today) {
-            card.classList.add('is-cancelled'); // Aggiunge classe per styling opzionale (es. grayscale)
-            cancelledBannerHTML = '<div class="cancelled-banner">Annullato</div>';
-        }
+    // --- NUOVA LOGICA PER IL BANNER "ANNULLATO" ---
+    let watermarkHTML = '';
+    if (event.stato === 'cancellato') {
+        card.classList.add('event-cancelled');
+        watermarkHTML = '<div class="cancelled-watermark">ANNULLATO</div>';
     }
+    // --- FINE NUOVA LOGICA ---
 
     // --- LOGICA PER LE "PILLOLE" INFORMATIVE GENERALI ---
     let infoPillsHTML = '<div class="card-info-pills">';
@@ -1780,8 +1774,19 @@ function createEventCard(event) {
     if (currentUserData && currentUserData.isAdmin) {
       card.classList.add('admin-card');
       let volantinoAdminLinkHTML = event.volantino_url?.trim() ? `<p class="card-info" style="font-size:0.9em; margin-bottom: 0.5rem;"><b>Volantino:</b> <a href="${sanitizeForAttribute(event.volantino_url)}" target="_blank" title="Visualizza il volantino dell'evento">Visualizza Volantino</a></p>` : '';
+      
+      // --- MODIFICA BOTTONI ADMIN PER EVENTO ANNULLATO ---
+      let adminButtonsHTML = '';
+      if (event.stato === 'cancellato') {
+          adminButtonsHTML = `<button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
+                              <button class="card-btn card-btn-primary" disabled>Annullato</button>`;
+      } else {
+          adminButtonsHTML = `<button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
+                              <button class="card-btn btn-delete card-btn-primary" data-event-id="${event.idevento}">Elimina</button>`;
+      }
+      
       card.innerHTML = `
-            ${cancelledBannerHTML}
+            ${watermarkHTML} 
             <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
             <div class="card-content">
                 <h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3>
@@ -1793,62 +1798,65 @@ function createEventCard(event) {
                 </p>
                 <p class="card-info" style="margin-bottom: 0.5rem;"><b>Prenotazioni:</b> ${parseInt(event.flagprenotabile) === 1 ? '<span class="status-prenotabile">Aperte</span>' : '<span class="status-non-prenotabile">Chiuse</span>'}</p>
                 ${volantinoAdminLinkHTML}
-                <div class="card-actions admin-actions">
-                    <button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
-                    <button class="card-btn btn-delete card-btn-primary" data-event-id="${event.idevento}">Elimina</button>
-                </div>
+                <div class="card-actions admin-actions">${adminButtonsHTML}</div>
             </div>`;
       card.querySelector('.btn-edit').addEventListener('click', function() {
         const eventToEdit = currentEventsData.find(e => e.idevento == this.dataset.eventId);
         if (eventToEdit) openDashAdminEventPopup(eventToEdit);
         else alert("Dettagli evento non trovati per la modifica.");
       });
-      card.querySelector('.btn-delete').addEventListener('click', function() { handleDeleteEvent(this.dataset.eventId); });
+      // Solo se il pulsante delete esiste, aggiungi l'handler
+      const deleteBtn = card.querySelector('.btn-delete');
+      if(deleteBtn) {
+        deleteBtn.addEventListener('click', function() { handleDeleteEvent(this.dataset.eventId); });
+      }
     } else {
       const postiDispEv = parseInt(event.posti_disponibili) || 0; const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
       const inCodaPerP = parseInt(event.in_coda_per_posti) || 0; const flagPrenDB = parseInt(event.flagprenotabile) === 1;
       
       let statusPillsHTML = '<div class="card-status-info">';
-      let postiClass = 'posti';
-      let postiText = '';
-      if (isCancelled) {
-          postiText = 'Evento Annullato';
-          postiClass += ' sold-out';
+      let postiClass = 'posti'; let postiText = '';
+      if (event.stato === 'cancellato') { // Aggiunto controllo stato
+          postiText = 'Annullato'; postiClass += ' sold-out';
       } else if (!flagPrenDB) {
-          postiText = 'Pren. Chiuse';
-          postiClass += ' sold-out';
+          postiText = 'Pren. Chiuse'; postiClass += ' sold-out';
       } else if (postiDispEv > 0) {
           postiText = `${postiDispEv} Posti Disp.`;
           if (postiDispEv <= 5) postiClass += ' low-seats';
       } else {
-          postiText = 'Esaurito';
-          postiClass += ' sold-out';
+          postiText = 'Esaurito'; postiClass += ' sold-out';
       }
       statusPillsHTML += `<span class="status-pill ${postiClass}"><i class="fas fa-chair"></i> ${postiText}</span>`;
-
       if (event.costo !== null) {
           let costoText = parseFloat(event.costo) > 0 ? ` ${parseFloat(event.costo).toFixed(2)}` : 'Offerta libera';
           statusPillsHTML += `<span class="status-pill costo"><i class="fas fa-euro-sign"></i> ${costoText}</span>`;
       }
       if (currentUserData) {
           if (pGiaPrenUt > 0) statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-check"></i> ${pGiaPrenUt} Posti tuoi</span>`;
-          if (inCodaPerP > 0) {
-              statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-clock"></i> In coda per ${inCodaPerP}</span>`;
-          }
+          if (inCodaPerP > 0) statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-clock"></i> In coda per ${inCodaPerP}</span>`;
       }
       statusPillsHTML += '</div>';
-      // --- FINE LOGICA PILLOLE DI STATO ---
 
       let primaryBtnHTML = '', volantinoBtnHTML = "";
       if (event.volantino_url?.trim()) { volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${sanitizeForAttribute(event.volantino_url)}">Volantino</button>`; }
       else { volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="">Dettagli</button>`; }
-      if (!flagPrenDB) primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled title="Prenotazioni chiuse">(Pren. Chiuse)</button>`;
-      else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti (${pGiaPrenUt})</button>`;
-      else if (inCodaPerP > 0) primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`;
-      else if (postiDispEv > 0) primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`;
-      else primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Mettiti in Coda</button>`;
       
-      card.innerHTML = `<div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+      // --- MODIFICA BOTTONE UTENTE PER EVENTO ANNULLATO ---
+      if (event.stato === 'cancellato') {
+          primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled>Annullato</button>`;
+      } else if (!flagPrenDB) {
+          primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled title="Prenotazioni chiuse">(Pren. Chiuse)</button>`;
+      } else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) {
+          primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti (${pGiaPrenUt})</button>`;
+      } else if (inCodaPerP > 0) {
+          primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`;
+      } else if (postiDispEv > 0) {
+          primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`;
+      } else {
+          primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Mettiti in Coda</button>`;
+      }
+      
+      card.innerHTML = `${watermarkHTML} <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
         <div class="card-content">
             <h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3>
             ${infoPillsHTML}
