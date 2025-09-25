@@ -2664,11 +2664,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeDashAdminEventPopupHandlers();
 
     // Questo controllo ora dipende dalla variabile currentUserData che viene popolata da auth.js
-    document.addEventListener('loginSuccess', () => { // Ascolta l'evento di login da auth.js
-        if (currentUserData && currentUserData.isAdmin) {
-            fetchAndPrepareGroqApiKey();
-        }
-    });
+   // Listener per eventi da auth.js per aggiornare la pagina dinamicamente
+document.addEventListener('loginSuccess', () => {
+    console.log('Login Rilevato. Aggiorno eventi.');
+    loadEvents(); // Ricarica le card degli eventi con la vista corretta (admin/utente)
+
+    // Manteniamo il fetch della API key se l'utente è admin
+    if (currentUserData && currentUserData.isAdmin) {
+        fetchAndPrepareGroqApiKey();
+    }
+});
+
+document.addEventListener('logoutSuccess', () => {
+    console.log('Logout Rilevato. Aggiorno eventi.');
+    loadEvents(); // Ricarica le card degli eventi con la vista pubblica
+});
     // Esegui anche al caricamento se l'utente è già loggato
     if (currentUserData && currentUserData.isAdmin) {
       fetchAndPrepareGroqApiKey();

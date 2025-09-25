@@ -68,6 +68,104 @@ function handleFileUpload($fileInputName, $allowedExtensions, $existingFilePath 
     return ['success' => true, 'path' => $existingFilePath];
 }
 
+/**
+ * NUOVA FUNZIONE: Invia email di notifica per un nuovo evento.
+ * @param int $eventId L'ID del nuovo evento.
+ * @param mysqli $conn L'oggetto di connessione al database.
+ */
+function inviaNotificheNuovoEvento($eventId, $conn) {
+    // 1. Recupera i dettagli dell'evento appena creato
+    $stmtEvento = $conn->prepare("SELECT Titolo, Data, Durata, Descrizione, FotoCopertina, Relatore, PrefissoRelatore FROM eventi WHERE IDEvento = ?");
+    if (!$stmtEvento) {
+        error_log("Errore prepare SELECT evento per email: " . $conn->error);
+        return;
+    }
+    $stmtEvento->bind_param("i", $eventId);
+    $stmtEvento->execute();
+    $resultEvento = $stmtEvento->get_result();
+    $evento = $resultEvento->fetch_assoc();
+    $stmtEvento->close();
+
+    if (!$evento) {
+        error_log("Impossibile trovare i dettagli per l'evento ID: " . $eventId);
+        return;
+    }
+
+    // 2. Recupera tutti gli utenti che hanno acconsentito a ricevere notifiche
+    $stmtUtenti = $conn->prepare("SELECT Nome, Contatto FROM utentiregistrati WHERE avvisi_eventi = 1");
+    if (!$stmtUtenti) {
+        error_log("Errore prepare SELECT utenti per email: " . $conn->error);
+        return;
+    }
+    $stmtUtenti->execute();
+    $resultUtenti = $stmtUtenti->get_result();
+    $utentiDaAvvisare = $resultUtenti->fetch_all(MYSQLI_ASSOC);
+    $stmtUtenti->close();
+
+    if (empty($utentiDaAvvisare)) {
+        error_log("Nessun utente da avvisare per il nuovo evento ID: " . $eventId);
+        return; // Nessun utente da avvisare, esce tranquillamente
+    }
+    
+    // 3. Prepara i dati per il template dell'email
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+    $domainName = $_SERVER['HTTP_HOST'];
+    $baseUrl = $protocol . $domainName;
+
+    $datiEmail = [
+        'titolo' => $evento['Titolo'],
+        'descrizione' => $evento['Descrizione'],
+        'immagine_url' => $evento['FotoCopertina'] ? $baseUrl . '/' . $evento['FotoCopertina'] : $baseUrl . '/images/default-event.jpg',
+        'data' => date("d F Y", strtotime($evento['Data'])),
+        'relatore' => ($evento['PrefissoRelatore'] ? $evento['PrefissoRelatore'] . ' ' : '') . $evento['Relatore'],
+        'orario' => $evento['Durata'],
+        'link_evento' => $baseUrl . '/eventiincorso.html' // Link generico al calendario
+    ];
+
+    // 4. Invia un'email a ciascun utente
+    $oggetto = "Nuovo Evento all'Eremo: " . $evento['Titolo'];
+    $headers = "From: Eremo Frate Francesco <noreply@" . $domainName . ">\r\n";
+    $headers .= "Reply-To: noreply@" . $domainName . "\r\n";
+    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+    
+    // Nota: per un invio massivo e affidabile, considera l'uso di una libreria come PHPMailer
+    // o un servizio di email transazionale (es. SendGrid, Mailgun).
+    // La funzione mail() di PHP potrebbe avere problemi di deliverability.
+
+    foreach ($utentiDaAvvisare as $utente) {
+        $datiEmail['nome_utente'] = $utente['Nome'];
+        $corpoEmail = creaCorpoEmailEvento($datiEmail);
+        
+        if (!mail($utente['Contatto'], $oggetto, $corpoEmail, $headers)) {
+            error_log("Invio email fallito a: " . $utente['Contatto']);
+        }
+    }
+}
+
+/**
+ * NUOVA FUNZIONE: Costruisce il corpo HTML dell'email partendo da un template.
+ * @param array $dati I dati dell'evento da inserire nel template.
+ * @return string Il corpo dell'email in HTML.
+ */
+function creaCorpoEmailEvento($dati) {
+    $templatePath = __DIR__ . '/template_email_nuovo_evento.html';
+    if (!file_exists($templatePath)) {
+        error_log("Template email non trovato in: " . $templatePath);
+        return "<h1>Nuovo evento: {$dati['titolo']}</h1><p>{$dati['descrizione']}</p>";
+    }
+
+    $template = file_get_contents($templatePath);
+    
+    // Sostituisce i placeholder con i dati reali
+    foreach ($dati as $key => $value) {
+        $template = str_replace('{{' . strtoupper($key) . '}}', htmlspecialchars($value, ENT_QUOTES, 'UTF-8'), $template);
+    }
+    
+    return $template;
+}
+
+
 $action = $_POST['action'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -155,7 +253,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 error_log("Errore prepare INSERT: " . $conn->error);
                 die(json_encode(['success' => false, 'message' => 'Errore server (DB Insert).']));
             }
-            // MODIFICA: Cambiato il tipo di 'Costo' da 'i' a 'd' (da integer a double)
             $stmt->bind_param("ssssssiidssss",
                 $titolo, $data, $orario, $descrizione, $descrizione_estesa, $associazione,
                 $prenotabile, $posti_disponibili, $costo,
@@ -170,7 +267,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 error_log("Errore prepare UPDATE: " . $conn->error);
                 die(json_encode(['success' => false, 'message' => 'Errore server (DB Update).']));
             }
-            // MODIFICA: Cambiato il tipo di 'Costo' da 'i' a 'd' (da integer a double)
             $stmt->bind_param("ssssssiidssssi",
                 $titolo, $data, $orario, $descrizione, $descrizione_estesa, $associazione,
                 $prenotabile, $posti_disponibili, $costo,
@@ -181,8 +277,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($stmt->execute()) {
+            $new_event_id = ($action === 'add_event') ? $conn->insert_id : $eventId;
+            
+            // ========== INIZIO CODICE AGGIUNTO PER INVIO EMAIL ==========
+            if ($action === 'add_event') {
+                // Chiamiamo la nuova funzione per inviare le notifiche in background.
+                // L'esecuzione dello script non attende il completamento dell'invio delle email.
+                inviaNotificheNuovoEvento($new_event_id, $conn);
+            }
+            // ========== FINE CODICE AGGIUNTO PER INVIO EMAIL ==========
+
             $message = ($action === 'add_event') ? 'Evento aggiunto con successo!' : 'Evento aggiornato con successo!';
-            echo json_encode(['success' => true, 'message' => $message, 'event_id' => ($action === 'add_event' ? $conn->insert_id : $eventId)]);
+            echo json_encode(['success' => true, 'message' => $message, 'event_id' => $new_event_id]);
         } else {
             error_log("Errore execute $action: " . $stmt->error . " SQL: " . $sql);
             echo json_encode(['success' => false, 'message' => 'Errore durante il salvataggio nel database: ' . $stmt->error]);
