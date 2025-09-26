@@ -1023,6 +1023,52 @@
     animation: pulse-fade 2s infinite ease-in-out;
 }
 
+/* Stile per la card di un evento rimandato */
+.card.event-postponed {
+    position: relative;
+    overflow: hidden;
+}
+
+.card.event-postponed .card-image-container img {
+    filter: grayscale(20%) brightness(0.9);
+    transition: all 0.4s ease;
+}
+
+.card.event-postponed:hover .card-image-container img {
+    transform: scale(1.1);
+    filter: grayscale(0%) brightness(1);
+}
+
+.postponed-watermark {
+    position: absolute;
+    top: 25px;
+    left: -60px;
+    transform: rotate(-35deg);
+    background-color: rgba(52, 152, 219, 0.85); /* BLU */
+    color: white;
+    padding: 8px 60px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-align: center;
+    z-index: 10;
+    pointer-events: none;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    animation: pulse-fade-blue 2.2s infinite ease-in-out;
+}
+
+/* Animazione per il banner blu */
+@keyframes pulse-fade-blue {
+    0%, 100% {
+        opacity: 0.85;
+        transform: rotate(-35deg) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: rotate(-35deg) scale(1.05);
+    }
+}
+
 /* Animazione per il banner */
 @keyframes pulse-fade {
     0%, 100% {
@@ -1357,6 +1403,26 @@
   <div id="ai-chat-input-container">
     <textarea id="ai-chat-input" placeholder="Scrivi la tua domanda..." rows="2"></textarea>
     <button id="ai-chat-send-btn" aria-label="Invia Messaggio"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<!-- Popup per Rimandare Evento -->
+<div class="custom-confirm-overlay" id="postponeEventOverlay">
+  <div class="custom-confirm-modal" id="postponeEventModal">
+    <h3 id="postponeEventTitle">Rimanda Evento</h3>
+    <form id="postponeEventForm">
+        <input type="hidden" id="postponeEventId" name="event_id">
+        <p id="postponeEventCurrentInfo" style="margin-bottom: 1.5rem;"></p>
+        <div class="form-group" style="text-align: left; margin-bottom: 1.5rem;">
+            <label for="postponeNewDate" style="font-weight: 500;">Seleziona la nuova data*</label>
+            <input type="date" id="postponeNewDate" name="new_date" class="form-control" required>
+        </div>
+        <div id="postponeEventMessage" class="form-message" style="display: none; margin-bottom: 1rem;"></div>
+        <div class="custom-confirm-actions">
+            <button type="button" class="btn-popup btn-confirm-no" id="postponeCancelBtn">Annulla</button>
+            <button type="submit" class="btn-popup btn-confirm-yes">Conferma Rinvio</button>
+        </div>
+    </form>
   </div>
 </div>
 
@@ -1747,18 +1813,24 @@ function createEventCard(event) {
     card.dataset.eventId = event.idevento;
     let imageSrc = event.immagine_url?.trim() ? event.immagine_url : "images/default-event.jpg";
 
-    // --- NUOVA LOGICA PER IL BANNER "ANNULLATO" ---
+    // --- LOGICA AGGIORNATA PER I BANNER ---
     let watermarkHTML = '';
     if (event.stato === 'cancellato') {
         card.classList.add('event-cancelled');
         watermarkHTML = '<div class="cancelled-watermark">ANNULLATO</div>';
+    } else if (event.stato === 'rimandato') {
+        card.classList.add('event-postponed');
+        watermarkHTML = `<div class="postponed-watermark">RIMANDATO</div>`;
     }
-    // --- FINE NUOVA LOGICA ---
+    // --- FINE LOGICA AGGIORNATA ---
 
-    // --- LOGICA PER LE "PILLOLE" INFORMATIVE GENERALI ---
     let infoPillsHTML = '<div class="card-info-pills">';
     if (event.datainizio) {
-        infoPillsHTML += `<span class="info-pill"><i class="fas fa-calendar-alt"></i> ${formatDate(event.datainizio)}</span>`;
+        let dateLabel = ` ${formatDate(event.datainizio)}`;
+        if (event.stato === 'rimandato') {
+            dateLabel = `<b>Nuova data:&nbsp</b> ${formatDate(event.datainizio)}`;
+        }
+        infoPillsHTML += `<span class="info-pill"><i class="fas fa-calendar-alt"></i>${dateLabel}</span>`;
     }
     if (event.durata) {
         infoPillsHTML += `<span class="info-pill"><i class="fas fa-clock"></i> ${sanitizeText(event.durata)}</span>`;
@@ -1770,23 +1842,25 @@ function createEventCard(event) {
         infoPillsHTML += `<span class="info-pill"><i class="fas fa-users"></i> ${sanitizeText(event.associazione)}</span>`;
     }
     infoPillsHTML += '</div>';
-    
+
     if (currentUserData && currentUserData.isAdmin) {
-      card.classList.add('admin-card');
-      let volantinoAdminLinkHTML = event.volantino_url?.trim() ? `<p class="card-info" style="font-size:0.9em; margin-bottom: 0.5rem;"><b>Volantino:</b> <a href="${sanitizeForAttribute(event.volantino_url)}" target="_blank" title="Visualizza il volantino dell'evento">Visualizza Volantino</a></p>` : '';
-      
-      // --- MODIFICA BOTTONI ADMIN PER EVENTO ANNULLATO ---
-      let adminButtonsHTML = '';
-      if (event.stato === 'cancellato') {
-          adminButtonsHTML = `<button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
-                              <button class="card-btn card-btn-primary" disabled>Annullato</button>`;
-      } else {
-          adminButtonsHTML = `<button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
-                              <button class="card-btn btn-delete card-btn-primary" data-event-id="${event.idevento}">Elimina</button>`;
-      }
-      
-      card.innerHTML = `
-            ${watermarkHTML} 
+        card.classList.add('admin-card');
+        let volantinoAdminLinkHTML = event.volantino_url?.trim() ? `<p class="card-info" style="font-size:0.9em; margin-bottom: 0.5rem;"><b>Volantino:</b> <a href="${sanitizeForAttribute(event.volantino_url)}" target="_blank" title="Visualizza il volantino dell'evento">Visualizza Volantino</a></p>` : '';
+
+        // --- BOTTONI ADMIN AGGIORNATI ---
+        let adminButtonsHTML = '';
+        if (event.stato === 'cancellato') {
+            adminButtonsHTML = `<button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
+                                <button class="card-btn card-btn-primary" disabled>Annullato</button>`;
+        } else {
+             // Aggiunto il pulsante "Rimanda"
+            adminButtonsHTML = `<button class="card-btn btn-edit card-btn-secondary" data-event-id="${event.idevento}">Modifica</button>
+                                <button class="card-btn btn-postpone card-btn-secondary" style="background-color: #3498db !important; color: white;" data-event-id="${event.idevento}">Rimanda</button>
+                                <button class="card-btn btn-delete card-btn-primary" data-event-id="${event.idevento}">Annulla</button>`;
+        }
+        
+        card.innerHTML = `
+            ${watermarkHTML}
             <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
             <div class="card-content">
                 <h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3>
@@ -1794,82 +1868,102 @@ function createEventCard(event) {
                 <p class="card-description" style="font-size:0.95em; min-height: auto;">${sanitizeText(event.descrizione) || "Nessuna descrizione."}</p>
                 <p class="card-info" style="margin-bottom: 0.5rem;">
                     <b>Posti Disponibili:</b> <span class="posti-disponibili">${event.posti_disponibili !== null ? event.posti_disponibili : 'N/D'}</span>
-                    ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)} ` : (parseFloat(event.costo) === 0.00 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}
+                    ${event.costo !== null ? (parseFloat(event.costo) > 0 ? `<br><b>Costo:</b> ${parseFloat(event.costo).toFixed(2)}€` : (parseFloat(event.costo) === 0.00 ? "<br><b>Costo:</b> Offerta libera" : "")) : ""}
                 </p>
                 <p class="card-info" style="margin-bottom: 0.5rem;"><b>Prenotazioni:</b> ${parseInt(event.flagprenotabile) === 1 ? '<span class="status-prenotabile">Aperte</span>' : '<span class="status-non-prenotabile">Chiuse</span>'}</p>
                 ${volantinoAdminLinkHTML}
                 <div class="card-actions admin-actions">${adminButtonsHTML}</div>
             </div>`;
-      card.querySelector('.btn-edit').addEventListener('click', function() {
-        const eventToEdit = currentEventsData.find(e => e.idevento == this.dataset.eventId);
-        if (eventToEdit) openDashAdminEventPopup(eventToEdit);
-        else alert("Dettagli evento non trovati per la modifica.");
-      });
-      // Solo se il pulsante delete esiste, aggiungi l'handler
-      const deleteBtn = card.querySelector('.btn-delete');
-      if(deleteBtn) {
-        deleteBtn.addEventListener('click', function() { handleDeleteEvent(this.dataset.eventId); });
-      }
-    } else {
-      const postiDispEv = parseInt(event.posti_disponibili) || 0; const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
-      const inCodaPerP = parseInt(event.in_coda_per_posti) || 0; const flagPrenDB = parseInt(event.flagprenotabile) === 1;
-      
-      let statusPillsHTML = '<div class="card-status-info">';
-      let postiClass = 'posti'; let postiText = '';
-      if (event.stato === 'cancellato') { // Aggiunto controllo stato
-          postiText = 'Annullato'; postiClass += ' sold-out';
-      } else if (!flagPrenDB) {
-          postiText = 'Pren. Chiuse'; postiClass += ' sold-out';
-      } else if (postiDispEv > 0) {
-          postiText = `${postiDispEv} Posti Disp.`;
-          if (postiDispEv <= 5) postiClass += ' low-seats';
-      } else {
-          postiText = 'Esaurito'; postiClass += ' sold-out';
-      }
-      statusPillsHTML += `<span class="status-pill ${postiClass}"><i class="fas fa-chair"></i> ${postiText}</span>`;
-      if (event.costo !== null) {
-          let costoText = parseFloat(event.costo) > 0 ? ` ${parseFloat(event.costo).toFixed(2)}` : 'Offerta libera';
-          statusPillsHTML += `<span class="status-pill costo"><i class="fas fa-euro-sign"></i> ${costoText}</span>`;
-      }
-      if (currentUserData) {
-          if (pGiaPrenUt > 0) statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-check"></i> ${pGiaPrenUt} Posti tuoi</span>`;
-          if (inCodaPerP > 0) statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-clock"></i> In coda per ${inCodaPerP}</span>`;
-      }
-      statusPillsHTML += '</div>';
+            
+        card.querySelector('.btn-edit').addEventListener('click', function() {
+            const eventToEdit = currentEventsData.find(e => e.idevento == this.dataset.eventId);
+            if (eventToEdit) openDashAdminEventPopup(eventToEdit);
+            else alert("Dettagli evento non trovati per la modifica.");
+        });
+        
+        const postponeBtn = card.querySelector('.btn-postpone');
+        if (postponeBtn) {
+            postponeBtn.addEventListener('click', function() {
+                const eventToPostpone = currentEventsData.find(e => e.idevento == this.dataset.eventId);
+                if (eventToPostpone) openPostponePopup(eventToPostpone);
+            });
+        }
 
-      let primaryBtnHTML = '', volantinoBtnHTML = "";
-      if (event.volantino_url?.trim()) { volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${sanitizeForAttribute(event.volantino_url)}">Volantino</button>`; }
-      else { volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="">Dettagli</button>`; }
-      
-      // --- MODIFICA BOTTONE UTENTE PER EVENTO ANNULLATO ---
-      if (event.stato === 'cancellato') {
-          primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled>Annullato</button>`;
-      } else if (!flagPrenDB) {
-          primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled title="Prenotazioni chiuse">(Pren. Chiuse)</button>`;
-      } else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) {
-          primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti (${pGiaPrenUt})</button>`;
-      } else if (inCodaPerP > 0) {
-          primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`;
-      } else if (postiDispEv > 0) {
-          primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`;
-      } else {
-          primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Mettiti in Coda</button>`;
-      }
-      
-      card.innerHTML = `${watermarkHTML} <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
-        <div class="card-content">
-            <h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3>
-            ${infoPillsHTML}
-            <p class="card-description">${sanitizeText(event.descrizione) || "Nessuna descrizione."}</p>
-            ${statusPillsHTML}
-            <div class="card-actions">${volantinoBtnHTML}${primaryBtnHTML}</div>
-        </div>`;
-      const actionBtn = card.querySelector('.btn-prenota'); if (actionBtn && !actionBtn.disabled) { actionBtn.addEventListener('click', function () { const act = this.dataset.action; const eId = this.dataset.eventId; const eTitle = this.dataset.eventTitle; const pDisp = parseInt(this.dataset.postiDisponibiliEvento); const pGiaPren = parseInt(this.dataset.postiGiaPrenotatiUtente); if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: act, eventId: eId, eventTitle: eTitle, postiDisp: pDisp, postiGiaPren: pGiaPren })); return; } if (act === 'book') { if (typeof window.openBookingPopup === 'function') window.openBookingPopup(eId, eTitle, pDisp, pGiaPren); } else if (act === 'waitlist') { if (typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(eId, eTitle, pGiaPren); } }); }
-      const viewFlyerBtn = card.querySelector(".btn-visualizza-volantino");
-      if (viewFlyerBtn) viewFlyerBtn.addEventListener("click", function () { if (typeof showFlyerPopupEff === 'function') showFlyerPopupEff(this.dataset.volantinoUrl); });
+        const deleteBtn = card.querySelector('.btn-delete');
+        if(deleteBtn) {
+            deleteBtn.addEventListener('click', function() { handleDeleteEvent(this.dataset.eventId); });
+        }
+    } else {
+        // La logica per l'utente non-admin è quasi identica, ma gestisce lo stato 'rimandato'
+        const postiDispEv = parseInt(event.posti_disponibili) || 0; const pGiaPrenUt = parseInt(event.posti_gia_prenotati_utente) || 0;
+        const inCodaPerP = parseInt(event.in_coda_per_posti) || 0; const flagPrenDB = parseInt(event.flagprenotabile) === 1;
+        
+        let statusPillsHTML = '<div class="card-status-info">';
+        let postiClass = 'posti'; let postiText = '';
+        if (event.stato === 'cancellato') {
+            postiText = 'Annullato'; postiClass += ' sold-out';
+        } else if (event.stato === 'rimandato') {
+            postiText = `${postiDispEv} Posti Disp.`;
+        } else if (!flagPrenDB) {
+            postiText = 'Pren. Chiuse'; postiClass += ' sold-out';
+        } else if (postiDispEv > 0) {
+            postiText = `${postiDispEv} Posti Disp.`;
+            if (postiDispEv <= 5) postiClass += ' low-seats';
+        } else {
+            postiText = 'Esaurito'; postiClass += ' sold-out';
+        }
+        statusPillsHTML += `<span class="status-pill ${postiClass}"><i class="fas fa-chair"></i> ${postiText}</span>`;
+        if (event.costo !== null) {
+            let costoText = parseFloat(event.costo) > 0 ? ` ${parseFloat(event.costo).toFixed(2)}€` : 'Offerta libera';
+            statusPillsHTML += `<span class="status-pill costo"><i class="fas fa-euro-sign"></i> ${costoText}</span>`;
+        }
+        if (currentUserData) {
+            if (pGiaPrenUt > 0) statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-check"></i> ${pGiaPrenUt} Posti tuoi</span>`;
+            if (inCodaPerP > 0) statusPillsHTML += `<span class="status-pill user-info"><i class="fas fa-user-clock"></i> In coda per ${inCodaPerP}</span>`;
+        }
+        statusPillsHTML += '</div>';
+
+        let primaryBtnHTML = '', volantinoBtnHTML = "";
+        if (event.volantino_url?.trim()) { volantinoBtnHTML = `<button class="card-btn btn-visualizza-volantino card-btn-secondary" data-volantino-url="${sanitizeForAttribute(event.volantino_url)}">Volantino</button>`; }
+        else { volantinoBtnHTML = `<button class="card-btn card-btn-secondary btn-visualizza-volantino" data-volantino-url="">Dettagli</button>`; }
+        
+        if (event.stato === 'cancellato') {
+            primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled>Annullato</button>`;
+        } else if (event.stato === 'rimandato') {
+            // Se è rimandato, l'utente può comunque prenotare/essere in coda
+            if (pGiaPrenUt > 0) { // Se è già prenotato, il bottone è informativo
+                primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled>Già Prenotato</button>`;
+            } else if (postiDispEv > 0) {
+                primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`;
+            } else {
+                primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Mettiti in Coda</button>`;
+            }
+        } else if (!flagPrenDB) {
+            primaryBtnHTML = `<button class="card-btn card-btn-primary" disabled title="Prenotazioni chiuse">(Pren. Chiuse)</button>`;
+        } else if (pGiaPrenUt >= MAX_TOTAL_SEATS_PER_USER) {
+            primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Max ${MAX_TOTAL_SEATS_PER_USER} posti totali.">Max Posti (${pGiaPrenUt})</button>`;
+        } else if (inCodaPerP > 0) {
+            primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" disabled title="Sei in coda per ${inCodaPerP} posti.">In Lista d'Attesa</button>`;
+        } else if (postiDispEv > 0) {
+            primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="book" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-disponibili-evento="${postiDispEv}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Prenota</button>`;
+        } else {
+            primaryBtnHTML = `<button class="card-btn card-btn-primary btn-prenota" data-action="waitlist" data-event-id="${event.idevento}" data-event-title="${sanitizeForAttribute(event.titolo || '')}" data-posti-gia-prenotati-utente="${pGiaPrenUt}">Mettiti in Coda</button>`;
+        }
+        
+        card.innerHTML = `${watermarkHTML} <div class="card-image-container"><img src="${imageSrc}" alt="Copertina: ${sanitizeForAttribute(event.titolo) || "Evento"}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='images/default-event-error.jpg';"></div>
+            <div class="card-content">
+                <h3>${sanitizeText(event.titolo) || "Titolo non disponibile"}</h3>
+                ${infoPillsHTML}
+                <p class="card-description">${sanitizeText(event.descrizione) || "Nessuna descrizione."}</p>
+                ${statusPillsHTML}
+                <div class="card-actions">${volantinoBtnHTML}${primaryBtnHTML}</div>
+            </div>`;
+        const actionBtn = card.querySelector('.btn-prenota'); if (actionBtn && !actionBtn.disabled) { actionBtn.addEventListener('click', function () { const act = this.dataset.action; const eId = this.dataset.eventId; const eTitle = this.dataset.eventTitle; const pDisp = parseInt(this.dataset.postiDisponibiliEvento); const pGiaPren = parseInt(this.dataset.postiGiaPrenotatiUtente); if (!currentUserData) { openLoginPopup(); localStorage.setItem("pending_action_eff", JSON.stringify({ action: act, eventId: eId, eventTitle: eTitle, postiDisp: pDisp, postiGiaPren: pGiaPren })); return; } if (act === 'book') { if (typeof window.openBookingPopup === 'function') window.openBookingPopup(eId, eTitle, pDisp, pGiaPren); } else if (act === 'waitlist') { if (typeof window.openWaitlistPopup === 'function') window.openWaitlistPopup(eId, eTitle, pGiaPren); } }); }
+        const viewFlyerBtn = card.querySelector(".btn-visualizza-volantino");
+        if (viewFlyerBtn) viewFlyerBtn.addEventListener("click", function () { if (typeof showFlyerPopupEff === 'function') showFlyerPopupEff(this.dataset.volantinoUrl); });
     }
     return card;
-  }
+}
 
 
   function formatDate(dateString) {
@@ -2720,6 +2814,85 @@ function createEventCard(event) {
       }
     }
   }
+
+function openPostponePopup(event) {
+    const overlay = gebi('postponeEventOverlay');
+    const modal = gebi('postponeEventModal');
+    const form = gebi('postponeEventForm');
+    const eventIdInput = gebi('postponeEventId');
+    const newDateInput = gebi('postponeNewDate');
+    const currentInfoEl = gebi('postponeEventCurrentInfo');
+    const messageEl = gebi('postponeEventMessage');
+    const titleEl = gebi('postponeEventTitle');
+
+    if (!overlay || !event) return;
+
+    form.reset();
+    messageEl.style.display = 'none';
+    titleEl.textContent = `Rimanda: ${sanitizeText(event.titolo)}`;
+    currentInfoEl.innerHTML = `Data attuale: <strong>${formatDate(event.datainizio)}</strong>. <br>Gli utenti prenotati riceveranno una notifica via email.`;
+    eventIdInput.value = event.idevento;
+    
+    // Imposta la data minima a domani per evitare di rimandare a date passate
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    newDateInput.min = today.toISOString().split('T')[0];
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closePostponePopup() {
+    const overlay = gebi('postponeEventOverlay');
+    if (overlay) overlay.classList.remove('active');
+    if (!isAnyPopupActive()) {
+        document.body.style.overflow = '';
+    }
+}
+
+async function handlePostponeEventSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    const messageEl = gebi('postponeEventMessage');
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<div class="spinner-mini" style="border-top-color:white;"></div>';
+    messageEl.style.display = 'none';
+
+    try {
+        const formData = new FormData(form);
+        formData.append('action', 'postpone_event');
+
+        const response = await fetch('gestione_eventi.php', { method: 'POST', body: formData });
+        const resText = await response.text();
+        let result;
+        try { result = JSON.parse(resText); }
+        catch (err) { throw new Error("Risposta non JSON dal server (rinvio): " + resText.substring(0, 150)); }
+
+        if (!response.ok) throw new Error(result.message || `Errore HTTP ${response.status}`);
+        
+        if (result.success) {
+            messageEl.textContent = result.message || 'Evento rimandato con successo!';
+            messageEl.className = 'form-message success';
+            messageEl.style.display = 'block';
+            loadEvents();
+            setTimeout(closePostponePopup, 2000);
+        } else {
+            throw new Error(result.message || 'Rinvio fallito.');
+        }
+    } catch (error) {
+        console.error('Errore rinvio evento:', error);
+        messageEl.textContent = `Errore: ${error.message}`;
+        messageEl.className = 'form-message error';
+        messageEl.style.display = 'block';
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const cY = gebi("currentYear"); if (cY) cY.textContent = new Date().getFullYear();
     initGlobalFlyerOverlay();
@@ -2742,6 +2915,15 @@ document.addEventListener('loginSuccess', () => {
     if (currentUserData && currentUserData.isAdmin) {
         fetchAndPrepareGroqApiKey();
     }
+// AGGIUNGI QUESTO BLOCCO ALLA FINE DEL DOMCONTENTLOADED
+    const postponeForm = gebi('postponeEventForm');
+    const postponeCancelBtn = gebi('postponeCancelBtn');
+    const postponeOverlay = gebi('postponeEventOverlay');
+    if(postponeForm) postponeForm.addEventListener('submit', handlePostponeEventSubmit);
+    if(postponeCancelBtn) postponeCancelBtn.addEventListener('click', closePostponePopup);
+    if(postponeOverlay) postponeOverlay.addEventListener('click', (e) => {
+        if (e.target === postponeOverlay) closePostponePopup();
+    });
 });
 
 document.addEventListener('logoutSuccess', () => {

@@ -1,11 +1,11 @@
 <?php
 // Configurazione del database
 $host = "localhost";
-$username = "eremofratefrancesco"; // Sostituisci con il tuo username DB Altervista
-$password = "";                   // Sostituisci con la tua password DB Altervista (spesso è vuota per l'utente principale)
-$dbname = "my_eremofratefrancesco";   // Sostituisci con il tuo nome DB Altervista (es. my_tuonomeutente)
+$username = "eremofratefrancesco";
+$password = "";
+$dbname = "my_eremofratefrancesco";
 
-define('UPLOAD_DIR', 'uploads/event_images/'); // Assicurati che esista e sia scrivibile! DEVE TERMINARE CON /
+define('UPLOAD_DIR', 'uploads/event_images/');
 
 // Impostazioni PHP per Produzione
 ini_set('display_errors', 0);
@@ -25,7 +25,7 @@ if ($conn->connect_error) {
 }
 $conn->set_charset("utf8mb4");
 
-// Funzione helper per gestire upload di un file (immagine o volantino)
+// Funzione helper per gestire upload di un file
 function handleFileUpload($fileInputName, $allowedExtensions, $existingFilePath = null) {
     if (isset($_FILES[$fileInputName]) && $_FILES[$fileInputName]['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath = $_FILES[$fileInputName]['tmp_name'];
@@ -68,11 +68,7 @@ function handleFileUpload($fileInputName, $allowedExtensions, $existingFilePath 
     return ['success' => true, 'path' => $existingFilePath];
 }
 
-/**
- * Invia email di notifica per un nuovo evento.
- * @param int $eventId L'ID del nuovo evento.
- * @param mysqli $conn L'oggetto di connessione al database.
- */
+
 function inviaNotificheNuovoEvento($eventId, $conn) {
     $stmtEvento = $conn->prepare("SELECT Titolo, Data, Durata, Descrizione, FotoCopertina, Relatore, PrefissoRelatore FROM eventi WHERE IDEvento = ?");
     if (!$stmtEvento) { error_log("Errore prepare SELECT evento per email: " . $conn->error); return; }
@@ -123,13 +119,8 @@ function inviaNotificheNuovoEvento($eventId, $conn) {
     }
 }
 
-/**
- * NUOVA FUNZIONE: Invia email di notifica per un evento annullato.
- * @param int $eventId L'ID dell'evento annullato.
- * @param mysqli $conn L'oggetto di connessione al database.
- */
+
 function inviaNotificheAnnullamentoEvento($eventId, $conn) {
-    // 1. Recupera i dettagli dell'evento
     $stmtEvento = $conn->prepare("SELECT Titolo, Data FROM eventi WHERE IDEvento = ?");
     if (!$stmtEvento) { error_log("Errore prepare SELECT evento per email annullamento: " . $conn->error); return; }
     $stmtEvento->bind_param("i", $eventId);
@@ -140,7 +131,6 @@ function inviaNotificheAnnullamentoEvento($eventId, $conn) {
 
     if (!$evento) { error_log("Impossibile trovare dettagli per evento da annullare ID: " . $eventId); return; }
 
-    // 2. Recupera tutti gli utenti PRENOTATI a questo specifico evento
     $stmtUtenti = $conn->prepare("
         SELECT u.Nome, u.Contatto 
         FROM utentiregistrati u
@@ -154,9 +144,8 @@ function inviaNotificheAnnullamentoEvento($eventId, $conn) {
     $utentiPrenotati = $resultUtenti->fetch_all(MYSQLI_ASSOC);
     $stmtUtenti->close();
 
-    if (empty($utentiPrenotati)) { return; } // Nessun prenotato, nessun avviso da inviare.
+    if (empty($utentiPrenotati)) { return; }
 
-    // 3. Prepara i dati per l'email
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
     $domainName = $_SERVER['HTTP_HOST'];
     $baseUrl = $protocol . $domainName;
@@ -174,7 +163,6 @@ function inviaNotificheAnnullamentoEvento($eventId, $conn) {
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
 
-    // 4. Invia email a ogni utente prenotato
     foreach ($utentiPrenotati as $utente) {
         $datiEmail['nome_utente'] = $utente['Nome'];
         $corpoEmail = preparaCorpoEmail('template_email_annullamento_evento.html', $datiEmail);
@@ -184,12 +172,60 @@ function inviaNotificheAnnullamentoEvento($eventId, $conn) {
     }
 }
 
-/**
- * NUOVA FUNZIONE HELPER: Costruisce il corpo HTML dell'email partendo da un template.
- * @param string $templateFileName Il nome del file del template.
- * @param array $dati I dati da inserire nel template.
- * @return string|false Il corpo dell'email in HTML o false in caso di errore.
- */
+// --- NUOVA FUNZIONE PER NOTIFICHE DI RINVIO ---
+function inviaNotificheRimandatoEvento($eventId, $vecchiaData, $nuovaData, $conn) {
+    $stmtEvento = $conn->prepare("SELECT Titolo FROM eventi WHERE IDEvento = ?");
+    if (!$stmtEvento) { error_log("Errore prepare SELECT evento per email rinvio: " . $conn->error); return; }
+    $stmtEvento->bind_param("i", $eventId);
+    $stmtEvento->execute();
+    $resultEvento = $stmtEvento->get_result();
+    $evento = $resultEvento->fetch_assoc();
+    $stmtEvento->close();
+
+    if (!$evento) { error_log("Impossibile trovare dettagli per evento da rimandare ID: " . $eventId); return; }
+
+    $stmtUtenti = $conn->prepare("
+        SELECT u.Nome, u.Contatto 
+        FROM utentiregistrati u
+        JOIN prenotazioni p ON u.Contatto = p.Contatto
+        WHERE p.IDEvento = ?
+    ");
+    if (!$stmtUtenti) { error_log("Errore prepare SELECT utenti prenotati per rinvio: " . $conn->error); return; }
+    $stmtUtenti->bind_param("i", $eventId);
+    $stmtUtenti->execute();
+    $resultUtenti = $stmtUtenti->get_result();
+    $utentiPrenotati = $resultUtenti->fetch_all(MYSQLI_ASSOC);
+    $stmtUtenti->close();
+
+    if (empty($utentiPrenotati)) { return; }
+
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+    $domainName = $_SERVER['HTTP_HOST'];
+    $baseUrl = $protocol . $domainName;
+
+    $datiEmail = [
+        'titolo_evento' => $evento['Titolo'],
+        'vecchia_data_evento' => date("d F Y", strtotime($vecchiaData)),
+        'nuova_data_evento' => date("d F Y", strtotime($nuovaData)),
+        'link_calendario' => $baseUrl . '/eventiincorso.html',
+    ];
+
+    $oggetto = "Variazione Data Evento: " . $evento['Titolo'];
+    $headers = "From: Eremo Frate Francesco <noreply@" . $domainName . ">\r\n";
+    $headers .= "Reply-To: noreply@" . $domainName . "\r\n";
+    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+
+    foreach ($utentiPrenotati as $utente) {
+        $datiEmail['nome_utente'] = $utente['Nome'];
+        $corpoEmail = preparaCorpoEmail('template_email_rimandato_evento.html', $datiEmail);
+        if ($corpoEmail) {
+            mail($utente['Contatto'], $oggetto, $corpoEmail, $headers);
+        }
+    }
+}
+
+
 function preparaCorpoEmail($templateFileName, $dati) {
     $templatePath = __DIR__ . '/' . $templateFileName;
     if (!file_exists($templatePath)) {
@@ -335,14 +371,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($eventId) || !ctype_digit((string)$eventId)) {
             die(json_encode(['success' => false, 'message' => 'ID evento non valido.']));
         }
-
-        // ========== INIZIO LOGICA DI ANNULLAMENTO EVENTO (SOSTITUISCE LA DELETE) ==========
         
-        // 1. (Opzionale, ma consigliato) Invia le notifiche di annullamento PRIMA di modificare lo stato.
-        // Assicurati che la funzione inviaNotificheAnnullamentoEvento sia presente nel file.
         inviaNotificheAnnullamentoEvento($eventId, $conn);
 
-        // 2. Aggiorna lo stato dell'evento a 'cancellato' e lo rende non prenotabile.
         $stmt_update_status = $conn->prepare("UPDATE eventi SET Stato = 'cancellato', FlagPrenotabile = 0 WHERE IDEvento = ?");
         if ($stmt_update_status) {
             $stmt_update_status->bind_param("i", $eventId);
@@ -361,7 +392,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             error_log("Errore nella preparazione dello statement per annullare l'evento: " . $conn->error);
             echo json_encode(['success' => false, 'message' => 'Errore server (DB Update Status).']);
         }
-        // ========== FINE LOGICA DI ANNULLAMENTO EVENTO ==========
+        
+    // --- NUOVA AZIONE PER RIMANDARE UN EVENTO ---
+    } elseif ($action === 'postpone_event') {
+        $eventId = $_POST['event_id'] ?? null;
+        $nuovaData = $_POST['new_date'] ?? null;
+
+        if (empty($eventId) || !ctype_digit((string)$eventId)) {
+            die(json_encode(['success' => false, 'message' => 'ID evento non valido.']));
+        }
+        if (empty($nuovaData)) {
+            die(json_encode(['success' => false, 'message' => 'La nuova data è obbligatoria.']));
+        }
+        // Validazione della data
+        $d = DateTime::createFromFormat('Y-m-d', $nuovaData);
+        if (!$d || $d->format('Y-m-d') !== $nuovaData) {
+             die(json_encode(['success' => false, 'message' => 'Formato data non valido. Usare YYYY-MM-DD.']));
+        }
+
+        // 1. Recupera la vecchia data per la notifica email
+        $stmt_old_date = $conn->prepare("SELECT Data FROM eventi WHERE IDEvento = ?");
+        $vecchiaData = null;
+        if ($stmt_old_date) {
+            $stmt_old_date->bind_param("i", $eventId);
+            $stmt_old_date->execute();
+            $stmt_old_date->bind_result($vecchiaData);
+            $stmt_old_date->fetch();
+            $stmt_old_date->close();
+        }
+        if (!$vecchiaData) {
+            die(json_encode(['success' => false, 'message' => 'Evento non trovato.']));
+        }
+
+        // 2. Invia le notifiche di rinvio PRIMA di aggiornare il DB
+        inviaNotificheRimandatoEvento($eventId, $vecchiaData, $nuovaData, $conn);
+
+        // 3. Aggiorna l'evento nel database
+        $stmt_update = $conn->prepare("UPDATE eventi SET Data = ?, Stato = 'rimandato', FlagPrenotabile = 1 WHERE IDEvento = ?");
+        if ($stmt_update) {
+            $stmt_update->bind_param("si", $nuovaData, $eventId);
+            if ($stmt_update->execute()) {
+                if ($stmt_update->affected_rows > 0) {
+                    echo json_encode(['success' => true, 'message' => 'Evento rimandato con successo e notifiche inviate.']);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Nessuna modifica apportata. La data potrebbe essere la stessa.']);
+                }
+            } else {
+                error_log("Errore DB durante rinvio evento: " . $stmt_update->error);
+                echo json_encode(['success' => false, 'message' => 'Errore durante l\'aggiornamento dell\'evento nel DB.']);
+            }
+            $stmt_update->close();
+        } else {
+            error_log("Errore prepare statement rinvio evento: " . $conn->error);
+            echo json_encode(['success' => false, 'message' => 'Errore server (DB Update Rinvio).']);
+        }
 
     } else {
         echo json_encode(['success' => false, 'message' => 'Azione non valida o non specificata.']);
@@ -371,5 +455,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 $conn->close();
 ?>
-
-
