@@ -7,30 +7,22 @@ if (session_status() == PHP_SESSION_NONE) {
 // Configurazione del database
 $config = [
     'host' => 'localhost',
-    'db'   => 'my_eremofratefrancesco', // Assicurati che sia il nome corretto del DB
-    'user' => 'eremofratefrancesco',    // Il tuo username DB
-    'pass' => ''                       // !!! INSERISCI QUI LA TUA PASSWORD DEL DATABASE !!!
+    'db'   => 'my_eremofratefrancesco',
+    'user' => 'eremofratefrancesco',
+    'pass' => '' // !!! INSERISCI QUI LA TUA PASSWORD DEL DATABASE !!!
 ];
 
-$conn = null;
+// Connessione al database con MySQLi
+$conn = new mysqli($config['host'], $config['user'], $config['pass'], $config['db']);
 
-try {
-    $conn = new PDO(
-        "mysql:host={$config['host']};dbname={$config['db']};charset=utf8mb4",
-        $config['user'],
-        $config['pass'],
-        [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-        ]
-    );
-} catch (PDOException $e) {
+if ($conn->connect_error) {
     http_response_code(500);
-    error_log("Errore di connessione al database (prenota_evento.php): " . $e->getMessage());
+    error_log("Errore di connessione al database (prenota_evento.php): " . $conn->connect_error);
     echo json_encode(['success' => false, 'message' => 'Errore di connessione al database. Riprova più tardi.']);
     exit;
 }
+$conn->set_charset("utf8mb4");
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -41,21 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Recupero e validazione dati
 $eventId = filter_input(INPUT_POST, 'eventId', FILTER_VALIDATE_INT);
 $numeroPostiRichiesti = filter_input(INPUT_POST, 'numeroPosti', FILTER_VALIDATE_INT);
-$contattoUtente = filter_input(INPUT_POST, 'contatto', FILTER_VALIDATE_EMAIL); // Email dell'utente che prenota
+$contattoUtente = filter_input(INPUT_POST, 'contatto', FILTER_VALIDATE_EMAIL);
 
 $nomiPartecipanti = isset($_POST['partecipanti_nomi']) && is_array($_POST['partecipanti_nomi']) ? $_POST['partecipanti_nomi'] : [];
 $cognomiPartecipanti = isset($_POST['partecipanti_cognomi']) && is_array($_POST['partecipanti_cognomi']) ? $_POST['partecipanti_cognomi'] : [];
 
 $errorMessages = [];
-if (!$eventId) {
-    $errorMessages[] = 'ID Evento non valido.';
-}
-if (!$numeroPostiRichiesti || $numeroPostiRichiesti < 1 || $numeroPostiRichiesti > 5) { // Limite posti per singola prenotazione
-    $errorMessages[] = 'Il numero di posti richiesti deve essere tra 1 e 5.';
-}
-if (!$contattoUtente) {
-    $errorMessages[] = 'Email del contatto non valida.';
-}
+if (!$eventId) $errorMessages[] = 'ID Evento non valido.';
+if (!$numeroPostiRichiesti || $numeroPostiRichiesti < 1 || $numeroPostiRichiesti > 5) $errorMessages[] = 'Il numero di posti richiesti deve essere tra 1 e 5.';
+if (!$contattoUtente) $errorMessages[] = 'Email del contatto non valida.';
 if (count($nomiPartecipanti) !== $numeroPostiRichiesti || count($cognomiPartecipanti) !== $numeroPostiRichiesti) {
     $errorMessages[] = 'Il numero di partecipanti non corrisponde ai nomi/cognomi forniti.';
 } else {
@@ -74,110 +60,165 @@ if (!empty($errorMessages)) {
 }
 
 try {
-    $conn->beginTransaction();
+    $conn->begin_transaction();
 
-    // 1. Controlla se l'utente ha già prenotato il massimo dei posti consentiti per questo evento
-    $stmtCheckUserBookings = $conn->prepare("SELECT SUM(NumeroPosti) AS total_booked_by_user FROM prenotazioni WHERE Contatto = :contatto AND IDEvento = :eventId");
-    $stmtCheckUserBookings->bindParam(':contatto', $contattoUtente, PDO::PARAM_STR);
-    $stmtCheckUserBookings->bindParam(':eventId', $eventId, PDO::PARAM_INT);
-    $stmtCheckUserBookings->execute();
-    $userBookingData = $stmtCheckUserBookings->fetch();
-    $postiGiaPrenotatiUtente = $userBookingData ? (int)$userBookingData['total_booked_by_user'] : 0;
+    // 1. Controlla prenotazioni utente
+    $stmtCheckUser = $conn->prepare("SELECT SUM(NumeroPosti) FROM prenotazioni WHERE Contatto = ? AND IDEvento = ?");
+    $stmtCheckUser->bind_param('si', $contattoUtente, $eventId);
+    $stmtCheckUser->execute();
+    $resultUser = $stmtCheckUser->get_result();
+    $postiGiaPrenotatiUtente = (int)($resultUser->fetch_row()[0] ?? 0);
+    $stmtCheckUser->close();
 
-    if (($postiGiaPrenotatiUtente + $numeroPostiRichiesti) > 5) { // Limite totale per utente per evento
+    if (($postiGiaPrenotatiUtente + $numeroPostiRichiesti) > 5) {
         $postiAncoraPrenotabili = 5 - $postiGiaPrenotatiUtente;
-        $messaggioErrore = "Limite massimo di 5 posti per utente per questo evento superato. ";
-        if ($postiAncoraPrenotabili > 0) {
-            $messaggioErrore .= "Hai già prenotato {$postiGiaPrenotatiUtente} posti. Puoi prenotarne al massimo altri {$postiAncoraPrenotabili}.";
-        } else {
-            $messaggioErrore .= "Hai già raggiunto il limite di {$postiGiaPrenotatiUtente} posti.";
-        }
-        throw new Exception($messaggioErrore);
+        $msg = "Limite di 5 posti per utente superato. " . ($postiAncoraPrenotabili > 0 ? "Puoi prenotarne altri {$postiAncoraPrenotabili}." : "Hai raggiunto il limite.");
+        throw new Exception($msg);
     }
 
-    // 2. Controlla posti disponibili e FlagPrenotabile per l'evento (con lock per concorrenza)
-    $stmtEvento = $conn->prepare("SELECT Titolo, PostiDisponibili, FlagPrenotabile FROM eventi WHERE IDEvento = :idevento FOR UPDATE");
-    $stmtEvento->bindParam(':idevento', $eventId, PDO::PARAM_INT);
+    // 2. Controlla evento (CON LOCK)
+    $stmtEvento = $conn->prepare("SELECT Titolo, PostiDisponibili, FlagPrenotabile, Data, Durata, Costo, FotoCopertina FROM eventi WHERE IDEvento = ? FOR UPDATE");
+    $stmtEvento->bind_param('i', $eventId);
     $stmtEvento->execute();
-    $evento = $stmtEvento->fetch();
+    $evento = $stmtEvento->get_result()->fetch_assoc();
+    $stmtEvento->close();
 
-    if (!$evento) {
-        throw new Exception("Evento non trovato (ID: " . htmlspecialchars($eventId) . ").");
-    }
+    if (!$evento) throw new Exception("Evento non trovato.");
+    if (!$evento['FlagPrenotabile']) throw new Exception("L'evento '" . htmlspecialchars($evento['Titolo']) . "' non è prenotabile.");
+    if ((int)$evento['PostiDisponibili'] < $numeroPostiRichiesti) throw new Exception("Posti non sufficienti. Rimasti: " . $evento['PostiDisponibili']);
 
-    if (!$evento['FlagPrenotabile']) {
-        throw new Exception("L'evento '" . htmlspecialchars($evento['Titolo']) . "' non è attualmente prenotabile.");
-    }
-
-    if ((int)$evento['PostiDisponibili'] < $numeroPostiRichiesti) {
-        throw new Exception("Spiacenti, non ci sono abbastanza posti disponibili per '" . htmlspecialchars($evento['Titolo']) . "'. Posti rimasti: " . htmlspecialchars($evento['PostiDisponibili']) . ". Richiesti: " . $numeroPostiRichiesti);
-    }
-
-    // 3. Inserisci nella tabella prenotazioni
-    $sqlPrenotazione = "INSERT INTO prenotazioni (NumeroPosti, Contatto, IDEvento) VALUES (:numPosti, :contatto, :idEvento)";
-    $stmtPrenotazione = $conn->prepare($sqlPrenotazione);
-    $stmtPrenotazione->bindParam(':numPosti', $numeroPostiRichiesti, PDO::PARAM_INT);
-    $stmtPrenotazione->bindParam(':contatto', $contattoUtente, PDO::PARAM_STR);
-    $stmtPrenotazione->bindParam(':idEvento', $eventId, PDO::PARAM_INT);
+    // 3. Inserisci prenotazione
+    $stmtPrenotazione = $conn->prepare("INSERT INTO prenotazioni (NumeroPosti, Contatto, IDEvento) VALUES (?, ?, ?)");
+    $stmtPrenotazione->bind_param('isi', $numeroPostiRichiesti, $contattoUtente, $eventId);
     $stmtPrenotazione->execute();
+    $idPrenotazione = $conn->insert_id;
+    $stmtPrenotazione->close();
 
-    $idPrenotazione = $conn->lastInsertId(); // Ottieni l'ID della prenotazione appena inserita
-
-    // 4. Inserisci i partecipanti nella tabella Partecipanti
-    $sqlPartecipante = "INSERT INTO Partecipanti (Nome, Cognome, Progressivo) VALUES (:nome, :cognome, :idPrenotazione)";
-    $stmtPartecipante = $conn->prepare($sqlPartecipante);
-
+    // 4. Inserisci partecipanti
+    $stmtPartecipante = $conn->prepare("INSERT INTO Partecipanti (Nome, Cognome, Progressivo) VALUES (?, ?, ?)");
     for ($i = 0; $i < $numeroPostiRichiesti; $i++) {
-        $nomeSanificato = htmlspecialchars(trim($nomiPartecipanti[$i]), ENT_QUOTES, 'UTF-8');
-        $cognomeSanificato = htmlspecialchars(trim($cognomiPartecipanti[$i]), ENT_QUOTES, 'UTF-8');
-
-        $stmtPartecipante->bindParam(':nome', $nomeSanificato, PDO::PARAM_STR);
-        $stmtPartecipante->bindParam(':cognome', $cognomeSanificato, PDO::PARAM_STR);
-        $stmtPartecipante->bindParam(':idPrenotazione', $idPrenotazione, PDO::PARAM_INT);
+        $nomeSan = trim($nomiPartecipanti[$i]);
+        $cognomeSan = trim($cognomiPartecipanti[$i]);
+        $stmtPartecipante->bind_param('ssi', $nomeSan, $cognomeSan, $idPrenotazione);
         $stmtPartecipante->execute();
     }
+    $stmtPartecipante->close();
 
-    // 5. Aggiorna i posti disponibili nella tabella eventi
-    $nuoviPostiDisponibili = (int)$evento['PostiDisponibili'] - $numeroPostiRichiesti;
-    $sqlAggiornaEvento = "UPDATE eventi SET PostiDisponibili = :nuoviPosti WHERE IDEvento = :idEvento";
-    $stmtAggiornaEvento = $conn->prepare($sqlAggiornaEvento);
-    $stmtAggiornaEvento->bindParam(':nuoviPosti', $nuoviPostiDisponibili, PDO::PARAM_INT);
-    $stmtAggiornaEvento->bindParam(':idEvento', $eventId, PDO::PARAM_INT);
-    $stmtAggiornaEvento->execute();
+    // 5. Aggiorna posti evento
+    $nuoviPosti = (int)$evento['PostiDisponibili'] - $numeroPostiRichiesti;
+    $stmtAggiorna = $conn->prepare("UPDATE eventi SET PostiDisponibili = ? WHERE IDEvento = ?");
+    $stmtAggiorna->bind_param('ii', $nuoviPosti, $eventId);
+    $stmtAggiorna->execute();
+    $stmtAggiorna->close();
 
-    // Fine transazione principale
     $conn->commit();
 
-    // 6. AGGIUNTA: Rimuovi l'utente dalla coda di attesa per questo evento, se presente
-    // Questo blocco viene eseguito DOPO che la prenotazione è stata confermata.
+    // 6. Rimuovi da coda di attesa (se presente)
+    $stmtRimuoviCoda = $conn->prepare("DELETE FROM utentiincoda WHERE Contatto = ? AND IDEvento = ?");
+    $stmtRimuoviCoda->bind_param('si', $contattoUtente, $eventId);
+    $stmtRimuoviCoda->execute();
+    $stmtRimuoviCoda->close();
+
+    // === BLOCCO INVIO EMAIL (dopo il commit) ===
     try {
-        $stmtRimuoviCoda = $conn->prepare("DELETE FROM utentiincoda WHERE Contatto = :contatto AND IDEvento = :idEvento");
-        $stmtRimuoviCoda->bindParam(':contatto', $contattoUtente, PDO::PARAM_STR);
-        $stmtRimuoviCoda->bindParam(':idEvento', $eventId, PDO::PARAM_INT);
-        $stmtRimuoviCoda->execute();
-        if ($stmtRimuoviCoda->rowCount() > 0) {
-            error_log("Utente {$contattoUtente} rimosso con successo dalla coda per evento {$eventId} dopo aver effettuato la prenotazione.");
-        }
-    } catch (PDOException $eCoda) {
-        // Logga l'errore ma non far fallire la risposta di successo della prenotazione principale per questo.
-        // L'utente ha comunque prenotato.
-        error_log("ATTENZIONE: Errore durante la rimozione automatica dalla coda per utente {$contattoUtente}, evento {$eventId}: " . $eCoda->getMessage());
+        $datiEmail = [
+            'info_utente' => ['email' => $contattoUtente],
+            'info_evento' => $evento,
+            'info_prenotazione' => [
+                'id' => $idPrenotazione, 'posti' => $numeroPostiRichiesti,
+                'nomi_partecipanti' => $nomiPartecipanti, 'cognomi_partecipanti' => $cognomiPartecipanti
+            ]
+        ];
+        sendBookingConfirmationEmail($datiEmail, $conn);
+    } catch (Exception $eMail) {
+        error_log("ERRORE INVIO EMAIL conferma per prenotazione #{$idPrenotazione}: " . $eMail->getMessage());
     }
+    // === FINE BLOCCO EMAIL ===
 
     echo json_encode([
         'success' => true,
-        'message' => "Prenotazione per l'evento '" . htmlspecialchars($evento['Titolo']) . "' effettuata con successo per {$numeroPostiRichiesti} partecipante/i!",
+        'message' => "Prenotazione per '" . htmlspecialchars($evento['Titolo']) . "' effettuata con successo!",
         'idPrenotazione' => $idPrenotazione
     ]);
 
 } catch (Exception $e) {
-    if ($conn && $conn->inTransaction()) {
-        $conn->rollBack();
-    }
-    error_log("Errore durante la prenotazione (prenota_evento.php): " . $e->getMessage() . " (Evento ID: " . htmlspecialchars($eventId ?? 'N/D') . ", Utente: " . htmlspecialchars($contattoUtente ?? 'N/D') . ")");
-    http_response_code(400); // Errore client o di logica di business
+    $conn->rollback();
+    error_log("Errore prenotazione (prenota_evento.php): " . $e->getMessage());
+    http_response_code(400);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 } finally {
-    $conn = null;
+    $conn->close();
+}
+
+/**
+ * Prepara e invia l'email di conferma prenotazione.
+ *
+ * @param array $data Dati per l'email.
+ * @param mysqli $db Connessione al DB per recuperare dettagli utente.
+ */
+function sendBookingConfirmationEmail(array $data, mysqli $db) {
+    // Recupera nome e cognome dell'utente
+    $stmtUtente = $db->prepare("SELECT Nome, Cognome FROM utentiregistrati WHERE Contatto = ?");
+    $stmtUtente->bind_param('s', $data['info_utente']['email']);
+    $stmtUtente->execute();
+    $utente = $stmtUtente->get_result()->fetch_assoc();
+    $stmtUtente->close();
+    $nomeCompleto = $utente ? trim($utente['Nome'] . ' ' . $utente['Cognome']) : explode('@', $data['info_utente']['email'])[0];
+
+    // Carica il template HTML
+    $templatePath = __DIR__ . '/template_email_conferma_prenotazione.html';
+    if (!file_exists($templatePath)) {
+        error_log("Template email non trovato in: " . $templatePath);
+        return;
+    }
+    $body = file_get_contents($templatePath);
+
+    // Formattazione dati per il template
+    setlocale(LC_TIME, 'it_IT.UTF-8');
+    $dataFormattata = strftime('%A %d %B %Y', strtotime($data['info_evento']['Data']));
+    $costoFormattato = floatval($data['info_evento']['Costo']) > 0 ? '€ ' . number_format($data['info_evento']['Costo'], 2, ',', '.') : 'Offerta libera';
+    
+    $listaPartecipantiHtml = '<ul>';
+    for($i = 0; $i < count($data['info_prenotazione']['nomi_partecipanti']); $i++){
+        $nome = htmlspecialchars(trim($data['info_prenotazione']['nomi_partecipanti'][$i]));
+        $cognome = htmlspecialchars(trim($data['info_prenotazione']['cognomi_partecipanti'][$i]));
+        $listaPartecipantiHtml .= "<li>{$nome} {$cognome}</li>";
+    }
+    $listaPartecipantiHtml .= '</ul>';
+
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+    $host = $_SERVER['HTTP_HOST'];
+    $baseUrl = $protocol . $host;
+    
+    // Sostituzione dei placeholder
+    $replacements = [
+        '{{NOME_UTENTE}}' => htmlspecialchars($nomeCompleto),
+        '{{TITOLO_EVENTO}}' => htmlspecialchars($data['info_evento']['Titolo']),
+        '{{IMMAGINE_URL}}' => $data['info_evento']['FotoCopertina'] ? $baseUrl . '/' . ltrim($data['info_evento']['FotoCopertina'], '/') : $baseUrl . '/images/default-event.jpg',
+        '{{DATA_EVENTO}}' => ucfirst($dataFormattata),
+        '{{ORARIO_EVENTO}}' => htmlspecialchars($data['info_evento']['Durata'] ?: 'Non specificato'),
+        '{{ID_PRENOTAZIONE}}' => $data['info_prenotazione']['id'],
+        '{{NUMERO_POSTI}}' => $data['info_prenotazione']['posti'],
+        '{{COSTO_EVENTO}}' => $costoFormattato,
+        '{{BASE_URL}}' => $baseUrl,
+        '{{LINK_PAGINA_EVENTI}}' => $baseUrl . '/eventiincorso.html'
+    ];
+
+    foreach ($replacements as $placeholder => $value) {
+        $body = str_replace($placeholder, $value, $body);
+    }
+    // Sostituisci la lista dei partecipanti (che è già HTML sicuro)
+    $body = str_replace('{{LISTA_PARTECIPANTI}}', $listaPartecipantiHtml, $body);
+
+    // Invio con la funzione mail() di PHP
+    $oggetto = 'Conferma della tua prenotazione per: ' . $data['info_evento']['Titolo'];
+    $domainName = $_SERVER['HTTP_HOST'] ?? 'eremofratefrancesco.it';
+    $headers = "From: Eremo Frate Francesco <noreply@" . $domainName . ">\r\n";
+    $headers .= "Reply-To: info@" . $domainName . "\r\n";
+    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+
+    mail($data['info_utente']['email'], $oggetto, $body, $headers);
 }
 ?>
+
